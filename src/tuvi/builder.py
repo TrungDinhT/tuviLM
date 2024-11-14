@@ -14,19 +14,14 @@ class Builder:
 
     # TODO : Fix here to not re-create tinh ban
     def build(self, birthTime: BirthTime) -> TinhBan:
-        self.tinhBan = self.build_role(self.tinhBan, birthTime)
+        self._build_role(birthTime)
+        self._build_cuc(birthTime)
+        self._build_chinh_tinh(birthTime)
+        self._build_khongkiep_xuongkhuc(birthTime)
+        self._build_loc_ton(birthTime)
+        self._build_thai_tue(birthTime)
 
-        tinhBan = self.build_cuc(self.tinhBan, birthTime)
-
-        tinhBan = self.build_chinh_tinh(self.tinhBan, birthTime)
-
-        tinhBan = self.build_khongkiep_xuongkhuc(self.tinhBan, birthTime)
-
-        tinhBan = self.build_loc_ton(self.tinhBan, birthTime)
-
-        tinhBan = self.build_thai_tue(self.tinhBan, birthTime)
-
-        return tinhBan
+        return self.tinhBan
 
     def _get_menh_position(self, birthTime : BirthTime) -> int:
 
@@ -70,17 +65,15 @@ class Builder:
 
         return LIST_DIA_CHI[(2 + div -1 - borrow_number) % 12]
 
-    def build_role(self, tinhBan : TinhBan, birthTime : BirthTime) -> TinhBan:
+    def _build_role(self, birthTime : BirthTime):
         menh_position = self._get_menh_position(birthTime)
 
         for idx, role in enumerate(LIST_ROLES):
-            tinhBan.map_cung[LIST_DIA_CHI[(menh_position + idx) % 12]].role = role
+            self.tinhBan.map_cung[LIST_DIA_CHI[(menh_position + idx) % 12]].role = role
 
-        return tinhBan
+    def _build_cuc(self, birthTime : BirthTime):
 
-    def build_cuc(self, tinhBan : TinhBan, birthTime : BirthTime):
-
-        menh_position = tinhBan.menh_position
+        menh_position = self.tinhBan.menh_position
 
         thien_can = birthTime.thien_can
 
@@ -94,15 +87,13 @@ class Builder:
             cuc_index = self._match_cuc_index_by_menh_position([1,2,4,0,3], menh_position)
         if thien_can in ["Mau", "Quy"]:
             cuc_index = self._match_cuc_index_by_menh_position([2,0,3,4,1], menh_position)
-        tinhBan.cuc = LIST_CUC[cuc_index]
-
-        return tinhBan
+        self.tinhBan.cuc = LIST_CUC[cuc_index]
 
 
-    def build_chinh_tinh(self, tinhBan : TinhBan, birthTime : BirthTime) -> TinhBan:
+    def _build_chinh_tinh(self, birthTime : BirthTime):
 
         # An tử vi
-        tuvi_position = self._get_tuvi_position(tinhBan, birthTime)
+        tuvi_position = self._get_tuvi_position(self.tinhBan, birthTime)
         tuvi_index = LIST_DIA_CHI.index(tuvi_position)
 
         # An thiên phủ
@@ -135,25 +126,23 @@ class Builder:
         thientuong_position = get_xung_chieu(phaquan_position)
 
         # Sắp xếp sao
-        tinhBan.map_cung[tuvi_position].chinhTinh.append(ChinhTinh(name="Tử  vi", elemental="Tho"))
-        tinhBan.map_cung[thienphu_position].chinhTinh.append(ChinhTinh(name="Thiên phủ", elemental="Tho"))
-        tinhBan.map_cung[thaiduong_position].chinhTinh.append(ChinhTinh(name="Thái Dương", elemental="Hoa"))
-        tinhBan.map_cung[vukhuc_position].chinhTinh.append(ChinhTinh(name="Vũ Khúc", elemental="Kim"))
-        tinhBan.map_cung[liemtrinh_position].chinhTinh.append(ChinhTinh(name="Liêm Trinh", elemental="Hoa"))
-        tinhBan.map_cung[thatsat_position].chinhTinh.append(ChinhTinh(name="Thất sát", elemental="Kim"))
-        tinhBan.map_cung[thamlang_position].chinhTinh.append(ChinhTinh(name="Tham Lang", elemental="Thuy"))
-        tinhBan.map_cung[phaquan_position].chinhTinh.append(ChinhTinh(name="Phá Quân", elemental="Thuy"))
-        tinhBan.map_cung[thiendong_position].chinhTinh.append(ChinhTinh(name="Thiên Đồng", elemental="Thuy"))
-        tinhBan.map_cung[thienco_position].chinhTinh.append(ChinhTinh(name="Thiên Cơ", elemental="Moc"))
-        tinhBan.map_cung[thaiam_position].chinhTinh.append(ChinhTinh(name="Thai Am", elemental="Thuy"))
-        tinhBan.map_cung[thienluong_position].chinhTinh.append(ChinhTinh(name="Thiên Lương", elemental="Moc"))
-        tinhBan.map_cung[cumon_position].chinhTinh.append(ChinhTinh(name="Cự Môn", elemental="Thuy"))
-        tinhBan.map_cung[thientuong_position].chinhTinh.append(ChinhTinh(name="Thiên Tướng", elemental="Thuy"))
-
-        return tinhBan
+        self.tinhBan.map_cung[tuvi_position].chinhTinh.append(ChinhTinh(name="Tử  vi", elemental="Tho"))
+        self.tinhBan.map_cung[thienphu_position].chinhTinh.append(ChinhTinh(name="Thiên phủ", elemental="Tho"))
+        self.tinhBan.map_cung[thaiduong_position].chinhTinh.append(ChinhTinh(name="Thái Dương", elemental="Hoa"))
+        self.tinhBan.map_cung[vukhuc_position].chinhTinh.append(ChinhTinh(name="Vũ Khúc", elemental="Kim"))
+        self.tinhBan.map_cung[liemtrinh_position].chinhTinh.append(ChinhTinh(name="Liêm Trinh", elemental="Hoa"))
+        self.tinhBan.map_cung[thatsat_position].chinhTinh.append(ChinhTinh(name="Thất sát", elemental="Kim"))
+        self.tinhBan.map_cung[thamlang_position].chinhTinh.append(ChinhTinh(name="Tham Lang", elemental="Thuy"))
+        self.tinhBan.map_cung[phaquan_position].chinhTinh.append(ChinhTinh(name="Phá Quân", elemental="Thuy"))
+        self.tinhBan.map_cung[thiendong_position].chinhTinh.append(ChinhTinh(name="Thiên Đồng", elemental="Thuy"))
+        self.tinhBan.map_cung[thienco_position].chinhTinh.append(ChinhTinh(name="Thiên Cơ", elemental="Moc"))
+        self.tinhBan.map_cung[thaiam_position].chinhTinh.append(ChinhTinh(name="Thai Am", elemental="Thuy"))
+        self.tinhBan.map_cung[thienluong_position].chinhTinh.append(ChinhTinh(name="Thiên Lương", elemental="Moc"))
+        self.tinhBan.map_cung[cumon_position].chinhTinh.append(ChinhTinh(name="Cự Môn", elemental="Thuy"))
+        self.tinhBan.map_cung[thientuong_position].chinhTinh.append(ChinhTinh(name="Thiên Tướng", elemental="Thuy"))
 
 
-    def build_khongkiep_xuongkhuc(self, tinhBan : TinhBan, birthTime : BirthTime) -> TinhBan:
+    def _build_khongkiep_xuongkhuc(self, birthTime : BirthTime):
 
         birthHourIndex = LIST_DIA_CHI.index(birthTime.hour)
 
@@ -171,36 +160,30 @@ class Builder:
         taphu_position = LIST_DIA_CHI[(4 + (birthTime.month -1)) % 12]
         huubat_position = LIST_DIA_CHI[(10 - (birthTime.month -1)) % 12]
 
-        tinhBan.map_cung[diakhong_position].phuTinh.append(PhuTinh(name="Địa Không", elemental="Hoa"))
-        tinhBan.map_cung[diaket_position].phuTinh.append(PhuTinh(name="Địa Kiếp", elemental="Hoa"))
-        tinhBan.map_cung[vanxuong_position].phuTinh.append(PhuTinh(name="Văn Xương", elemental="Kim"))
-        tinhBan.map_cung[vankhuc_position].phuTinh.append(PhuTinh(name="Văn Khúc", elemental="Thuy"))
-        tinhBan.map_cung[anquang_position].phuTinh.append(PhuTinh(name="Ân Quang", elemental="Moc"))
-        tinhBan.map_cung[thienquy_position].phuTinh.append(PhuTinh(name="Thiên Quý", elemental="Tho"))
-        tinhBan.map_cung[taphu_position].phuTinh.append(PhuTinh(name="Tả Phù", elemental="Tho"))
-        tinhBan.map_cung[huubat_position].phuTinh.append(PhuTinh(name="Hữu Bật", elemental="Thuy"))
+        self.tinhBan.map_cung[diakhong_position].phuTinh.append(PhuTinh(name="Địa Không", elemental="Hoa"))
+        self.tinhBan.map_cung[diaket_position].phuTinh.append(PhuTinh(name="Địa Kiếp", elemental="Hoa"))
+        self.tinhBan.map_cung[vanxuong_position].phuTinh.append(PhuTinh(name="Văn Xương", elemental="Kim"))
+        self.tinhBan.map_cung[vankhuc_position].phuTinh.append(PhuTinh(name="Văn Khúc", elemental="Thuy"))
+        self.tinhBan.map_cung[anquang_position].phuTinh.append(PhuTinh(name="Ân Quang", elemental="Moc"))
+        self.tinhBan.map_cung[thienquy_position].phuTinh.append(PhuTinh(name="Thiên Quý", elemental="Tho"))
+        self.tinhBan.map_cung[taphu_position].phuTinh.append(PhuTinh(name="Tả Phù", elemental="Tho"))
+        self.tinhBan.map_cung[huubat_position].phuTinh.append(PhuTinh(name="Hữu Bật", elemental="Thuy"))
 
-        return tinhBan
-
-    def build_loc_ton(self, tinhBan : TinhBan, birthTime : BirthTime) -> TinhBan:
+    def _build_loc_ton(self, birthTime : BirthTime):
 
         locton_position = MAP_LOC_TON_POSITION[birthTime.thien_can]
         locton_index = LIST_DIA_CHI.index(locton_position)
 
         for i in range(12):
-            tinhBan.map_cung[
+            self.tinhBan.map_cung[
                 LIST_DIA_CHI[(locton_index + i) % 12]
             ].phuTinh.extend(VONG_LOCTON[i])
 
-        return tinhBan
-
-    def build_thai_tue(self, tinhBan : TinhBan, birthTime : BirthTime) -> TinhBan:
+    def _build_thai_tue(self, birthTime : BirthTime):
 
         thaitue_index = LIST_DIA_CHI.index(birthTime.dia_chi)
 
         for i in range(12):
-            tinhBan.map_cung[
+            self.tinhBan.map_cung[
                 LIST_DIA_CHI[(thaitue_index + i) % 12]
             ].phuTinh.extend(VONG_THAI_TUE[i])
-
-        return tinhBan
