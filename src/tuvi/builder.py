@@ -1,12 +1,29 @@
-from src.tuvi.types import LIST_DIA_CHI, LIST_ROLES, TYPE_DIA_CHI
+from src.tuvi.types import LIST_DIA_CHI, LIST_ROLES, TYPE_DIA_CHI, TYPE_THIEN_CAN
 from src.tuvi.birth import BirthTime
-from src.tuvi.sao import ChinhTinh
+from src.tuvi.sao import ChinhTinh, PhuTinh
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.cuc import LIST_CUC
 
 
 class Builder:
+
+    def __init__(self) -> None:
+        self.tinhBan = TinhBan.init_empty_plate()
+
+    # TODO : Fix here to not re-create tinh ban
+    def build(self, birthTime: BirthTime) -> TinhBan:
+        self.tinhBan = self.build_role(self.tinhBan, birthTime)
+
+        tinhBan = self.build_cuc(self.tinhBan, birthTime)
+
+        tinhBan = self.build_chinh_tinh(self.tinhBan, birthTime)
+
+        tinhBan = self.build_khongkiep_xuongkhuc(self.tinhBan, birthTime)
+
+        tinhBan = self.build_loc_ton(self.tinhBan, birthTime)
+
+        return tinhBan
 
     def _get_menh_position(self, birthTime : BirthTime) -> int:
 
@@ -129,5 +146,74 @@ class Builder:
         tinhBan.map_cung[thienluong_position].chinhTinh.append(ChinhTinh(name="Thiên Lương", elemental="Moc"))
         tinhBan.map_cung[cumon_position].chinhTinh.append(ChinhTinh(name="Cự Môn", elemental="Thuy"))
         tinhBan.map_cung[thientuong_position].chinhTinh.append(ChinhTinh(name="Thiên Tướng", elemental="Thuy"))
+
+        return tinhBan
+
+
+    def build_khongkiep_xuongkhuc(self, tinhBan : TinhBan, birthTime : BirthTime) -> TinhBan:
+
+        birthHourIndex = LIST_DIA_CHI.index(birthTime.hour)
+
+        # khởi từ cung hợi
+        diakhong_position = LIST_DIA_CHI[(11 - birthHourIndex) % 12]
+        diaket_position = LIST_DIA_CHI[(11 + birthHourIndex) % 12]
+
+        # Khởi từ thìn tuất
+        vanxuong_position = LIST_DIA_CHI[(10 - birthHourIndex) % 12]
+        vankhuc_position = LIST_DIA_CHI[(4 + birthHourIndex) % 12]
+
+        anquang_position = LIST_DIA_CHI[(LIST_DIA_CHI.index(vanxuong_position) + (birthTime.date -1) -1) % 12]
+        thienquy_position = LIST_DIA_CHI[(LIST_DIA_CHI.index(vankhuc_position) - (birthTime.date -1) +1) % 12]
+
+        taphu_position = LIST_DIA_CHI[(4 + (birthTime.month -1)) % 12]
+        huubat_position = LIST_DIA_CHI[(10 - (birthTime.month -1)) % 12]
+
+        tinhBan.map_cung[diakhong_position].phuTinh.append(PhuTinh(name="Địa Không", elemental="Hoa"))
+        tinhBan.map_cung[diaket_position].phuTinh.append(PhuTinh(name="Địa Kiếp", elemental="Hoa"))
+        tinhBan.map_cung[vanxuong_position].phuTinh.append(PhuTinh(name="Văn Xương", elemental="Kim"))
+        tinhBan.map_cung[vankhuc_position].phuTinh.append(PhuTinh(name="Văn Khúc", elemental="Thuy"))
+        tinhBan.map_cung[anquang_position].phuTinh.append(PhuTinh(name="Ân Quang", elemental="Moc"))
+        tinhBan.map_cung[thienquy_position].phuTinh.append(PhuTinh(name="Thiên Quý", elemental="Tho"))
+        tinhBan.map_cung[taphu_position].phuTinh.append(PhuTinh(name="Tả Phù", elemental="Tho"))
+        tinhBan.map_cung[huubat_position].phuTinh.append(PhuTinh(name="Hữu Bật", elemental="Thuy"))
+
+        return tinhBan
+
+    def build_loc_ton(self, tinhBan : TinhBan, birthTime : BirthTime) -> TinhBan:
+
+        _MAP_LOC_TON_POSITION : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
+            "Giap" : "Dan",
+            "At" : "Mao",
+            "Binh" : "Ti",
+            "Dinh" : "Ngo",
+            "Mau" : "Ti",
+            "Ky" : "Ngo",
+            "Canh" : "Than",
+            "Tan" : "Dau",
+            "Nham" : "Hoi",
+            "Quy" : "Ty",
+        }
+
+        # TODO : verify lực sĩ luôn đi cùng kình dương , quan phủ có theo vòng lộc tồn?
+        VONG_LOCTON = [
+            [PhuTinh(name="Lộc Tồn", elemental="Tho"), PhuTinh(name="Bác Sĩ", elemental="Thuy")],
+            [PhuTinh(name="Kình Dương", elemental="Kim")],
+            [PhuTinh(name="Thanh Long", elemental="Thuy")],
+            [PhuTinh(name="Tieu Hao", elemental="Hoa")],
+            [PhuTinh(name="Tướng Quân", elemental="Moc")],
+            [PhuTinh(name="Tấu Thư", elemental="Kim")],
+            [PhuTinh(name="Phi Liêm", elemental="Hoa")],
+            [PhuTinh(name="Hỷ Thần", elemental="Hoa")],
+            [PhuTinh(name="Bệnh Phù", elemental="Tho")],
+            [PhuTinh(name="Đại Hao", elemental="Hoa")],
+            [PhuTinh(name="Phuc Binh", elemental="Hoa")],
+            [PhuTinh(name="Đà La", elemental="Kim")],
+        ]
+
+        locton_position = _MAP_LOC_TON_POSITION[birthTime.thien_can]
+        locton_index = LIST_DIA_CHI.index(locton_position)
+
+        for i in range(12):
+            tinhBan.map_cung[LIST_DIA_CHI[(locton_index + i) % 12]].phuTinh.extend(VONG_LOCTON[i])
 
         return tinhBan

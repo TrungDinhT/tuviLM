@@ -25,7 +25,7 @@ STAR_STATUS = Literal["Ham", "Binh", "Dac", "Vuong", "Mieu", None]
 MAP_COLOR : dict[NGU_HANH, str] = {
     "Kim" : "#808080",
     "Moc" : "#008000",
-    "Thuy" : "#A9A9A9",
+    "Thuy" : "#00008B",
     "Hoa" : "#FF0000",
     "Tho" : "#B8860B",
 }

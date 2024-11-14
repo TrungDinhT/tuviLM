@@ -1,6 +1,6 @@
 import pydantic
 
-from src.tuvi.types import NGU_HANH, STAR_STATUS
+from src.tuvi.types import NGU_HANH, STAR_STATUS, TYPE_DIA_CHI
 
 
 class Sao(pydantic.BaseModel):
@@ -11,11 +11,11 @@ class Sao(pydantic.BaseModel):
 
     elemental : NGU_HANH
 
-    def get_status(position : str) -> STAR_STATUS:
+    def get_status(position : TYPE_DIA_CHI) -> STAR_STATUS:
         return None
 
 
-class ChinhTinh(Sao):
+class   ChinhTinh(Sao):
 
     pass
 

@@ -71,13 +71,7 @@ birthTime = BirthTime(
 )
 builder = Builder()
 
-tinhBan = TinhBan.init_empty_plate()
-
-tinhBan = builder.build_role(tinhBan, birthTime)
-
-tinhBan = builder.build_cuc(tinhBan, birthTime)
-
-tinhBan = builder.build_chinh_tinh(tinhBan, birthTime)
+tinhBan = builder.build(birthTime)
 
 # Display the HTML table in Streamlit
 st.markdown(html_table_template.format(

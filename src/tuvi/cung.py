@@ -21,4 +21,7 @@ class Cung(pydantic.BaseModel):
         for chinhTinh in self.chinhTinh:
             markdown_content += f"<p style='color: {MAP_COLOR[chinhTinh.elemental]};font-size: 20px;'>{chinhTinh.name}</p>\n"
 
+        for phuTinh in self.phuTinh:
+            markdown_content += f"<p style='color: {MAP_COLOR[phuTinh.elemental]};font-size: 15;'>{phuTinh.name}</p>\n"
+
         return markdown_content
