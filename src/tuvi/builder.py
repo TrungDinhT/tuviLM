@@ -1,10 +1,10 @@
-from src.tuvi.types import LIST_DIA_CHI, LIST_ROLES, TYPE_DIA_CHI, TYPE_THIEN_CAN
+from src.tuvi.types import LIST_DIA_CHI, LIST_ROLES, TYPE_DIA_CHI
 from src.tuvi.birth import BirthTime
 from src.tuvi.sao import ChinhTinh, PhuTinh
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.cuc import LIST_CUC
-from tuvi.constant import MAP_LOC_TON_POSITION, VONG_LOCTON
+from src.tuvi.constant import MAP_LOC_TON_POSITION, VONG_LOCTON, VONG_THAI_TUE
 
 
 class Builder:
@@ -23,6 +23,8 @@ class Builder:
         tinhBan = self.build_khongkiep_xuongkhuc(self.tinhBan, birthTime)
 
         tinhBan = self.build_loc_ton(self.tinhBan, birthTime)
+
+        tinhBan = self.build_thai_tue(self.tinhBan, birthTime)
 
         return tinhBan
 
@@ -189,5 +191,16 @@ class Builder:
             tinhBan.map_cung[
                 LIST_DIA_CHI[(locton_index + i) % 12]
             ].phuTinh.extend(VONG_LOCTON[i])
+
+        return tinhBan
+
+    def build_thai_tue(self, tinhBan : TinhBan, birthTime : BirthTime) -> TinhBan:
+
+        thaitue_index = LIST_DIA_CHI.index(birthTime.dia_chi)
+
+        for i in range(12):
+            tinhBan.map_cung[
+                LIST_DIA_CHI[(thaitue_index + i) % 12]
+            ].phuTinh.extend(VONG_THAI_TUE[i])
 
         return tinhBan
