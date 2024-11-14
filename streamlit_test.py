@@ -93,5 +93,5 @@ st.markdown(html_table_template.format(
         cung_10=repr(tinhBan.map_cung["Suu"]),
         cung_11=repr(tinhBan.map_cung["Ty"]),
         cung_12=repr(tinhBan.map_cung["Hoi"]),
-        common_info=f"{tinhBan.cuc} cuc"
+        common_info=f"{tinhBan.cuc.name} cuc"
     ), unsafe_allow_html=True)

@@ -20,8 +20,6 @@ LIST_THIEN_CAN : TYPE_THIEN_CAN = ["Giap", "At", "Binh", "Dinh", "Mau", "Ky", "C
 LIST_ROLES = ["Menh", "Phu Mau", "Phuc Duc", "Dien Trach", "Quan Loc", "No Boc",
                "Thien Di", "Tat Ach", "Tai Bach", "Tu Tuc", "Phu The", "Huynh De"]
 
-LIST_CUC = ["Thuy Nhi", "Moc Tam", "Kim Tu", "Tho Ngu", "Hoa Luc"]
-
 STAR_STATUS = Literal["Ham", "Binh", "Dac", "Vuong", "Mieu", None]
 
 MAP_COLOR : dict[NGU_HANH, str] = {

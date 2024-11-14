@@ -3,12 +3,13 @@ import pydantic
 from src.tuvi.cung import Cung
 from src.tuvi.birth import BirthTime
 from src.tuvi.types import LIST_DIA_CHI, TYPE_DIA_CHI
+from src.tuvi.cuc import Cuc
 
 class TinhBan(pydantic.BaseModel):
 
     map_cung : dict[TYPE_DIA_CHI, Cung]
 
-    cuc : str | None = None
+    cuc : Cuc | None = None
 
     @classmethod
     def from_birthtime(cls, birthTime : BirthTime):

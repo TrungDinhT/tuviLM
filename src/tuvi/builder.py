@@ -1,9 +1,9 @@
-from src.tuvi.types import LIST_CUC, LIST_DIA_CHI, LIST_ROLES, TYPE_DIA_CHI
+from src.tuvi.types import LIST_DIA_CHI, LIST_ROLES, TYPE_DIA_CHI
 from src.tuvi.birth import BirthTime
 from src.tuvi.sao import ChinhTinh
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
-
+from src.tuvi.cuc import LIST_CUC
 
 
 class Builder:
@@ -32,10 +32,9 @@ class Builder:
             return cuc_index_order[4]
 
 
-
     def _get_tuvi_position(self, tinhBan : TinhBan, birthTime : BirthTime) -> TYPE_DIA_CHI:
 
-        cuc_number = LIST_CUC.index(tinhBan.cuc) + 2
+        cuc_number = tinhBan.cuc.number
 
         if (mod := birthTime.date % cuc_number) == 0:
             div = birthTime.date // cuc_number
