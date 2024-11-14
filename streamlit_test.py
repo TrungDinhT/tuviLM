@@ -1,8 +1,9 @@
 import streamlit as st
 
 from src.tuvi.birth import BirthTime
-from src.tuvi.tinh_ban import TinhBan, build_chinh_tinh, build_role, set_cuc
+from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.types import LIST_DIA_CHI, LIST_THIEN_CAN
+from src.tuvi.builder import Builder
 
 # Define the HTML and CSS for the table
 html_table_template = """
@@ -54,7 +55,7 @@ html_table_template = """
 st.sidebar.header("Ngày sinh theo lịch âm")
 
 date = st.sidebar.number_input("Ngày sinh:", min_value=1, max_value=31, value=8)
-month = st.sidebar.number_input("Tháng sinh:", min_value=1, max_value=13, value=3)
+month = st.sidebar.number_input("Tháng sinh:", min_value=1, max_value=12, value=3)
 hour = st.sidebar.selectbox("Giờ Sinh:", options=LIST_DIA_CHI, index=4)
 
 thien_can = st.sidebar.selectbox("Thiên can năm sinh:", options=LIST_THIEN_CAN, index=4)
@@ -68,16 +69,15 @@ birthTime = BirthTime(
     thien_can=thien_can,
     dia_chi=dia_chi
 )
-
+builder = Builder()
 
 tinhBan = TinhBan.init_empty_plate()
 
-tinhBan = build_role(tinhBan, birthTime)
+tinhBan = builder.build_role(tinhBan, birthTime)
 
-tinhBan = set_cuc(tinhBan, birthTime)
+tinhBan = builder.build_cuc(tinhBan, birthTime)
 
-tinhBan = build_chinh_tinh(tinhBan, birthTime)
-
+tinhBan = builder.build_chinh_tinh(tinhBan, birthTime)
 
 # Display the HTML table in Streamlit
 st.markdown(html_table_template.format(
