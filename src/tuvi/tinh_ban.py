@@ -56,6 +56,18 @@ def build_role(tinhBan : TinhBan, birthTime : BirthTime) -> TinhBan:
 
     return tinhBan
 
+def match_cuc_index_by_menh_position(cuc_index_order : list[int], menh_position : TYPE_DIA_CHI):
+    if menh_position in ["Ty", "Suu"]:
+        return cuc_index_order[0]
+    if menh_position in ["Dan", "Mao", "Tuat", "Hoi"]:
+        return cuc_index_order[1]
+    if menh_position in ["Thin", "Ti"]:
+        return cuc_index_order[2]
+    if menh_position in ["Ngo", "Mui"]:
+        return cuc_index_order[3]
+    if menh_position in ["Than", "Dau"]:
+        return cuc_index_order[4]
+
 def set_cuc(tinhBan : TinhBan, birthTime : BirthTime) -> int:
 
     menh_position = tinhBan.menh_position
@@ -63,61 +75,15 @@ def set_cuc(tinhBan : TinhBan, birthTime : BirthTime) -> int:
     thien_can = birthTime.thien_can
 
     if thien_can in ["Giap", "Ky"]:
-        if menh_position in ["Ty", "Suu"]:
-            cuc_index = 0
-        if menh_position in ["Dan", "Mao", "Tuat", "Hoi"]:
-            cuc_index = 4
-        if menh_position in ["Thin", "Ti"]:
-            cuc_index = 1
-        if menh_position in ["Ngo", "Mui"]:
-            cuc_index = 3
-        if menh_position in ["Than", "Dau"]:
-            cuc_index = 2
+        cuc_index = match_cuc_index_by_menh_position([0,4,1,3,2], menh_position)
     if thien_can in ["At", "Canh"]:
-        if menh_position in ["Ty", "Suu"]:
-            cuc_index = 4
-        if menh_position in ["Dan", "Mao", "Tuat", "Hoi"]:
-            cuc_index = 3
-        if menh_position in ["Thin", "Ti"]:
-            cuc_index = 2
-        if menh_position in ["Ngo", "Mui"]:
-            cuc_index = 1
-        if menh_position in ["Than", "Dau"]:
-            cuc_index = 0
+        cuc_index = match_cuc_index_by_menh_position([4,3,2,1,0], menh_position)
     if thien_can in ["Binh", "Tan"]:
-        if menh_position in ["Ty", "Suu"]:
-            cuc_index = 3
-        if menh_position in ["Dan", "Mao", "Tuat", "Hoi"]:
-            cuc_index = 1
-        if menh_position in ["Thin", "Ti"]:
-            cuc_index = 0
-        if menh_position in ["Ngo", "Mui"]:
-            cuc_index = 2
-        if menh_position in ["Than", "Dau"]:
-            cuc_index = 4
+        cuc_index = match_cuc_index_by_menh_position([3,1,0,2,4], menh_position)
     if thien_can in ["Dinh", "Nham"]:
-        if menh_position in ["Ty", "Suu"]:
-            cuc_index = 1
-        if menh_position in ["Dan", "Mao", "Tuat", "Hoi"]:
-            cuc_index = 2
-        if menh_position in ["Thin", "Ti"]:
-            cuc_index = 4
-        if menh_position in ["Ngo", "Mui"]:
-            cuc_index = 0
-        if menh_position in ["Than", "Dau"]:
-            cuc_index = 3
+        cuc_index = match_cuc_index_by_menh_position([1,2,4,0,3], menh_position)
     if thien_can in ["Mau", "Quy"]:
-        if menh_position in ["Ty", "Suu"]:
-            cuc_index = 2
-        if menh_position in ["Dan", "Mao", "Tuat", "Hoi"]:
-            cuc_index = 0
-        if menh_position in ["Thin", "Ti"]:
-            cuc_index = 3
-        if menh_position in ["Ngo", "Mui"]:
-            cuc_index = 4
-        if menh_position in ["Than", "Dau"]:
-            cuc_index = 1
-
+        cuc_index = match_cuc_index_by_menh_position([2,0,3,4,1], menh_position)
     tinhBan.cuc = LIST_CUC[cuc_index]
 
     return tinhBan
