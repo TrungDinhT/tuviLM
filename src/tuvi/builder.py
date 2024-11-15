@@ -1,3 +1,4 @@
+from typing import Literal
 from src.tuvi.types import LIST_DIA_CHI, LIST_ROLES, LIST_THIEN_CAN, TYPE_DIA_CHI
 from src.tuvi.birth import BirthTime
 from src.tuvi.sao import ChinhTinh, PhuTinh
@@ -5,6 +6,17 @@ from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.cuc import LIST_CUC
 from src.tuvi.constant import MAP_LOC_TON_POSITION, MAP_THIEN_KHOI, MAP_THIEN_VIET, VONG_LOCTON, VONG_THAI_TUE
+
+
+def get_position_by_move(
+    begin_position : TYPE_DIA_CHI | int,
+    offset : int,
+    direction : Literal[1, -1]
+) -> TYPE_DIA_CHI:
+    if isinstance(begin_position, str):
+        begin_position = LIST_DIA_CHI.index(begin_position)
+
+    return LIST_DIA_CHI[(begin_position + direction * offset) % 12]
 
 
 class Builder:
@@ -159,18 +171,18 @@ class Builder:
         birthHourIndex = LIST_DIA_CHI.index(birthTime.hour)
 
         # khởi từ cung hợi
-        diakhong_position = LIST_DIA_CHI[(11 - birthHourIndex) % 12]
-        diaket_position = LIST_DIA_CHI[(11 + birthHourIndex) % 12]
+        diakhong_position = get_position_by_move(11, birthHourIndex, -1)
+        diaket_position = get_position_by_move(11, birthHourIndex, 1)
 
         # Khởi từ thìn tuất
-        vanxuong_position = LIST_DIA_CHI[(10 - birthHourIndex) % 12]
-        vankhuc_position = LIST_DIA_CHI[(4 + birthHourIndex) % 12]
+        vanxuong_position = get_position_by_move(10, birthHourIndex, -1)
+        vankhuc_position = get_position_by_move(4, birthHourIndex, 1)
 
-        anquang_position = LIST_DIA_CHI[(LIST_DIA_CHI.index(vanxuong_position) + (birthTime.date -1) -1) % 12]
-        thienquy_position = LIST_DIA_CHI[(LIST_DIA_CHI.index(vankhuc_position) - (birthTime.date -1) +1) % 12]
+        anquang_position = get_position_by_move(vanxuong_position, birthTime.date -1 -1, 1)
+        thienquy_position = get_position_by_move(vankhuc_position, birthTime.date -1 -1, -1)
 
-        taphu_position = LIST_DIA_CHI[(4 + (birthTime.month -1)) % 12]
-        huubat_position = LIST_DIA_CHI[(10 - (birthTime.month -1)) % 12]
+        taphu_position = get_position_by_move(4, birthTime.month -1, 1)
+        huubat_position = get_position_by_move(10, birthTime.month -1, -1)
 
         self.tinhBan.map_cung[diakhong_position].phuTinh.append(PhuTinh(name="Địa Không", elemental="Hoa"))
         self.tinhBan.map_cung[diaket_position].phuTinh.append(PhuTinh(name="Địa Kiếp", elemental="Hoa"))

@@ -68,7 +68,8 @@ birthTime = BirthTime(
     date=date,
     month=month,
     thien_can=thien_can,
-    dia_chi=dia_chi
+    dia_chi=dia_chi,
+    gender=gender
 )
 builder = Builder()
 
