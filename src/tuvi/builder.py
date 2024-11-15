@@ -4,7 +4,7 @@ from src.tuvi.sao import ChinhTinh, PhuTinh
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.cuc import LIST_CUC
-from src.tuvi.constant import MAP_LOC_TON_POSITION, VONG_LOCTON, VONG_THAI_TUE
+from src.tuvi.constant import MAP_LOC_TON_POSITION, MAP_THIEN_KHOI, MAP_THIEN_VIET, VONG_LOCTON, VONG_THAI_TUE
 
 
 class Builder:
@@ -20,6 +20,7 @@ class Builder:
         self._build_khongkiep_xuongkhuc(birthTime)
         self._build_loc_ton(birthTime)
         self._build_thai_tue(birthTime)
+        self._build_khoiviet(birthTime)
 
         return self.tinhBan
 
@@ -168,6 +169,11 @@ class Builder:
         self.tinhBan.map_cung[thienquy_position].phuTinh.append(PhuTinh(name="Thiên Quý", elemental="Tho"))
         self.tinhBan.map_cung[taphu_position].phuTinh.append(PhuTinh(name="Tả Phù", elemental="Tho"))
         self.tinhBan.map_cung[huubat_position].phuTinh.append(PhuTinh(name="Hữu Bật", elemental="Thuy"))
+
+    def _build_khoiviet(self, birthTime : BirthTime):
+
+        self.tinhBan.map_cung[MAP_THIEN_KHOI[birthTime.thien_can]].phuTinh.append(PhuTinh(name="Thiên Khôi", elemental="Hoa"))
+        self.tinhBan.map_cung[MAP_THIEN_VIET[birthTime.thien_can]].phuTinh.append(PhuTinh(name="Thiên Việt", elemental="Hoa"))
 
     def _build_loc_ton(self, birthTime : BirthTime):
 

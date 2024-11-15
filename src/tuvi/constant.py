@@ -46,3 +46,30 @@ VONG_THAI_TUE = [
     [PhuTinh(name="Điếu Khách", elemental="Hoa")],
     [PhuTinh(name="Trực Phù", elemental="Kim")],
 ]
+
+
+MAP_THIEN_KHOI : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
+    "Giap": "Mui",
+    "At": "Than",
+    "Binh": "Dau",
+    "Dinh": "Hoi",
+    "Mau": "Suu",
+    "Ky": "Ty",
+    "Canh": "Suu",
+    "Tan": "Dan",
+    "Nham": "Mao",
+    "Quy": "Ti"
+}
+
+MAP_THIEN_VIET : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
+    "Giap": "Suu",
+    "At": "Ty",
+    "Binh": "Hoi",
+    "Dinh": "Dau",
+    "Mau": "Mui",
+    "Ky": "Than",
+    "Canh": "Mui",
+    "Tan": "Ngo",
+    "Nham": "Ti",
+    "Quy": "Mao"
+}
