@@ -1,4 +1,4 @@
-from src.tuvi.types import LIST_DIA_CHI, LIST_ROLES, TYPE_DIA_CHI
+from src.tuvi.types import LIST_DIA_CHI, LIST_ROLES, LIST_THIEN_CAN, TYPE_DIA_CHI
 from src.tuvi.birth import BirthTime
 from src.tuvi.sao import ChinhTinh, PhuTinh
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
@@ -14,6 +14,7 @@ class Builder:
 
     # TODO : Fix here to not re-create tinh ban
     def build(self, birthTime: BirthTime) -> TinhBan:
+        self._build_general_info(birthTime)
         self._build_role(birthTime)
         self._build_cuc(birthTime)
         self._build_chinh_tinh(birthTime)
@@ -65,6 +66,16 @@ class Builder:
             return LIST_DIA_CHI[(2 + div -1 + borrow_number) % 12]
 
         return LIST_DIA_CHI[(2 + div -1 - borrow_number) % 12]
+
+    def _build_general_info(self, birthTime : BirthTime):
+
+        self.tinhBan.gender = birthTime.gender
+
+        self.tinhBan.am_duong = "Duong" if (LIST_THIEN_CAN.index(birthTime.thien_can) % 2 == 0) else "Am"
+
+        self.tinhBan.direction = 1 if (
+            self.tinhBan.gender == "M" and self.tinhBan.am_duong == "Duong"
+            ) or (self.tinhBan.gender == "F" and self.tinhBan.am_duong == "Am") else -1
 
     def _build_role(self, birthTime : BirthTime):
         menh_position = self._get_menh_position(birthTime)

@@ -17,6 +17,8 @@ TYPE_THIEN_CAN = Literal["Giap", "At", "Binh", "Dinh", "Mau", "Ky", "Canh", "Tan
 
 LIST_THIEN_CAN : TYPE_THIEN_CAN = ["Giap", "At", "Binh", "Dinh", "Mau", "Ky", "Canh", "Tan", "Nham", "Quy"]
 
+TYPE_GENDER = Literal["M", "F"]
+
 LIST_ROLES = ["Menh", "Phu Mau", "Phuc Duc", "Dien Trach", "Quan Loc", "No Boc",
                "Thien Di", "Tat Ach", "Tai Bach", "Tu Tuc", "Phu The", "Huynh De"]
 

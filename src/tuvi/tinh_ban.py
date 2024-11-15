@@ -1,8 +1,9 @@
+from typing import Literal
 import pydantic
 
 from src.tuvi.cung import Cung
 from src.tuvi.birth import BirthTime
-from src.tuvi.types import LIST_DIA_CHI, TYPE_DIA_CHI
+from src.tuvi.types import AM_DUONG, LIST_DIA_CHI, TYPE_DIA_CHI, TYPE_GENDER
 from src.tuvi.cuc import Cuc
 
 class TinhBan(pydantic.BaseModel):
@@ -11,11 +12,11 @@ class TinhBan(pydantic.BaseModel):
 
     cuc : Cuc | None = None
 
-    @classmethod
-    def from_birthtime(cls, birthTime : BirthTime):
+    direction : Literal[1, -1] | None = None
 
-        pass
+    gender : TYPE_GENDER | None = None
 
+    am_duong : AM_DUONG | None = None
 
     @classmethod
     def init_empty_plate(cls):

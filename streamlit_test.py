@@ -57,6 +57,7 @@ st.sidebar.header("Ngày sinh theo lịch âm")
 date = st.sidebar.number_input("Ngày sinh:", min_value=1, max_value=31, value=8)
 month = st.sidebar.number_input("Tháng sinh:", min_value=1, max_value=12, value=3)
 hour = st.sidebar.selectbox("Giờ Sinh:", options=LIST_DIA_CHI, index=4)
+gender = st.sidebar.selectbox("Giới tính:", options=["M", "F"], index=0)
 
 thien_can = st.sidebar.selectbox("Thiên can năm sinh:", options=LIST_THIEN_CAN, index=4)
 dia_chi = st.sidebar.selectbox("Địa chi năm sinh:", options=LIST_DIA_CHI, index=2)
