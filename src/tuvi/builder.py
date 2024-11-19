@@ -216,6 +216,14 @@ class Builder:
                 LIST_DIA_CHI[(locton_index + i) % 12]
             ].phuTinh.extend(VONG_LOCTON[i])
 
+        if self.tinhBan.direction == 1:
+            lucsi_position = LIST_DIA_CHI[(locton_index + 1) % 12]
+        else:
+            lucsi_position = LIST_DIA_CHI[(locton_index - 1) % 12]
+
+        self.tinhBan.map_cung[lucsi_position].phuTinh.append(PhuTinh(name="Lực Sĩ", elemental="Thuy"))
+
+
     def _build_thai_tue(self, birthTime : BirthTime):
 
         thaitue_index = LIST_DIA_CHI.index(birthTime.dia_chi)
