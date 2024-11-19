@@ -34,6 +34,7 @@ class Builder:
         self._build_loc_ton(birthTime)
         self._build_thai_tue(birthTime)
         self._build_khoiviet(birthTime)
+        self._build_linhhoa(birthTime)
 
         return self.tinhBan
 
@@ -216,3 +217,30 @@ class Builder:
             self.tinhBan.map_cung[
                 LIST_DIA_CHI[(thaitue_index + i) % 12]
             ].phuTinh.extend(VONG_THAI_TUE[i])
+
+    def _build_linhhoa(self, birthTime : BirthTime):
+        index_diachi = LIST_DIA_CHI.index(birthTime.dia_chi)
+        hour_index = LIST_DIA_CHI.index(birthTime.hour)
+
+        # source : http://tuvi.cohoc.net/sao-linh-tinh-hoa-tinh-y-nghia-tai-menh-va-cung-khac-nid-6978.html
+        match index_diachi % 4:
+            case 0:
+                hoatinh_cung_khoi = "Dan"
+                linhtinh_cung_khoi = "Tuat"
+            case 1:
+                hoatinh_cung_khoi = "Mao"
+                linhtinh_cung_khoi = "Tuat"
+            case 2:
+                hoatinh_cung_khoi = "Suu"
+                linhtinh_cung_khoi = "Mao"
+            case 3:
+                hoatinh_cung_khoi = "Dau"
+                linhtinh_cung_khoi = "Tuat"
+
+        print(self.tinhBan.direction)
+
+        hoatinh_position = get_position_by_move(hoatinh_cung_khoi, hour_index , self.tinhBan.direction)
+        linhinh_position = get_position_by_move(linhtinh_cung_khoi, hour_index ,  (-1) * self.tinhBan.direction)
+
+        self.tinhBan.map_cung[hoatinh_position].phuTinh.append(PhuTinh(name="Hỏa Tinh", elemental="Hoa"))
+        self.tinhBan.map_cung[linhinh_position].phuTinh.append(PhuTinh(name="Linh Tinh", elemental="Hoa"))
