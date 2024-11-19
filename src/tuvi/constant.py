@@ -20,7 +20,7 @@ VONG_LOCTON = [
     [PhuTinh(name="Lộc Tồn", elemental="Tho"), PhuTinh(name="Bác Sĩ", elemental="Thuy")],
     [PhuTinh(name="Kình Dương", elemental="Kim")],
     [PhuTinh(name="Thanh Long", elemental="Thuy")],
-    [PhuTinh(name="Tiểu Hao", elemental="Hoa")],
+    [PhuTinh(name="Tiểu Hao", elemental="Hoa"), PhuTinh(name="LN Văn Tinh", elemental="Hoa")],
     [PhuTinh(name="Tướng Quân", elemental="Moc")],
     [PhuTinh(name="Tấu Thư", elemental="Kim")],
     [PhuTinh(name="Phi Liêm", elemental="Hoa")],
@@ -34,12 +34,12 @@ VONG_LOCTON = [
 # TODO : Có thêm đào không sát vào đây ?
 VONG_THAI_TUE = [
     [PhuTinh(name="Thái Tuế", elemental="Hoa")],
-    [PhuTinh(name="Thiếu Dương", elemental="Hoa")],
+    [PhuTinh(name="Thiếu Dương", elemental="Hoa"), PhuTinh(name="Thiên Không", elemental="Hoa")],
     [PhuTinh(name="Tang Môn", elemental="Moc")],
     [PhuTinh(name="Thiếu Âm", elemental="Thuy")],
-    [PhuTinh(name="Quan Phù", elemental="Hoa")],
+    [PhuTinh(name="Quan Phù", elemental="Hoa"), PhuTinh(name="Long Trì", elemental="Thuy")],
     [PhuTinh(name="Tử Phù", elemental="Kim")],
-    [PhuTinh(name="Tuế Phá", elemental="Hoa")],
+    [PhuTinh(name="Tuế Phá", elemental="Hoa"), PhuTinh(name="Thiên Hư", elemental="Thuy")],
     [PhuTinh(name="Long Đức", elemental="Thuy")],
     [PhuTinh(name="Bạch Hổ", elemental="Kim")],
     [PhuTinh(name="Phúc Đức", elemental="Tho")],
@@ -74,6 +74,8 @@ MAP_THIEN_VIET : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
     "Quy": "Mao"
 }
 
+
+
 # TODO : there is difference between books and web
 # https://lyso.vn/xem-tu-vi/lai-mot-van-de-tranh-cai-trong-tu-vi-lan-nay-la-cach-an-luu-ha-voi-tuoi-dinh-va-canh-t102897/
 MAP_LUU_HA : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
@@ -87,4 +89,18 @@ MAP_LUU_HA : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
     "Tan": "Thin",
     "Nham": "Hoi",
     "Quy": "Dan"
+}
+
+# http://tuvi.cohoc.net/sao-thien-tru-o-menh-va-cac-cung-khac-nid-6989.html
+MAP_THIEN_TRU : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
+    "Giap": "Ti",
+    "At": "Ngo",
+    "Binh": "Ty",
+    "Dinh": "Ti",
+    "Mau": "Ngo",
+    "Ky": "Than",
+    "Canh": "Dan",
+    "Tan": "Ngo",
+    "Nham": "Dau",
+    "Quy": "Tuat"
 }

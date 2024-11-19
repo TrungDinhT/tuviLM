@@ -5,7 +5,7 @@ from src.tuvi.sao import ChinhTinh, PhuTinh
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.cuc import LIST_CUC
-from src.tuvi.constant import MAP_LOC_TON_POSITION, MAP_LUU_HA, MAP_THIEN_KHOI, MAP_THIEN_VIET, VONG_LOCTON, VONG_THAI_TUE
+from src.tuvi.constant import MAP_LOC_TON_POSITION, MAP_LUU_HA, MAP_THIEN_KHOI, MAP_THIEN_TRU, MAP_THIEN_VIET, VONG_LOCTON, VONG_THAI_TUE
 
 
 def get_position_by_move(
@@ -30,6 +30,7 @@ class Builder:
         self._build_role(birthTime)
         self._build_cuc(birthTime)
         self._build_chinh_tinh(birthTime)
+        self._build_by_month(birthTime)
         self._build_by_hour(birthTime)
         self._build_loc_ton(birthTime)
         self._build_thai_tue(birthTime)
@@ -37,6 +38,8 @@ class Builder:
         self._build_linhhoa(birthTime)
         self._build_by_map(birthTime)
         self._build_cothan_quatu(birthTime)
+        self._build_by_diachi(birthTime)
+        self._build_lavong(birthTime)
 
         return self.tinhBan
 
@@ -96,7 +99,13 @@ class Builder:
         menh_position = self._get_menh_position(birthTime)
 
         for idx, role in enumerate(LIST_ROLES):
-            self.tinhBan.map_cung[LIST_DIA_CHI[(menh_position + idx) % 12]].role = role
+            position = LIST_DIA_CHI[(menh_position + idx) % 12]
+            self.tinhBan.map_cung[position].role = role
+
+            if role == "Tat Ach":
+                self.tinhBan.map_cung[position].phuTinh.append(PhuTinh(name="Thiên Sứ", elemental="Thuy"))
+            if role == "No Boc":
+                self.tinhBan.map_cung[position].phuTinh.append(PhuTinh(name="Thien Thuong", elemental="Tho"))
 
     def _build_cuc(self, birthTime : BirthTime):
 
@@ -169,6 +178,19 @@ class Builder:
         self.tinhBan.map_cung[thientuong_position].chinhTinh.append(ChinhTinh(name="Thiên Tướng", elemental="Thuy"))
 
 
+    def _build_by_month(self, birthTime : BirthTime):
+
+        taphu_position = get_position_by_move(4, birthTime.month -1, 1)
+        huubat_position = get_position_by_move(10, birthTime.month -1, -1)
+
+        thiengiai_position = get_position_by_move("Than", birthTime.month -1, 1)
+        diagiai_position = get_position_by_move("Mui", birthTime.month -1, 1)
+
+        self.tinhBan.map_cung[taphu_position].phuTinh.append(PhuTinh(name="Tả Phù", elemental="Tho"))
+        self.tinhBan.map_cung[huubat_position].phuTinh.append(PhuTinh(name="Hữu Bật", elemental="Thuy"))
+        self.tinhBan.map_cung[thiengiai_position].phuTinh.append(PhuTinh(name="Thiên Giải", elemental="Hoa"))
+        self.tinhBan.map_cung[diagiai_position].phuTinh.append(PhuTinh(name="Địa Giải", elemental="Tho"))
+
     def _build_by_hour(self, birthTime : BirthTime):
 
         birthHourIndex = LIST_DIA_CHI.index(birthTime.hour)
@@ -184,8 +206,7 @@ class Builder:
         anquang_position = get_position_by_move(vanxuong_position, birthTime.date -1 -1, 1)
         thienquy_position = get_position_by_move(vankhuc_position, birthTime.date -1 -1, -1)
 
-        taphu_position = get_position_by_move(4, birthTime.month -1, 1)
-        huubat_position = get_position_by_move(10, birthTime.month -1, -1)
+
 
         thaiphu_position = get_position_by_move("Ngo", birthHourIndex , 1)
         phongcao_position = get_position_by_move("Dan", birthHourIndex, 1)
@@ -196,8 +217,7 @@ class Builder:
         self.tinhBan.map_cung[vankhuc_position].phuTinh.append(PhuTinh(name="Văn Khúc", elemental="Thuy"))
         self.tinhBan.map_cung[anquang_position].phuTinh.append(PhuTinh(name="Ân Quang", elemental="Moc"))
         self.tinhBan.map_cung[thienquy_position].phuTinh.append(PhuTinh(name="Thiên Quý", elemental="Tho"))
-        self.tinhBan.map_cung[taphu_position].phuTinh.append(PhuTinh(name="Tả Phù", elemental="Tho"))
-        self.tinhBan.map_cung[huubat_position].phuTinh.append(PhuTinh(name="Hữu Bật", elemental="Thuy"))
+
         self.tinhBan.map_cung[thaiphu_position].phuTinh.append(PhuTinh(name="Thai Phụ", elemental="Kim"))
         self.tinhBan.map_cung[phongcao_position].phuTinh.append(PhuTinh(name="Phong Cáo", elemental="Tho"))
 
@@ -262,8 +282,10 @@ class Builder:
     def _build_by_map(self, birthTime : BirthTime):
 
         luuha_position = MAP_LUU_HA[birthTime.thien_can]
+        thientru_position = MAP_THIEN_TRU[birthTime.thien_can]
 
         self.tinhBan.map_cung[luuha_position].phuTinh.append(PhuTinh(name="Lưu Hà", elemental="Thuy"))
+        self.tinhBan.map_cung[thientru_position].phuTinh.append(PhuTinh(name="Thiên Trù", elemental="Tho"))
 
     def _build_cothan_quatu(self, birthTime : BirthTime):
 
@@ -284,6 +306,43 @@ class Builder:
         self.tinhBan.map_cung[quatu_position].phuTinh.append(PhuTinh(name="Quả Tú", elemental="Tho"))
 
 
-    def _build_phongcao():
+    def _build_by_diachi(self, birthTime : BirthTime):
 
-        hoatinh_position = get_position_by_move(hoatinh_cung_khoi, hour_index , self.tinhBan.direction)
+        diachi_index = LIST_DIA_CHI.index(birthTime.dia_chi)
+
+        thienhi_position = get_position_by_move("Dau", diachi_index, -1)
+        hongloan_position = get_xung_chieu(thienhi_position)
+
+        nguyetduc_position = get_position_by_move("Ti", diachi_index, 1)
+
+        giaithan_position = get_position_by_move("Tuat", diachi_index, -1)
+
+        match diachi_index % 4:
+            case 0:
+                thienma_position = "Dan"
+            case 1:
+                thienma_position = "Hoi"
+            case 2:
+                thienma_position = "Than"
+            case 3:
+                thienma_position = "Ti"
+
+        match diachi_index % 3:
+            case 0:
+                phatoai_position = "Ti"
+            case 1:
+                phatoai_position = "Suu"
+            case 2:
+                phatoai_position = "Dau"
+
+        self.tinhBan.map_cung[thienhi_position].phuTinh.append(PhuTinh(name="Thiên Hỉ", elemental="Hoa"))
+        self.tinhBan.map_cung[hongloan_position].phuTinh.append(PhuTinh(name="Hồng Loan", elemental="Thuy"))
+        self.tinhBan.map_cung[nguyetduc_position].phuTinh.append(PhuTinh(name="Nguyệt Đức", elemental="Hoa"))
+        self.tinhBan.map_cung[thienma_position].phuTinh.append(PhuTinh(name="Thiên Mã", elemental="Hoa"))
+        self.tinhBan.map_cung[giaithan_position].phuTinh.append(PhuTinh(name="Giải Thần", elemental="Moc"))
+        self.tinhBan.map_cung[giaithan_position].phuTinh.append(PhuTinh(name="Phượng Các", elemental="Tho"))
+        self.tinhBan.map_cung[phatoai_position].phuTinh.append(PhuTinh(name="Phá Toái", elemental="Hoa"))
+
+    def _build_lavong(self, birthTime: BirthTime):
+        self.tinhBan.map_cung["Thin"].phuTinh.append(PhuTinh(name="Thiên La", elemental="Kim"))
+        self.tinhBan.map_cung["Tuat"].phuTinh.append(PhuTinh(name="Địa Võng", elemental="Kim"))
