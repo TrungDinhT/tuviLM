@@ -73,3 +73,18 @@ MAP_THIEN_VIET : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
     "Nham": "Ti",
     "Quy": "Mao"
 }
+
+# TODO : there is difference between books and web
+# https://lyso.vn/xem-tu-vi/lai-mot-van-de-tranh-cai-trong-tu-vi-lan-nay-la-cach-an-luu-ha-voi-tuoi-dinh-va-canh-t102897/
+MAP_LUU_HA : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
+    "Giap": "Dau",
+    "At": "Tuat",
+    "Binh": "Mui",
+    "Dinh": "Thin",
+    "Mau": "Ti",
+    "Ky": "Ngo",
+    "Canh": "Than",
+    "Tan": "Thin",
+    "Nham": "Hoi",
+    "Quy": "Dan"
+}
