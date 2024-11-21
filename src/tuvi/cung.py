@@ -15,13 +15,17 @@ class Cung(pydantic.BaseModel):
 
     phuTinh : list[PhuTinh] = []
 
+    is_cung_than : bool = False
+
     def __repr__(self) -> str:
-        markdown_content = f"<h5 style='text-align: center;'><b>{self.role}</b></h5>\n\n"
+        role_str = self.role if not self.is_cung_than else f"{self.role} - Than"
+
+        markdown_content = f"<h3 style='text-align: center;'><b>{role_str}</b></h3>\n\n"
 
         for chinhTinh in self.chinhTinh:
             markdown_content += f"<p style='color: {MAP_COLOR[chinhTinh.elemental]};font-size: 20px;'>{chinhTinh.name}</p>\n"
 
         for phuTinh in self.phuTinh:
-            markdown_content += f"<p style='color: {MAP_COLOR[phuTinh.elemental]};font-size: 15;'>{phuTinh.name}</p>\n"
+            markdown_content += f"<p style='color: {MAP_COLOR[phuTinh.elemental]};font-size: 15px;'>{phuTinh.name}</p>\n"
 
         return markdown_content

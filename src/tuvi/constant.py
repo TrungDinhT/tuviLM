@@ -22,13 +22,13 @@ VONG_LOCTON = [
     [PhuTinh(name="Thanh Long", elemental="Thuy")],
     [PhuTinh(name="Tiểu Hao", elemental="Hoa"), PhuTinh(name="LN Văn Tinh", elemental="Hoa")],
     [PhuTinh(name="Tướng Quân", elemental="Moc")],
-    [PhuTinh(name="Tấu Thư", elemental="Kim")],
+    [PhuTinh(name="Tấu Thư", elemental="Kim"), PhuTinh(name="Đường Phù", elemental="Moc")],
     [PhuTinh(name="Phi Liêm", elemental="Hoa")],
     [PhuTinh(name="Hỷ Thần", elemental="Hoa")],
-    [PhuTinh(name="Bệnh Phù", elemental="Tho")],
+    [PhuTinh(name="Bệnh Phù", elemental="Tho"), PhuTinh(name="Quốc Ấn", elemental="Tho")],
     [PhuTinh(name="Đại Hao", elemental="Hoa")],
     [PhuTinh(name="Phuc Binh", elemental="Hoa")],
-    [PhuTinh(name="Đà La", elemental="Kim")],
+    [PhuTinh(name="Đà La", elemental="Kim"), PhuTinh(name="Quan Phủ", elemental="Hoa")],
 ]
 
 # TODO : Có thêm đào không sát vào đây ?
@@ -38,11 +38,11 @@ VONG_THAI_TUE = [
     [PhuTinh(name="Tang Môn", elemental="Moc")],
     [PhuTinh(name="Thiếu Âm", elemental="Thuy")],
     [PhuTinh(name="Quan Phù", elemental="Hoa"), PhuTinh(name="Long Trì", elemental="Thuy")],
-    [PhuTinh(name="Tử Phù", elemental="Kim")],
+    [PhuTinh(name="Tử Phù", elemental="Kim"), PhuTinh(name="Nguyệt Đức", elemental="Hoa")],
     [PhuTinh(name="Tuế Phá", elemental="Hoa"), PhuTinh(name="Thiên Hư", elemental="Thuy")],
     [PhuTinh(name="Long Đức", elemental="Thuy")],
     [PhuTinh(name="Bạch Hổ", elemental="Kim")],
-    [PhuTinh(name="Phúc Đức", elemental="Tho")],
+    [PhuTinh(name="Phúc Đức", elemental="Tho"), PhuTinh(name="Thiên Đức", elemental="Hoa")],
     [PhuTinh(name="Điếu Khách", elemental="Hoa")],
     [PhuTinh(name="Trực Phù", elemental="Kim")],
 ]
@@ -103,4 +103,31 @@ MAP_THIEN_TRU : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
     "Tan": "Ngo",
     "Nham": "Dau",
     "Quy": "Tuat"
+}
+
+
+MAP_THIEN_QUAN : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
+    "Giap": "Mui",
+    "At": "Mui",
+    "Binh": "Thin",
+    "Dinh": "Dan",
+    "Mau": "Mao",
+    "Ky": "Dau",
+    "Canh": "Hoi",
+    "Tan": "Dau",
+    "Nham": "Tuat",
+    "Quy": "Ngo"
+}
+
+MAP_THIEN_PHUC : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
+    "Giap": "Dau",
+    "At": "Dau",
+    "Binh": "Than",
+    "Dinh": "Hoi",
+    "Mau": "Mao",
+    "Ky": "Dan",
+    "Canh": "Ngo",
+    "Tan": "Ti",
+    "Nham": "Ngo",
+    "Quy": "Ti"
 }

@@ -18,6 +18,8 @@ class TinhBan(pydantic.BaseModel):
 
     am_duong : AM_DUONG | None = None
 
+    cung_than : TYPE_DIA_CHI | None = None
+
     @classmethod
     def init_empty_plate(cls):
 

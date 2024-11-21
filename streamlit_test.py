@@ -91,3 +91,6 @@ st.markdown(html_table_template.format(
         cung_12=repr(tinhBan.map_cung["Hoi"]),
         common_info=f"{tinhBan.cuc.name} cuc"
     ), unsafe_allow_html=True)
+
+
+print(sum(len(cung.phuTinh) + len(cung.chinhTinh) for cung in tinhBan.map_cung.values()))
