@@ -27,27 +27,27 @@ html_table_template = """
     }}
 </style>
 
-<table class="custom-table">
+<table class="custom-table"; table-layout: auto;>
     <tr>
-        <td>{cung_1}</td>
-        <td>{cung_2}</td>
-        <td>{cung_3}</td>
-        <td>{cung_4}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_1}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_2}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_3}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_4}</td>
     </tr>
     <tr>
-        <td>{cung_5}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_5}</td>
         <td class="merged-cell" rowspan="2" colspan="2">{common_info}</td>
-        <td>{cung_6}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_6}</td>
     </tr>
     <tr>
-        <td>{cung_7}</td>
-        <td>{cung_8}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_7}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_8}</td>
     </tr>
     <tr>
-        <td>{cung_9}</td>
-        <td>{cung_10}</td>
-        <td>{cung_11}</td>
-        <td>{cung_12}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_9}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_10}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_11}</td>
+        <td style='vertical-align: top; padding: 5px;>{cung_12}</td>
     </tr>
 </table>
 """
@@ -56,8 +56,10 @@ st.sidebar.header("Ngày sinh theo lịch âm")
 
 date = st.sidebar.number_input("Ngày sinh:", min_value=1, max_value=31, value=8)
 month = st.sidebar.number_input("Tháng sinh:", min_value=1, max_value=12, value=3)
-hour = st.sidebar.selectbox("Giờ Sinh:", options=LIST_DIA_CHI, index=4)
+hour = st.sidebar.number_input("Giờ Sinh:", min_value=0, max_value=12, value=4)
 gender = st.sidebar.selectbox("Giới tính:", options=["M", "F"], index=0)
+
+hour = LIST_DIA_CHI[hour]
 
 thien_can = st.sidebar.selectbox("Thiên can năm sinh:", options=LIST_THIEN_CAN, index=4)
 dia_chi = st.sidebar.selectbox("Địa chi năm sinh:", options=LIST_DIA_CHI, index=2)

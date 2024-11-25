@@ -31,8 +31,29 @@ class Cung(pydantic.BaseModel):
         for chinhTinh in self.chinhTinh:
             markdown_content += f"<p style='color: {MAP_COLOR[chinhTinh.elemental]};font-size: 20px;'>{chinhTinh.name}</p>\n"
 
-        for phuTinh in self.phuTinh:
-            markdown_content += f"<p style='color: {MAP_COLOR[phuTinh.elemental]};font-size: 15px;'>{phuTinh.name}</p>\n"
+        grouped_by_elemental = {}
+        for item in self.phuTinh:
+            if item.elemental not in grouped_by_elemental:
+                grouped_by_elemental[item.elemental] = []
+            grouped_by_elemental[item.elemental].append(item)
+
+        markdown_content += "<table style='width: 100%; border-collapse: collapse;'>\n"
+        markdown_content += "  <tr>\n"
+
+        for elemental in grouped_by_elemental.keys():
+            markdown_content += f"    <th style='text-align: center; color: {MAP_COLOR[elemental]}; width: 40%;'>{elemental}</th>\n"
+        markdown_content += "  </tr>\n"
+        markdown_content += "  <tr>\n"
+
+        for elemental, items in grouped_by_elemental.items():
+            markdown_content += "    <td style='vertical-align: top;'>\n"
+            for item in items:
+                font_size = "15px"
+                markdown_content += f"      <p style='color: {MAP_COLOR[item.elemental]}; font-size: {font_size}; white-space: nowrap;'>{item.name}</p>\n"
+            markdown_content += "    </td>\n"
+
+        markdown_content += "  </tr>\n"
+        markdown_content += "</table>\n"
 
         if self.tuhoa:
             for tuhoa in self.tuhoa:
