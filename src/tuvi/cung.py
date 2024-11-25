@@ -19,7 +19,7 @@ class Cung(pydantic.BaseModel):
 
     trang_sinh : TypeTrangSinh | None = None
 
-    tuhoa : TypeTuHoa | None = None
+    tuhoa : list[TypeTuHoa] = []
 
     is_cung_than : bool = False
 
@@ -35,7 +35,8 @@ class Cung(pydantic.BaseModel):
             markdown_content += f"<p style='color: {MAP_COLOR[phuTinh.elemental]};font-size: 15px;'>{phuTinh.name}</p>\n"
 
         if self.tuhoa:
-            markdown_content += f"<p style='font-size: 15px;'>--{self.tuhoa.name}--</p>\n"
+            for tuhoa in self.tuhoa:
+                markdown_content += f"<p style='font-size: 15px;'>--{tuhoa.name}--</p>\n"
 
         markdown_content += f"<p style='font-size: 15px;'>--{self.trang_sinh.name}--</p>\n"
 

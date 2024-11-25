@@ -435,7 +435,7 @@ class Builder:
         hoakhoa_position = search_sao(self.tinhBan, sao_hoa_khi[2])
         hoaky_position = search_sao(self.tinhBan, sao_hoa_khi[3])
 
-        self.tinhBan.map_cung[hoaloc_position].tuhoa = TypeTuHoa(name="Hóa Lộc")
-        self.tinhBan.map_cung[hoaquyen_position].tuhoa = TypeTuHoa(name="Hóa Quyền")
-        self.tinhBan.map_cung[hoakhoa_position].tuhoa = TypeTuHoa(name="Hóa Khoa")
-        self.tinhBan.map_cung[hoaky_position].tuhoa = TypeTuHoa(name="Hóa Kỵ")
+        self.tinhBan.map_cung[hoaloc_position].tuhoa.append(TypeTuHoa(name="Hóa Lộc"))
+        self.tinhBan.map_cung[hoaquyen_position].tuhoa.append(TypeTuHoa(name="Hóa Quyền"))
+        self.tinhBan.map_cung[hoakhoa_position].tuhoa.append(TypeTuHoa(name="Hóa Khoa"))
+        self.tinhBan.map_cung[hoaky_position].tuhoa.append(TypeTuHoa(name="Hóa Kỵ"))
