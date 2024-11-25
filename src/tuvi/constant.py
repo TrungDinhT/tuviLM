@@ -143,5 +143,5 @@ MAP_TUHOA : dict[TYPE_THIEN_CAN, list[str]] = {
     "Canh": ["Thái Dương", "Vũ Khúc", "Thiên Đồng", "Thái Âm"],
     "Tan": ["Cự Môn", "Thái Dương", "Văn Khúc", "Văn Xương"],
     "Nham": ["Thiên Lương", "Tử Vi", "Thiên Phủ", "Vũ Khúc"],
-    "Quy": ["Phá Quân", "Cự Môn", "Thiếu Âm", "Tham Lam"]
+    "Quy": ["Phá Quân", "Cự Môn", "Thái Âm", "Tham Lam"]
 }
