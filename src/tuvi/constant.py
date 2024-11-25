@@ -49,29 +49,29 @@ VONG_THAI_TUE = [
 
 
 MAP_THIEN_KHOI : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
-    "Giap": "Mui",
-    "At": "Than",
-    "Binh": "Dau",
-    "Dinh": "Hoi",
-    "Mau": "Suu",
-    "Ky": "Ty",
-    "Canh": "Suu",
-    "Tan": "Dan",
-    "Nham": "Mao",
-    "Quy": "Ti"
-}
-
-MAP_THIEN_VIET : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
     "Giap": "Suu",
     "At": "Ty",
     "Binh": "Hoi",
+    "Dinh": "Hoi",
+    "Mau": "Suu",
+    "Ky": "Ty",
+    "Canh": "Ngo",
+    "Tan": "Ngo",
+    "Nham": "Mao",
+    "Quy": "Mao"
+}
+
+MAP_THIEN_VIET : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
+    "Giap": "Mui",
+    "At": "Than",
+    "Binh": "Dau",
     "Dinh": "Dau",
     "Mau": "Mui",
     "Ky": "Than",
-    "Canh": "Mui",
-    "Tan": "Ngo",
+    "Canh": "Dan",
+    "Tan": "Dan",
     "Nham": "Ti",
-    "Quy": "Mao"
+    "Quy": "Ti"
 }
 
 
@@ -105,7 +105,7 @@ MAP_THIEN_TRU : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
     "Quy": "Tuat"
 }
 
-
+# http://tuvi.cohoc.net/sao-thien-quan-thien-phuc-y-nghia-tai-menh-va-cung-khac-nid-6953.html
 MAP_THIEN_QUAN : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
     "Giap": "Mui",
     "At": "Mui",
@@ -130,4 +130,18 @@ MAP_THIEN_PHUC : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
     "Tan": "Ti",
     "Nham": "Ngo",
     "Quy": "Ti"
+}
+
+
+MAP_TUHOA : dict[TYPE_THIEN_CAN, list[str]] = {
+    "Giap": ["Liêm Trinh", "Phá Quân", "Vũ Khúc", "Thái Dương"],
+    "At": ["Thiên Cơ", "Thiên Lương", "Tử Vi", "Thái Âm"],
+    "Binh": ["Thiên Đồng", "Thiên Cơ", "Văn Xương", "Liêm Trinh"],
+    "Dinh": ["Thái Âm", "Thiên Đồng", "Thiên Cơ", "Cự Môn"],
+    "Mau": ["Tham Lang", "Thái Âm", "Hữu Bật", "Thiên Cơ"],
+    "Ky": ["Vũ Khúc", "Tham Lang", "Thiên Lương", "Văn Khúc"],
+    "Canh": ["Thái Dương", "Vũ Khúc", "Thiên Đồng", "Thái Âm"],
+    "Tan": ["Cự Môn", "Thái Dương", "Văn Khúc", "Văn Xương"],
+    "Nham": ["Thiên Lương", "Tử Vi", "Thiên Phủ", "Vũ Khúc"],
+    "Quy": ["Phá Quân", "Cự Môn", "Thiếu Âm", "Tham Lam"]
 }

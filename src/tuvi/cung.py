@@ -2,6 +2,8 @@ import pydantic
 
 from src.tuvi.sao import ChinhTinh, PhuTinh
 from src.tuvi.types import AM_DUONG, MAP_COLOR, NGU_HANH, ROLE_TYPE
+from src.tuvi.trangsinh import TypeTrangSinh
+from src.tuvi.tuhoa import TypeTuHoa
 
 class Cung(pydantic.BaseModel):
 
@@ -15,6 +17,10 @@ class Cung(pydantic.BaseModel):
 
     phuTinh : list[PhuTinh] = []
 
+    trang_sinh : TypeTrangSinh | None = None
+
+    tuhoa : TypeTuHoa | None = None
+
     is_cung_than : bool = False
 
     def __repr__(self) -> str:
@@ -27,5 +33,10 @@ class Cung(pydantic.BaseModel):
 
         for phuTinh in self.phuTinh:
             markdown_content += f"<p style='color: {MAP_COLOR[phuTinh.elemental]};font-size: 15px;'>{phuTinh.name}</p>\n"
+
+        if self.tuhoa:
+            markdown_content += f"<p style='font-size: 15px;'>--{self.tuhoa.name}--</p>\n"
+
+        markdown_content += f"<p style='font-size: 15px;'>--{self.trang_sinh.name}--</p>\n"
 
         return markdown_content

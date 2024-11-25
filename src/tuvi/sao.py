@@ -15,7 +15,7 @@ class Sao(pydantic.BaseModel):
         return None
 
 
-class   ChinhTinh(Sao):
+class ChinhTinh(Sao):
 
     pass
 
