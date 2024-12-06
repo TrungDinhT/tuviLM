@@ -71,6 +71,8 @@ builder = Builder()
 
 tinhBan = builder.build(birthTime)
 
+common_info = f"Cục : {tinhBan.cuc.name} cục.<br> Giờ sinh : {birthTime}"
+
 # Display the HTML table in Streamlit
 st.markdown(html_table_template.format(
         cung_1=repr(tinhBan.map_cung["Ti"]),
@@ -85,7 +87,7 @@ st.markdown(html_table_template.format(
         cung_10=repr(tinhBan.map_cung["Suu"]),
         cung_11=repr(tinhBan.map_cung["Ty"]),
         cung_12=repr(tinhBan.map_cung["Hoi"]),
-        common_info=f"{tinhBan.cuc.name} cuc"
+        common_info=common_info
     ), unsafe_allow_html=True)
 
 
