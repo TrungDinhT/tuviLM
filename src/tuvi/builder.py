@@ -195,7 +195,7 @@ class Builder:
         thientuong_position = get_xung_chieu(phaquan_position)
 
         # Sắp xếp sao
-        self.tinhBan.map_cung[tuvi_position].chinhTinh.append(ChinhTinh(name="Tử vi", elemental="Tho"))
+        self.tinhBan.map_cung[tuvi_position].chinhTinh.append(ChinhTinh(name="Tử Vi", elemental="Tho"))
         self.tinhBan.map_cung[thienphu_position].chinhTinh.append(ChinhTinh(name="Thiên phủ", elemental="Tho"))
         self.tinhBan.map_cung[thaiduong_position].chinhTinh.append(ChinhTinh(name="Thái Dương", elemental="Hoa"))
         self.tinhBan.map_cung[vukhuc_position].chinhTinh.append(ChinhTinh(name="Vũ Khúc", elemental="Kim"))
