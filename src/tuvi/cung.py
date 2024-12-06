@@ -46,7 +46,7 @@ class Cung(pydantic.BaseModel):
         markdown_content += "  <tr>\n"
 
         for elemental, items in grouped_by_elemental.items():
-            markdown_content += "    <td style='vertical-align: top;'>\n"
+            markdown_content += "    <td style='vertical-align: top; padding: 5px;'>\n"
             for item in items:
                 font_size = "15px"
                 markdown_content += f"      <p style='color: {MAP_COLOR[item.elemental]}; font-size: {font_size}; white-space: nowrap;'>{item.name}</p>\n"

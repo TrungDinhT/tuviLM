@@ -4,6 +4,7 @@ from src.tuvi.birth import BirthTime
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.types import LIST_DIA_CHI, LIST_THIEN_CAN
 from src.tuvi.builder import Builder
+import datetime as dt
 
 # Define the HTML and CSS for the table
 html_table_template = """
@@ -54,25 +55,18 @@ html_table_template = """
 
 st.sidebar.header("Ngày sinh theo lịch âm")
 
-date = st.sidebar.number_input("Ngày sinh:", min_value=1, max_value=31, value=8)
-month = st.sidebar.number_input("Tháng sinh:", min_value=1, max_value=12, value=3)
-hour = st.sidebar.number_input("Giờ Sinh:", min_value=0, max_value=12, value=4)
+date = st.sidebar.number_input("Ngày sinh:", min_value=1, max_value=31, value=4)
+month = st.sidebar.number_input("Tháng sinh:", min_value=1, max_value=12, value=4)
+year = st.sidebar.number_input("Năm sinh:", min_value=1, max_value=9999, value=1998)
+hour = st.sidebar.number_input("Giờ Sinh:", min_value=0, max_value=23, value=8)
 gender = st.sidebar.selectbox("Giới tính:", options=["M", "F"], index=0)
 
-hour = LIST_DIA_CHI[hour]
+birthTime = dt.datetime(year, month, date, hour)
 
-thien_can = st.sidebar.selectbox("Thiên can năm sinh:", options=LIST_THIEN_CAN, index=4)
-dia_chi = st.sidebar.selectbox("Địa chi năm sinh:", options=LIST_DIA_CHI, index=2)
+birthTime = BirthTime.from_solar_day(birthTime, gender)
 
+print(birthTime)
 
-birthTime = BirthTime(
-    hour=hour,
-    date=date,
-    month=month,
-    thien_can=thien_can,
-    dia_chi=dia_chi,
-    gender=gender
-)
 builder = Builder()
 
 tinhBan = builder.build(birthTime)
