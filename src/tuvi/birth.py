@@ -1,7 +1,8 @@
 import datetime as dt
-from lunarcalendar import Converter, Solar, Lunar, DateNotExist
+from lunarcalendar import Converter, Solar
 import pydantic
 
+from src.external_lib.day_from_js import get_lunar_date
 from src.tuvi.types import LIST_DIA_CHI, LIST_THIEN_CAN, TYPE_DIA_CHI, TYPE_GENDER, TYPE_THIEN_CAN
 
 class BirthTime(pydantic.BaseModel):
@@ -33,8 +34,7 @@ class BirthTime(pydantic.BaseModel):
         else:
             hour = LIST_DIA_CHI[(time.hour + 1) // 2]
 
-        lunar = Converter.Solar2Lunar(Solar(time.year, time.month, time.day))
-
+        lunar = get_lunar_date(time.day, time.month, time.year)
 
         dia_chi = LIST_DIA_CHI[(lunar.year + 8) % 12]
         thien_can = LIST_THIEN_CAN[(lunar.year + 6) % 10]
