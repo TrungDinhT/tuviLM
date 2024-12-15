@@ -13,6 +13,8 @@ from src.tuvi.constant import (
     MAP_THIEN_QUAN,
     MAP_THIEN_TRU,
     MAP_THIEN_VIET,
+    MAP_TRIET,
+    MAP_TUAN,
     MAP_TUHOA,
     VONG_LOCTON,
     VONG_THAI_TUE
@@ -58,6 +60,7 @@ class Builder:
         self._build_dauquan(birthTime)
         self._build_trangsinh()
         self._build_tuhoa(birthTime)
+        self._build_tuan_triet(birthTime)
 
         return self.tinhBan
 
@@ -439,3 +442,18 @@ class Builder:
         self.tinhBan.map_cung[hoaquyen_position].tuhoa.append(TypeTuHoa(name="Hóa Quyền"))
         self.tinhBan.map_cung[hoakhoa_position].tuhoa.append(TypeTuHoa(name="Hóa Khoa"))
         self.tinhBan.map_cung[hoaky_position].tuhoa.append(TypeTuHoa(name="Hóa Kỵ"))
+
+
+    def _build_tuan_triet(self, birthTime : BirthTime):
+
+        triet_positions = MAP_TRIET[birthTime.thien_can]
+
+        dia_chi_index = LIST_DIA_CHI.index(birthTime.dia_chi)
+        thien_can_index = LIST_THIEN_CAN.index(birthTime.thien_can)
+
+        tuan_positions = MAP_TUAN[LIST_DIA_CHI[(dia_chi_index - thien_can_index) % 12]]
+
+        self.tinhBan.map_cung[triet_positions[0]].is_triet = True
+        self.tinhBan.map_cung[triet_positions[1]].is_triet = True
+        self.tinhBan.map_cung[tuan_positions[0]].is_tuan = True
+        self.tinhBan.map_cung[tuan_positions[1]].is_tuan = True

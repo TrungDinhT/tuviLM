@@ -145,3 +145,25 @@ MAP_TUHOA : dict[TYPE_THIEN_CAN, list[str]] = {
     "Nham": ["Thiên Lương", "Tử Vi", "Thiên Phủ", "Vũ Khúc"],
     "Quy": ["Phá Quân", "Cự Môn", "Thái Âm", "Tham Lang"]
 }
+
+MAP_TRIET : dict[TYPE_THIEN_CAN, list[TYPE_DIA_CHI]] = {
+    "Giap": ["Than", "Dau"],
+    "At": ["Ngo", "Mui"],
+    "Binh": ["Thin", "Ti"],
+    "Dinh": ["Dan", "Mao"],
+    "Mau": ["Ty", "Suu"],
+    "Ky": ["Than", "Dau"],
+    "Canh": ["Ngo", "Mui"],
+    "Tan": ["Thin", "Ti"],
+    "Nham": ["Dan", "Mao"],
+    "Quy": ["Ty", "Suu"],
+}
+
+MAP_TUAN : dict[TYPE_DIA_CHI, TYPE_DIA_CHI] = {
+    "Ty" : ["Tuat", "Hoi"],
+    "Dan" : ["Ty", "Suu"],
+    "Thin" : ["Dan", "Mao"],
+    "Ngo" : ["Thin", "Ti"],
+    "Than" : ["Ngo", "Mui"],
+    "Tuat" : ["Than", "Dau"],
+}

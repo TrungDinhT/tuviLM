@@ -21,6 +21,10 @@ class Cung(pydantic.BaseModel):
 
     tuhoa : list[TypeTuHoa] = []
 
+    is_tuan : bool = False
+
+    is_triet : bool = False
+
     is_cung_than : bool = False
 
     def __repr__(self) -> str:
@@ -30,6 +34,11 @@ class Cung(pydantic.BaseModel):
 
         for chinhTinh in self.chinhTinh:
             markdown_content += f"<p style='color: {MAP_COLOR[chinhTinh.elemental]};font-size: 20px;'>{chinhTinh.name}</p>\n"
+
+        if self.is_tuan:
+            markdown_content += f"<p style='font-size: 15px;'>**Tuần**</p>\n"
+        if self.is_triet:
+            markdown_content += f"<p style='font-size: 15px;'>**Triệt**</p>\n"
 
         grouped_by_elemental = {}
         for item in self.phuTinh:
