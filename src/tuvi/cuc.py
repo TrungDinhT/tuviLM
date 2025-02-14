@@ -1,6 +1,6 @@
 import pydantic
 
-from src.tuvi.types import NGU_HANH
+from src.tuvi.element.types import NGU_HANH
 
 class Cuc(pydantic.BaseModel):
 

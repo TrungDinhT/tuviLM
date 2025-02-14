@@ -1,6 +1,6 @@
 import pydantic
 
-from src.tuvi.types import NGU_HANH, TYPE_DIA_CHI
+from src.tuvi.element.types import NGU_HANH, TYPE_DIA_CHI
 
 
 class TypeTrangSinh(pydantic.BaseModel):

@@ -1,5 +1,5 @@
 from src.tuvi.sao import PhuTinh
-from src.tuvi.types import TYPE_DIA_CHI, TYPE_THIEN_CAN
+from src.tuvi.element.types import TYPE_DIA_CHI, TYPE_THIEN_CAN
 
 
 MAP_LOC_TON_POSITION : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {

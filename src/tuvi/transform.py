@@ -1,5 +1,5 @@
 from typing import Tuple
-from src.tuvi.types import LIST_DIA_CHI, TYPE_DIA_CHI
+from src.tuvi.element.types import LIST_DIA_CHI, TYPE_DIA_CHI
 
 
 def get_xung_chieu(position : TYPE_DIA_CHI) -> TYPE_DIA_CHI:

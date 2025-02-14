@@ -1,6 +1,6 @@
 import pydantic
 
-from src.tuvi.types import NGU_HANH, STAR_STATUS, TYPE_DIA_CHI
+from src.tuvi.element.types import NGU_HANH, STAR_STATUS, TYPE_DIA_CHI
 
 
 class Sao(pydantic.BaseModel):
