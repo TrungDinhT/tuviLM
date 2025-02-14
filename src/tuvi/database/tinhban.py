@@ -1,7 +1,7 @@
 from typing import Literal
 from pydantic import BaseModel
 
-from src.tuvi.sao import Sao
+from src.tuvi.element.sao import Sao
 from src.tuvi.element.types import ROLE_TYPE
 
 # TODO : could having nhi hop

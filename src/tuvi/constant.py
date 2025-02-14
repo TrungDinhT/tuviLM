@@ -1,4 +1,4 @@
-from src.tuvi.sao import PhuTinh
+from src.tuvi.element.sao import PhuTinh
 from src.tuvi.element.types import TYPE_DIA_CHI, TYPE_THIEN_CAN
 
 

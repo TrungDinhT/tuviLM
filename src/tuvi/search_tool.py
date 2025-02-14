@@ -41,4 +41,3 @@ def check_composition(
         if composition.relation == "tam phuong":
             if len(list_sao_positions) != 3:
                 return False
-            if

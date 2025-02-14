@@ -1,7 +1,7 @@
 from typing import Literal
 from src.tuvi.element.types import LIST_DIA_CHI, LIST_ROLES, LIST_THIEN_CAN, TYPE_DIA_CHI
 from src.tuvi.birth import BirthTime
-from src.tuvi.sao import ChinhTinh, PhuTinh
+from src.tuvi.element.sao import ChinhTinh, PhuTinh
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.cuc import LIST_CUC

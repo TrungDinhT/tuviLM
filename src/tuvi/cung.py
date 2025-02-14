@@ -1,6 +1,6 @@
 import pydantic
 
-from src.tuvi.sao import ChinhTinh, PhuTinh
+from src.tuvi.element.sao import ChinhTinh, PhuTinh
 from src.tuvi.element.types import AM_DUONG, MAP_COLOR, NGU_HANH, ROLE_TYPE
 from src.tuvi.element.trangsinh import TypeTrangSinh
 from src.tuvi.element.tuhoa import TypeTuHoa
