@@ -1,11 +1,8 @@
-import pydantic
-
 from src.tuvi.element.types import NGU_HANH, STAR_STATUS, TYPE_DIA_CHI
+from src.tuvi.element.base import Element
 
 
-class Sao(pydantic.BaseModel):
-
-    name : str
+class Sao(Element):
 
     description : str | None = None
 

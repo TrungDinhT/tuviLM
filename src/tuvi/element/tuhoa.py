@@ -1,6 +1,5 @@
-import pydantic
+from src.tuvi.element.base import Element
 
 
-class TypeTuHoa(pydantic.BaseModel):
-
-    name : str
+class TypeTuHoa(Element):
+    pass

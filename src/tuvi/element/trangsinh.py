@@ -1,11 +1,10 @@
-import pydantic
-
 from src.tuvi.element.types import NGU_HANH, TYPE_DIA_CHI
+from src.tuvi.element.base import Element
 
 
-class TypeTrangSinh(pydantic.BaseModel):
+class TypeTrangSinh(Element):
 
-    name : str
+    pass
 
 
 VONG_TRANG_SINH = [
