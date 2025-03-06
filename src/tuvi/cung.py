@@ -1,5 +1,7 @@
+from functools import cached_property
 import pydantic
 
+from src.tuvi.element.base import Element
 from src.tuvi.element.sao import ChinhTinh, PhuTinh
 from src.tuvi.element.types import AM_DUONG, MAP_COLOR, NGU_HANH, ROLE_TYPE
 from src.tuvi.element.trangsinh import TypeTrangSinh
@@ -26,6 +28,10 @@ class Cung(pydantic.BaseModel):
     is_triet : bool = False
 
     is_cung_than : bool = False
+
+    @cached_property
+    def all_element(self) -> list[Element]:
+        return [*self.chinhTinh, *self.phuTinh, self.trang_sinh, *self.tuhoa]
 
     def __repr__(self) -> str:
         role_str = self.role if not self.is_cung_than else f"{self.role} - Than"

@@ -2,9 +2,10 @@ from typing import Literal
 from src.tuvi.element.types import LIST_DIA_CHI, LIST_ROLES, LIST_THIEN_CAN, TYPE_DIA_CHI
 from src.tuvi.birth import BirthTime
 from src.tuvi.element.sao import ChinhTinh, PhuTinh
+from src.tuvi.search_tool import search_element
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
-from src.tuvi.cuc import LIST_CUC
+from src.tuvi.element.cuc import LIST_CUC
 from src.tuvi.constant import (
     MAP_LOC_TON_POSITION,
     MAP_LUU_HA,
@@ -21,7 +22,6 @@ from src.tuvi.constant import (
 )
 
 from src.tuvi.element.trangsinh import MAP_TRANGSINH_POSITION, VONG_TRANG_SINH
-from src.tuvi.search_tool import search_sao
 from src.tuvi.element.tuhoa import TypeTuHoa
 
 
@@ -433,10 +433,10 @@ class Builder:
     def _build_tuhoa(self, birthTime : BirthTime):
         sao_hoa_khi = MAP_TUHOA[birthTime.thien_can]
 
-        hoaloc_position = search_sao(self.tinhBan, sao_hoa_khi[0])
-        hoaquyen_position = search_sao(self.tinhBan, sao_hoa_khi[1])
-        hoakhoa_position = search_sao(self.tinhBan, sao_hoa_khi[2])
-        hoaky_position = search_sao(self.tinhBan, sao_hoa_khi[3])
+        hoaloc_position = search_element(self.tinhBan, sao_hoa_khi[0])
+        hoaquyen_position = search_element(self.tinhBan, sao_hoa_khi[1])
+        hoakhoa_position = search_element(self.tinhBan, sao_hoa_khi[2])
+        hoaky_position = search_element(self.tinhBan, sao_hoa_khi[3])
 
         self.tinhBan.map_cung[hoaloc_position].tuhoa.append(TypeTuHoa(name="Hóa Lộc"))
         self.tinhBan.map_cung[hoaquyen_position].tuhoa.append(TypeTuHoa(name="Hóa Quyền"))

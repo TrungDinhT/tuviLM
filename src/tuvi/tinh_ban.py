@@ -2,9 +2,8 @@ from typing import Literal
 import pydantic
 
 from src.tuvi.cung import Cung
-from src.tuvi.birth import BirthTime
 from src.tuvi.element.types import AM_DUONG, LIST_DIA_CHI, TYPE_DIA_CHI, TYPE_GENDER
-from src.tuvi.cuc import Cuc
+from src.tuvi.element.cuc import Cuc
 
 class TinhBan(pydantic.BaseModel):
 
