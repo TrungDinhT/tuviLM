@@ -1,10 +1,11 @@
 import streamlit as st
 
 from src.tuvi.birth import BirthTime
-from src.tuvi.tinh_ban import TinhBan
-from src.tuvi.types import LIST_DIA_CHI, LIST_THIEN_CAN
 from src.tuvi.builder import Builder
 import datetime as dt
+
+from src.tuvi.database.database import ALL_COMPOSITIONS
+from src.tuvi.search_tool import check_composition, search_elements
 
 # Define the HTML and CSS for the table
 html_table_template = """
@@ -90,5 +91,8 @@ st.markdown(html_table_template.format(
         common_info=common_info
     ), unsafe_allow_html=True)
 
+# ---------------- Seach for element composition -------------
 
-print(sum(len(cung.phuTinh) + len(cung.chinhTinh) for cung in tinhBan.map_cung.values()))
+for compo in ALL_COMPOSITIONS:
+    if check_composition(tinhBan, compo):
+        st.markdown(f"Having : {compo.name}")
