@@ -1,0 +1,23 @@
+from src.refactored.element.dia_chi import DiaChi
+
+def get_xung_chieu(position: DiaChi) -> DiaChi:
+    return position + 6
+
+def get_nhi_hop(position: DiaChi) -> DiaChi:
+    index = position.value
+    return DiaChi((13 - index) % 12)
+
+def get_luc_hai(position: DiaChi) -> DiaChi:
+    index = position.value
+    return DiaChi((7 - index) % 12)
+
+def get_tam_hop_thuan(position: DiaChi) -> DiaChi:
+    # Increase clockwise
+    return position + 4
+
+def get_tam_hop_nghich(position: DiaChi) -> DiaChi:
+    # Decrease counter-clockwise
+    return position - 4
+
+def get_tam_hop(position: DiaChi) -> tuple[DiaChi, DiaChi]:
+    return get_tam_hop_thuan(position), get_tam_hop_nghich(position)
