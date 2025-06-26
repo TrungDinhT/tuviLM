@@ -25,7 +25,8 @@ class TinhBan(pydantic.BaseModel):
         return cls(
             map_cung={
                 dia_chi : Cung(
-                    sign="Am" if idx % 2 == 1 else "Duong"
+                    sign="Am" if idx % 2 == 1 else "Duong",
+                    dia_chi=dia_chi,
                 ) for idx, dia_chi in enumerate(LIST_DIA_CHI)}
         )
 

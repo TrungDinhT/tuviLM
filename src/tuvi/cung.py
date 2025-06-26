@@ -2,6 +2,7 @@ from functools import cached_property
 import pydantic
 
 from src.tuvi.element.base import Element
+from src.tuvi.element.dia_chi import DiaChi
 from src.tuvi.element.sao import ChinhTinh, PhuTinh
 from src.tuvi.element.types import AM_DUONG, MAP_COLOR, NGU_HANH, ROLE_TYPE
 from src.tuvi.element.trangsinh import TypeTrangSinh
@@ -28,6 +29,10 @@ class Cung(pydantic.BaseModel):
     is_triet : bool = False
 
     is_cung_than : bool = False
+
+    dia_chi : str = ""
+
+    thien_can : str = ""
 
     @cached_property
     def all_element(self) -> list[Element]:
