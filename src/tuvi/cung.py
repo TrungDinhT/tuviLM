@@ -4,7 +4,7 @@ import pydantic
 from src.tuvi.element.base import Element
 from src.tuvi.element.dia_chi import DiaChi
 from src.tuvi.element.sao import ChinhTinh, PhuTinh
-from src.tuvi.element.types import AM_DUONG, MAP_COLOR, NGU_HANH, ROLE_TYPE
+from src.tuvi.element.types import AM_DUONG, MAP_COLOR, NGU_HANH, ROLE_TYPE, TYPE_DIA_CHI
 from src.tuvi.element.trangsinh import TypeTrangSinh
 from src.tuvi.element.tuhoa import TypeTuHoa
 
@@ -30,7 +30,7 @@ class Cung(pydantic.BaseModel):
 
     is_cung_than : bool = False
 
-    dia_chi : str = ""
+    dia_chi : TYPE_DIA_CHI | None = None
 
     thien_can : str = ""
 
@@ -44,14 +44,14 @@ class Cung(pydantic.BaseModel):
         markdown_content = f"<h3 style='text-align: center;'><b>{role_str}</b></h3>\n\n"
 
         for chinhTinh in self.chinhTinh:
-            markdown_content += f"<p style='color: {MAP_COLOR[chinhTinh.elemental]};font-size: 20px;'>{chinhTinh.name}</p>\n"
+            markdown_content += f"<p style='color: {MAP_COLOR[chinhTinh.elemental]};font-size: 20px;'>{chinhTinh.star_name_with_status(self.dia_chi)}</p>\n"
 
         if self.is_tuan:
             markdown_content += f"<p style='font-size: 15px;'>**Tuần**</p>\n"
         if self.is_triet:
             markdown_content += f"<p style='font-size: 15px;'>**Triệt**</p>\n"
 
-        grouped_by_elemental = {}
+        grouped_by_elemental : dict[NGU_HANH, list[PhuTinh]] = {}
         for item in self.phuTinh:
             if item.elemental not in grouped_by_elemental:
                 grouped_by_elemental[item.elemental] = []
@@ -69,7 +69,7 @@ class Cung(pydantic.BaseModel):
             markdown_content += "    <td style='vertical-align: top; padding: 5px;'>\n"
             for item in items:
                 font_size = "15px"
-                markdown_content += f"      <p style='color: {MAP_COLOR[item.elemental]}; font-size: {font_size}; white-space: nowrap;'>{item.name}</p>\n"
+                markdown_content += f"      <p style='color: {MAP_COLOR[item.elemental]}; font-size: {font_size}; white-space: nowrap;'>{item.star_name_with_status(self.dia_chi)}</p>\n"
             markdown_content += "    </td>\n"
 
         markdown_content += "  </tr>\n"

@@ -78,5 +78,14 @@ MAP_START_STATUS: dict[str, dict[TYPE_DIA_CHI, STAR_STATUS]] = {
     "Linh Tinh": {
         "Tý": "Hãm", "Sửu": "Đắc", "Dần": "Hãm", "Mão": "Hãm", "Thìn": "Đắc", "Tị": "Hãm",
         "Ngọ": "Hãm", "Mùi": "Đắc", "Thân": "Hãm", "Dậu": "Hãm", "Tuất": "Đắc", "Hợi": "Hãm"
-    }
+    },
+    # Lúc cát tinh
+    "Văn Xương": {
+        "Tý": "Hãm", "Sửu": "Đắc", "Dần": "Hãm", "Mão": "Đắc", "Thìn": "Đắc", "Tị": "Đắc",
+        "Ngọ": "Hãm", "Mùi": "Đắc", "Thân": "Hãm", "Dậu": "Đắc", "Tuất": "Đắc", "Hợi": "Đắc"
+    },
+    "Văn Khúc": {
+        "Tý": "Hãm", "Sửu": "Đắc", "Dần": "Hãm", "Mão": "Đắc", "Thìn": "Đắc", "Tị": "Đắc",
+        "Ngọ": "Hãm", "Mùi": "Đắc", "Thân": "Hãm", "Dậu": "Đắc", "Tuất": "Đắc", "Hợi": "Đắc"
+    },
 }
