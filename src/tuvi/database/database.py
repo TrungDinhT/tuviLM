@@ -2,7 +2,7 @@ from src.tuvi.database.star_composition import ElementComposition
 
 
 ALL_COMPOSITIONS = [
-    ElementComposition(name="nhật trầm thủy bễ tại tý", target_position="Ty", role="Menh", list_elements=["Thái Dương"], relation="cung"),
-    ElementComposition(name="nhật trầm thủy bễ tại hợi", target_position="Hoi", role="Menh", list_elements=["Thái Dương"], relation="cung"),
+    ElementComposition(name="nhật trầm thủy bễ tại tý", target_position="Tý", role="Menh", list_elements=["Thái Dương"], relation="cung"),
+    ElementComposition(name="nhật trầm thủy bễ tại hợi", target_position="Hợi", role="Menh", list_elements=["Thái Dương"], relation="cung"),
     ElementComposition(name="đế ngộ hung đồ", list_elements=["Tử Vi", "Địa Kiếp"], relation="cung"),
 ]

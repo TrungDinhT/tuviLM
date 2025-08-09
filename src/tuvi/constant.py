@@ -3,16 +3,16 @@ from src.tuvi.element.types import TYPE_DIA_CHI, TYPE_THIEN_CAN
 
 
 MAP_LOC_TON_POSITION : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
-        "Giap" : "Dan",
-        "At" : "Mao",
-        "Binh" : "Ti",
-        "Dinh" : "Ngo",
-        "Mau" : "Ti",
-        "Ky" : "Ngo",
-        "Canh" : "Than",
-        "Tan" : "Dau",
-        "Nham" : "Hoi",
-        "Quy" : "Ty",
+        "Giap" : "Dần",
+        "At" : "Mão",
+        "Binh" : "Tị",
+        "Dinh" : "Ngọ",
+        "Mau" : "Tị",
+        "Ky" : "Ngọ",
+        "Canh" : "Thân",
+        "Tan" : "Dậu",
+        "Nham" : "Hợi",
+        "Quy" : "Tý",
     }
 
 # TODO : verify lực sĩ luôn đi cùng kình dương , quan phủ có theo vòng lộc tồn?
@@ -49,29 +49,29 @@ VONG_THAI_TUE = [
 
 
 MAP_THIEN_KHOI : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
-    "Giap": "Suu",
-    "At": "Ty",
-    "Binh": "Hoi",
-    "Dinh": "Hoi",
-    "Mau": "Suu",
-    "Ky": "Ty",
-    "Canh": "Ngo",
-    "Tan": "Ngo",
-    "Nham": "Mao",
-    "Quy": "Mao"
+    "Giap": "Sửu",
+    "At": "Tý",
+    "Binh": "Hợi",
+    "Dinh": "Hợi",
+    "Mau": "Sửu",
+    "Ky": "Tý",
+    "Canh": "Ngọ",
+    "Tan": "Ngọ",
+    "Nham": "Mão",
+    "Quy": "Mão"
 }
 
 MAP_THIEN_VIET : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
-    "Giap": "Mui",
-    "At": "Than",
-    "Binh": "Dau",
-    "Dinh": "Dau",
-    "Mau": "Mui",
-    "Ky": "Than",
-    "Canh": "Dan",
-    "Tan": "Dan",
-    "Nham": "Ti",
-    "Quy": "Ti"
+    "Giap": "Mùi",
+    "At": "Thân",
+    "Binh": "Dậu",
+    "Dinh": "Dậu",
+    "Mau": "Mùi",
+    "Ky": "Thân",
+    "Canh": "Dần",
+    "Tan": "Dần",
+    "Nham": "Tị",
+    "Quy": "Tị"
 }
 
 
@@ -79,57 +79,57 @@ MAP_THIEN_VIET : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
 # TODO : there is difference between books and web
 # https://lyso.vn/xem-tu-vi/lai-mot-van-de-tranh-cai-trong-tu-vi-lan-nay-la-cach-an-luu-ha-voi-tuoi-dinh-va-canh-t102897/
 MAP_LUU_HA : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
-    "Giap": "Dau",
-    "At": "Tuat",
-    "Binh": "Mui",
-    "Dinh": "Thin",
-    "Mau": "Ti",
-    "Ky": "Ngo",
-    "Canh": "Than",
-    "Tan": "Thin",
-    "Nham": "Hoi",
-    "Quy": "Dan"
+    "Giap": "Dậu",
+    "At": "Tuất",
+    "Binh": "Mùi",
+    "Dinh": "Thìn",
+    "Mau": "Tị",
+    "Ky": "Ngọ",
+    "Canh": "Thân",
+    "Tan": "Thìn",
+    "Nham": "Hợi",
+    "Quy": "Dần"
 }
 
 # http://tuvi.cohoc.net/sao-thien-tru-o-menh-va-cac-cung-khac-nid-6989.html
 MAP_THIEN_TRU : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
-    "Giap": "Ti",
-    "At": "Ngo",
-    "Binh": "Ty",
-    "Dinh": "Ti",
-    "Mau": "Ngo",
-    "Ky": "Than",
-    "Canh": "Dan",
-    "Tan": "Ngo",
-    "Nham": "Dau",
-    "Quy": "Tuat"
+    "Giap": "Tị",
+    "At": "Ngọ",
+    "Binh": "Tý",
+    "Dinh": "Tị",
+    "Mau": "Ngọ",
+    "Ky": "Thân",
+    "Canh": "Dần",
+    "Tan": "Ngọ",
+    "Nham": "Dậu",
+    "Quy": "Tuất"
 }
 
 # http://tuvi.cohoc.net/sao-thien-quan-thien-phuc-y-nghia-tai-menh-va-cung-khac-nid-6953.html
 MAP_THIEN_QUAN : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
-    "Giap": "Mui",
-    "At": "Mui",
-    "Binh": "Thin",
-    "Dinh": "Dan",
-    "Mau": "Mao",
-    "Ky": "Dau",
-    "Canh": "Hoi",
-    "Tan": "Dau",
-    "Nham": "Tuat",
-    "Quy": "Ngo"
+    "Giap": "Mùi",
+    "At": "Mùi",
+    "Binh": "Thìn",
+    "Dinh": "Dần",
+    "Mau": "Mão",
+    "Ky": "Dậu",
+    "Canh": "Hợi",
+    "Tan": "Dậu",
+    "Nham": "Tuất",
+    "Quy": "Ngọ"
 }
 
 MAP_THIEN_PHUC : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
-    "Giap": "Dau",
-    "At": "Dau",
-    "Binh": "Than",
-    "Dinh": "Hoi",
-    "Mau": "Mao",
-    "Ky": "Dan",
-    "Canh": "Ngo",
-    "Tan": "Ti",
-    "Nham": "Ngo",
-    "Quy": "Ti"
+    "Giap": "Dậu",
+    "At": "Dậu",
+    "Binh": "Thân",
+    "Dinh": "Hợi",
+    "Mau": "Mão",
+    "Ky": "Dần",
+    "Canh": "Ngọ",
+    "Tan": "Tị",
+    "Nham": "Ngọ",
+    "Quy": "Tị"
 }
 
 
@@ -147,23 +147,23 @@ MAP_TUHOA : dict[TYPE_THIEN_CAN, list[str]] = {
 }
 
 MAP_TRIET : dict[TYPE_THIEN_CAN, list[TYPE_DIA_CHI]] = {
-    "Giap": ["Than", "Dau"],
-    "At": ["Ngo", "Mui"],
-    "Binh": ["Thin", "Ti"],
-    "Dinh": ["Dan", "Mao"],
-    "Mau": ["Ty", "Suu"],
-    "Ky": ["Than", "Dau"],
-    "Canh": ["Ngo", "Mui"],
-    "Tan": ["Thin", "Ti"],
-    "Nham": ["Dan", "Mao"],
-    "Quy": ["Ty", "Suu"],
+    "Giap": ["Thân", "Dậu"],
+    "At": ["Ngọ", "Mùi"],
+    "Binh": ["Thìn", "Tị"],
+    "Dinh": ["Dần", "Mão"],
+    "Mau": ["Tý", "Sửu"],
+    "Ky": ["Thân", "Dậu"],
+    "Canh": ["Ngọ", "Mùi"],
+    "Tan": ["Thìn", "Tị"],
+    "Nham": ["Dần", "Mão"],
+    "Quy": ["Tý", "Sửu"],
 }
 
 MAP_TUAN : dict[TYPE_DIA_CHI, TYPE_DIA_CHI] = {
-    "Ty" : ["Tuat", "Hoi"],
-    "Dan" : ["Ty", "Suu"],
-    "Thin" : ["Dan", "Mao"],
-    "Ngo" : ["Thin", "Ti"],
-    "Than" : ["Ngo", "Mui"],
-    "Tuat" : ["Than", "Dau"],
+    "Tý" : ["Tuất", "Hợi"],
+    "Dần" : ["Tý", "Sửu"],
+    "Thìn" : ["Dần", "Mão"],
+    "Ngọ" : ["Thìn", "Tị"],
+    "Thân" : ["Ngọ", "Mùi"],
+    "Tuất" : ["Thân", "Dậu"],
 }

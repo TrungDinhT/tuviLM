@@ -30,7 +30,7 @@ class BirthTime(pydantic.BaseModel):
             is_tomorrow = True
 
         if is_tomorrow or time.hour == 0:
-            hour = "Ty"
+            hour = "Tý"
         else:
             hour = LIST_DIA_CHI[(time.hour + 1) // 2]
 

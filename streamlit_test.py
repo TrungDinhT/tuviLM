@@ -76,18 +76,18 @@ common_info = f"Cục : {tinhBan.cuc.name} cục.<br> Giờ sinh : {birthTime}"
 
 # Display the HTML table in Streamlit
 st.markdown(html_table_template.format(
-        cung_1=repr(tinhBan.map_cung["Ti"]),
-        cung_2=repr(tinhBan.map_cung["Ngo"]),
-        cung_3=repr(tinhBan.map_cung["Mui"]),
-        cung_4=repr(tinhBan.map_cung["Than"]),
-        cung_5=repr(tinhBan.map_cung["Thin"]),
-        cung_6=repr(tinhBan.map_cung["Dau"]),
-        cung_7=repr(tinhBan.map_cung["Mao"]),
-        cung_8=repr(tinhBan.map_cung["Tuat"]),
-        cung_9=repr(tinhBan.map_cung["Dan"]),
-        cung_10=repr(tinhBan.map_cung["Suu"]),
-        cung_11=repr(tinhBan.map_cung["Ty"]),
-        cung_12=repr(tinhBan.map_cung["Hoi"]),
+        cung_1=repr(tinhBan.map_cung["Tị"]),
+        cung_2=repr(tinhBan.map_cung["Ngọ"]),
+        cung_3=repr(tinhBan.map_cung["Mùi"]),
+        cung_4=repr(tinhBan.map_cung["Thân"]),
+        cung_5=repr(tinhBan.map_cung["Thìn"]),
+        cung_6=repr(tinhBan.map_cung["Dậu"]),
+        cung_7=repr(tinhBan.map_cung["Mão"]),
+        cung_8=repr(tinhBan.map_cung["Tuất"]),
+        cung_9=repr(tinhBan.map_cung["Dần"]),
+        cung_10=repr(tinhBan.map_cung["Sửu"]),
+        cung_11=repr(tinhBan.map_cung["Tý"]),
+        cung_12=repr(tinhBan.map_cung["Hợi"]),
         common_info=common_info
     ), unsafe_allow_html=True)
 

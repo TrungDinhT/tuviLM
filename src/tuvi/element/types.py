@@ -7,10 +7,10 @@ AM_DUONG = Literal["Am", "Duong"]
 ROLE_TYPE = Literal["Menh", "Phu Mau", "Phuc Duc", "Dien Trach", "Quan Loc", "No Boc",
                "Thien Di", "Tat Ach", "Tai Bach", "Tu Tuc", "Phu The", "Huynh De"]
 
-TYPE_DIA_CHI = Literal["Ty", "Suu", "Dan", "Mao", "Thin", "Ti", "Ngo", "Mui", "Than", "Dau", "Tuat", "Hoi"]
+TYPE_DIA_CHI = Literal["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"]
 
 LIST_DIA_CHI : list[TYPE_DIA_CHI] = [
-    "Ty", "Suu", "Dan", "Mao", "Thin", "Ti", "Ngo", "Mui", "Than", "Dau", "Tuat", "Hoi"
+    "Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"
 ]
 
 TYPE_THIEN_CAN = Literal["Giap", "At", "Binh", "Dinh", "Mau", "Ky", "Canh", "Tan", "Nham", "Quy"]

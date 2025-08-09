@@ -8,16 +8,16 @@ class DiaChi(BaseModel):
     index : int
 
 LIST_DIA_CHI = [
-    DiaChi(name="Ty", index=0),
-    DiaChi(name="Suu", index=1),
-    DiaChi(name="Dan", index=2),
-    DiaChi(name="Ngo", index=3),
-    DiaChi(name="Thin", index=4),
-    DiaChi(name="Ti", index=5),
-    DiaChi(name="Ngo", index=6),
-    DiaChi(name="Mui", index=7),
-    DiaChi(name="Than", index=8),
-    DiaChi(name="Dau", index=9),
-    DiaChi(name="Tuat", index=10),
-    DiaChi(name="Hoi", index=11),
+    DiaChi(name="Tý", index=0),
+    DiaChi(name="Sửu", index=1),
+    DiaChi(name="Dần", index=2),
+    DiaChi(name="Ngọ", index=3),
+    DiaChi(name="Thìn", index=4),
+    DiaChi(name="Tị", index=5),
+    DiaChi(name="Ngọ", index=6),
+    DiaChi(name="Mùi", index=7),
+    DiaChi(name="Thân", index=8),
+    DiaChi(name="Dậu", index=9),
+    DiaChi(name="Tuất", index=10),
+    DiaChi(name="Hợi", index=11),
 ]
