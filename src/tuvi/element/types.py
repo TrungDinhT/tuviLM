@@ -4,8 +4,8 @@ NGU_HANH = Literal["Kim", "Moc", "Thuy", "Hoa", "Tho"]
 
 AM_DUONG = Literal["Am", "Duong"]
 
-ROLE_TYPE = Literal["Menh", "Phu Mậu", "Phuc Duc", "Dien Trach", "Quan Loc", "No Boc",
-               "Thien Di", "Tat Ach", "Tai Bach", "Tu Tuc", "Phu The", "Huynh De"]
+ROLE_TYPE = Literal["Mệnh", "Phu Mẫu", "Phúc Đức", "Điền Trạch", "Quan Lộc", "Nô Bộc",
+               "Thiên Di", "Tật Ách", "Tài Bạch", "Tử Tức", "Phu Thê", "Huynh Đệ"]
 
 TYPE_DIA_CHI = Literal["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"]
 
@@ -19,8 +19,8 @@ LIST_THIEN_CAN : TYPE_THIEN_CAN = ["Giấp", "Ất", "Bính", "Đinh", "Mậu", 
 
 TYPE_GENDER = Literal["M", "F"]
 
-LIST_ROLES = ["Menh", "Phu Mậu", "Phuc Duc", "Dien Trach", "Quan Loc", "No Boc",
-               "Thien Di", "Tat Ach", "Tai Bach", "Tu Tuc", "Phu The", "Huynh De"]
+LIST_ROLES = ["Mệnh", "Phu Mẫu", "Phúc Đức", "Điền Trạch", "Quan Lộc", "Nô Bộc",
+               "Thiên Di", "Tật Ách", "Tài Bạch", "Tử Tức", "Phu Thê", "Huynh Đệ"]
 
 STAR_STATUS = Literal["Ham", "Bính", "Dac", "Vuong", "Mieu", None]
 

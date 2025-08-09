@@ -33,7 +33,7 @@ class TinhBan(pydantic.BaseModel):
     @property
     def menh_position(self):
         for dia_chi, cung in self.map_cung.items():
-            if cung.role == "Menh":
+            if cung.role == "Mệnh":
                 return dia_chi
 
         raise ValueError("Non role tinh ban")

@@ -134,9 +134,9 @@ class Builder:
             position = LIST_DIA_CHI[(menh_position + idx) % 12]
             self.tinhBan.map_cung[position].role = role
 
-            if role == "Tat Ach":
+            if role == "Tật Ách":
                 self.tinhBan.map_cung[position].phuTinh.append(PhuTinh(name="Thiên Sứ", elemental="Thuy"))
-            if role == "No Boc":
+            if role == "Nô Bộc":
                 self.tinhBan.map_cung[position].phuTinh.append(PhuTinh(name="Thiên Thuơng", elemental="Tho"))
 
         self.tinhBan.map_cung[thientho_position].phuTinh.append(PhuTinh(name="Thiên Thọ", elemental="Tho"))
