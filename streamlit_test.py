@@ -54,7 +54,7 @@ html_table_template = """
 </table>
 """
 
-st.sidebar.header("Ngày sinh theo lịch âm")
+st.sidebar.header("Ngày sinh theo lịch dương")
 
 date = st.sidebar.number_input("Ngày sinh:", min_value=1, max_value=31, value=4)
 month = st.sidebar.number_input("Tháng sinh:", min_value=1, max_value=12, value=4)
