@@ -199,11 +199,11 @@ class Builder:
 
         # Sắp xếp sao
         self.tinhBan.map_cung[tuvi_position].chinhTinh.append(ChinhTinh(name="Tử Vi", elemental="Thổ"))
-        self.tinhBan.map_cung[thienphu_position].chinhTinh.append(ChinhTinh(name="Thiên phủ", elemental="Thổ"))
+        self.tinhBan.map_cung[thienphu_position].chinhTinh.append(ChinhTinh(name="Thiên Phủ", elemental="Thổ"))
         self.tinhBan.map_cung[thaiduong_position].chinhTinh.append(ChinhTinh(name="Thái Dương", elemental="Hỏa"))
         self.tinhBan.map_cung[vukhuc_position].chinhTinh.append(ChinhTinh(name="Vũ Khúc", elemental="Kim"))
         self.tinhBan.map_cung[liemtrinh_position].chinhTinh.append(ChinhTinh(name="Liêm Trinh", elemental="Hỏa"))
-        self.tinhBan.map_cung[thatsat_position].chinhTinh.append(ChinhTinh(name="Thất sát", elemental="Kim"))
+        self.tinhBan.map_cung[thatsat_position].chinhTinh.append(ChinhTinh(name="Thất Sát", elemental="Kim"))
         self.tinhBan.map_cung[thamlang_position].chinhTinh.append(ChinhTinh(name="Tham Lang", elemental="Thủy"))
         self.tinhBan.map_cung[phaquan_position].chinhTinh.append(ChinhTinh(name="Phá Quân", elemental="Thủy"))
         self.tinhBan.map_cung[thiendong_position].chinhTinh.append(ChinhTinh(name="Thiên Đồng", elemental="Thủy"))
