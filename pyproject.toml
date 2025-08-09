@@ -2,7 +2,7 @@
 name = "tuvilm"
 version = "0.1.0"
 description = ""
-authors = ["lephuock <phuockhanhnk94@gmail.com>"]
+authors = ["lephuock <phuockhanhnk94@gmail.com>", "TrungDinhT <dinhthanhtrung1996@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

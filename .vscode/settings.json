@@ -32,7 +32,9 @@
   "mypy-type-checker.args": ["--cache-dir=.mypy_cache/vscode"],
   // The daemon doesn't seem to work properly, errors don't show, so better to disable it for now
   "mypy-type-checker.preferDaemon": false,
-  "ruff.lint.args": ["--cache-dir=.ruff_cache/vscode"],
+  "ruff.configuration": {
+    "cache-dir": ".ruff_cache/vscode"
+  },
   "ruff.importStrategy": "fromEnvironment",
   "black-formatter.importStrategy": "fromEnvironment",
   "python.languageServer": "Pylance",
