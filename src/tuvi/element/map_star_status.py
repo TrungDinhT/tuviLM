@@ -93,8 +93,9 @@ MAP_START_STATUS: dict[str, dict[TYPE_DIA_CHI, STAR_STATUS]] = {
         "Tý": "Hãm", "Sửu": "Hãm", "Dần": "Đắc", "Mão": "Đắc", "Thìn": "Hãm", "Tị": "Hãm",
         "Ngọ": "Hãm", "Mùi": "Hãm", "Thân": "Đắc", "Dậu": "Đắc", "Tuất": "Hãm", "Hợi": "Hãm"
     },
-    "Thiên Hình" : {
+    "Thiên Hình" : { # https://tuvinamphai.vn/sao-thien-hinh-d82
         "Tý": "Bình", "Sửu": "Hãm", "Dần": "Miếu", "Mão": "Miếu", "Thìn": "Bình", "Tị": "Bình",
         "Ngọ": "Bình", "Mùi": "Hãm", "Thân": "Bình", "Dậu": "Miếu", "Tuất": "Miếu", "Hợi": "Bình"
     },
+
 }
