@@ -88,4 +88,13 @@ MAP_START_STATUS: dict[str, dict[TYPE_DIA_CHI, STAR_STATUS]] = {
         "Tý": "Hãm", "Sửu": "Đắc", "Dần": "Hãm", "Mão": "Đắc", "Thìn": "Đắc", "Tị": "Đắc",
         "Ngọ": "Hãm", "Mùi": "Đắc", "Thân": "Hãm", "Dậu": "Đắc", "Tuất": "Đắc", "Hợi": "Đắc"
     },
+    # Other
+    "Thiên Diêu" : {
+        "Tý": "Hãm", "Sửu": "Hãm", "Dần": "Đắc", "Mão": "Đắc", "Thìn": "Hãm", "Tị": "Hãm",
+        "Ngọ": "Hãm", "Mùi": "Hãm", "Thân": "Đắc", "Dậu": "Đắc", "Tuất": "Hãm", "Hợi": "Hãm"
+    },
+    "Thiên Hình" : {
+        "Tý": "Bình", "Sửu": "Hãm", "Dần": "Miếu", "Mão": "Miếu", "Thìn": "Bình", "Tị": "Bình",
+        "Ngọ": "Bình", "Mùi": "Hãm", "Thân": "Bình", "Dậu": "Miếu", "Tuất": "Miếu", "Hợi": "Bình"
+    },
 }
