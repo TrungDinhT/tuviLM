@@ -149,15 +149,15 @@ class Builder:
 
         thien_can = birthTime.thien_can
 
-        if thien_can in ["Giap", "Ky"]:
+        if thien_can in ["Giấp", "Kỷ"]:
             cuc_index = self._match_cuc_index_by_menh_position([0,4,1,3,2], menh_position)
-        if thien_can in ["At", "Canh"]:
+        if thien_can in ["Ất", "Canh"]:
             cuc_index = self._match_cuc_index_by_menh_position([4,3,2,1,0], menh_position)
-        if thien_can in ["Binh", "Tan"]:
+        if thien_can in ["Bính", "Tân"]:
             cuc_index = self._match_cuc_index_by_menh_position([3,1,0,2,4], menh_position)
-        if thien_can in ["Dinh", "Nham"]:
+        if thien_can in ["Đinh", "Nhâm"]:
             cuc_index = self._match_cuc_index_by_menh_position([1,2,4,0,3], menh_position)
-        if thien_can in ["Mau", "Quy"]:
+        if thien_can in ["Mậu", "Quý"]:
             cuc_index = self._match_cuc_index_by_menh_position([2,0,3,4,1], menh_position)
         self.tinhBan.cuc = LIST_CUC[cuc_index]
 
