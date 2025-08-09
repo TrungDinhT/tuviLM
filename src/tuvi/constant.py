@@ -27,7 +27,7 @@ VONG_LOCTON = [
     [PhuTinh(name="Hỷ Thần", elemental="Hỏa")],
     [PhuTinh(name="Bệnh Phù", elemental="Thổ"), PhuTinh(name="Quốc Ấn", elemental="Thổ")],
     [PhuTinh(name="Đại Hao", elemental="Hỏa")],
-    [PhuTinh(name="Phuc Bính", elemental="Hỏa")],
+    [PhuTinh(name="Phục Binh", elemental="Hỏa")],
     [PhuTinh(name="Đà La", elemental="Kim"), PhuTinh(name="Quan Phủ", elemental="Hỏa")],
 ]
 
