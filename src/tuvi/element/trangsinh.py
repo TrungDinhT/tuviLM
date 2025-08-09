@@ -24,8 +24,8 @@ VONG_TRANG_SINH = [
 
 MAP_TRANGSINH_POSITION : dict[NGU_HANH, TYPE_DIA_CHI] = {
     "Kim" : "Tị",
-    "Moc" : "Hợi",
-    "Hoa" : "Dần",
-    "Tho" : "Thân",
-    "Thuy" : "Thân",
+    "Mộc" : "Hợi",
+    "Hỏa" : "Dần",
+    "Thổ" : "Thân",
+    "Thủy" : "Thân",
 }

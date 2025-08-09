@@ -9,9 +9,9 @@ class Cuc(pydantic.BaseModel):
     elemental : NGU_HANH
 
 LIST_CUC = [
-    Cuc(name="Thủy Nhị cục", number=2, elemental="Thuy"),
-    Cuc(name="Mộc Tam cục", number=3, elemental="Moc"),
+    Cuc(name="Thủy Nhị cục", number=2, elemental="Thủy"),
+    Cuc(name="Mộc Tam cục", number=3, elemental="Mộc"),
     Cuc(name="Kim Tứ cục", number=4, elemental="Kim"),
-    Cuc(name="Thổ Ngũ cục", number=5, elemental="Tho"),
-    Cuc(name="Hỏa Lục cục", number=6, elemental="Hoa"),
+    Cuc(name="Thổ Ngũ cục", number=5, elemental="Thổ"),
+    Cuc(name="Hỏa Lục cục", number=6, elemental="Hỏa"),
 ]

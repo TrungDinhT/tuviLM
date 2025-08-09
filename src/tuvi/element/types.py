@@ -1,6 +1,6 @@
 from typing import Literal
 
-NGU_HANH = Literal["Kim", "Moc", "Thuy", "Hoa", "Tho"]
+NGU_HANH = Literal["Kim", "Mộc", "Thủy", "Hỏa", "Thổ"]
 
 AM_DUONG = Literal["Am", "Duong"]
 
@@ -26,8 +26,8 @@ STAR_STATUS = Literal["Hãm", "Bình", "Đắc", "Vượng", "Miếu", None]
 
 MAP_COLOR : dict[NGU_HANH, str] = {
     "Kim" : "#808080",
-    "Moc" : "#008000",
-    "Thuy" : "#00008B",
-    "Hoa" : "#FF0000",
-    "Tho" : "#B8860B",
+    "Mộc" : "#008000",
+    "Thủy" : "#00008B",
+    "Hỏa" : "#FF0000",
+    "Thổ" : "#B8860B",
 }
