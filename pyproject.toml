@@ -14,7 +14,9 @@ pydantic = "^2.9.2"
 streamlit = "^1.40.0"
 lunarcalendar = "^0.0.9"
 whoosh = "^2.7.4"
+pdfplumber = "^0.11.7"
 tqdm = "^4.67.1"
+jinaai = "^0.2.10"
 
 
 [build-system]
