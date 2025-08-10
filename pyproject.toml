@@ -4,16 +4,16 @@ version = "0.1.0"
 description = ""
 authors = ["lephuock <phuockhanhnk94@gmail.com>"]
 readme = "README.md"
+packages = [
+    { include = "src" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 pydantic = "^2.9.2"
 streamlit = "^1.40.0"
 lunarcalendar = "^0.0.9"
-faiss-cpu = "^1.11.0"
 whoosh = "^2.7.4"
-pdfplumber = "^0.11.7"
-sentence-transformers = "^4.1.0"
 tqdm = "^4.67.1"
 
 
