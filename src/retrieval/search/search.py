@@ -1,7 +1,5 @@
-import json, faiss, math
+import json, faiss
 from pathlib import Path
-import numpy as np
-from sentence_transformers import SentenceTransformer
 from whoosh.qparser import MultifieldParser
 from whoosh import index as wix
 from src.retrieval.constant import FAISS_OUT, META_JSON, WHOOSH_DIR
@@ -45,10 +43,28 @@ def search(query: str, k: int = TOP_K, alpha: float = ALPHA):
     return [{"score": round(score, 3), **meta[idx]} for idx, score in top]
 
 if __name__ == "__main__":
-    while True:
-        q = input("❓ Query (empty = quit): ").strip()
-        if not q: break
-        for hit in search(q):
-            print(f"• p.{hit['page']:>3}  {hit['score']:.3f}  {hit['text']}")
+    import sys
+
+    if len(sys.argv) < 2:
+        print("Usage: python search.py <query>")
+        print("Example: python search.py 'cung phụ mẫu'")
+        sys.exit(1)
+
+    query = " ".join(sys.argv[1:])
+    print(f"🔍 Searching for: '{query}'")
+    print("=" * 60)
+
+    results = search(query, )
+    if not results:
+        print("No results found.")
+    else:
+        for hit in results:
+            print(f"• Score: {hit['score']:.3f}")
+            if hit.get('header_1'):
+                print(f"  Header 1: {hit['header_1']}")
+            if hit.get('header_2'):
+                print(f"  Header 2: {hit['header_2']}")
+            if hit.get('header_3'):
+                print(f"  Header 3: {hit['header_3']}")
+            print(f"  Text: {hit['text'][:500]}...")
             print("  " + "-" * 60)
-        print("-" * 60)
