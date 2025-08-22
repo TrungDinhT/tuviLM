@@ -166,3 +166,4 @@ cython_debug/
 .virtualenv-app-data/
 
 .vscode/
+./data
