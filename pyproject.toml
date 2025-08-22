@@ -21,9 +21,29 @@ dependencies = [
     "pytest>=8.3.5,<9",
 ]
 
+<<<<<<< HEAD
 ## TODO: proper packaging
 #[tool.uv]
 #package = false
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+=======
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = "^2.9.2"
+streamlit = "^1.40.0"
+lunarcalendar = "^0.0.9"
+whoosh = "^2.7.4"
+pdfplumber = "^0.11.7"
+tqdm = "^4.67.1"
+jinaai = "^0.2.10"
+pyvi = "^0.1.1"
+unidecode = "^1.4.0"
+pandas = "^2.3.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+>>>>>>> ee3fa3c (Add package)
