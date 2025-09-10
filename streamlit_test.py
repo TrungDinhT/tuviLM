@@ -1,11 +1,12 @@
 import streamlit as st
 
+from src.agent.cung_analyzer import CungAnalyzer
 from src.tuvi.birth import BirthTime
 from src.tuvi.builder import Builder
 import datetime as dt
 
 from src.tuvi.database.database import ALL_COMPOSITIONS
-from src.tuvi.search_tool import check_composition, search_elements
+from src.tuvi.search_tool import check_composition
 
 # Define the HTML and CSS for the table
 html_table_template = """
@@ -96,3 +97,33 @@ st.markdown(html_table_template.format(
 for compo in ALL_COMPOSITIONS:
     if check_composition(tinhBan, compo):
         st.markdown(f"Having : {compo.name}")
+
+# Add position selection and analyze button
+st.markdown("## Phân tích cung")
+
+analyzer = CungAnalyzer()
+
+
+# Get all available positions
+available_positions = list(tinhBan.map_cung.keys())
+
+# Multi-select box for choosing positions
+selected_positions = st.multiselect(
+    "Chọn các cung muốn phân tích:",
+    options=available_positions,
+    default=[]
+)
+
+# Analyze button
+analyze_button = st.button("Phân tích các cung đã chọn")
+
+# Only analyze when button is clicked and positions are selected
+if analyze_button and selected_positions:
+    for position in selected_positions:
+        cung = tinhBan.map_cung[position]
+
+        st.markdown(f"### Bình luận về cung {cung.role} ({position})")
+
+        st.markdown(analyzer.analyze_cung(position, cung))
+
+        st.markdown("---")
