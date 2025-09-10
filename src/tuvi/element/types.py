@@ -19,7 +19,7 @@ LIST_THIEN_CAN : TYPE_THIEN_CAN = ["Giấp", "Ất", "Bính", "Đinh", "Mậu", 
 
 TYPE_GENDER = Literal["M", "F"]
 
-LIST_ROLES = ["Mệnh", "Phu Mẫu", "Phúc Đức", "Điền Trạch", "Quan Lộc", "Nô Bộc",
+LIST_ROLES = ["Mệnh", "Phụ Mẫu", "Phúc Đức", "Điền Trạch", "Quan Lộc", "Nô Bộc",
                "Thiên Di", "Tật Ách", "Tài Bạch", "Tử Tức", "Phu Thê", "Huynh Đệ"]
 
 STAR_STATUS = Literal["Hãm", "Bình", "Đắc", "Vượng", "Miếu", None]
