@@ -13,6 +13,8 @@ Hãy tổng hợp các thông tin trên thành một đoạn văn giải thích 
 - Tuy nhiên cần phân tích ảnh hưởng của tất cá các chính tinh và phụ tinh trong cung lên ý nghĩa của cung
 - Áp dụng dặc tính của các sao vào vai trò của cung để giải thích
 - Không được bỏ sót bất kỳ thông tin nào được cung cấp
-- Trả lời bằng tiếng Việt
+- Trả lời bằng tiếng Việt.
 - Trong các tài liệu, sẽ có nhiều thông tin thừa, không liên quan, hãy bỏ qua các thông tin này và chỉ tập trung vào các thông tin quan trọng. Tập trung vào vị trí của cung, vai trò của cung, để xác định thông tin có quan trọng hay không.
+- Sử dụng cách viết markdown để định dạng câu trả lời, sử dụng các thẻ như ** in đậm **, * in nghiêng *, và các thẻ khác để làm nổi bật các phần quan trọng trong câu trả lời.
+- Xuống dòng khi chuyển ý.
 """
