@@ -25,18 +25,21 @@ class LLMParameters(TypedDict, total=False):
     stop: Annotated[list[Annotated[str, at.MinLen(1)]], at.MinLen(1)]
     seed: Annotated[int, at.Ge(0)]
 
-class ChatAgent:
+class BaseAgent:
     """
     Agent uses OpenAI Responses API.
     """
     def __init__(
         self,
         model: str = "gpt-4o-mini",
+        system_prompt: str | None = None,
         messages: Sequence[LLMMessage] = (),
         timeout: httpx.Timeout = httpx.Timeout(connect=5.0, timeout=30.0),
         **kwargs: Unpack[LLMParameters],
     ):
-        self.messages = tuple(messages)
+        self.messages: list[LLMMessage] = [
+            {"role": "system", "content": system_prompt}, *messages
+        ] if system_prompt else list(messages)
         self.model = model
         self.parameters = kwargs.copy()
 
