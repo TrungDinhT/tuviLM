@@ -101,7 +101,7 @@ class Builder:
 
             borrow_number = cuc_number - mod
 
-        if div % 2 == 0:
+        if borrow_number % 2 == 0:
             return LIST_DIA_CHI[(2 + div -1 + borrow_number) % 12]
 
         return LIST_DIA_CHI[(2 + div -1 - borrow_number) % 12]
