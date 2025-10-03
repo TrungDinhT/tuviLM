@@ -1,12 +1,10 @@
 import datetime as dt
-from time import strftime
-from lunarcalendar import Converter, Solar
 import pydantic
+from typing import Literal
+from enum import StrEnum
 
 from src.external_lib.day_from_js import LunarDate, get_lunar_date
-from src.refactored.element.dia_chi import DiaChi
-from src.refactored.element.thien_can import ThienCan
-from src.refactored.element.luong_nghi import LuongNghi
+from src.refactored.component.elementary import DiaChi, LuongNghi, ThienCan
 
 
 class LunarYear(pydantic.BaseModel):
@@ -14,7 +12,7 @@ class LunarYear(pydantic.BaseModel):
     thien_can: ThienCan
 
     @classmethod
-    def from_solar_year(cls, lunar_date: LunarDate) -> 'LunarYear':
+    def from_solar_year(cls, lunar_date: LunarDate) -> "LunarYear":
         dia_chi = DiaChi((lunar_date.year + 8) % 12)
         thien_can = ThienCan((lunar_date.year + 6) % 10)
         return cls(
@@ -23,20 +21,25 @@ class LunarYear(pydantic.BaseModel):
         )
 
 
-class BirthTime(pydantic.BaseModel):
+class Gender(StrEnum):
+    MALE = "Nam"
+    FEMALE = "Nữ"
 
-    hour : DiaChi
-    date : int
-    month : int
+
+class LaSoPrior(pydantic.BaseModel):
+    hour: DiaChi
+    date: int
+    month: int
     year: LunarYear
 
-    @classmethod
-    def from_solar_day(cls, time : dt.datetime) -> 'BirthTime':
+    gender: Gender
 
+    @classmethod
+    def from_solar_day(cls, time: dt.datetime, gender: Gender) -> "LaSoPrior":
         is_tomorrow = False
 
         # Move to tomorrow if 23h
-        if time.hour == 23 :
+        if time.hour == 23:
             time += dt.timedelta(days=1)
             is_tomorrow = True
 
@@ -52,8 +55,22 @@ class BirthTime(pydantic.BaseModel):
             date=lunar_date.day,
             month=lunar_date.month,
             year=LunarYear.from_solar_year(lunar_date),  # type: ignore
+            gender=gender,
         )
 
     def get_am_duong(self) -> LuongNghi:
         return LuongNghi(self.year.dia_chi.value % 2)
 
+    def get_thien_can(self) -> ThienCan:
+        return self.year.thien_can
+
+    def get_dia_chi(self) -> DiaChi:
+        return self.year.dia_chi
+
+    def van_direction(self) -> Literal[1, -1]:
+        return (
+            1
+            if (self.gender == Gender.MALE and self.get_am_duong() == LuongNghi.DUONG)
+            or (self.gender == Gender.FEMALE and self.get_am_duong() == LuongNghi.AM)
+            else -1
+        )
