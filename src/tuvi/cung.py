@@ -2,7 +2,6 @@ from functools import cached_property
 import pydantic
 
 from src.tuvi.element.base import Element
-from src.tuvi.element.dia_chi import DiaChi
 from src.tuvi.element.sao import ChinhTinh, PhuTinh
 from src.tuvi.element.types import AM_DUONG, MAP_COLOR, NGU_HANH, ROLE_TYPE, TYPE_DIA_CHI
 from src.tuvi.element.trangsinh import TypeTrangSinh
@@ -16,13 +15,13 @@ class Cung(pydantic.BaseModel):
 
     role : ROLE_TYPE | None = None
 
-    chinhTinh : list[ChinhTinh] = []
+    chinhTinh : list[ChinhTinh] = pydantic.Field(default_factory=list)
 
-    phuTinh : list[PhuTinh] = []
+    phuTinh : list[PhuTinh] = pydantic.Field(default_factory=list)
 
     trang_sinh : TypeTrangSinh | None = None
 
-    tuhoa : list[TypeTuHoa] = []
+    tuhoa : list[TypeTuHoa] = pydantic.Field(default_factory=list)
 
     is_tuan : bool = False
 
@@ -47,9 +46,9 @@ class Cung(pydantic.BaseModel):
             markdown_content += f"<p style='color: {MAP_COLOR[chinhTinh.elemental]};font-size: 20px;'>{chinhTinh.star_name_with_status(self.dia_chi)}</p>\n"
 
         if self.is_tuan:
-            markdown_content += f"<p style='font-size: 15px;'>**Tuần**</p>\n"
+            markdown_content += "<p style='font-size: 15px;'>**Tuần**</p>\n"
         if self.is_triet:
-            markdown_content += f"<p style='font-size: 15px;'>**Triệt**</p>\n"
+            markdown_content += "<p style='font-size: 15px;'>**Triệt**</p>\n"
 
         grouped_by_elemental : dict[NGU_HANH, list[PhuTinh]] = {}
         for item in self.phuTinh:

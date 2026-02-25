@@ -1,4 +1,3 @@
-from src.tuvi.element.sao import PhuTinh
 from src.tuvi.element.types import TYPE_DIA_CHI, TYPE_THIEN_CAN
 
 
@@ -17,34 +16,34 @@ MAP_LOC_TON_POSITION : dict[TYPE_THIEN_CAN, TYPE_DIA_CHI] = {
 
 # TODO : verify lực sĩ luôn đi cùng kình dương , quan phủ có theo vòng lộc tồn?
 VONG_LOCTON = [
-    [PhuTinh(name="Lộc Tồn", elemental="Thổ"), PhuTinh(name="Bác Sĩ", elemental="Thủy")],
-    [PhuTinh(name="Kình Dương", elemental="Kim")],
-    [PhuTinh(name="Thanh Long", elemental="Thủy")],
-    [PhuTinh(name="Tiểu Hao", elemental="Hỏa"), PhuTinh(name="LN Văn Tinh", elemental="Hỏa")],
-    [PhuTinh(name="Tướng Quân", elemental="Mộc")],
-    [PhuTinh(name="Tấu Thư", elemental="Kim"), PhuTinh(name="Đường Phù", elemental="Mộc")],
-    [PhuTinh(name="Phi Liêm", elemental="Hỏa")],
-    [PhuTinh(name="Hỷ Thần", elemental="Hỏa")],
-    [PhuTinh(name="Bệnh Phù", elemental="Thổ"), PhuTinh(name="Quốc Ấn", elemental="Thổ")],
-    [PhuTinh(name="Đại Hao", elemental="Hỏa")],
-    [PhuTinh(name="Phục Binh", elemental="Hỏa")],
-    [PhuTinh(name="Đà La", elemental="Kim"), PhuTinh(name="Quan Phủ", elemental="Hỏa")],
+    ["Lộc Tồn", "Bác Sĩ"],
+    ["Kình Dương"],
+    ["Thanh Long"],
+    ["Tiểu Hao", "LN Văn Tinh"],
+    ["Tướng Quân"],
+    ["Tấu Thư", "Đường Phù"],
+    ["Phi Liêm"],
+    ["Hỷ Thần"],
+    ["Bệnh Phù", "Quốc Ấn"],
+    ["Đại Hao"],
+    ["Phục Binh"],
+    ["Đà La", "Quan Phủ"],
 ]
 
 # TODO : Có thêm đào không sát vào đây ?
 VONG_THAI_TUE = [
-    [PhuTinh(name="Thái Tuế", elemental="Hỏa")],
-    [PhuTinh(name="Thiếu Dương", elemental="Hỏa"), PhuTinh(name="Thiên Không", elemental="Hỏa")],
-    [PhuTinh(name="Tang Môn", elemental="Mộc")],
-    [PhuTinh(name="Thiếu Âm", elemental="Thủy")],
-    [PhuTinh(name="Quan Phù", elemental="Hỏa"), PhuTinh(name="Long Trì", elemental="Thủy")],
-    [PhuTinh(name="Tử Phù", elemental="Kim"), PhuTinh(name="Nguyệt Đức", elemental="Hỏa")],
-    [PhuTinh(name="Tuế Phá", elemental="Hỏa"), PhuTinh(name="Thiên Hư", elemental="Thủy")],
-    [PhuTinh(name="Long Đức", elemental="Thủy")],
-    [PhuTinh(name="Bạch Hổ", elemental="Kim")],
-    [PhuTinh(name="Phúc Đức", elemental="Thổ"), PhuTinh(name="Thiên Đức", elemental="Hỏa")],
-    [PhuTinh(name="Điếu Khách", elemental="Hỏa")],
-    [PhuTinh(name="Trực Phù", elemental="Kim")],
+    ["Thái Tuế"],
+    ["Thiếu Dương", "Thiên Không"],
+    ["Tang Môn"],
+    ["Thiếu Âm"],
+    ["Quan Phù", "Long Trì"],
+    ["Tử Phù", "Nguyệt Đức"],
+    ["Tuế Phá", "Thiên Hư"],
+    ["Long Đức"],
+    ["Bạch Hổ"],
+    ["Phúc Đức", "Thiên Đức"],
+    ["Điếu Khách"],
+    ["Trực Phù"],
 ]
 
 
