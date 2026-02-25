@@ -6,7 +6,7 @@ from src.tuvi.element.types import (
     TYPE_DIA_CHI,
 )
 from src.tuvi.birth import BirthTime
-from src.tuvi.element.sao import ChinhTinh, PhuTinh
+from src.tuvi.element.star_registry import make_chinh_tinh, make_phu_tinh
 from src.tuvi.search_tool import search_element
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
@@ -42,6 +42,12 @@ def get_position_by_move(
 class Builder:
     def __init__(self) -> None:
         self.tinhBan = TinhBan.init_empty_plate()
+
+    def _add_chinh_tinh(self, position: TYPE_DIA_CHI, star_name: str):
+        self.tinhBan.map_cung[position].chinhTinh.append(make_chinh_tinh(star_name))
+
+    def _add_phu_tinh(self, position: TYPE_DIA_CHI, star_name: str):
+        self.tinhBan.map_cung[position].phuTinh.append(make_phu_tinh(star_name))
 
     # TODO : Fix here to not re-create tinh ban
     def build(self, birthTime: BirthTime) -> TinhBan:
@@ -392,9 +398,9 @@ class Builder:
         # An đẩu quân
 
         for i in range(12):
-            self.tinhBan.map_cung[
-                LIST_DIA_CHI[(thaitue_index + i) % 12]
-            ].phuTinh.extend(VONG_THAI_TUE[i])
+            position = LIST_DIA_CHI[(thaitue_index + i) % 12]
+            for star_name in VONG_THAI_TUE[i]:
+                self._add_phu_tinh(position, star_name)
 
     def _build_linhhoa(self, birthTime: BirthTime):
         index_diachi = LIST_DIA_CHI.index(birthTime.dia_chi)
