@@ -158,7 +158,7 @@ MAP_TRIET : dict[TYPE_THIEN_CAN, list[TYPE_DIA_CHI]] = {
     "Quý": ["Tý", "Sửu"],
 }
 
-MAP_TUAN : dict[TYPE_DIA_CHI, TYPE_DIA_CHI] = {
+MAP_TUAN : dict[TYPE_DIA_CHI, list[TYPE_DIA_CHI]] = {
     "Tý" : ["Tuất", "Hợi"],
     "Dần" : ["Tý", "Sửu"],
     "Thìn" : ["Dần", "Mão"],
