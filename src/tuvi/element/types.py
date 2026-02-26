@@ -4,7 +4,7 @@ NGU_HANH = Literal["Kim", "Mộc", "Thủy", "Hỏa", "Thổ"]
 
 AM_DUONG = Literal["Am", "Duong"]
 
-ROLE_TYPE = Literal["Mệnh", "Phu Mẫu", "Phúc Đức", "Điền Trạch", "Quan Lộc", "Nô Bộc",
+ROLE_TYPE = Literal["Mệnh", "Phụ Mẫu", "Phúc Đức", "Điền Trạch", "Quan Lộc", "Nô Bộc",
                "Thiên Di", "Tật Ách", "Tài Bạch", "Tử Tức", "Phu Thê", "Huynh Đệ"]
 
 TYPE_DIA_CHI = Literal["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"]
@@ -15,7 +15,7 @@ LIST_DIA_CHI : list[TYPE_DIA_CHI] = [
 
 TYPE_THIEN_CAN = Literal["Giấp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"]
 
-LIST_THIEN_CAN : TYPE_THIEN_CAN = ["Giấp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"]
+LIST_THIEN_CAN : list[TYPE_THIEN_CAN] = ["Giấp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"]
 
 TYPE_GENDER = Literal["M", "F"]
 

@@ -1,4 +1,3 @@
-from functools import cached_property
 import pydantic
 
 from src.tuvi.element.base import Element
@@ -33,9 +32,12 @@ class Cung(pydantic.BaseModel):
 
     thien_can : str = ""
 
-    @cached_property
+    @property
     def all_element(self) -> list[Element]:
-        return [*self.chinhTinh, *self.phuTinh, self.trang_sinh, *self.tuhoa]
+        elements: list[Element] = [*self.chinhTinh, *self.phuTinh, *self.tuhoa]
+        if self.trang_sinh is not None:
+            elements.append(self.trang_sinh)
+        return elements
 
     def __repr__(self) -> str:
         role_str = self.role if not self.is_cung_than else f"{self.role} - Than"
