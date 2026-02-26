@@ -1,5 +1,4 @@
 import datetime as dt
-from lunarcalendar import Converter, Solar
 import pydantic
 
 from src.external_lib.day_from_js import get_lunar_date
