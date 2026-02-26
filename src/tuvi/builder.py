@@ -2,6 +2,7 @@ from typing import Literal
 from src.tuvi.element.types import LIST_DIA_CHI, LIST_ROLES, LIST_THIEN_CAN, TYPE_DIA_CHI
 from src.tuvi.birth import BirthTime
 from src.tuvi.element.star_registry import make_chinh_tinh, make_phu_tinh
+from src.tuvi.element.tuhoa_registry import make_tuhoa
 from src.tuvi.search_tool import search_element
 from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
 from src.tuvi.tinh_ban import TinhBan
@@ -22,7 +23,6 @@ from src.tuvi.constant import (
 )
 
 from src.tuvi.element.trangsinh import MAP_TRANGSINH_POSITION, VONG_TRANG_SINH
-from src.tuvi.element.tuhoa import TypeTuHoa
 
 
 def get_position_by_move(
@@ -46,6 +46,9 @@ class Builder:
 
     def _add_phu_tinh(self, position: TYPE_DIA_CHI, star_name: str):
         self.tinhBan.map_cung[position].phuTinh.append(make_phu_tinh(star_name))
+
+    def _add_tuhoa(self, position: TYPE_DIA_CHI, tuhoa_name: str):
+        self.tinhBan.map_cung[position].tuhoa.append(make_tuhoa(tuhoa_name))
 
     # TODO : Fix here to not re-create tinh ban
     def build(self, birthTime: BirthTime) -> TinhBan:
@@ -444,10 +447,10 @@ class Builder:
         hoakhoa_position = search_element(self.tinhBan, sao_hoa_khi[2])
         hoaky_position = search_element(self.tinhBan, sao_hoa_khi[3])
 
-        self.tinhBan.map_cung[hoaloc_position].tuhoa.append(TypeTuHoa(name="Hóa Lộc"))
-        self.tinhBan.map_cung[hoaquyen_position].tuhoa.append(TypeTuHoa(name="Hóa Quyền"))
-        self.tinhBan.map_cung[hoakhoa_position].tuhoa.append(TypeTuHoa(name="Hóa Khoa"))
-        self.tinhBan.map_cung[hoaky_position].tuhoa.append(TypeTuHoa(name="Hóa Kỵ"))
+        self._add_tuhoa(hoaloc_position, "Hóa Lộc")
+        self._add_tuhoa(hoaquyen_position, "Hóa Quyền")
+        self._add_tuhoa(hoakhoa_position, "Hóa Khoa")
+        self._add_tuhoa(hoaky_position, "Hóa Kỵ")
 
 
     def _build_tuan_triet(self, birthTime : BirthTime):
