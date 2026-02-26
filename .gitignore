@@ -163,3 +163,4 @@ cython_debug/
 
 .codegpt
 ./data
+./frontend/node_modules
