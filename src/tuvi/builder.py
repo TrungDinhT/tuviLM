@@ -72,6 +72,7 @@ class Builder:
         self._build_trangsinh()
         self._build_tuhoa(birthTime)
         self._build_tuan_triet(birthTime)
+        self._build_age_daivan(birthTime)
 
         return self.tinhBan
 
