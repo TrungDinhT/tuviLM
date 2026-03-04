@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import datetime as dt
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.schemas import (
+    AnalyzeCungRequest,
+    AnalyzeCungResponse,
     BuildLasoRequest,
     BuildLasoResponse,
     CungPayload,
-    DummyAnalyzeRequest,
-    DummyAnalyzeResponse,
     DummyChatRequest,
     DummyChatResponse,
     StarPayload,
@@ -84,11 +84,41 @@ def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
     )
 
 
-@app.post("/api/v1/laso/analyze", response_model=DummyAnalyzeResponse)
-def analyze_dummy(payload: DummyAnalyzeRequest) -> DummyAnalyzeResponse:
-    return DummyAnalyzeResponse(
-        position=payload.position,
-        analysis="Dummy analysis route. Real analyzer will be integrated later.",
+@app.post("/api/v1/laso/analyze", response_model=AnalyzeCungResponse)
+def analyze_cung(payload: AnalyzeCungRequest) -> AnalyzeCungResponse:
+    try:
+        solar_dt = dt.datetime(
+            year=payload.year,
+            month=payload.month,
+            day=payload.date,
+            hour=payload.hour,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    birth_time = BirthTime.from_solar_day(solar_dt, payload.gender)
+    tinh_ban = Builder().build(birth_time)
+
+    position = payload.position.strip()
+    if position not in tinh_ban.map_cung:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid position '{payload.position}'. Must be one of: {', '.join(tinh_ban.map_cung.keys())}",
+        )
+
+    cung = tinh_ban.map_cung[position]
+
+    try:
+        from src.agent.cung_analyzer import CungAnalyzer
+        analyzer = CungAnalyzer(model=payload.model)
+        analysis = analyzer.analyze_cung(position, cung)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Cung analysis failed: {exc}") from exc
+
+    return AnalyzeCungResponse(
+        position=position,
+        role=cung.role,
+        analysis=analysis,
     )
 
 

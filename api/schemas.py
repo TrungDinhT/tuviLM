@@ -37,12 +37,19 @@ class BuildLasoResponse(BaseModel):
     cung_by_position: dict[str, CungPayload]
 
 
-class DummyAnalyzeRequest(BaseModel):
+class AnalyzeCungRequest(BaseModel):
+    date: int = Field(ge=1, le=31)
+    month: int = Field(ge=1, le=12)
+    year: int = Field(ge=1900, le=2099)
+    hour: int = Field(ge=0, le=23)
+    gender: Literal["M", "F"]
     position: str
+    model: str = "gpt-4.1-mini"
 
 
-class DummyAnalyzeResponse(BaseModel):
+class AnalyzeCungResponse(BaseModel):
     position: str
+    role: str | None = None
     analysis: str
 
 
