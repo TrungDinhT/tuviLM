@@ -29,6 +29,7 @@ class CungPayload(BaseModel):
     is_tuan: bool = False
     is_triet: bool = False
     is_cung_than: bool = False
+    age_daivan: int | None = None
 
 
 class BuildLasoResponse(BaseModel):
