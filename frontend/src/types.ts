@@ -22,6 +22,7 @@ export type CungData = {
   isTuan: boolean;
   isTriet: boolean;
   isCungThan: boolean;
+  ageDaiVan: number | null;
 };
 
 export type LasoData = {

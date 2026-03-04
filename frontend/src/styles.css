@@ -175,9 +175,20 @@ textarea {
 }
 
 .cung-content {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.age-dai-van {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #855a31;
+  line-height: 1;
 }
 
 .main-tuhoa-row {
