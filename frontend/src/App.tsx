@@ -22,7 +22,8 @@ export default function App() {
   const [input, setInput] = useState<BirthInput>(INITIAL_INPUT);
   const [laso, setLaso] = useState<LasoData | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
-  const [analysis, setAnalysis] = useState("");
+  const [analysisByPosition, setAnalysisByPosition] = useState<Record<string, string>>({});
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const [building, setBuilding] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -38,29 +39,39 @@ export default function App() {
   ]);
 
   const canChat = useMemo(() => laso !== null, [laso]);
+  const selectedAnalysis = selectedPosition ? (analysisByPosition[selectedPosition] ?? "") : "";
+  const hasSelectedAnalysis = selectedPosition ? Boolean(analysisByPosition[selectedPosition]) : false;
 
   const handleBuild = async () => {
     setBuilding(true);
     try {
       const result = await buildLaso(input);
       setLaso(result);
+      setAnalysisByPosition({});
+      setAnalysisError(null);
       const nextPosition = "Tị";
       setSelectedPosition(nextPosition);
-      setAnalyzing(true);
-      const analysisText = await getAnalysis(nextPosition);
-      setAnalysis(analysisText);
     } finally {
-      setAnalyzing(false);
       setBuilding(false);
     }
   };
 
-  const handleSelectPosition = async (position: string) => {
+  const handleSelectPosition = (position: string) => {
     setSelectedPosition(position);
+    setAnalysisError(null);
+  };
+
+  const handleAnalyzeSelected = async () => {
+    if (!selectedPosition) return;
+    if (analysisByPosition[selectedPosition]) return;
+
     setAnalyzing(true);
+    setAnalysisError(null);
     try {
-      const analysisText = await getAnalysis(position);
-      setAnalysis(analysisText);
+      const analysisText = await getAnalysis(input, selectedPosition);
+      setAnalysisByPosition((prev) => ({ ...prev, [selectedPosition]: analysisText }));
+    } catch (error) {
+      setAnalysisError(error instanceof Error ? error.message : "Phân tích thất bại.");
     } finally {
       setAnalyzing(false);
     }
@@ -117,10 +128,17 @@ export default function App() {
         <LasoBoard
           laso={laso}
           selectedPosition={selectedPosition}
-          onSelectPosition={(position) => void handleSelectPosition(position)}
+          onSelectPosition={handleSelectPosition}
         />
 
-        <AnalysisPanel position={selectedPosition} content={analysis} loading={analyzing} />
+        <AnalysisPanel
+          position={selectedPosition}
+          content={selectedAnalysis}
+          loading={analyzing}
+          hasAnalysis={hasSelectedAnalysis}
+          error={analysisError}
+          onAnalyze={() => void handleAnalyzeSelected()}
+        />
       </section>
 
       <ChatPanel messages={messages} onSend={handleSendChat} busy={chatBusy || !canChat} />
