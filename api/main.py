@@ -66,6 +66,7 @@ def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
             is_tuan=cung.is_tuan,
             is_triet=cung.is_triet,
             is_cung_than=cung.is_cung_than,
+            age_daivan=cung.age_daivan,
         )
 
     summary = (
