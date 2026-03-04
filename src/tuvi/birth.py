@@ -4,7 +4,7 @@ import pydantic
 from src.external_lib.day_from_js import get_lunar_date
 from src.tuvi.element.types import LIST_DIA_CHI, LIST_THIEN_CAN, TYPE_DIA_CHI, TYPE_GENDER, TYPE_THIEN_CAN
 
-class BirthTime(pydantic.BaseModel):
+class TuviTime(pydantic.BaseModel):
 
     hour : TYPE_DIA_CHI
 

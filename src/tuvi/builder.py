@@ -1,6 +1,6 @@
 from typing import Literal
 from src.tuvi.element.types import LIST_DIA_CHI, LIST_ROLES, LIST_THIEN_CAN, TYPE_DIA_CHI
-from src.tuvi.birth import BirthTime
+from src.tuvi.birth import TuviTime
 from src.tuvi.element.star_registry import make_chinh_tinh, make_phu_tinh
 from src.tuvi.element.tuhoa_registry import make_tuhoa
 from src.tuvi.search_tool import search_element
@@ -51,7 +51,7 @@ class Builder:
         self.tinhBan.map_cung[position].tuhoa.append(make_tuhoa(tuhoa_name))
 
     # TODO : Fix here to not re-create tinh ban
-    def build(self, birthTime: BirthTime) -> TinhBan:
+    def build(self, birthTime: TuviTime) -> TinhBan:
         self._build_general_info(birthTime)
         self._build_role(birthTime)
         self._build_cuc(birthTime)
@@ -74,7 +74,10 @@ class Builder:
 
         return self.tinhBan
 
-    def _get_menh_position(self, birthTime : BirthTime) -> int:
+    def build_current_year(self, observed_time: int):
+        self
+
+    def _get_menh_position(self, birthTime : TuviTime) -> int:
 
         # + 2 vì khởi tại cung Dần
         month_position = (2 + birthTime.month - 1) % 12
@@ -98,7 +101,7 @@ class Builder:
             return cuc_index_order[4]
 
 
-    def _get_tuvi_position(self, tinhBan : TinhBan, birthTime : BirthTime) -> TYPE_DIA_CHI:
+    def _get_tuvi_position(self, tinhBan : TinhBan, birthTime : TuviTime) -> TYPE_DIA_CHI:
 
         cuc_number = tinhBan.cuc.number
 
@@ -116,7 +119,7 @@ class Builder:
 
         return LIST_DIA_CHI[(2 + div -1 - borrow_number) % 12]
 
-    def _build_general_info(self, birthTime : BirthTime):
+    def _build_general_info(self, birthTime : TuviTime):
 
         self.tinhBan.gender = birthTime.gender
 
@@ -126,7 +129,7 @@ class Builder:
             self.tinhBan.gender == "M" and self.tinhBan.am_duong == "Duong"
             ) or (self.tinhBan.gender == "F" and self.tinhBan.am_duong == "Am") else -1
 
-    def _build_role(self, birthTime : BirthTime):
+    def _build_role(self, birthTime : TuviTime):
         menh_position = self._get_menh_position(birthTime)
 
         hour_index = LIST_DIA_CHI.index(birthTime.hour)
@@ -153,7 +156,7 @@ class Builder:
         self._add_phu_tinh(thientai_position, "Thiên Tài")
 
 
-    def _build_cuc(self, birthTime : BirthTime):
+    def _build_cuc(self, birthTime : TuviTime):
 
         menh_position = self.tinhBan.menh_position
 
@@ -171,7 +174,7 @@ class Builder:
             cuc_index = self._match_cuc_index_by_menh_position([2,0,3,4,1], menh_position)
         self.tinhBan.cuc = LIST_CUC[cuc_index]
 
-    def _build_age_daivan(self, birthTime : BirthTime):
+    def _build_age_daivan(self, birthTime : TuviTime):
 
         menh_position = LIST_DIA_CHI.index(self.tinhBan.menh_position)
         cuc = self.tinhBan.cuc
@@ -182,7 +185,7 @@ class Builder:
             self.tinhBan.map_cung[position].age_daivan = i * 10 + cuc.number
 
 
-    def _build_chinh_tinh(self, birthTime : BirthTime):
+    def _build_chinh_tinh(self, birthTime : TuviTime):
 
         # An tử vi
         tuvi_position = self._get_tuvi_position(self.tinhBan, birthTime)
@@ -234,7 +237,7 @@ class Builder:
         self._add_chinh_tinh(thientuong_position, "Thiên Tướng")
 
 
-    def _build_by_month(self, birthTime : BirthTime):
+    def _build_by_month(self, birthTime : TuviTime):
 
         taphu_position = get_position_by_move("Thìn", birthTime.month -1, 1)
         huubat_position = get_position_by_move("Tuất", birthTime.month -1, -1)
@@ -258,7 +261,7 @@ class Builder:
         self._add_phu_tinh(thiendieu_position, "Thiên Diêu")
         self._add_phu_tinh(thiendieu_position, "Thiên Y")
 
-    def _build_by_hour(self, birthTime : BirthTime):
+    def _build_by_hour(self, birthTime : TuviTime):
 
         birthHourIndex = LIST_DIA_CHI.index(birthTime.hour)
 
@@ -286,12 +289,12 @@ class Builder:
         self._add_phu_tinh(thaiphu_position, "Thai Phụ")
         self._add_phu_tinh(phongcao_position, "Phong Cáo")
 
-    def _build_khoiviet(self, birthTime : BirthTime):
+    def _build_khoiviet(self, birthTime : TuviTime):
 
         self._add_phu_tinh(MAP_THIEN_KHOI[birthTime.thien_can], "Thiên Khôi")
         self._add_phu_tinh(MAP_THIEN_VIET[birthTime.thien_can], "Thiên Việt")
 
-    def _build_loc_ton(self, birthTime : BirthTime):
+    def _build_loc_ton(self, birthTime : TuviTime):
 
         locton_position = MAP_LOC_TON_POSITION[birthTime.thien_can]
         locton_index = LIST_DIA_CHI.index(locton_position)
@@ -309,7 +312,7 @@ class Builder:
         self._add_phu_tinh(lucsi_position, "Lực Sĩ")
 
 
-    def _build_thai_tue(self, birthTime : BirthTime):
+    def _build_thai_tue(self, birthTime : TuviTime):
 
         thaitue_index = LIST_DIA_CHI.index(birthTime.dia_chi)
 
@@ -321,7 +324,7 @@ class Builder:
             for star_name in VONG_THAI_TUE[i]:
                 self._add_phu_tinh(position, star_name)
 
-    def _build_linhhoa(self, birthTime : BirthTime):
+    def _build_linhhoa(self, birthTime : TuviTime):
         index_diachi = LIST_DIA_CHI.index(birthTime.dia_chi)
         hour_index = LIST_DIA_CHI.index(birthTime.hour)
 
@@ -346,7 +349,7 @@ class Builder:
         self._add_phu_tinh(hoatinh_position, "Hỏa Tinh")
         self._add_phu_tinh(linhinh_position, "Linh Tinh")
 
-    def _build_by_map(self, birthTime : BirthTime):
+    def _build_by_map(self, birthTime : TuviTime):
 
         luuha_position = MAP_LUU_HA[birthTime.thien_can]
         thientru_position = MAP_THIEN_TRU[birthTime.thien_can]
@@ -358,7 +361,7 @@ class Builder:
         self._add_phu_tinh(thienquan_position, "Thiên Quan")
         self._add_phu_tinh(thienphuc_position, "Thiên Phúc")
 
-    def _build_cothan_quatu(self, birthTime : BirthTime):
+    def _build_cothan_quatu(self, birthTime : TuviTime):
 
         if birthTime.dia_chi in ["Dần", "Mão", "Thìn"]:
             cothan_position = "Tị"
@@ -376,7 +379,7 @@ class Builder:
         self._add_phu_tinh(cothan_position, "Cô Thần")
         self._add_phu_tinh(quatu_position, "Quả Tú")
 
-    def _build_dauquan(self, birthTime : BirthTime):
+    def _build_dauquan(self, birthTime : TuviTime):
 
         month_position = get_position_by_move(birthTime.dia_chi, birthTime.month -1, -1)
 
@@ -384,7 +387,7 @@ class Builder:
         self._add_phu_tinh(dauquan_position, "Đẩu Quân")
 
 
-    def _build_by_diachi(self, birthTime : BirthTime):
+    def _build_by_diachi(self, birthTime : TuviTime):
 
         diachi_index = LIST_DIA_CHI.index(birthTime.dia_chi)
 
@@ -450,7 +453,7 @@ class Builder:
             self.tinhBan.map_cung[LIST_DIA_CHI[position_index]].trang_sinh = dat_trang_sinh
 
 
-    def _build_tuhoa(self, birthTime : BirthTime):
+    def _build_tuhoa(self, birthTime : TuviTime):
         sao_hoa_khi = MAP_TUHOA[birthTime.thien_can]
 
         hoaloc_position = search_element(self.tinhBan, sao_hoa_khi[0])
@@ -464,7 +467,7 @@ class Builder:
         self._add_tuhoa(hoaky_position, "Hóa Kỵ")
 
 
-    def _build_tuan_triet(self, birthTime : BirthTime):
+    def _build_tuan_triet(self, birthTime : TuviTime):
 
         triet_positions = MAP_TRIET[birthTime.thien_can]
 
