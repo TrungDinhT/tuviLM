@@ -53,7 +53,7 @@ class Builder:
         self.tinhBan.map_cung[position].tuhoa.append(make_tuhoa(tuhoa_name))
 
     # TODO : Fix here to not re-create tinh ban
-    def build(self, birthTime: BirthTime) -> TinhBan:
+    def build(self, birthTime: TuviTime) -> TinhBan:
         self._build_general_info(birthTime)
         self._build_role(birthTime)
         self._build_cuc(birthTime)
