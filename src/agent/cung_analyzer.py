@@ -94,13 +94,14 @@ class CungAnalyzer:
         """Analyze a single cung and return the agent's response."""
         cung_context = self._build_cung_context(position, cung)
         documents = self._gather_documents(cung)
+        documents_text = "\n\n".join(documents) if documents else "Không có tài liệu tham khảo phù hợp."
 
         prompt = (
             "Hãy phân tích cung sau dựa trên thông tin đầu vào và tài liệu tham khảo.\n\n"
             "## Thông tin cung\n"
             f"{cung_context}\n\n"
             "## Tài liệu tham khảo\n"
-            f"{'\n\n'.join(documents) if documents else 'Không có tài liệu tham khảo phù hợp.'}"
+            f"{documents_text}"
         )
 
         return self.agent.run_sync(prompt).output
