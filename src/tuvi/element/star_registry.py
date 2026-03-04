@@ -16,6 +16,7 @@ class StarDefinition:
     elemental: NGU_HANH
     star_type: StarType
     description: str | None = None
+    having_luu: bool = False
 
 
 STAR_REGISTRY: dict[str, StarDefinition] = {
@@ -48,14 +49,14 @@ STAR_REGISTRY: dict[str, StarDefinition] = {
     "Thiên Y": StarDefinition(name="Thiên Y", elemental="Thủy", star_type="phu_tinh"),
     "Địa Không": StarDefinition(name="Địa Không", elemental="Hỏa", star_type="phu_tinh"),
     "Địa Kiếp": StarDefinition(name="Địa Kiếp", elemental="Hỏa", star_type="phu_tinh"),
-    "Văn Xương": StarDefinition(name="Văn Xương", elemental="Kim", star_type="phu_tinh"),
-    "Văn Khúc": StarDefinition(name="Văn Khúc", elemental="Thủy", star_type="phu_tinh"),
+    "Văn Xương": StarDefinition(name="Văn Xương", elemental="Kim", star_type="phu_tinh", having_luu=True),
+    "Văn Khúc": StarDefinition(name="Văn Khúc", elemental="Thủy", star_type="phu_tinh", having_luu=True),
     "Ân Quang": StarDefinition(name="Ân Quang", elemental="Mộc", star_type="phu_tinh"),
     "Thiên Quý": StarDefinition(name="Thiên Quý", elemental="Thổ", star_type="phu_tinh"),
     "Thai Phụ": StarDefinition(name="Thai Phụ", elemental="Kim", star_type="phu_tinh"),
     "Phong Cáo": StarDefinition(name="Phong Cáo", elemental="Thổ", star_type="phu_tinh"),
-    "Thiên Khôi": StarDefinition(name="Thiên Khôi", elemental="Hỏa", star_type="phu_tinh"),
-    "Thiên Việt": StarDefinition(name="Thiên Việt", elemental="Hỏa", star_type="phu_tinh"),
+    "Thiên Khôi": StarDefinition(name="Thiên Khôi", elemental="Hỏa", star_type="phu_tinh", having_luu=True),
+    "Thiên Việt": StarDefinition(name="Thiên Việt", elemental="Hỏa", star_type="phu_tinh", having_luu=True),
     "Lực Sĩ": StarDefinition(name="Lực Sĩ", elemental="Thủy", star_type="phu_tinh"),
     "Hỏa Tinh": StarDefinition(name="Hỏa Tinh", elemental="Hỏa", star_type="phu_tinh"),
     "Linh Tinh": StarDefinition(name="Linh Tinh", elemental="Hỏa", star_type="phu_tinh"),
@@ -67,18 +68,18 @@ STAR_REGISTRY: dict[str, StarDefinition] = {
     "Quả Tú": StarDefinition(name="Quả Tú", elemental="Thổ", star_type="phu_tinh"),
     "Đẩu Quân": StarDefinition(name="Đẩu Quân", elemental="Hỏa", star_type="phu_tinh"),
     "Thiên Hỉ": StarDefinition(name="Thiên Hỉ", elemental="Hỏa", star_type="phu_tinh"),
-    "Hồng Loan": StarDefinition(name="Hồng Loan", elemental="Thủy", star_type="phu_tinh"),
-    "Thiên Mã": StarDefinition(name="Thiên Mã", elemental="Hỏa", star_type="phu_tinh"),
+    "Hồng Loan": StarDefinition(name="Hồng Loan", elemental="Thủy", star_type="phu_tinh", having_luu=True),
+    "Thiên Mã": StarDefinition(name="Thiên Mã", elemental="Hỏa", star_type="phu_tinh", having_luu=True),
     "Giải Thần": StarDefinition(name="Giải Thần", elemental="Mộc", star_type="phu_tinh"),
     "Phượng Các": StarDefinition(name="Phượng Các", elemental="Thổ", star_type="phu_tinh"),
     "Phá Toái": StarDefinition(name="Phá Toái", elemental="Hỏa", star_type="phu_tinh"),
     "Hỏa Cái": StarDefinition(name="Hỏa Cái", elemental="Kim", star_type="phu_tinh"),
-    "Đào Hỏa": StarDefinition(name="Đào Hỏa", elemental="Mộc", star_type="phu_tinh"),
-    "Thiên Khốc": StarDefinition(name="Thiên Khốc", elemental="Thủy", star_type="phu_tinh"),
+    "Đào Hoa": StarDefinition(name="Đào Hoa", elemental="Mộc", star_type="phu_tinh"),
+    "Thiên Khốc": StarDefinition(name="Thiên Khốc", elemental="Thủy", star_type="phu_tinh", having_luu=True),
     "Kiếp Sát": StarDefinition(name="Kiếp Sát", elemental="Hỏa", star_type="phu_tinh"),
     "Thiên La": StarDefinition(name="Thiên La", elemental="Kim", star_type="phu_tinh"),
     "Địa Võng": StarDefinition(name="Địa Võng", elemental="Kim", star_type="phu_tinh"),
-    "Lộc Tồn": StarDefinition(name="Lộc Tồn", elemental="Thổ", star_type="phu_tinh"),
+    "Lộc Tồn": StarDefinition(name="Lộc Tồn", elemental="Thổ", star_type="phu_tinh", having_luu=True),
     "Bác Sĩ": StarDefinition(name="Bác Sĩ", elemental="Thủy", star_type="phu_tinh"),
     "Kình Dương": StarDefinition(name="Kình Dương", elemental="Kim", star_type="phu_tinh"),
     "Thanh Long": StarDefinition(name="Thanh Long", elemental="Thủy", star_type="phu_tinh"),
@@ -105,7 +106,7 @@ STAR_REGISTRY: dict[str, StarDefinition] = {
     "Tử Phù": StarDefinition(name="Tử Phù", elemental="Kim", star_type="phu_tinh"),
     "Nguyệt Đức": StarDefinition(name="Nguyệt Đức", elemental="Hỏa", star_type="phu_tinh"),
     "Tuế Phá": StarDefinition(name="Tuế Phá", elemental="Hỏa", star_type="phu_tinh"),
-    "Thiên Hư": StarDefinition(name="Thiên Hư", elemental="Thủy", star_type="phu_tinh"),
+    "Thiên Hư": StarDefinition(name="Thiên Hư", elemental="Thủy", star_type="phu_tinh", having_luu=True),
     "Long Đức": StarDefinition(name="Long Đức", elemental="Thủy", star_type="phu_tinh"),
     "Bạch Hổ": StarDefinition(name="Bạch Hổ", elemental="Kim", star_type="phu_tinh"),
     "Phúc Đức": StarDefinition(name="Phúc Đức", elemental="Thổ", star_type="phu_tinh"),
@@ -125,11 +126,11 @@ def make_chinh_tinh(star_name: str) -> ChinhTinh:
     star_definition = _get_star_definition(star_name)
     if star_definition.star_type != "chinh_tinh":
         raise ValueError(f"Star '{star_name}' is not a ChinhTinh")
-    return ChinhTinh(name=star_definition.name, elemental=star_definition.elemental)
+    return ChinhTinh(name=star_definition.name, elemental=star_definition.elemental, have_luu=star_definition.having_luu)
 
 
 def make_phu_tinh(star_name: str) -> PhuTinh:
     star_definition = _get_star_definition(star_name)
     if star_definition.star_type != "phu_tinh":
         raise ValueError(f"Star '{star_name}' is not a PhuTinh")
-    return PhuTinh(name=star_definition.name, elemental=star_definition.elemental)
+    return PhuTinh(name=star_definition.name, elemental=star_definition.elemental, have_luu=star_definition.having_luu)

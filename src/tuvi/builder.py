@@ -421,7 +421,7 @@ class Builder:
         self._add_phu_tinh(giaithan_position, "Phượng Các")
         self._add_phu_tinh(phatoai_position, "Phá Toái")
         self._add_phu_tinh(hoacai_position, "Hỏa Cái")
-        self._add_phu_tinh(daohoa_position, "Đào Hỏa")
+        self._add_phu_tinh(daohoa_position, "Đào Hoa")
         self._add_phu_tinh(thienkhoc_position, "Thiên Khốc")
         self._add_phu_tinh(kiepsat_position, "Kiếp Sát")
 

@@ -17,6 +17,8 @@ class Sao(Element):
 
     elemental : NGU_HANH
 
+    have_luu: bool = False
+
     def get_status(self, position : TYPE_DIA_CHI) -> STAR_STATUS:
         if self.name not in MAP_START_STATUS:
             return None
