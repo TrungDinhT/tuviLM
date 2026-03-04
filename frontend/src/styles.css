@@ -54,6 +54,7 @@ body {
   display: grid;
   grid-template-columns: minmax(220px, 280px) 1fr minmax(250px, 340px);
   gap: 12px;
+  align-items: start;
 }
 
 .panel {
@@ -276,6 +277,8 @@ textarea {
 .analysis-panel {
   display: grid;
   grid-template-rows: auto 1fr;
+  min-height: 520px;
+  max-height: 1500px;
 }
 
 .analysis-body {
