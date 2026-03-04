@@ -55,7 +55,8 @@ function buildDummyCung(position: string, role: string, idx: number): CungData {
     trangSinh: ["Tràng Sinh", "Mộc Dục", "Quan Đới", "Lâm Quan", "Đế Vượng", "Suy", "Bệnh", "Tử", "Mộ", "Tuyệt", "Thai", "Dưỡng"][idx],
     isTuan: false,
     isTriet: false,
-    isCungThan: false
+    isCungThan: false,
+    ageDaiVan: 0
   };
 }
 
@@ -84,6 +85,7 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
       is_tuan: boolean;
       is_triet: boolean;
       is_cung_than: boolean;
+      age_daivan: number | null;
     }>;
   };
 
@@ -100,7 +102,8 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
         trangSinh: item.trang_sinh,
         isTuan: item.is_tuan,
         isTriet: item.is_triet,
-        isCungThan: item.is_cung_than
+        isCungThan: item.is_cung_than,
+        ageDaiVan: item.age_daivan ?? null
       };
       continue;
     }

@@ -92,6 +92,8 @@ export default function LasoBoard({ laso, selectedPosition, onSelectPosition }: 
             >
               {cung ? (
                 <div className="cung-content">
+                  <p className="age-dai-van">{cung.ageDaiVan ?? "N/A"}</p>
+
                   {(cung.isTuan || cung.isTriet) && (
                     <p className="star-flags top-center">
                       {cung.isTuan ? "Tuần " : ""}
