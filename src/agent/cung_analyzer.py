@@ -1,112 +1,109 @@
 import httpx
-from typing import List
+from typing import Iterable
 
-from src.agent.agent import BaseAgent, LLMMessage
 from src.agent.prompt import CUNG_AGENT_INSTRUCTION
 from src.retrieval.search.tool import search_role_info, search_start_info, search_start_role_info
 from src.tuvi.cung import Cung
 from src.tuvi.tinh_ban import TinhBan
+from pydantic_ai import Agent
 
 
 class CungAnalyzer:
     def __init__(self, model: str = "gpt-4.1-mini", timeout: httpx.Timeout = None):
-        if timeout is None:
-            timeout = httpx.Timeout(connect=5.0, timeout=60.0)
-        self.agent = BaseAgent(
-            system_prompt=CUNG_AGENT_INSTRUCTION,
+        self.timeout = timeout or httpx.Timeout(connect=5.0, timeout=60.0)
+        self.agent: Agent[str] = Agent(
             model=model,
-            timeout=timeout
+            system_prompt=CUNG_AGENT_INSTRUCTION,
+            output_type=str,
         )
 
-    def _build_cung_messages(self, position: str, cung: Cung) -> List[LLMMessage]:
-        """Build messages for a specific cung (palace)."""
-        messages: List[LLMMessage] = []
+    @staticmethod
+    def _format_docs(items: Iterable[dict[str, str]]) -> list[str]:
+        docs: list[str] = []
+        for item in items:
+            title = item.get("title", "")
+            content = item.get("content", "")
+            docs.append(f"{title}: {content}")
+        return docs
 
-        messages.append({
-            "role": "user",
-            "content": f"Vị trí của cung là {position}, vai trò của cung là {cung.role}.",
-        })
+    def _build_cung_context(self, position: str, cung: Cung) -> str:
+        """Build structured user context for a specific cung."""
+        chinh_tinh = ", ".join(
+            f"{star.name} {star.get_status(position)}" for star in cung.chinhTinh
+        ) or "Không có"
 
-        messages.append({
-            "role": "user",
-            "content": f"Các sao chính trong cung là : {', '.join([f'{star.name} {star.get_status(position)}' for star in cung.chinhTinh])}.",
-        })
+        phu_tinh = ", ".join(star.name for star in cung.phuTinh) or "Không có"
 
-        messages.append({
-            "role": "user",
-            "content": f"Các sao phụ trong cung là : {', '.join([star.name for star in cung.phuTinh])}.",
-        })
+        tu_hoa = ", ".join(star.name for star in cung.tuhoa) or "Không có"
 
-        messages.append({
-            "role": "user",
-            "content": f"Sao Tràng Sinh trong cung là : {cung.trang_sinh.name}.",
-        })
+        trang_sinh = cung.trang_sinh.name if cung.trang_sinh else "Không có"
 
-        messages.append({
-            "role": "user",
-            "content": f"Các sao hóa trong cung là : {', '.join([star.name for star in cung.tuhoa])}.",
-        })
-
+        flags: list[str] = []
         if cung.is_tuan:
-            messages.append({
-                "role": "user",
-                "content": "Cung có Tuần.",
-            })
-
+            flags.append("Có Tuần")
         if cung.is_triet:
-            messages.append({
-                "role": "user",
-                "content": "Cung có Triệt.",
-            })
+            flags.append("Có Triệt")
+        tinh_trang = ", ".join(flags) if flags else "Không có Tuần/Triệt"
 
-        return messages
+        return "\n".join(
+            [
+                f"Vị trí cung: {position}",
+                f"Vai trò cung: {cung.role}",
+                f"Chính tinh: {chinh_tinh}",
+                f"Phụ tinh: {phu_tinh}",
+                f"Tràng sinh: {trang_sinh}",
+                f"Tứ hóa: {tu_hoa}",
+                f"Đặc điểm bổ sung: {tinh_trang}",
+            ]
+        )
 
-    def _gather_documents(self, cung: Cung) -> List[str]:
+    def _gather_documents(self, cung: Cung) -> list[str]:
         """Gather relevant documents for a cung."""
-        documents = []
+        documents: list[str] = []
 
         # Search role information
-        doc = search_role_info(cung.role)
-        for d in doc:
-            documents.append(f"{d['title']}: {d['content']}")
+        documents.extend(self._format_docs(search_role_info(cung.role)))
 
         # Search main stars information
         for star in cung.chinhTinh:
-            doc = search_start_role_info(star.name, cung.role)
-            for d in doc:
-                documents.append(f"{d['title']}: {d['content']}")
+            documents.extend(self._format_docs(search_start_role_info(star.name, cung.role)))
 
         # Search transformation stars information
         for tuhoa in cung.tuhoa:
-            doc = search_start_info(tuhoa.name)
-            for d in doc:
-                documents.append(f"{d['title']}: {d['content']}")
+            documents.extend(self._format_docs(search_start_info(tuhoa.name)))
 
         # Search longevity star information
         if cung.trang_sinh:
-            doc = search_start_info(cung.trang_sinh.name)
-            for d in doc:
-                documents.append(f"{d['title']}: {d['content']}")
+            documents.extend(self._format_docs(search_start_info(cung.trang_sinh.name)))
 
         # Search auxiliary stars information
         for star in cung.phuTinh:
-            doc = search_start_info(star.name)
-            for d in doc:
-                documents.append(f"{d['title']}: {d['content']}")
+            documents.extend(self._format_docs(search_start_info(star.name)))
 
-        return documents
+        # De-duplicate while preserving order
+        seen = set()
+        unique_documents: list[str] = []
+        for doc in documents:
+            if doc not in seen:
+                seen.add(doc)
+                unique_documents.append(doc)
 
-    def analyze_cung(self, position: str, cung) -> str:
+        return unique_documents
+
+    def analyze_cung(self, position: str, cung: Cung) -> str:
         """Analyze a single cung and return the agent's response."""
-        messages = self._build_cung_messages(position, cung)
+        cung_context = self._build_cung_context(position, cung)
         documents = self._gather_documents(cung)
 
-        messages.append({
-            "role": "system",
-            "content": "\n\n".join(documents),
-        })
+        prompt = (
+            "Hãy phân tích cung sau dựa trên thông tin đầu vào và tài liệu tham khảo.\n\n"
+            "## Thông tin cung\n"
+            f"{cung_context}\n\n"
+            "## Tài liệu tham khảo\n"
+            f"{'\n\n'.join(documents) if documents else 'Không có tài liệu tham khảo phù hợp.'}"
+        )
 
-        return self.agent.run(messages)
+        return self.agent.run_sync(prompt).output
 
     def run(self, tinh_ban: TinhBan) -> dict:
         """Analyze all cungs in a tinh_ban and return results."""
