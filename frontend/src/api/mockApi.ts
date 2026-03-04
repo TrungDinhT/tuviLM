@@ -33,19 +33,6 @@ const PHU_TINH = [
   "Thiên Khôi", "Thiên Việt", "Hữu Bật", "Tả Phù", "Địa Không", "Địa Kiếp"
 ];
 
-const ANALYSIS_BLOCK = `
-## Tổng quan cung
-Cung này có tổ hợp sao thiên về **khả năng thích ứng**, nhưng dễ dao động nếu gặp sát tinh.
-
-## Điểm mạnh
-- Chính tinh ở thế khá thuận, dễ tạo lực phát triển.
-- Có phụ tinh trợ lực nên khả năng xử lý tình huống tốt.
-
-## Lưu ý
-- Nên ưu tiên kế hoạch dài hạn.
-- Tránh quyết định vội khi cảm xúc cao.
-`;
-
 function randomPick<T>(arr: T[], index: number): T {
   return arr[index % arr.length];
 }
@@ -129,9 +116,32 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
   };
 }
 
-export async function getAnalysis(position: string): Promise<string> {
-  await new Promise((r) => setTimeout(r, 300));
-  return `# Phân tích ${position}\n${ANALYSIS_BLOCK}`;
+export async function getAnalysis(input: BirthInput, position: string): Promise<string> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/laso/analyze`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      date: input.date,
+      month: input.month,
+      year: input.year,
+      hour: input.hour,
+      gender: input.gender,
+      position
+    })
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Analyze cung failed (${response.status}): ${detail}`);
+  }
+
+  const payload = await response.json() as {
+    position: string;
+    role: string | null;
+    analysis: string;
+  };
+
+  return payload.analysis;
 }
 
 export async function streamChatReply(
