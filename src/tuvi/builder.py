@@ -70,6 +70,7 @@ class Builder:
         self._build_trangsinh()
         self._build_tuhoa(birthTime)
         self._build_tuan_triet(birthTime)
+        self._build_age_daivan(birthTime)
 
         return self.tinhBan
 
@@ -169,6 +170,16 @@ class Builder:
         if thien_can in ["Mậu", "Quý"]:
             cuc_index = self._match_cuc_index_by_menh_position([2,0,3,4,1], menh_position)
         self.tinhBan.cuc = LIST_CUC[cuc_index]
+
+    def _build_age_daivan(self, birthTime : BirthTime):
+
+        menh_position = LIST_DIA_CHI.index(self.tinhBan.menh_position)
+        cuc = self.tinhBan.cuc
+
+        for i in range(12):
+            position = LIST_DIA_CHI[(menh_position + i*self.tinhBan.direction) % 12]
+
+            self.tinhBan.map_cung[position].age_daivan = i * 10 + cuc.number
 
 
     def _build_chinh_tinh(self, birthTime : BirthTime):
