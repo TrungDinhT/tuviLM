@@ -15,7 +15,7 @@ from api.schemas import (
     DummyChatResponse,
     StarPayload,
 )
-from src.tuvi.birth import BirthTime
+from src.tuvi.birth import TuviTime
 from src.tuvi.builder import Builder
 
 
@@ -44,7 +44,7 @@ def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
         hour=payload.hour,
     )
 
-    birth_time = BirthTime.from_solar_day(solar_dt, payload.gender)
+    birth_time = TuviTime.from_solar_day(solar_dt, payload.gender)
     tinh_ban = Builder().build(birth_time)
 
     cung_by_position: dict[str, CungPayload] = {}
@@ -97,7 +97,7 @@ def analyze_cung(payload: AnalyzeCungRequest) -> AnalyzeCungResponse:
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    birth_time = BirthTime.from_solar_day(solar_dt, payload.gender)
+    birth_time = TuviTime.from_solar_day(solar_dt, payload.gender)
     tinh_ban = Builder().build(birth_time)
 
     position = payload.position.strip()
