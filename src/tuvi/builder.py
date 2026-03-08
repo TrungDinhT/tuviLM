@@ -8,18 +8,19 @@ from src.tuvi.element.types import (
 from src.tuvi.birth import BirthTime
 from src.tuvi.element.star_registry import make_chinh_tinh, make_phu_tinh
 from src.tuvi.element.tuhoa_registry import make_tuhoa
+from src.tuvi.star_rules import (
+    get_chinh_tinh_positions,
+    get_hour_star_positions,
+    get_month_star_positions,
+    get_star_by_dia_chi_position,
+    get_star_by_thien_can_position,
+)
 from src.tuvi.search_tool import search_element
-from src.tuvi.transform import get_luc_hai, get_nhi_hop, get_xung_chieu
+from src.tuvi.star_rules.linh_hoa import get_hoatinh_position, get_linhtinh_position
+from src.tuvi.star_rules.thai_tue import get_vong_thai_tue_positions
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.element.cuc import LIST_CUC
 from src.tuvi.constant import (
-    MAP_LOC_TON_POSITION,
-    MAP_LUU_HA,
-    MAP_THIEN_KHOI,
-    MAP_THIEN_PHUC,
-    MAP_THIEN_QUAN,
-    MAP_THIEN_TRU,
-    MAP_THIEN_VIET,
     MAP_TRIET,
     MAP_TUAN,
     MAP_TUHOA,
@@ -60,12 +61,9 @@ class Builder:
         self._build_chinh_tinh(birthTime)
         self._build_by_month(birthTime)
         self._build_by_hour(birthTime)
-        self._build_loc_ton(birthTime)
+        self._build_by_thien_can(birthTime)
         self._build_thai_tue(birthTime)
-        self._build_khoiviet(birthTime)
         self._build_linhhoa(birthTime)
-        self._build_by_map(birthTime)
-        self._build_cothan_quatu(birthTime)
         self._build_by_diachi(birthTime)
         self._build_lavong()
         self._build_dauquan(birthTime)
