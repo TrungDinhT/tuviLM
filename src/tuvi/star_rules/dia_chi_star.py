@@ -7,7 +7,8 @@ def get_thien_hi_position(dia_chi: TYPE_DIA_CHI) -> TYPE_DIA_CHI:
     return get_position_by_move("Dậu", dia_chi_index, -1)
 
 
-def get_hong_loan_position(thien_hi_position: TYPE_DIA_CHI) -> TYPE_DIA_CHI:
+def get_hong_loan_position(dia_chi: TYPE_DIA_CHI) -> TYPE_DIA_CHI:
+    thien_hi_position = get_thien_hi_position(dia_chi)
     return get_xung_chieu(thien_hi_position)
 
 
@@ -107,7 +108,7 @@ def get_star_by_dia_chi_position(dia_chi: TYPE_DIA_CHI) -> list[tuple[str, TYPE_
 
     return [
         ("Thiên Hỉ", thien_hi_position),
-        ("Hồng Loan", get_hong_loan_position(thien_hi_position)),
+        ("Hồng Loan", get_hong_loan_position(dia_chi)),
         ("Thiên Mã", get_thien_ma_position(dia_chi)),
         ("Giải Thần", giai_than_position),
         ("Phượng Các", get_phuong_cac_position(giai_than_position)),
