@@ -66,9 +66,9 @@ class AnalyzeCungResponse(BaseModel):
     analysis: str
 
 
-class DummyChatRequest(BaseModel):
+class ChatRequest(BaseModel):
     message: str
 
 
-class DummyChatResponse(BaseModel):
+class ChatResponse(BaseModel):
     answer: str
