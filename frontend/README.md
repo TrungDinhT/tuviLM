@@ -119,6 +119,7 @@ frontend/
 File: `src/api/mockApi.ts`
 
 - `buildLaso(input)` -> calls real backend `POST /api/v1/laso/build`
+- `buildSaoLuu({ tinhBan, observationTime })` -> calls backend `POST /api/v1/laso/build_sao_luu`
 - `getAnalysis(position)` -> returns markdown string
 - `streamChatReply(messages, selectedPosition, onChunk)` -> chunked chat text
 
@@ -132,6 +133,7 @@ Recommended migration steps:
 2. Replace internals of `src/api/mockApi.ts` with HTTP calls (`fetch`/`axios`).
 3. Preserve function signatures:
    - `buildLaso`
+   - `buildSaoLuu`
    - `getAnalysis`
    - `streamChatReply`
 4. If backend supports SSE/WebSocket, map stream events to `onChunk`.

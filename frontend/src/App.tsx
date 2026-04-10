@@ -3,7 +3,7 @@ import BirthForm from "./components/BirthForm";
 import LasoBoard from "./components/LasoBoard";
 import AnalysisPanel from "./components/AnalysisPanel";
 import ChatPanel from "./components/ChatPanel";
-import { buildLaso, getAnalysis, streamChatReply } from "./api/mockApi";
+import { buildLaso, buildSaoLuu, getAnalysis, streamChatReply } from "./api/mockApi";
 import type { BirthInput, ChatMessage, LasoData } from "./types";
 
 const INITIAL_INPUT: BirthInput = {
@@ -20,12 +20,14 @@ function id(prefix: string): string {
 
 export default function App() {
   const [input, setInput] = useState<BirthInput>(INITIAL_INPUT);
+  const [viewYear, setViewYear] = useState<number>(new Date().getFullYear());
   const [laso, setLaso] = useState<LasoData | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
   const [analysisByPosition, setAnalysisByPosition] = useState<Record<string, string>>({});
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const [building, setBuilding] = useState(false);
+  const [buildingSaoLuu, setBuildingSaoLuu] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [chatBusy, setChatBusy] = useState(false);
 
@@ -59,6 +61,35 @@ export default function App() {
   const handleSelectPosition = (position: string) => {
     setSelectedPosition(position);
     setAnalysisError(null);
+  };
+
+  const handleBuildSaoLuu = async () => {
+    if (!laso) return;
+
+    setBuildingSaoLuu(true);
+    try {
+      const result = await buildSaoLuu({
+        tinhBan: laso.tinhBan,
+        observationTime: {
+          date: input.date,
+          month: input.month,
+          year: viewYear,
+          hour: input.hour,
+          gender: input.gender
+        }
+      });
+
+      setLaso((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          tinhBan: result.tinhBan,
+          cungByPosition: result.cungByPosition
+        };
+      });
+    } finally {
+      setBuildingSaoLuu(false);
+    }
   };
 
   const handleAnalyzeSelected = async () => {
@@ -123,7 +154,17 @@ export default function App() {
       </header>
 
       <section className="top-layout">
-        <BirthForm value={input} onChange={setInput} onSubmit={() => void handleBuild()} loading={building} />
+        <BirthForm
+          value={input}
+          onChange={setInput}
+          viewYear={viewYear}
+          onViewYearChange={setViewYear}
+          onSubmit={() => void handleBuild()}
+          onBuildSaoLuu={() => void handleBuildSaoLuu()}
+          loadingBuild={building}
+          loadingSaoLuu={buildingSaoLuu}
+          canBuildSaoLuu={Boolean(laso)}
+        />
 
         <LasoBoard
           laso={laso}
