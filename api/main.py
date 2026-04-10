@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import datetime as dt
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.schemas import (
@@ -13,16 +15,43 @@ from api.schemas import (
     BuildSaoLuuRequest,
     BuildSaoLuuResponse,
     CungPayload,
-    DummyChatRequest,
-    DummyChatResponse,
+    ChatRequest,
+    ChatResponse,
     StarPayload,
 )
+from src.agent.deps import TuviAgentDeps
+from src.agent.main import build_tuvi_agent
 from src.tuvi.birth import TuviTime
 from src.tuvi.builder import Builder
 from src.tuvi.tinh_ban import TinhBan
 
 
-app = FastAPI(title="TuviLM API", version="0.1.0")
+@dataclass(slots=True)
+class ApiState:
+    agent_deps: TuviAgentDeps
+
+    @property
+    def has_tinh_ban(self) -> bool:
+        return self.agent_deps.tinh_ban is not None
+
+    def set_tinh_ban(self, tinh_ban: TinhBan) -> None:
+        self.agent_deps.tinh_ban = tinh_ban
+
+    def require_tinh_ban(self) -> TinhBan:
+        return self.agent_deps.require_tinh_ban()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    agent_deps = TuviAgentDeps()
+    agent_deps.agent = build_tuvi_agent()
+    app.state.api_state = ApiState(
+        agent_deps=agent_deps,
+    )
+    yield
+
+
+app = FastAPI(title="TuviLM API", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,9 +62,17 @@ app.add_middleware(
 )
 
 
+def get_api_state(request: Request) -> ApiState:
+    return request.app.state.api_state
+
+
 @app.get("/api/v1/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+def health(request: Request) -> dict[str, str | bool]:
+    api_state = get_api_state(request)
+    return {
+        "status": "ok",
+        "tinh_ban_created": api_state.has_tinh_ban,
+    }
 
 
 def _to_cung_payload_map(tinh_ban: TinhBan) -> dict[str, CungPayload]:
@@ -72,7 +109,7 @@ def _to_cung_payload_map(tinh_ban: TinhBan) -> dict[str, CungPayload]:
 
 
 @app.post("/api/v1/laso/build", response_model=BuildLasoResponse)
-def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
+def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse:
     try:
         solar_dt = dt.datetime(
             year=payload.year,
@@ -85,6 +122,7 @@ def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
 
     birth_time = TuviTime.from_solar_day(solar_dt, payload.gender)
     tinh_ban = Builder().build(birth_time)
+    get_api_state(request).set_tinh_ban(tinh_ban)
 
     cung_by_position = _to_cung_payload_map(tinh_ban)
 
@@ -106,7 +144,7 @@ def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
 
 
 @app.post("/api/v1/laso/build_sao_luu", response_model=BuildSaoLuuResponse)
-def build_sao_luu(payload: BuildSaoLuuRequest) -> BuildSaoLuuResponse:
+def build_sao_luu(payload: BuildSaoLuuRequest, request: Request) -> BuildSaoLuuResponse:
     try:
         observed_solar_dt = dt.datetime(
             year=payload.observation_time.year,
@@ -122,6 +160,7 @@ def build_sao_luu(payload: BuildSaoLuuRequest) -> BuildSaoLuuResponse:
     builder = Builder()
     builder.tinhBan = payload.tinhBan
     tinh_ban = builder.build_current_year(observed_time)
+    get_api_state(request).set_tinh_ban(tinh_ban)
 
     return BuildSaoLuuResponse(
         tinhBan=tinh_ban,
@@ -130,19 +169,13 @@ def build_sao_luu(payload: BuildSaoLuuRequest) -> BuildSaoLuuResponse:
 
 
 @app.post("/api/v1/laso/analyze", response_model=AnalyzeCungResponse)
-def analyze_cung(payload: AnalyzeCungRequest) -> AnalyzeCungResponse:
-    try:
-        solar_dt = dt.datetime(
-            year=payload.year,
-            month=payload.month,
-            day=payload.date,
-            hour=payload.hour,
-        )
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
+def analyze_cung(payload: AnalyzeCungRequest, request: Request) -> AnalyzeCungResponse:
+    api_state = get_api_state(request)
 
-    birth_time = TuviTime.from_solar_day(solar_dt, payload.gender)
-    tinh_ban = Builder().build(birth_time)
+    try:
+        tinh_ban = api_state.require_tinh_ban()
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     position = payload.position.strip()
     if position not in tinh_ban.map_cung:
@@ -167,8 +200,16 @@ def analyze_cung(payload: AnalyzeCungRequest) -> AnalyzeCungResponse:
     )
 
 
-@app.post("/api/v1/chat", response_model=DummyChatResponse)
-def chat_dummy(payload: DummyChatRequest) -> DummyChatResponse:
-    return DummyChatResponse(
-        answer=f"Dummy chat route. Received: {payload.message}",
+@app.post("/api/v1/chat", response_model=ChatResponse)
+async def chat_dummy(payload: ChatRequest, request: Request) -> ChatResponse:
+    api_state = get_api_state(request)
+    if not api_state.has_tinh_ban:
+        return ChatResponse(
+            answer="TinhBan chưa được tạo trong state.",
+        )
+
+    agent = api_state.agent_deps.require_agent()
+    result = await agent.run(payload.message, deps=api_state.agent_deps)
+    return ChatResponse(
+        answer=result.output,
     )
