@@ -1,4 +1,4 @@
-import type { BirthInput, ChatMessage, CungData, LasoData } from "../types";
+import type { BirthInput, BuildSaoLuuInput, ChatMessage, CungData, LasoData } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -56,7 +56,8 @@ function buildDummyCung(position: string, role: string, idx: number): CungData {
     isTuan: false,
     isTriet: false,
     isCungThan: false,
-    ageDaiVan: 0
+    ageDaiVan: 0,
+    saoLuu: []
   };
 }
 
@@ -75,6 +76,7 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
   const payload = await response.json() as {
     id: string;
     summary: string;
+    tinhBan: unknown;
     cung_by_position: Record<string, {
       position: string;
       role: string | null;
@@ -86,6 +88,7 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
       is_triet: boolean;
       is_cung_than: boolean;
       age_daivan: number | null;
+      saoLuu: Array<{ name: string; display: string; element: string }>;
     }>;
   };
 
@@ -103,7 +106,8 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
         isTuan: item.is_tuan,
         isTriet: item.is_triet,
         isCungThan: item.is_cung_than,
-        ageDaiVan: item.age_daivan ?? null
+        ageDaiVan: item.age_daivan ?? null,
+        saoLuu: item.saoLuu ?? []
       };
       continue;
     }
@@ -115,6 +119,78 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
   return {
     id: payload.id,
     summary: payload.summary,
+    tinhBan: payload.tinhBan,
+    cungByPosition: mapped
+  };
+}
+
+export async function buildSaoLuu(input: BuildSaoLuuInput): Promise<{
+  tinhBan: unknown;
+  cungByPosition: Record<string, CungData>;
+}> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/laso/build_sao_luu`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      tinhBan: input.tinhBan,
+      observation_time: {
+        date: input.observationTime.date,
+        month: input.observationTime.month,
+        year: input.observationTime.year,
+        hour: input.observationTime.hour,
+        gender: input.observationTime.gender
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Build sao lưu failed (${response.status}): ${detail}`);
+  }
+
+  const payload = await response.json() as {
+    tinhBan: unknown;
+    cung_by_position: Record<string, {
+      position: string;
+      role: string | null;
+      chinh_tinh: string[];
+      phu_tinh: Array<{ name: string; display: string; element: string }>;
+      tuhoa: string[];
+      trang_sinh: string | null;
+      is_tuan: boolean;
+      is_triet: boolean;
+      is_cung_than: boolean;
+      age_daivan: number | null;
+      saoLuu: Array<{ name: string; display: string; element: string }>;
+    }>;
+  };
+
+  const mapped: Record<string, CungData> = {};
+  for (const position of BOARD_ORDER) {
+    const item = payload.cung_by_position[position];
+    if (item) {
+      mapped[position] = {
+        position: item.position,
+        role: item.role ?? ROLE_BY_POSITION[position] ?? "Cung",
+        chinhTinh: item.chinh_tinh,
+        phuTinh: item.phu_tinh,
+        tuhoa: item.tuhoa,
+        trangSinh: item.trang_sinh,
+        isTuan: item.is_tuan,
+        isTriet: item.is_triet,
+        isCungThan: item.is_cung_than,
+        ageDaiVan: item.age_daivan ?? null,
+        saoLuu: item.saoLuu ?? []
+      };
+      continue;
+    }
+
+    const fallbackRole = ROLE_BY_POSITION[position] ?? "Cung";
+    mapped[position] = buildDummyCung(position, fallbackRole, BOARD_ORDER.indexOf(position));
+  }
+
+  return {
+    tinhBan: payload.tinhBan,
     cungByPosition: mapped
   };
 }

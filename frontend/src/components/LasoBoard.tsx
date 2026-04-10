@@ -131,6 +131,21 @@ export default function LasoBoard({ laso, selectedPosition, onSelectPosition }: 
                     </p>
                   ))}
 
+                  {cung.saoLuu.length > 0 && (
+                    <>
+                      <p className="star-luu-divider">--Lưu--</p>
+                      {cung.saoLuu.map((star) => (
+                        <p
+                          key={`luu-${star.name}-${star.display}`}
+                          className="star-sub"
+                          style={{ color: ELEMENT_COLORS[star.element] ?? "#374151" }}
+                        >
+                          {star.display}
+                        </p>
+                      ))}
+                    </>
+                  )}
+
                   <p className="star-trangsinh bottom-center">Tràng Sinh: {cung.trangSinh ?? "N/A"}</p>
                 </div>
               ) : (

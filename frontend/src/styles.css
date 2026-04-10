@@ -135,6 +135,11 @@ textarea {
   cursor: not-allowed;
 }
 
+.input-actions {
+  display: grid;
+  gap: 8px;
+}
+
 .laso-panel {
   display: grid;
   grid-template-rows: auto 1fr;
@@ -215,6 +220,13 @@ textarea {
 
 .star-sub {
   font-size: 16px;
+}
+
+.star-luu-divider {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #5b3d20;
 }
 
 .star-tuhoa {

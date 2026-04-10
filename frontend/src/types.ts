@@ -8,6 +8,8 @@ export type BirthInput = {
   gender: Gender;
 };
 
+export type TuviTimeInput = BirthInput;
+
 export type CungData = {
   position: string;
   role: string;
@@ -23,12 +25,23 @@ export type CungData = {
   isTriet: boolean;
   isCungThan: boolean;
   ageDaiVan: number | null;
+  saoLuu: Array<{
+    name: string;
+    display: string;
+    element: string;
+  }>;
 };
 
 export type LasoData = {
   id: string;
   summary: string;
+  tinhBan: unknown;
   cungByPosition: Record<string, CungData>;
+};
+
+export type BuildSaoLuuInput = {
+  tinhBan: unknown;
+  observationTime: TuviTimeInput;
 };
 
 export type ChatMessage = {

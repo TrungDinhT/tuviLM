@@ -4,15 +4,30 @@ import type { BirthInput, Gender } from "../types";
 type Props = {
   value: BirthInput;
   onChange: (next: BirthInput) => void;
+  viewYear: number;
+  onViewYearChange: (year: number) => void;
   onSubmit: () => void;
-  loading: boolean;
+  onBuildSaoLuu: () => void;
+  loadingBuild: boolean;
+  loadingSaoLuu: boolean;
+  canBuildSaoLuu: boolean;
 };
 
 function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
-export default function BirthForm({ value, onChange, onSubmit, loading }: Props) {
+export default function BirthForm({
+  value,
+  onChange,
+  viewYear,
+  onViewYearChange,
+  onSubmit,
+  onBuildSaoLuu,
+  loadingBuild,
+  loadingSaoLuu,
+  canBuildSaoLuu,
+}: Props) {
   const ageHint = useMemo(() => new Date().getFullYear() - value.year, [value.year]);
 
   const setField = <K extends keyof BirthInput>(key: K, fieldValue: BirthInput[K]) => {
@@ -57,6 +72,17 @@ export default function BirthForm({ value, onChange, onSubmit, loading }: Props)
         </label>
 
         <label>
+          Năm xem
+          <input
+            type="number"
+            min={1900}
+            max={2099}
+            value={viewYear}
+            onChange={(e) => onViewYearChange(clamp(Number(e.target.value), 1900, 2099))}
+          />
+        </label>
+
+        <label>
           Giờ
           <input
             type="number"
@@ -81,9 +107,18 @@ export default function BirthForm({ value, onChange, onSubmit, loading }: Props)
 
       <p className="hint">Tuổi ước tính: {ageHint}</p>
 
-      <button className="primary-btn" onClick={onSubmit} disabled={loading}>
-        {loading ? "Đang lập lá số..." : "Lập lá số"}
-      </button>
+      <div className="input-actions">
+        <button className="primary-btn" onClick={onSubmit} disabled={loadingBuild || loadingSaoLuu}>
+          {loadingBuild ? "Đang lập lá số..." : "Lập lá số"}
+        </button>
+        <button
+          className="primary-btn"
+          onClick={onBuildSaoLuu}
+          disabled={!canBuildSaoLuu || loadingBuild || loadingSaoLuu}
+        >
+          {loadingSaoLuu ? "Đang an sao lưu..." : "An sao lưu"}
+        </button>
+      </div>
     </section>
   );
 }
