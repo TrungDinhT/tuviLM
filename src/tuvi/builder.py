@@ -1,4 +1,5 @@
 from typing import Literal
+
 from src.tuvi.element.types import LIST_DIA_CHI, LIST_ROLES, LIST_THIEN_CAN, TYPE_DIA_CHI
 from src.tuvi.birth import TuviTime
 from src.tuvi.element.star_registry import make_chinh_tinh, make_phu_tinh
@@ -11,8 +12,11 @@ from src.tuvi.star_rules import (
     get_star_by_thien_can_position
 )
 from src.tuvi.search_tool import search_element
+from src.tuvi.star_rules.dia_chi_star import get_hong_loan_position, get_thien_khoc_position, get_thien_ma_position
+from src.tuvi.star_rules.hour_star import get_van_khuc_position, get_van_xuong_position
 from src.tuvi.star_rules.linh_hoa import get_hoatinh_position, get_linhtinh_position
-from src.tuvi.star_rules.thai_tue import get_vong_thai_tue_positions
+from src.tuvi.star_rules.thai_tue import get_thien_hu_position, get_vong_thai_tue_positions
+from src.tuvi.star_rules.thien_can_star import get_loc_ton_position, get_thien_khoi_position, get_thien_viet_position
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.element.cuc import LIST_CUC
 from src.tuvi.constant import (
@@ -37,14 +41,17 @@ def get_position_by_move(
 
 class Builder:
 
-    def __init__(self) -> None:
-        self.tinhBan = TinhBan.init_empty_plate()
+    def __init__(self, tinh_ban: TinhBan | None = None) -> None:
+        self.tinhBan = tinh_ban or TinhBan.init_empty_plate()
 
     def _add_chinh_tinh(self, position: TYPE_DIA_CHI, star_name: str):
         self.tinhBan.map_cung[position].chinhTinh.append(make_chinh_tinh(star_name))
 
     def _add_phu_tinh(self, position: TYPE_DIA_CHI, star_name: str):
         self.tinhBan.map_cung[position].phuTinh.append(make_phu_tinh(star_name))
+
+    def _add_sao_luu(self, position: TYPE_DIA_CHI, star_name: str):
+        self.tinhBan.map_cung[position].saoLuu.append(make_phu_tinh(star_name))
 
     def _add_tuhoa(self, position: TYPE_DIA_CHI, tuhoa_name: str):
         self.tinhBan.map_cung[position].tuhoa.append(make_tuhoa(tuhoa_name))
@@ -71,7 +78,40 @@ class Builder:
         return self.tinhBan
 
     def build_current_year(self, observed_time: TuviTime):
-        self
+        for cung in self.tinhBan.map_cung.values():
+            cung.saoLuu.clear()
+
+        vanxuong_position = get_van_xuong_position(observed_time.hour)
+        vankhuc_position = get_van_khuc_position(observed_time.hour)
+
+        thienkhoi_position = get_thien_khoi_position(observed_time.thien_can)
+        thienviet_position = get_thien_viet_position(observed_time.thien_can)
+
+        hongloan_position = get_hong_loan_position(observed_time.dia_chi)
+        thienma_position = get_thien_ma_position(observed_time.dia_chi)
+
+        thienkhoc_position = get_thien_khoc_position(observed_time.dia_chi)
+        locton_position = get_loc_ton_position(observed_time.thien_can)
+
+        thienhu_position = get_thien_hu_position(observed_time.dia_chi)
+
+        map_sao_position = {
+            "Văn Xương": vanxuong_position,
+            "Văn Khúc": vankhuc_position,
+            "Thiên Khôi": thienkhoi_position,
+            "Thiên Việt": thienviet_position,
+            "Hồng Loan": hongloan_position,
+            "Thiên Mã": thienma_position,
+            "Thiên Khốc": thienkhoc_position,
+            "Lộc Tồn": locton_position,
+            "Thiên Hư": thienhu_position
+        }
+
+        for star_name, position in map_sao_position.items():
+            self._add_sao_luu(position, star_name)
+
+        return self.tinhBan
+
 
     def _get_menh_position(self, birthTime : TuviTime) -> int:
 

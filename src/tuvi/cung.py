@@ -47,7 +47,7 @@ class Cung(pydantic.BaseModel):
     age_daivan : int | None = None
     "Tuổi đại vận của cung"
 
-    list_sao_luu : list[str] = pydantic.Field(default_factory=list)
+    saoLuu : list[PhuTinh] = pydantic.Field(default_factory=list)
     "Danh sách sao lưu của cung, ví dụ: Lưu Văn Xương, Lưu Văn Khúc,..."
 
     @property
