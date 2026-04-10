@@ -13,8 +13,8 @@ class LunarYear(pydantic.BaseModel):
 
     @classmethod
     def from_solar_year(cls, lunar_date: LunarDate) -> "LunarYear":
-        dia_chi = DiaChi((lunar_date.year + 8) % 12)
-        thien_can = ThienCan((lunar_date.year + 6) % 10)
+        dia_chi = DiaChi.from_index(lunar_date.year + 8)
+        thien_can = ThienCan.from_index(lunar_date.year + 6)
         return cls(
             dia_chi=dia_chi,
             thien_can=thien_can,
@@ -44,9 +44,9 @@ class LaSoPrior(pydantic.BaseModel):
             is_tomorrow = True
 
         if is_tomorrow or time.hour == 0:
-            hour = DiaChi.Ty
+            hour = DiaChi.TY
         else:
-            hour = DiaChi((time.hour + 1) // 2)
+            hour = DiaChi.from_index((time.hour + 1) // 2)
 
         lunar_date = get_lunar_date(time.day, time.month, time.year)
 
@@ -59,7 +59,7 @@ class LaSoPrior(pydantic.BaseModel):
         )
 
     def get_am_duong(self) -> LuongNghi:
-        return LuongNghi(self.year.dia_chi.value % 2)
+        return LuongNghi(self.year.dia_chi.index % 2)
 
     def get_thien_can(self) -> ThienCan:
         return self.year.thien_can

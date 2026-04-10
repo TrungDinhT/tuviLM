@@ -3,42 +3,40 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-class DiaChi(Enum):
-    TY = 0
-    SUU = auto()
-    DAN = auto()
-    MEO = auto()
-    THIN = auto()
-    TI = auto()
-    NGO = auto()
-    MUI = auto()
-    THAN = auto()
-    DAU = auto()
-    TUAT = auto()
-    HOI = auto()
+class CyclicIndexMixin:
+    @classmethod
+    def from_index(cls, index: int):
+        members = tuple(cls)
+        return members[index % len(members)]
 
-    def __str__(self) -> str:
-        _DIA_CHI_NAMES = [
-            "Tý",
-            "Sửu",
-            "Dần",
-            "Mão",
-            "Thìn",
-            "Tỵ",
-            "Ngọ",
-            "Mùi",
-            "Thân",
-            "Dậu",
-            "Tuất",
-            "Hợi",
-        ]
-        return _DIA_CHI_NAMES[self.value]
+    @property
+    def index(self) -> int:
+        return tuple(type(self)).index(self)
 
-    def __add__(self, val: int) -> "DiaChi":
-        return DiaChi((self.value + val % 12 + 12) % 12)
+    def __add__(self, val: int):
+        if not isinstance(val, int):
+            return NotImplemented
+        return type(self).from_index(self.index + val)
 
     def __sub__(self, val: int):
+        if not isinstance(val, int):
+            return NotImplemented
         return self + (-1) * val
+
+
+class DiaChi(CyclicIndexMixin, StrEnum):
+    TY = "Tý"
+    SUU = "Sửu"
+    DAN = "Dần"
+    MEO = "Mão"
+    THIN = "Thìn"
+    TI = "Tỵ"
+    NGO = "Ngọ"
+    MUI = "Mùi"
+    THAN = "Thân"
+    DAU = "Dậu"
+    TUAT = "Tuất"
+    HOI = "Hợi"
 
     @classmethod
     def list_dia_chi(cls) -> list["DiaChi"]:
@@ -77,7 +75,7 @@ class NguHanh(Enum):
         return (self.value - other.value) % 5 == 3
 
 
-class ThienCan(StrEnum):
+class ThienCan(CyclicIndexMixin, StrEnum):
     GIAP = "Giáp"
     AT = "Ất"
     BINH = "Bính"

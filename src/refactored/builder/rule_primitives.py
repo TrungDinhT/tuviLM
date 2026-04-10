@@ -1,23 +1,23 @@
 from functools import partial
+from typing import Protocol
+
+from src.refactored.builder.components_registry import (
+    AbsolutePositionResolver,
+    AbsolutePositionSpec,
+    ComponentRegistry,
+    PositionTransform,
+    RelativePositionSpec,
+)
 from src.refactored.component import Component
 from src.refactored.component.elementary import DiaChi
-from typing import Protocol
-from src.refactored.builder.components_registry import (
-    ComponentRegistry,
-    RelativePositionResolver,
-    PositionTransform,
-)
+from src.refactored.component.prior import LaSoPrior
 from src.refactored.transform import (
-    get_xung_chieu,
-    get_nhi_hop,
     get_luc_hai,
-    get_tam_hop_thuan,
+    get_nhi_hop,
     get_tam_hop_nghich,
+    get_tam_hop_thuan,
+    get_xung_chieu,
 )
-
-
-def offset_position(position: DiaChi, offset: int) -> DiaChi:
-    return position + offset
 
 
 class Rule(Protocol):
@@ -25,6 +25,8 @@ class Rule(Protocol):
 
     def register_components(self, registry: ComponentRegistry): ...
 
+
+# ========================= Relative Position Rules =========================
 
 class RelativePosition(Rule):
     """Rule to register a component relative to another component."""
@@ -39,7 +41,7 @@ class RelativePosition(Rule):
     def register_components(self, registry: ComponentRegistry):
         registry.register_component_lazy(
             self.other,
-            RelativePositionResolver(self.reference, self.transform),
+            RelativePositionSpec(self.reference, self.transform),
         )
 
 
@@ -50,7 +52,7 @@ class SamePosition(RelativePosition):
         super().__init__(
             reference=reference,
             other=other,
-            transform=partial(offset_position, offset=0),
+            transform=partial(_offset_by, offset=0),
         )
 
 
@@ -109,7 +111,7 @@ class TamHopNghich(RelativePosition):
         )
 
 
-class CircularOrderedGroup(Rule):
+class Vong(Rule):
     """Rule to register a group of components in a circular order."""
 
     def __init__(self, principal: Component, others: list[Component]):
@@ -120,7 +122,40 @@ class CircularOrderedGroup(Rule):
         for idx, component in enumerate(self.others):
             registry.register_component_lazy(
                 component,
-                RelativePositionResolver(
-                    self.principal, partial(offset_position, offset=idx + 1)
+                RelativePositionSpec(
+                    self.principal, partial(_offset_by, offset=idx + 1)
                 ),
             )
+
+
+class AbsolutePosition(Rule):
+    """Rule to register a component at an absolute position."""
+
+    def __init__(self, *, component: Component, position_fn: AbsolutePositionResolver):
+        self.component = component
+        self.position_fn = position_fn
+
+    def register_components(self, registry: ComponentRegistry):
+        registry.register_component_lazy(
+            self.component,
+            AbsolutePositionSpec(self.position_fn),
+        )
+
+
+# ========================= Absolute Position Rules =========================
+
+def menh_position_fn(prior: LaSoPrior) -> DiaChi:
+    month_anchor = DiaChi.DAN + (prior.month - 1)
+    return month_anchor - prior.hour.index
+
+
+def thai_tue_position_fn(prior: LaSoPrior) -> DiaChi:
+    """Thái Tuế an tại cung theo Địa Chi năm sinh."""
+    return prior.get_dia_chi()
+
+
+
+
+# ========================= Utility functions =========================
+def _offset_by(position: DiaChi, offset: int) -> DiaChi:
+    return position + offset
