@@ -6,7 +6,7 @@ Frontend app for:
 - cung analysis panel
 - chatbot panel (streaming-style responses)
 
-Current version uses a local dummy API (`src/api/mockApi.ts`).  
+Current version uses a local dummy API (`src/api/mockApi.ts`).
 You can later swap it to your real backend without changing UI layout/components.
 
 ## 1. Tech Stack
