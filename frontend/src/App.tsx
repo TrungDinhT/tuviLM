@@ -129,7 +129,7 @@ export default function App() {
     setChatBusy(true);
 
     try {
-      await streamChatReply([...messages, userMsg], selectedPosition, (chunk) => {
+      await streamChatReply([...messages, userMsg], (chunk) => {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsg.id
@@ -150,7 +150,7 @@ export default function App() {
     <main className="app-root">
       <header className="app-header">
         <h1>TuviLM UI</h1>
-        <p>Input + Lá số + Phân tích + Chat (dummy API)</p>
+        <p>Input + Lá số + Phân tích + Chat</p>
       </header>
 
       <section className="top-layout">

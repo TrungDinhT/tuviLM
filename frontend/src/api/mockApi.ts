@@ -225,13 +225,29 @@ export async function getAnalysis(input: BirthInput, position: string): Promise<
 
 export async function streamChatReply(
   messages: ChatMessage[],
-  selectedPosition: string | null,
   onChunk: (chunk: string) => void
 ): Promise<void> {
   const userMessages = messages.filter((m) => m.role === "user");
   const latest = userMessages.length > 0 ? userMessages[userMessages.length - 1].content : "";
-  const seed = selectedPosition ? `cung ${selectedPosition}` : "toàn lá số";
-  const full = `Mình đã đọc câu hỏi của bạn về ${seed}. Với ngữ cảnh hiện tại, mình ưu tiên luận chính tinh trước, sau đó xét phụ tinh và Tràng Sinh để kết luận rõ ràng. Câu hỏi của bạn: "${latest}".`;
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: latest
+    })
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Chat failed (${response.status}): ${detail}`);
+  }
+
+  const payload = await response.json() as {
+    answer: string;
+  };
+
+  const full = payload.answer;
 
   for (let i = 0; i < full.length; i += 6) {
     await new Promise((r) => setTimeout(r, 24));
