@@ -16,8 +16,22 @@ from src.tuvi.star_rules import (
     get_star_by_thien_can_position,
 )
 from src.tuvi.search_tool import search_element
+from src.tuvi.star_rules.dia_chi_star import (
+    get_hong_loan_position,
+    get_thien_khoc_position,
+    get_thien_ma_position,
+)
+from src.tuvi.star_rules.hour_star import get_van_khuc_position, get_van_xuong_position
 from src.tuvi.star_rules.linh_hoa import get_hoatinh_position, get_linhtinh_position
-from src.tuvi.star_rules.thai_tue import get_vong_thai_tue_positions
+from src.tuvi.star_rules.thai_tue import (
+    get_thien_hu_position,
+    get_vong_thai_tue_positions,
+)
+from src.tuvi.star_rules.thien_can_star import (
+    get_loc_ton_position,
+    get_thien_khoi_position,
+    get_thien_viet_position,
+)
 from src.tuvi.tinh_ban import TinhBan
 from src.tuvi.element.cuc import LIST_CUC
 from src.tuvi.constant import (
@@ -49,6 +63,9 @@ class Builder:
 
     def _add_phu_tinh(self, position: TYPE_DIA_CHI, star_name: str):
         self.tinhBan.map_cung[position].phuTinh.append(make_phu_tinh(star_name))
+
+    def _add_sao_luu(self, position: TYPE_DIA_CHI, star_name: str):
+        self.tinhBan.map_cung[position].saoLuu.append(make_phu_tinh(star_name))
 
     def _add_tuhoa(self, position: TYPE_DIA_CHI, tuhoa_name: str):
         self.tinhBan.map_cung[position].tuhoa.append(make_tuhoa(tuhoa_name))
