@@ -3,14 +3,24 @@ from __future__ import annotations
 from typing import Literal
 
 from pydantic import BaseModel, Field
+from src.tuvi.tinh_ban import TinhBan
 
 
-class BuildLasoRequest(BaseModel):
+class TuviTimePayload(BaseModel):
     date: int = Field(ge=1, le=31)
     month: int = Field(ge=1, le=12)
     year: int = Field(ge=1900, le=2099)
     hour: int = Field(ge=0, le=23)
     gender: Literal["M", "F"]
+
+
+class BuildLasoRequest(TuviTimePayload):
+    pass
+
+
+class BuildSaoLuuRequest(BaseModel):
+    tinhBan: TinhBan
+    observation_time: TuviTimePayload
 
 
 class StarPayload(BaseModel):
@@ -30,20 +40,22 @@ class CungPayload(BaseModel):
     is_triet: bool = False
     is_cung_than: bool = False
     age_daivan: int | None = None
+    saoLuu: list[StarPayload]
 
 
 class BuildLasoResponse(BaseModel):
     id: str
     summary: str
+    tinhBan: TinhBan
     cung_by_position: dict[str, CungPayload]
 
 
-class AnalyzeCungRequest(BaseModel):
-    date: int = Field(ge=1, le=31)
-    month: int = Field(ge=1, le=12)
-    year: int = Field(ge=1900, le=2099)
-    hour: int = Field(ge=0, le=23)
-    gender: Literal["M", "F"]
+class BuildSaoLuuResponse(BaseModel):
+    tinhBan: TinhBan
+    cung_by_position: dict[str, CungPayload]
+
+
+class AnalyzeCungRequest(TuviTimePayload):
     position: str
     model: str = "gpt-4.1-mini"
 

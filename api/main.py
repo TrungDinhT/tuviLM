@@ -10,6 +10,8 @@ from api.schemas import (
     AnalyzeCungResponse,
     BuildLasoRequest,
     BuildLasoResponse,
+    BuildSaoLuuRequest,
+    BuildSaoLuuResponse,
     CungPayload,
     DummyChatRequest,
     DummyChatResponse,
@@ -17,6 +19,7 @@ from api.schemas import (
 )
 from src.tuvi.birth import TuviTime
 from src.tuvi.builder import Builder
+from src.tuvi.tinh_ban import TinhBan
 
 
 app = FastAPI(title="TuviLM API", version="0.1.0")
@@ -35,18 +38,7 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.post("/api/v1/laso/build", response_model=BuildLasoResponse)
-def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
-    solar_dt = dt.datetime(
-        year=payload.year,
-        month=payload.month,
-        day=payload.date,
-        hour=payload.hour,
-    )
-
-    birth_time = TuviTime.from_solar_day(solar_dt, payload.gender)
-    tinh_ban = Builder().build(birth_time)
-
+def _to_cung_payload_map(tinh_ban: TinhBan) -> dict[str, CungPayload]:
     cung_by_position: dict[str, CungPayload] = {}
     for position, cung in tinh_ban.map_cung.items():
         cung_by_position[position] = CungPayload(
@@ -67,7 +59,34 @@ def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
             is_triet=cung.is_triet,
             is_cung_than=cung.is_cung_than,
             age_daivan=cung.age_daivan,
+            saoLuu=[
+                StarPayload(
+                    name=star.name,
+                    display=star.star_name_with_status(position),
+                    element=star.elemental,
+                )
+                for star in cung.saoLuu
+            ],
         )
+    return cung_by_position
+
+
+@app.post("/api/v1/laso/build", response_model=BuildLasoResponse)
+def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
+    try:
+        solar_dt = dt.datetime(
+            year=payload.year,
+            month=payload.month,
+            day=payload.date,
+            hour=payload.hour,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    birth_time = TuviTime.from_solar_day(solar_dt, payload.gender)
+    tinh_ban = Builder().build(birth_time)
+
+    cung_by_position = _to_cung_payload_map(tinh_ban)
 
     summary = (
         f"Cục: {tinh_ban.cuc.name if tinh_ban.cuc else 'N/A'} | "
@@ -81,7 +100,32 @@ def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
     return BuildLasoResponse(
         id=response_id,
         summary=summary,
+        tinhBan=tinh_ban,
         cung_by_position=cung_by_position,
+    )
+
+
+@app.post("/api/v1/laso/build_sao_luu", response_model=BuildSaoLuuResponse)
+def build_sao_luu(payload: BuildSaoLuuRequest) -> BuildSaoLuuResponse:
+    try:
+        observed_solar_dt = dt.datetime(
+            year=payload.observation_time.year,
+            month=payload.observation_time.month,
+            day=payload.observation_time.date,
+            hour=payload.observation_time.hour,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    observed_time = TuviTime.from_solar_day(observed_solar_dt, payload.observation_time.gender)
+
+    builder = Builder()
+    builder.tinhBan = payload.tinhBan
+    tinh_ban = builder.build_current_year(observed_time)
+
+    return BuildSaoLuuResponse(
+        tinhBan=tinh_ban,
+        cung_by_position=_to_cung_payload_map(tinh_ban),
     )
 
 
