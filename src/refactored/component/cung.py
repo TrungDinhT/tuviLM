@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 class Role(StrEnum):
     MENH = "Mệnh"
-    PHU_MAU = "Phụ Mẫu"
+    PHU = "Phụ Mẫu"
     PHUC = "Phúc Đức"
     DIEN = "Điền Trạch"
     QUAN = "Quan Lộc"
@@ -12,7 +12,7 @@ class Role(StrEnum):
     DI = "Thiên Di"
     TAT = "Tật Ách"
     TAI = "Tài Bạch"
-    TU_TUC = "Tử Tức"
+    TU = "Tử Tức"
     PHOI = "Phu Thê"
     HUYNH = "Huynh Đệ"
     THAN = "Thân"

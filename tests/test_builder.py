@@ -28,7 +28,7 @@ def test_builder_resolves_chained_specs_in_any_order():
     )
     builder.register_component_lazy(
         component_a,
-        AbsolutePositionSpec(lambda _prior: DiaChi.DAN),
+        AbsolutePositionSpec(lambda _context: DiaChi.DAN),
     )
 
     builder.resolve_pending()
@@ -36,6 +36,28 @@ def test_builder_resolves_chained_specs_in_any_order():
     assert builder.get_or_resolve_position(component_a) == DiaChi.DAN
     assert builder.get_or_resolve_position(component_b) == DiaChi.MEO
     assert builder.get_or_resolve_position(component_c) == DiaChi.THIN
+
+
+def test_builder_supports_prior_aware_relative_specs():
+    component_a = ComponentBase(name="A")
+    component_b = ComponentBase(name="B")
+
+    builder = Builder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
+    builder.register_component_lazy(
+        component_b,
+        RelativePositionSpec(
+            component_a,
+            lambda position, context: position + context.van_direction(),
+        ),
+    )
+    builder.register_component_lazy(
+        component_a,
+        AbsolutePositionSpec(lambda _context: DiaChi.DAN),
+    )
+
+    builder.resolve_pending()
+
+    assert builder.get_or_resolve_position(component_b) == DiaChi.MEO
 
 
 def test_builder_detects_circular_position_dependencies():

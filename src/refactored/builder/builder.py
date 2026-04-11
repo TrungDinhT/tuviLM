@@ -9,7 +9,7 @@ from src.refactored.builder.components_registry import (
 )
 from src.refactored.component import Component
 from src.refactored.component.elementary import DiaChi
-from src.refactored.component.prior import Gender, LaSoPrior
+from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior
 
 
 @dataclass
@@ -20,7 +20,8 @@ class PositionedComponent:
 
 class Builder(ComponentRegistry):
     def __init__(self, time: dt.datetime, gender: Gender) -> None:
-        self._la_so_prior = LaSoPrior.from_solar_day(time, gender)
+        la_so_prior = LaSoPrior.from_solar_day(time, gender)
+        self._la_so_context = LaSoContext.from_prior(la_so_prior)
         self._position_specs: dict[Component, PositionSpec] = {}
         self._components: dict[Component, PositionedComponent] = {}
         self._resolving: list[Component] = []
@@ -59,12 +60,10 @@ class Builder(ComponentRegistry):
         try:
             spec = self._position_specs[component]
             if isinstance(spec, RelativePositionSpec):
-                reference_position = self.get_or_resolve_position(
-                    spec.reference_component
-                )
-                position = spec.transform(reference_position)
+                reference_position = self.get_or_resolve_position(spec.reference)
+                position = spec.transform(reference_position, self._la_so_context)
             elif isinstance(spec, AbsolutePositionSpec):
-                position = spec.position_fn(self._la_so_prior)
+                position = spec.position_fn(self._la_so_context)
             else:
                 raise ValueError(f"Invalid position spec: {spec}")
         finally:
