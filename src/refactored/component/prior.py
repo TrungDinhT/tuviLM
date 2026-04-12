@@ -71,16 +71,11 @@ class LaSoPrior(pydantic.BaseModel):
 class LaSoContext:
     prior: LaSoPrior
     menh_position: DiaChi
-    cuc: Cuc
 
     @classmethod
     def from_prior(cls, prior: LaSoPrior) -> "LaSoContext":
         menh_position = _get_menh_position(prior)
-        return cls(
-            prior=prior,
-            menh_position=menh_position,
-            cuc=_get_cuc(prior, menh_position),
-        )
+        return cls(prior=prior, menh_position=menh_position)
 
     def get_am_duong(self) -> LuongNghi:
         return LuongNghi(self.prior.year.dia_chi.index % 2)
@@ -98,6 +93,10 @@ class LaSoContext:
             )
             else -1
         )
+
+    @property
+    def cuc(self) -> Cuc:
+        return _get_cuc(self.prior, self.menh_position)
 
 
 def _get_menh_position(prior: LaSoPrior) -> DiaChi:

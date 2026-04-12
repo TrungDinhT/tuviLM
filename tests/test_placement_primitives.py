@@ -1,7 +1,7 @@
 
 import pytest
 
-from src.refactored.builder.rule_primitives import move_by_la_so_attr
+from src.refactored.builder.placement_primitives import move_by_la_so_attr
 from src.refactored.component.elementary import DiaChi, ThienCan
 from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior, LunarYear
 

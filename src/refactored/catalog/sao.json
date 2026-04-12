@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Thiên Tài",
+    "ngu_hanh": "Thổ",
+    "is_chinh_tinh": false,
+    "sao_type": []
+  },
+  {
+    "name": "Thiên Thọ",
+    "ngu_hanh": "Thổ",
+    "is_chinh_tinh": false,
+    "sao_type": []
+  },
+  {
+    "name": "Thiên Sứ",
+    "ngu_hanh": "Thủy",
+    "is_chinh_tinh": false,
+    "sao_type": []
+  },
+  {
+    "name": "Thiên Thuơng",
+    "ngu_hanh": "Thổ",
+    "is_chinh_tinh": false,
+    "sao_type": []
+  }
+]

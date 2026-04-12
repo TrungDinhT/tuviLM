@@ -1,4 +1,6 @@
-from src.refactored.component.elementary import DiaChi, ThienCan
+import pytest
+
+from src.refactored.component.elementary import DiaChi, NguHanh, ThienCan
 
 
 def test_dia_chi():
@@ -32,3 +34,33 @@ def test_thien_can_str_enum_and_cyclic_index():
     assert ThienCan.GIAP + 1 == ThienCan.AT
     assert ThienCan.GIAP - 1 == ThienCan.QUY
     assert ThienCan.QUY + 30 == ThienCan.QUY
+
+
+def test_ngu_hanh_str_enum_without_cyclic_arithmetic():
+    assert NguHanh.KIM.value == "Kim"
+    assert str(NguHanh.KIM) == "Kim"
+    assert NguHanh("Kim") == NguHanh.KIM
+    assert NguHanh.KIM.index == 1
+
+    with pytest.raises(TypeError):
+        _ = NguHanh.KIM + 1
+
+    with pytest.raises(TypeError):
+        _ = NguHanh.KIM - 1
+
+
+def test_ngu_hanh_directional_relationships():
+    assert NguHanh.HOA.sinh_xuat(NguHanh.THO)
+    assert NguHanh.THO.sinh_nhap(NguHanh.HOA)
+    assert not NguHanh.THO.sinh_xuat(NguHanh.HOA)
+    assert not NguHanh.HOA.sinh_nhap(NguHanh.THO)
+
+    assert NguHanh.THO.khac_xuat(NguHanh.THUY)
+    assert NguHanh.THUY.khac_nhap(NguHanh.THO)
+    assert not NguHanh.THUY.khac_xuat(NguHanh.THO)
+    assert not NguHanh.THO.khac_nhap(NguHanh.THUY)
+
+    assert NguHanh.HOA.tuong_sinh(NguHanh.THO)
+    assert NguHanh.THO.tuong_sinh(NguHanh.HOA)
+    assert NguHanh.THO.tuong_khac(NguHanh.THUY)
+    assert NguHanh.THUY.tuong_khac(NguHanh.THO)

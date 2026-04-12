@@ -1,17 +1,19 @@
-from enum import Enum, StrEnum, auto
+from enum import Enum, StrEnum
 from pydantic import BaseModel
 from typing import Optional
 
 
-class CyclicIndexMixin:
+class IndexedEnumMixin:
+    @property
+    def index(self) -> int:
+        return tuple(type(self)).index(self)
+
+
+class CyclicEnumMixin(IndexedEnumMixin):
     @classmethod
     def from_index(cls, index: int):
         members = tuple(cls)
         return members[index % len(members)]
-
-    @property
-    def index(self) -> int:
-        return tuple(type(self)).index(self)
 
     def __add__(self, val: int):
         if not isinstance(val, int):
@@ -24,7 +26,20 @@ class CyclicIndexMixin:
         return self + (-1) * val
 
 
-class DiaChi(CyclicIndexMixin, StrEnum):
+class ThienCan(CyclicEnumMixin, StrEnum):
+    GIAP = "Giáp"
+    AT = "Ất"
+    BINH = "Bính"
+    DINH = "Đinh"
+    MAU = "Mậu"
+    KY = "Kỷ"
+    CANH = "Canh"
+    TAN = "Tân"
+    NHAM = "Nhâm"
+    QUY = "Quý"
+
+
+class DiaChi(CyclicEnumMixin, StrEnum):
     TY = "Tý"
     SUU = "Sửu"
     DAN = "Dần"
@@ -51,41 +66,34 @@ class LuongNghi(Enum):
         return "Dương" if self.value == 0 else "Âm"
 
 
-class NguHanh(Enum):
-    THO = 0
-    KIM = auto()
-    THUY = auto()
-    MOC = auto()
-    HOA = auto()
-
-    def __str__(self) -> str:
-        _NGU_HANH_NAMES = [
-            "Thổ", "Kim", "Thủy", "Mộc", "Hỏa"
-        ]
-        return _NGU_HANH_NAMES[self.value]
+class NguHanh(IndexedEnumMixin, StrEnum):
+    THO = "Thổ"
+    KIM = "Kim"
+    THUY = "Thủy"
+    MOC = "Mộc"
+    HOA = "Hỏa"
 
     @classmethod
-    def list_ngu_hanh(cls) -> list['NguHanh']:
+    def list_ngu_hanh(cls) -> list["NguHanh"]:
         return list(cls)
 
-    def tuong_sinh(self, other: 'NguHanh') -> bool:
-        return (self.value - other.value) % 5 == 1
+    def sinh_xuat(self, other: "NguHanh") -> bool:
+        return (other.index - self.index) % 5 == 1
 
-    def tuong_khac(self, other: 'NguHanh') -> bool:
-        return (self.value - other.value) % 5 == 3
+    def sinh_nhap(self, other: "NguHanh") -> bool:
+        return other.sinh_xuat(self)
 
+    def khac_xuat(self, other: "NguHanh") -> bool:
+        return (self.index - other.index) % 5 == 3
 
-class ThienCan(CyclicIndexMixin, StrEnum):
-    GIAP = "Giáp"
-    AT = "Ất"
-    BINH = "Bính"
-    DINH = "Đinh"
-    MAU = "Mậu"
-    KY = "Kỷ"
-    CANH = "Canh"
-    TAN = "Tân"
-    NHAM = "Nhâm"
-    QUY = "Quý"
+    def khac_nhap(self, other: "NguHanh") -> bool:
+        return other.khac_xuat(self)
+
+    def tuong_sinh(self, other: "NguHanh") -> bool:
+        return self.sinh_xuat(other) or self.sinh_nhap(other)
+
+    def tuong_khac(self, other: "NguHanh") -> bool:
+        return self.khac_xuat(other) or self.khac_nhap(other)
 
 
 class ComponentBase(BaseModel):

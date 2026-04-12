@@ -2,9 +2,10 @@ import inspect
 from dataclasses import dataclass, field
 from typing import Callable, Protocol
 
-from src.refactored.component import Component
 from src.refactored.component.elementary import DiaChi
 from src.refactored.component.prior import LaSoContext
+
+ComponentName = str
 
 
 SimplePositionTransform = Callable[[DiaChi], DiaChi]
@@ -41,11 +42,13 @@ class AbsolutePositionSpec:
 class RelativePositionSpec:
     """Declarative spec for positions derived from another component."""
 
-    reference: Component
+    reference_name: ComponentName
     transform: RelativePositionTransform = field(repr=False)
 
-    def __init__(self, reference: Component, transform: PositionTransform) -> None:
-        object.__setattr__(self, "reference", reference)
+    def __init__(
+        self, reference_name: ComponentName, transform: PositionTransform
+    ) -> None:
+        object.__setattr__(self, "reference_name", reference_name)
         object.__setattr__(
             self,
             "transform",
@@ -56,9 +59,11 @@ class RelativePositionSpec:
 PositionSpec = AbsolutePositionSpec | RelativePositionSpec
 
 
-class ComponentRegistry(Protocol):
-    """Protocol for registering declarative component position specs."""
+class PlacementRegistry(Protocol):
+    """Protocol for registering declarative component placement specs."""
 
-    def register_component_lazy(self, component: Component, spec: PositionSpec) -> None:
-        """Register a component position spec for later resolution."""
+    def register_component_lazy(
+        self, component_name: ComponentName, spec: PositionSpec
+    ) -> None:
+        """Register a component placement spec for later resolution."""
         ...
