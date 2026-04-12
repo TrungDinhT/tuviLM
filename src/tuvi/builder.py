@@ -274,7 +274,7 @@ class Builder:
         trangsinh_index = LIST_DIA_CHI.index(trangsinh_position)
 
         for idx, dat_trang_sinh in enumerate(VONG_TRANG_SINH):
-            position_index = (trangsinh_index + idx) % 12
+            position_index = (trangsinh_index + idx * self.tinhBan.direction) % 12
             self.tinhBan.map_cung[LIST_DIA_CHI[position_index]].trang_sinh = dat_trang_sinh
 
 
