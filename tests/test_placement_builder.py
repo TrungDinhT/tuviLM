@@ -3,7 +3,7 @@ import datetime as dt
 import pytest
 
 from src.refactored.builder.placement_builder import PlacementBuilder
-from src.refactored.builder.placement_registry import (
+from src.refactored.placement.registry import (
     AbsolutePositionSpec,
     RelativePositionSpec,
 )

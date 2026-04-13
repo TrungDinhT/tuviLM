@@ -1,8 +1,8 @@
 import datetime as dt
 
-from src.refactored.builder.placement_registry import (
+from src.refactored.placement.registry import (
     AbsolutePositionSpec,
-    ComponentName,
+    ComponentId,
     PlacementRegistry,
     PositionSpec,
     RelativePositionSpec,
@@ -15,29 +15,29 @@ class PlacementBuilder(PlacementRegistry):
     def __init__(self, time: dt.datetime, gender: Gender) -> None:
         la_so_prior = LaSoPrior.from_solar_day(time, gender)
         self._la_so_context = LaSoContext.from_prior(la_so_prior)
-        self._position_specs: dict[ComponentName, PositionSpec] = {}
-        self._positions: dict[ComponentName, DiaChi] = {}
-        self._resolving: list[ComponentName] = []
+        self._position_specs: dict[ComponentId, PositionSpec] = {}
+        self._positions: dict[ComponentId, DiaChi] = {}
+        self._resolving: list[ComponentId] = []
 
-    def get_or_resolve_position(self, component_name: ComponentName) -> DiaChi:
+    def get_or_resolve_position(self, component_id: ComponentId) -> DiaChi:
         """Find the position of a registered component."""
-        if component_name in self._positions:
-            return self._positions[component_name]
-        if component_name not in self._position_specs:
-            raise KeyError(f"Component has no registered position spec: {component_name}")
-        return self._compute_position(component_name)
+        if component_id in self._positions:
+            return self._positions[component_id]
+        if component_id not in self._position_specs:
+            raise KeyError(f"Component has no registered position spec: {component_id}")
+        return self._compute_position(component_id)
 
     def register_component(
-        self, component_name: ComponentName, position: DiaChi
+        self, component_id: ComponentId, position: DiaChi
     ) -> None:
         """Register a component with a known position."""
-        self._positions[component_name] = position
+        self._positions[component_id] = position
 
     def register_component_lazy(
-        self, component_name: ComponentName, spec: PositionSpec
+        self, component_id: ComponentId, spec: PositionSpec
     ) -> None:
         """Register a component position spec for later resolution."""
-        self._position_specs[component_name] = spec
+        self._position_specs[component_id] = spec
 
     def register_rules(self, rules) -> None:
         """Register declarative placement rules into the builder."""
@@ -46,26 +46,26 @@ class PlacementBuilder(PlacementRegistry):
 
     def resolve_pending(self) -> None:
         """Resolve all pending components using their declared specs."""
-        for component_name in list(self._position_specs):
-            if component_name not in self._positions:
-                self._compute_position(component_name)
+        for component_id in list(self._position_specs):
+            if component_id not in self._positions:
+                self._compute_position(component_id)
 
-    def resolve_all(self) -> dict[ComponentName, DiaChi]:
-        """Resolve all pending components and return a name-based position mapping."""
+    def resolve_all(self) -> dict[ComponentId, DiaChi]:
+        """Resolve all pending components and return an id-based position mapping."""
         self.resolve_pending()
         return dict(self._positions)
 
-    def _compute_position(self, component_name: ComponentName) -> DiaChi:
+    def _compute_position(self, component_id: ComponentId) -> DiaChi:
         """Compute and cache a component position from its declared spec."""
-        if component_name in self._resolving:
-            cycle = " -> ".join([*self._resolving, component_name])
+        if component_id in self._resolving:
+            cycle = " -> ".join([*self._resolving, component_id])
             raise ValueError(f"Circular position dependency detected: {cycle}")
 
-        self._resolving.append(component_name)
+        self._resolving.append(component_id)
         try:
-            spec = self._position_specs[component_name]
+            spec = self._position_specs[component_id]
             if isinstance(spec, RelativePositionSpec):
-                reference_position = self.get_or_resolve_position(spec.reference_name)
+                reference_position = self.get_or_resolve_position(spec.reference_id)
                 position = spec.transform(reference_position, self._la_so_context)
             elif isinstance(spec, AbsolutePositionSpec):
                 position = spec.position_fn(self._la_so_context)
@@ -74,5 +74,5 @@ class PlacementBuilder(PlacementRegistry):
         finally:
             self._resolving.pop()
 
-        self.register_component(component_name, position)
+        self.register_component(component_id, position)
         return position

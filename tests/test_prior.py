@@ -39,6 +39,7 @@ def test_laso_context_from_prior_derives_menh_position_and_cuc():
     context = LaSoContext.from_prior(prior)
 
     assert context.menh_position == DiaChi.DAU
+    assert context.cuc.id == "hoa_luc_cuc"
     assert context.cuc.name == "Hỏa Lục cục"
     assert context.cuc.number == 6
     assert context.cuc.ngu_hanh == NguHanh.HOA

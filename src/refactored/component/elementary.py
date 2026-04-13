@@ -99,8 +99,9 @@ class NguHanh(IndexedEnumMixin, StrEnum):
 class ComponentBase(BaseModel):
     model_config = {"frozen": True}
 
+    id: str
     name: str
     ngu_hanh: Optional[NguHanh] = None
 
     def __hash__(self) -> int:
-        return hash(self.name)
+        return hash(self.id)

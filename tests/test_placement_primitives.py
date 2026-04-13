@@ -1,7 +1,7 @@
 
 import pytest
 
-from src.refactored.builder.placement_primitives import move_by_la_so_attr
+from src.refactored.placement.primitives import move_by_la_so_attr
 from src.refactored.component.elementary import DiaChi, ThienCan
 from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior, LunarYear
 
@@ -27,7 +27,7 @@ def test_move_by_prior_attr(
         )
     )
 
-    transform = move_by_la_so_attr(attribute_name, multiplier=multiplier)
+    transform = move_by_la_so_attr(attribute_name, step_multiplier=multiplier)
 
     assert transform(DiaChi.DAN, context) == expected
 
@@ -42,6 +42,6 @@ def test_move_by_prior_attr_uses_prior_inside_context():
             gender=Gender.MALE,
         )
     )
-    transform = move_by_la_so_attr("month", multiplier=1)
+    transform = move_by_la_so_attr("month", step_multiplier=1)
 
     assert transform(DiaChi.DAN, context) == DiaChi.NGO

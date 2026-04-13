@@ -1,0 +1,32 @@
+[
+  {
+    "id": "thuy_nhi_cuc",
+    "name": "Thủy Nhị cục",
+    "number": 2,
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "moc_tam_cuc",
+    "name": "Mộc Tam cục",
+    "number": 3,
+    "ngu_hanh": "Mộc"
+  },
+  {
+    "id": "kim_tu_cuc",
+    "name": "Kim Tứ cục",
+    "number": 4,
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "tho_ngu_cuc",
+    "name": "Thổ Ngũ cục",
+    "number": 5,
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "hoa_luc_cuc",
+    "name": "Hỏa Lục cục",
+    "number": 6,
+    "ngu_hanh": "Hỏa"
+  }
+]

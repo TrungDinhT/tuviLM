@@ -1,15 +1,15 @@
 [
-  { "role": "Mệnh" },
-  { "role": "Phụ Mẫu" },
-  { "role": "Phúc Đức" },
-  { "role": "Điền Trạch" },
-  { "role": "Quan Lộc" },
-  { "role": "Nô Bộc" },
-  { "role": "Thiên Di" },
-  { "role": "Tật Ách" },
-  { "role": "Tài Bạch" },
-  { "role": "Tử Tức" },
-  { "role": "Phu Thê" },
-  { "role": "Huynh Đệ" },
-  { "role": "Thân" }
+  { "id": "menh", "role": "Mệnh" },
+  { "id": "phu_mau", "role": "Phụ Mẫu" },
+  { "id": "phuc_duc", "role": "Phúc Đức" },
+  { "id": "dien_trach", "role": "Điền Trạch" },
+  { "id": "quan_loc", "role": "Quan Lộc" },
+  { "id": "no_boc", "role": "Nô Bộc" },
+  { "id": "thien_di", "role": "Thiên Di" },
+  { "id": "tat_ach", "role": "Tật Ách" },
+  { "id": "tai_bach", "role": "Tài Bạch" },
+  { "id": "tu_tuc", "role": "Tử Tức" },
+  { "id": "phu_the", "role": "Phu Thê" },
+  { "id": "huynh_de", "role": "Huynh Đệ" },
+  { "id": "than", "role": "Thân" }
 ]

@@ -21,6 +21,7 @@ class Role(StrEnum):
 class Cung(BaseModel):
     model_config = {"frozen": True}
 
+    id: str
     role: Role
 
     @property
@@ -28,4 +29,4 @@ class Cung(BaseModel):
         return self.role.value
 
     def __hash__(self) -> int:
-        return hash(self.name)
+        return hash(self.id)

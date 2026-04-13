@@ -1,17 +1,17 @@
 from functools import partial
 from typing import Callable, Protocol
 
-from src.refactored.builder.placement_registry import (
+from src.refactored.component.elementary import DiaChi, IndexedEnumMixin
+from src.refactored.component.prior import LaSoContext
+from src.refactored.placement.registry import (
     AbsolutePositionResolver,
     AbsolutePositionSpec,
-    ComponentName,
+    ComponentId,
     PlacementRegistry,
     PositionTransform,
     RelativePositionSpec,
 )
-from src.refactored.component.elementary import DiaChi, IndexedEnumMixin
-from src.refactored.component.prior import LaSoContext
-from src.refactored.transform import (
+from src.refactored.placement.transforms import (
     get_luc_hai,
     get_nhi_hop,
     get_tam_hop_nghich,
@@ -28,27 +28,24 @@ class Rule(Protocol):
     def register_components(self, registry: PlacementRegistry): ...
 
 
-# ========================= Relative Position Rules =========================
-
-
 class RelativePosition(Rule):
     """Rule to register a component relative to another component."""
 
     def __init__(
         self,
         *,
-        component_name: ComponentName,
-        reference_name: ComponentName,
+        component_id: ComponentId,
+        reference_id: ComponentId,
         transform: PositionTransform,
     ):
-        self.component_name = component_name
-        self.reference_name = reference_name
+        self.component_id = component_id
+        self.reference_id = reference_id
         self.transform = transform
 
     def register_components(self, registry: PlacementRegistry):
         registry.register_component_lazy(
-            self.component_name,
-            RelativePositionSpec(self.reference_name, self.transform),
+            self.component_id,
+            RelativePositionSpec(self.reference_id, self.transform),
         )
 
 
@@ -56,11 +53,11 @@ class SamePosition(RelativePosition):
     """Rule to register a component at the same position as another component."""
 
     def __init__(
-        self, *, component_name: ComponentName, reference_name: ComponentName
+        self, *, component_id: ComponentId, reference_id: ComponentId
     ):
         super().__init__(
-            component_name=component_name,
-            reference_name=reference_name,
+            component_id=component_id,
+            reference_id=reference_id,
             transform=partial(offset_by, offset=0),
         )
 
@@ -69,11 +66,11 @@ class XungChieu(RelativePosition):
     """Rule to register a component at the opposite position of another component."""
 
     def __init__(
-        self, *, component_name: ComponentName, reference_name: ComponentName
+        self, *, component_id: ComponentId, reference_id: ComponentId
     ):
         super().__init__(
-            component_name=component_name,
-            reference_name=reference_name,
+            component_id=component_id,
+            reference_id=reference_id,
             transform=get_xung_chieu,
         )
 
@@ -82,11 +79,11 @@ class NhiHop(RelativePosition):
     """Rule to register a component at the nhi hop position of another component."""
 
     def __init__(
-        self, *, component_name: ComponentName, reference_name: ComponentName
+        self, *, component_id: ComponentId, reference_id: ComponentId
     ):
         super().__init__(
-            component_name=component_name,
-            reference_name=reference_name,
+            component_id=component_id,
+            reference_id=reference_id,
             transform=get_nhi_hop,
         )
 
@@ -95,11 +92,11 @@ class LucHai(RelativePosition):
     """Rule to register a component at the luc hai position of another component."""
 
     def __init__(
-        self, *, component_name: ComponentName, reference_name: ComponentName
+        self, *, component_id: ComponentId, reference_id: ComponentId
     ):
         super().__init__(
-            component_name=component_name,
-            reference_name=reference_name,
+            component_id=component_id,
+            reference_id=reference_id,
             transform=get_luc_hai,
         )
 
@@ -108,11 +105,11 @@ class TamHopThuan(RelativePosition):
     """Rule to register a component at the tam hop position of another component."""
 
     def __init__(
-        self, *, component_name: ComponentName, reference_name: ComponentName
+        self, *, component_id: ComponentId, reference_id: ComponentId
     ):
         super().__init__(
-            component_name=component_name,
-            reference_name=reference_name,
+            component_id=component_id,
+            reference_id=reference_id,
             transform=get_tam_hop_thuan,
         )
 
@@ -121,11 +118,11 @@ class TamHopNghich(RelativePosition):
     """Rule to register a component at the tam hop nghich position of another component."""
 
     def __init__(
-        self, *, component_name: ComponentName, reference_name: ComponentName
+        self, *, component_id: ComponentId, reference_id: ComponentId
     ):
         super().__init__(
-            component_name=component_name,
-            reference_name=reference_name,
+            component_id=component_id,
+            reference_id=reference_id,
             transform=get_tam_hop_nghich,
         )
 
@@ -135,24 +132,24 @@ class Vong(Rule):
 
     def __init__(
         self,
-        principal_name: ComponentName,
+        principal_id: ComponentId,
         principal_position_fn: AbsolutePositionResolver,
-        others: list[ComponentName],
+        others: list[ComponentId],
     ):
-        self.principal_name = principal_name
+        self.principal_id = principal_id
         self.principal_position_fn = principal_position_fn
         self.others = others
 
     def register_components(self, registry: PlacementRegistry):
         registry.register_component_lazy(
-            self.principal_name,
+            self.principal_id,
             AbsolutePositionSpec(self.principal_position_fn),
         )
-        for idx, component_name in enumerate(self.others):
+        for idx, component_id in enumerate(self.others):
             registry.register_component_lazy(
-                component_name,
+                component_id,
                 RelativePositionSpec(
-                    self.principal_name, partial(offset_by, offset=idx + 1)
+                    self.principal_id, partial(offset_by, offset=idx + 1)
                 ),
             )
 
@@ -161,19 +158,16 @@ class AbsolutePosition(Rule):
     """Rule to register a component at an absolute position."""
 
     def __init__(
-        self, *, component_name: ComponentName, position_fn: AbsolutePositionResolver
+        self, *, component_id: ComponentId, position_fn: AbsolutePositionResolver
     ):
-        self.component_name = component_name
+        self.component_id = component_id
         self.position_fn = position_fn
 
     def register_components(self, registry: PlacementRegistry):
         registry.register_component_lazy(
-            self.component_name,
+            self.component_id,
             AbsolutePositionSpec(self.position_fn),
         )
-
-
-# ========================= Absolute Position Rules =========================
 
 
 def thai_tue_position_fn(context: LaSoContext) -> DiaChi:
@@ -203,9 +197,6 @@ def tuvi_position_fn(context: LaSoContext) -> DiaChi:
     return DiaChi.DAN + offset
 
 
-# ========================= Position Transform Functions =========================
-
-
 def move_by_van_direction(
     step_selector: ContextStepSelector, *, multiplier: int = 1
 ) -> PositionTransform:
@@ -219,20 +210,17 @@ def move_by_van_direction(
 
 
 def move_by_la_so_attr(
-    attribute_name: str, *, multiplier: int = 1
+    attribute_name: str, *, step_multiplier: int = 1
 ) -> PositionTransform:
     """Build a relative transform from a prior attribute such as `month` or `hour`."""
     return move_by_van_direction(
         partial(_get_prior_attr_steps, attribute_name=attribute_name),
-        multiplier=multiplier,
+        multiplier=step_multiplier,
     )
 
 
 def offset_by(position: DiaChi, offset: int) -> DiaChi:
     return position + offset
-
-
-# ========================= Utility Functions =========================
 
 
 def _get_prior_attr_steps(context: LaSoContext, attribute_name: str) -> int:
