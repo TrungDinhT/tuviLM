@@ -200,6 +200,16 @@
     "ngu_hanh": "Hỏa"
   },
   {
+    "id": "hoa_tinh",
+    "name": "Hỏa Tinh",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "linh_tinh",
+    "name": "Linh Tinh",
+    "ngu_hanh": "Hỏa"
+  },
+  {
     "id": "tu_vi",
     "name": "Tử Vi",
     "ngu_hanh": "Thổ",

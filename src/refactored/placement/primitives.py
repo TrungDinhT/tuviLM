@@ -38,6 +38,7 @@ ContextStepSelector = Callable[[LaSoContext], int]
 ThienCanPositionMap = Mapping[ThienCan, DiaChi]
 DiaChiGroup = tuple[DiaChi, ...]
 BirthDiaChiGroups = Mapping[DiaChiGroup, DiaChi]
+AnchorResolver = DiaChi | AbsolutePositionResolver
 
 
 # ---------------------------------------------------------------------------
@@ -181,13 +182,13 @@ class MirrorAcross(RelativePosition):
 
 
 class FromAnchor(Rule):
-    """Rule to register a component relative to a fixed DiaChi anchor."""
+    """Rule to register a component relative to a fixed or computed anchor."""
 
     def __init__(
         self,
         *,
         component_id: ComponentId,
-        anchor: DiaChi,
+        anchor: AnchorResolver,
         transform: PositionTransform,
     ):
         self.component_id = component_id
@@ -198,7 +199,10 @@ class FromAnchor(Rule):
         registry.register_component_lazy(
             self.component_id,
             AbsolutePositionSpec(
-                lambda context: self.transform(self.anchor, context)
+                lambda context: self.transform(
+                    self.anchor(context) if callable(self.anchor) else self.anchor,
+                    context,
+                )
             ),
         )
 

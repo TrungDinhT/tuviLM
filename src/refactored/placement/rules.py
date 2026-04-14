@@ -460,6 +460,38 @@ PHU_TINH_RULES = [
         position_fn=pp.dau_quan_position_fn,
     ),
 
+    # An Hoa Tinh, Linh Tinh
+    pp.FromAnchor(
+        component_id="hoa_tinh",
+        anchor=pp.position_by_birth_dia_chi_groups(
+            {
+                (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.DAN,
+                (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.MEO,
+                (DiaChi.DAN, DiaChi.NGO, DiaChi.TUAT): DiaChi.SUU,
+                (DiaChi.HOI, DiaChi.MEO, DiaChi.MUI): DiaChi.DAU,
+            }
+        ),
+        transform=pp.move_by_van_direction(
+            lambda context: context.prior.hour.index,
+            step_multiplier=1,
+        ),
+    ),
+    pp.FromAnchor(
+        component_id="linh_tinh",
+        anchor=pp.position_by_birth_dia_chi_groups(
+            {
+                (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.TUAT,
+                (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.TUAT,
+                (DiaChi.DAN, DiaChi.NGO, DiaChi.TUAT): DiaChi.MEO,
+                (DiaChi.HOI, DiaChi.MEO, DiaChi.MUI): DiaChi.TUAT,
+            }
+        ),
+        transform=pp.move_by_van_direction(
+            lambda context: context.prior.hour.index,
+            step_multiplier=-1,
+        ),
+    ),
+
     # An theo cung
     pp.RelativePosition(
         component_id="thien_tai",

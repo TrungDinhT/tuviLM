@@ -13,6 +13,7 @@ def test_default_catalog_loads_cung_and_sao_components():
     thien_khoi = catalog.get("thien_khoi")
     co_than = catalog.get("co_than")
     dau_quan = catalog.get("dau_quan")
+    hoa_tinh = catalog.get("hoa_tinh")
     dia_khong = catalog.get("dia_khong")
     tu_vi = catalog.get("tu_vi")
     loc_ton = catalog.get("loc_ton")
@@ -52,6 +53,12 @@ def test_default_catalog_loads_cung_and_sao_components():
     assert dau_quan.name == "Đẩu Quân"
     assert dau_quan.ngu_hanh == NguHanh.HOA
     assert dau_quan.is_chinh_tinh is False
+
+    assert isinstance(hoa_tinh, Sao)
+    assert hoa_tinh.id == "hoa_tinh"
+    assert hoa_tinh.name == "Hỏa Tinh"
+    assert hoa_tinh.ngu_hanh == NguHanh.HOA
+    assert hoa_tinh.is_chinh_tinh is False
 
     assert isinstance(dia_khong, Sao)
     assert dia_khong.id == "dia_khong"
