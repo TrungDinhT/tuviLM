@@ -147,6 +147,108 @@ PHU_TINH_RULES = [
         ],
     ),
 
+    # An theo thang
+    pp.FromAnchor(
+        component_id="ta_phu",
+        anchor=DiaChi.THIN,
+        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+    ),
+    pp.FromAnchor(
+        component_id="huu_bat",
+        anchor=DiaChi.TUAT,
+        transform=pp.move_by_birth_month(direction=CircleDirection.CCW),
+    ),
+    pp.FromAnchor(
+        component_id="thien_giai",
+        anchor=DiaChi.THAN,
+        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+    ),
+    pp.FromAnchor(
+        component_id="dia_giai",
+        anchor=DiaChi.MUI,
+        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+    ),
+    pp.FromAnchor(
+        component_id="thien_hinh",
+        anchor=DiaChi.DAU,
+        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+    ),
+    pp.FromAnchor(
+        component_id="thien_dieu",
+        anchor=DiaChi.SUU,
+        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+    ),
+    pp.SamePosition(
+        component_id="thien_y",
+        reference_id="thien_dieu",
+    ),
+
+    # An theo ngay
+    pp.RelativePosition(
+        component_id="tam_thai",
+        reference_id="ta_phu",
+        transform=pp.move_with(
+            lambda context: context.prior.date - 1,
+            direction=CircleDirection.CW,
+        ),
+    ),
+    pp.RelativePosition(
+        component_id="bat_toa",
+        reference_id="huu_bat",
+        transform=pp.move_with(
+            lambda context: context.prior.date - 1,
+            direction=CircleDirection.CCW,
+        ),
+    ),
+    pp.RelativePosition(
+        component_id="an_quang",
+        reference_id="van_xuong",
+        transform=pp.move_with(
+            lambda context: context.prior.date - 2,
+            direction=CircleDirection.CW,
+        ),
+    ),
+    pp.RelativePosition(
+        component_id="thien_quy",
+        reference_id="van_khuc",
+        transform=pp.move_with(
+            lambda context: context.prior.date - 2,
+            direction=CircleDirection.CCW,
+        ),
+    ),
+
+    # An theo gio
+    pp.FromAnchor(
+        component_id="dia_khong",
+        anchor=DiaChi.HOI,
+        transform=pp.move_by_birth_hour(direction=CircleDirection.CCW),
+    ),
+    pp.FromAnchor(
+        component_id="dia_kiep",
+        anchor=DiaChi.HOI,
+        transform=pp.move_by_birth_hour(direction=CircleDirection.CW),
+    ),
+    pp.FromAnchor(
+        component_id="van_xuong",
+        anchor=DiaChi.TUAT,
+        transform=pp.move_by_birth_hour(direction=CircleDirection.CCW),
+    ),
+    pp.FromAnchor(
+        component_id="van_khuc",
+        anchor=DiaChi.THIN,
+        transform=pp.move_by_birth_hour(direction=CircleDirection.CW),
+    ),
+    pp.FromAnchor(
+        component_id="thai_phu",
+        anchor=DiaChi.NGO,
+        transform=pp.move_by_birth_hour(direction=CircleDirection.CW),
+    ),
+    pp.FromAnchor(
+        component_id="phong_cao",
+        anchor=DiaChi.DAN,
+        transform=pp.move_by_birth_hour(direction=CircleDirection.CW),
+    ),
+
     # An theo cung
     pp.RelativePosition(
         component_id="thien_tai",

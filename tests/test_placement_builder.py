@@ -73,6 +73,37 @@ LOC_TON_COMPONENT_IDS = {
     "Quan Phủ": "quan_phur",
 }
 
+MONTH_COMPONENT_IDS = {
+    "Tả Phù": "ta_phu",
+    "Hữu Bật": "huu_bat",
+    "Tam Thai": "tam_thai",
+    "Bát Toạ": "bat_toa",
+    "Thiên Giải": "thien_giai",
+    "Địa Giải": "dia_giai",
+    "Thiên Hình": "thien_hinh",
+    "Thiên Diêu": "thien_dieu",
+    "Thiên Y": "thien_y",
+}
+
+HOUR_COMPONENT_IDS = {
+    "Địa Không": "dia_khong",
+    "Địa Kiếp": "dia_kiep",
+    "Văn Xương": "van_xuong",
+    "Văn Khúc": "van_khuc",
+    "Ân Quang": "an_quang",
+    "Thiên Quý": "thien_quy",
+    "Thai Phụ": "thai_phu",
+    "Phong Cáo": "phong_cao",
+}
+
+
+def _select_rules_by_component_ids(component_ids: set[str]):
+    return [
+        rule
+        for rule in PHU_TINH_RULES
+        if getattr(rule, "component_id", None) in component_ids
+    ]
+
 
 def _build_legacy_chinh_tinh_positions(time: dt.datetime) -> dict[str, DiaChi]:
     tinh_ban = LegacyBuilder().build(BirthTime.from_solar_day(time, "M"))
@@ -240,3 +271,35 @@ def test_builder_resolves_loc_ton_ring_like_legacy_builder():
     assert positions["tau_thu"] == positions["duong_phu"]
     assert positions["benh_phu"] == positions["quoc_an"]
     assert positions["da_la"] == positions["quan_phur"]
+
+
+def test_builder_resolves_month_rules_like_legacy_builder():
+    time = dt.datetime(1996, 12, 19, 6, 30)
+    builder = PlacementBuilder(time, Gender.MALE)
+    builder.register_rules(
+        _select_rules_by_component_ids(set(MONTH_COMPONENT_IDS.values()))
+    )
+
+    positions = builder.resolve_all()
+    legacy_positions = _build_legacy_phu_tinh_positions(time, MONTH_COMPONENT_IDS)
+
+    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
+        legacy_positions
+    )
+
+    assert positions["thien_dieu"] == positions["thien_y"]
+
+
+def test_builder_resolves_hour_rules_like_legacy_builder():
+    time = dt.datetime(1996, 12, 19, 6, 30)
+    builder = PlacementBuilder(time, Gender.MALE)
+    builder.register_rules(
+        _select_rules_by_component_ids(set(HOUR_COMPONENT_IDS.values()))
+    )
+
+    positions = builder.resolve_all()
+    legacy_positions = _build_legacy_phu_tinh_positions(time, HOUR_COMPONENT_IDS)
+
+    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
+        legacy_positions
+    )

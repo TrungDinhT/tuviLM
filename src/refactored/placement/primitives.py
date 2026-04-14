@@ -348,6 +348,16 @@ def move_by_birth_hour(
     )
 
 
+def move_by_birth_month(
+    *, direction: CircleDirection, step_multiplier: int = 1
+) -> PositionTransform:
+    return move_with(
+        lambda context: context.prior.month - 1,
+        direction=direction,
+        step_multiplier=step_multiplier,
+    )
+
+
 def move_with(
     step_selector: ContextStepSelector,
     *,

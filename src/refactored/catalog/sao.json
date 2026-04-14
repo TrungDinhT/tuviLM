@@ -20,6 +20,91 @@
     "ngu_hanh": "Thổ"
   },
   {
+    "id": "ta_phu",
+    "name": "Tả Phù",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "huu_bat",
+    "name": "Hữu Bật",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "tam_thai",
+    "name": "Tam Thai",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "bat_toa",
+    "name": "Bát Toạ",
+    "ngu_hanh": "Mộc"
+  },
+  {
+    "id": "thien_giai",
+    "name": "Thiên Giải",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "dia_giai",
+    "name": "Địa Giải",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "thien_hinh",
+    "name": "Thiên Hình",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "thien_dieu",
+    "name": "Thiên Diêu",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "thien_y",
+    "name": "Thiên Y",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "dia_khong",
+    "name": "Địa Không",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "dia_kiep",
+    "name": "Địa Kiếp",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "van_xuong",
+    "name": "Văn Xương",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "van_khuc",
+    "name": "Văn Khúc",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "an_quang",
+    "name": "Ân Quang",
+    "ngu_hanh": "Mộc"
+  },
+  {
+    "id": "thien_quy",
+    "name": "Thiên Quý",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "thai_phu",
+    "name": "Thai Phụ",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "phong_cao",
+    "name": "Phong Cáo",
+    "ngu_hanh": "Thổ"
+  },
+  {
     "id": "tu_vi",
     "name": "Tử Vi",
     "ngu_hanh": "Thổ",

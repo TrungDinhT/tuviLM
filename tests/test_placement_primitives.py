@@ -5,6 +5,7 @@ from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCa
 from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior, LunarYear
 from src.refactored.placement.primitives import (
     move_by_attr,
+    move_by_birth_month,
     move_by_van_direction,
     move_with,
 )
@@ -59,6 +60,31 @@ def test_move_with_uses_context_derived_steps():
     )
 
     assert transform(DiaChi.DAN, context) == DiaChi.NGO
+
+
+@pytest.mark.parametrize(
+    "month, direction, expected",
+    [
+        (1, CircleDirection.CW, DiaChi.DAN),
+        (12, CircleDirection.CW, DiaChi.SUU),
+        (12, CircleDirection.CCW, DiaChi.MEO),
+    ],
+)
+def test_move_by_birth_month_uses_zero_based_month_offset(
+    month: int, direction: CircleDirection, expected: DiaChi
+):
+    context = LaSoContext.from_prior(
+        LaSoPrior(
+            hour=DiaChi.TY,
+            date=1,
+            month=month,
+            year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.GIAP),
+            gender=Gender.MALE,
+        )
+    )
+    transform = move_by_birth_month(direction=direction)
+
+    assert transform(DiaChi.DAN, context) == expected
 
 
 @pytest.mark.parametrize(
