@@ -68,7 +68,8 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
     @agent.tool
     def get_star_info(ctx: RunContext[TuviAgentDeps], query: str) -> str:
         """Tìm kiếm thông tin về sao, ví dụ: Tử Vi, Thiên Phủ."""
-        raw_info = search_start_info(name=query)
+        _logger.info(f"Tìm kiếm thông tin về sao: {query}")
+        raw_info = search_star_info(name=query)
         if raw_info:
             return "\n".join(f"{item['title']}: {item['content']}" for item in raw_info)
         return "Không tìm thấy thông tin về sao này."
