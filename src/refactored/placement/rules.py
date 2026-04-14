@@ -251,6 +251,107 @@ PHU_TINH_RULES = [
         ),
     ),
 
+    # An theo dia chi
+    pp.AbsolutePosition(
+        component_id="co_than",
+        position_fn=pp.position_by_birth_dia_chi_groups(
+            {
+                (DiaChi.DAN, DiaChi.MEO, DiaChi.THIN): DiaChi.TI,
+                (DiaChi.TI, DiaChi.NGO, DiaChi.MUI): DiaChi.THAN,
+                (DiaChi.THAN, DiaChi.DAU, DiaChi.TUAT): DiaChi.HOI,
+                (DiaChi.HOI, DiaChi.TY, DiaChi.SUU): DiaChi.MUI,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="qua_tu",
+        position_fn=pp.position_by_birth_dia_chi_groups(
+            {
+                (DiaChi.DAN, DiaChi.MEO, DiaChi.THIN): DiaChi.SUU,
+                (DiaChi.TI, DiaChi.NGO, DiaChi.MUI): DiaChi.THIN,
+                (DiaChi.THAN, DiaChi.DAU, DiaChi.TUAT): DiaChi.DAN,
+                (DiaChi.HOI, DiaChi.TY, DiaChi.SUU): DiaChi.TUAT,
+            }
+        ),
+    ),
+    pp.FromAnchor(
+        component_id="thien_hi",
+        anchor=DiaChi.DAU,
+        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CCW),
+    ),
+    pp.XungChieu(
+        component_id="hong_loan",
+        reference_id="thien_hi",
+    ),
+    pp.FromAnchor(
+        component_id="giai_than",
+        anchor=DiaChi.TUAT,
+        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CCW),
+    ),
+    pp.SamePosition(
+        component_id="phuong_cac",
+        reference_id="giai_than",
+    ),
+    pp.FromAnchor(
+        component_id="thien_khoc",
+        anchor=DiaChi.NGO,
+        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CCW),
+    ),
+    pp.AbsolutePosition(
+        component_id="thien_ma",
+        position_fn=pp.position_by_birth_dia_chi_groups(
+            {
+                (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.DAN,
+                (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.HOI,
+                (DiaChi.DAN, DiaChi.NGO, DiaChi.TUAT): DiaChi.THAN,
+                (DiaChi.HOI, DiaChi.MEO, DiaChi.MUI): DiaChi.TI,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="hoa_cai",
+        position_fn=pp.position_by_birth_dia_chi_groups(
+            {
+                (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.THIN,
+                (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.SUU,
+                (DiaChi.DAN, DiaChi.NGO, DiaChi.TUAT): DiaChi.TUAT,
+                (DiaChi.HOI, DiaChi.MEO, DiaChi.MUI): DiaChi.MUI,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="dao_hoa",
+        position_fn=pp.position_by_birth_dia_chi_groups(
+            {
+                (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.DAU,
+                (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.NGO,
+                (DiaChi.DAN, DiaChi.NGO, DiaChi.TUAT): DiaChi.MEO,
+                (DiaChi.HOI, DiaChi.MEO, DiaChi.MUI): DiaChi.TY,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="kiep_sat",
+        position_fn=pp.position_by_birth_dia_chi_groups(
+            {
+                (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.TI,
+                (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.DAN,
+                (DiaChi.DAN, DiaChi.NGO, DiaChi.TUAT): DiaChi.HOI,
+                (DiaChi.HOI, DiaChi.MEO, DiaChi.MUI): DiaChi.THAN,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="pha_toai",
+        position_fn=pp.position_by_birth_dia_chi_groups(
+            {
+                (DiaChi.TY, DiaChi.NGO, DiaChi.MEO, DiaChi.DAU): DiaChi.TI,
+                (DiaChi.THIN, DiaChi.TUAT, DiaChi.SUU, DiaChi.MUI): DiaChi.SUU,
+                (DiaChi.DAN, DiaChi.THAN, DiaChi.TI, DiaChi.HOI): DiaChi.DAU,
+            }
+        ),
+    ),
+
     # An theo thang
     pp.FromAnchor(
         component_id="ta_phu",

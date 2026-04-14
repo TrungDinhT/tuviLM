@@ -95,6 +95,66 @@
     "ngu_hanh": "Thổ"
   },
   {
+    "id": "co_than",
+    "name": "Cô Thần",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "qua_tu",
+    "name": "Quả Tú",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "thien_hi",
+    "name": "Thiên Hỉ",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "hong_loan",
+    "name": "Hồng Loan",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "giai_than",
+    "name": "Giải Thần",
+    "ngu_hanh": "Mộc"
+  },
+  {
+    "id": "phuong_cac",
+    "name": "Phượng Các",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "thien_ma",
+    "name": "Thiên Mã",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "pha_toai",
+    "name": "Phá Toái",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "hoa_cai",
+    "name": "Hoa Cái",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "dao_hoa",
+    "name": "Đào Hoa",
+    "ngu_hanh": "Mộc"
+  },
+  {
+    "id": "thien_khoc",
+    "name": "Thiên Khốc",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "kiep_sat",
+    "name": "Kiếp Sát",
+    "ngu_hanh": "Hỏa"
+  },
+  {
     "id": "dia_khong",
     "name": "Địa Không",
     "ngu_hanh": "Hỏa"

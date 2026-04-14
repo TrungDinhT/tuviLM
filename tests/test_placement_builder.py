@@ -105,6 +105,21 @@ THIEN_CAN_COMPONENT_IDS = {
     "Thiên Phúc": "thien_phuc",
 }
 
+YEAR_BRANCH_COMPONENT_IDS = {
+    "Cô Thần": "co_than",
+    "Quả Tú": "qua_tu",
+    "Thiên Hỉ": "thien_hi",
+    "Hồng Loan": "hong_loan",
+    "Giải Thần": "giai_than",
+    "Phượng Các": "phuong_cac",
+    "Thiên Khốc": "thien_khoc",
+    "Thiên Mã": "thien_ma",
+    "Phá Toái": "pha_toai",
+    "Hỏa Cái": "hoa_cai",
+    "Đào Hỏa": "dao_hoa",
+    "Kiếp Sát": "kiep_sat",
+}
+
 
 def _select_rules_by_component_ids(component_ids: set[str]):
     return [
@@ -327,3 +342,21 @@ def test_builder_resolves_thien_can_rules_like_legacy_builder():
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
         legacy_positions
     )
+
+
+def test_builder_resolves_year_branch_rules_like_legacy_builder():
+    time = dt.datetime(1996, 12, 19, 6, 30)
+    builder = PlacementBuilder(time, Gender.MALE)
+    builder.register_rules(
+        _select_rules_by_component_ids(set(YEAR_BRANCH_COMPONENT_IDS.values()))
+    )
+
+    positions = builder.resolve_all()
+    legacy_positions = _build_legacy_phu_tinh_positions(time, YEAR_BRANCH_COMPONENT_IDS)
+
+    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
+        legacy_positions
+    )
+
+    assert positions["hong_loan"] == positions["thien_hi"] + 6
+    assert positions["phuong_cac"] == positions["giai_than"]

@@ -8,6 +8,7 @@ from src.refactored.placement.primitives import (
     move_by_birth_month,
     move_by_van_direction,
     move_with,
+    position_by_birth_dia_chi_groups,
     position_by_thien_can,
 )
 
@@ -81,6 +82,26 @@ def test_position_by_thien_can_uses_prior_thien_can():
     )
 
     assert position_fn(context) == DiaChi.THAN
+
+
+def test_position_by_birth_dia_chi_groups_uses_group_membership():
+    context = LaSoContext.from_prior(
+        LaSoPrior(
+            hour=DiaChi.TY,
+            date=1,
+            month=1,
+            year=LunarYear(dia_chi=DiaChi.MEO, thien_can=ThienCan.GIAP),
+            gender=Gender.MALE,
+        )
+    )
+    position_fn = position_by_birth_dia_chi_groups(
+        {
+            (DiaChi.DAN, DiaChi.MEO, DiaChi.THIN): DiaChi.TI,
+            (DiaChi.TI, DiaChi.NGO, DiaChi.MUI): DiaChi.THAN,
+        }
+    )
+
+    assert position_fn(context) == DiaChi.TI
 
 
 @pytest.mark.parametrize(

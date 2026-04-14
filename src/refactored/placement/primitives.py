@@ -36,6 +36,8 @@ from src.refactored.placement.transforms import (
 
 ContextStepSelector = Callable[[LaSoContext], int]
 ThienCanPositionMap = Mapping[ThienCan, DiaChi]
+DiaChiGroup = tuple[DiaChi, ...]
+BirthDiaChiGroups = Mapping[DiaChiGroup, DiaChi]
 
 
 # ---------------------------------------------------------------------------
@@ -311,6 +313,24 @@ def position_by_thien_can(
     """Build an absolute position resolver from a Thiên Can map."""
 
     return lambda context: mapping[context.prior.get_thien_can()]
+
+
+def position_by_birth_dia_chi_groups(
+    groups: BirthDiaChiGroups,
+) -> AbsolutePositionResolver:
+    """Build an absolute resolver from grouped birth DiaChi declarations."""
+
+    resolved_positions = {
+        birth_dia_chi: position
+        for birth_dia_chis, position in groups.items()
+        for birth_dia_chi in birth_dia_chis
+    }
+
+    expected_size = sum(len(birth_dia_chis) for birth_dia_chis in groups)
+    if len(resolved_positions) != expected_size:
+        raise ValueError("Birth DiaChi groups must not overlap.")
+
+    return lambda context: resolved_positions[context.prior.get_dia_chi()]
 
 
 def tuvi_position_fn(context: LaSoContext) -> DiaChi:
