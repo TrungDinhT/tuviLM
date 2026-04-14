@@ -8,6 +8,7 @@ from src.refactored.placement.primitives import (
     move_by_birth_month,
     move_by_van_direction,
     move_with,
+    position_by_thien_can,
 )
 
 
@@ -60,6 +61,26 @@ def test_move_with_uses_context_derived_steps():
     )
 
     assert transform(DiaChi.DAN, context) == DiaChi.NGO
+
+
+def test_position_by_thien_can_uses_prior_thien_can():
+    context = LaSoContext.from_prior(
+        LaSoPrior(
+            hour=DiaChi.TY,
+            date=1,
+            month=1,
+            year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.CANH),
+            gender=Gender.MALE,
+        )
+    )
+    position_fn = position_by_thien_can(
+        {
+            ThienCan.GIAP: DiaChi.DAN,
+            ThienCan.CANH: DiaChi.THAN,
+        }
+    )
+
+    assert position_fn(context) == DiaChi.THAN
 
 
 @pytest.mark.parametrize(

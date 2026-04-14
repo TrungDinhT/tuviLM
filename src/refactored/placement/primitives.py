@@ -8,12 +8,13 @@ This module is organized in four layers:
 """
 
 from dataclasses import dataclass
-from typing import Callable, Protocol
+from typing import Callable, Mapping, Protocol
 
 from src.refactored.component.elementary import (
     CircleDirection,
     DiaChi,
     IndexedEnumMixin,
+    ThienCan,
 )
 from src.refactored.component.prior import LaSoContext
 from src.refactored.placement.registry import (
@@ -34,6 +35,7 @@ from src.refactored.placement.transforms import (
 )
 
 ContextStepSelector = Callable[[LaSoContext], int]
+ThienCanPositionMap = Mapping[ThienCan, DiaChi]
 
 
 # ---------------------------------------------------------------------------
@@ -288,18 +290,27 @@ def thai_tue_position_fn(context: LaSoContext) -> DiaChi:
 
 def loc_ton_position_fn(context: LaSoContext) -> DiaChi:
     """Lộc Tồn an tại cung theo Thiên Can năm sinh."""
-    return {
-        "Giáp": DiaChi.DAN,
-        "Ất": DiaChi.MEO,
-        "Bính": DiaChi.TI,
-        "Đinh": DiaChi.NGO,
-        "Mậu": DiaChi.TI,
-        "Kỷ": DiaChi.NGO,
-        "Canh": DiaChi.THAN,
-        "Tân": DiaChi.DAU,
-        "Nhâm": DiaChi.HOI,
-        "Quý": DiaChi.TY,
-    }[context.prior.get_thien_can()]
+    position_fn = position_by_thien_can({
+        ThienCan.GIAP: DiaChi.DAN,
+        ThienCan.AT: DiaChi.MEO,
+        ThienCan.BINH: DiaChi.TI,
+        ThienCan.DINH: DiaChi.NGO,
+        ThienCan.MAU: DiaChi.TI,
+        ThienCan.KY: DiaChi.NGO,
+        ThienCan.CANH: DiaChi.THAN,
+        ThienCan.TAN: DiaChi.DAU,
+        ThienCan.NHAM: DiaChi.HOI,
+        ThienCan.QUY: DiaChi.TY,
+    })
+    return position_fn(context)
+
+
+def position_by_thien_can(
+    mapping: ThienCanPositionMap,
+) -> AbsolutePositionResolver:
+    """Build an absolute position resolver from a Thiên Can map."""
+
+    return lambda context: mapping[context.prior.get_thien_can()]
 
 
 def tuvi_position_fn(context: LaSoContext) -> DiaChi:

@@ -96,6 +96,15 @@ HOUR_COMPONENT_IDS = {
     "Phong Cáo": "phong_cao",
 }
 
+THIEN_CAN_COMPONENT_IDS = {
+    "Thiên Khôi": "thien_khoi",
+    "Thiên Việt": "thien_viet",
+    "Lưu Hà": "luu_ha",
+    "Thiên Trù": "thien_tru",
+    "Thiên Quan": "thien_quan",
+    "Thiên Phúc": "thien_phuc",
+}
+
 
 def _select_rules_by_component_ids(component_ids: set[str]):
     return [
@@ -299,6 +308,21 @@ def test_builder_resolves_hour_rules_like_legacy_builder():
 
     positions = builder.resolve_all()
     legacy_positions = _build_legacy_phu_tinh_positions(time, HOUR_COMPONENT_IDS)
+
+    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
+        legacy_positions
+    )
+
+
+def test_builder_resolves_thien_can_rules_like_legacy_builder():
+    time = dt.datetime(1996, 12, 19, 6, 30)
+    builder = PlacementBuilder(time, Gender.MALE)
+    builder.register_rules(
+        _select_rules_by_component_ids(set(THIEN_CAN_COMPONENT_IDS.values()))
+    )
+
+    positions = builder.resolve_all()
+    legacy_positions = _build_legacy_phu_tinh_positions(time, THIEN_CAN_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
         legacy_positions

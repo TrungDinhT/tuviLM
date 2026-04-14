@@ -1,5 +1,5 @@
 import src.refactored.placement.primitives as pp
-from src.refactored.component.elementary import CircleDirection, DiaChi
+from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCan
 
 
 CUNG_RULES = [
@@ -145,6 +145,110 @@ PHU_TINH_RULES = [
             "dieu_khach",
             "truc_phu",
         ],
+    ),
+
+    # An theo thien can
+    pp.AbsolutePosition(
+        component_id="thien_khoi",
+        position_fn=pp.position_by_thien_can(
+            {
+                ThienCan.GIAP: DiaChi.SUU,
+                ThienCan.AT: DiaChi.TY,
+                ThienCan.BINH: DiaChi.HOI,
+                ThienCan.DINH: DiaChi.HOI,
+                ThienCan.MAU: DiaChi.SUU,
+                ThienCan.KY: DiaChi.TY,
+                ThienCan.CANH: DiaChi.NGO,
+                ThienCan.TAN: DiaChi.NGO,
+                ThienCan.NHAM: DiaChi.MEO,
+                ThienCan.QUY: DiaChi.MEO,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="thien_viet",
+        position_fn=pp.position_by_thien_can(
+            {
+                ThienCan.GIAP: DiaChi.MUI,
+                ThienCan.AT: DiaChi.THAN,
+                ThienCan.BINH: DiaChi.DAU,
+                ThienCan.DINH: DiaChi.DAU,
+                ThienCan.MAU: DiaChi.MUI,
+                ThienCan.KY: DiaChi.THAN,
+                ThienCan.CANH: DiaChi.DAN,
+                ThienCan.TAN: DiaChi.DAN,
+                ThienCan.NHAM: DiaChi.TI,
+                ThienCan.QUY: DiaChi.TI,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="luu_ha",
+        position_fn=pp.position_by_thien_can(
+            {
+                ThienCan.GIAP: DiaChi.DAU,
+                ThienCan.AT: DiaChi.TUAT,
+                ThienCan.BINH: DiaChi.MUI,
+                ThienCan.DINH: DiaChi.THIN,
+                ThienCan.MAU: DiaChi.TI,
+                ThienCan.KY: DiaChi.NGO,
+                ThienCan.CANH: DiaChi.THAN,
+                ThienCan.TAN: DiaChi.THIN,
+                ThienCan.NHAM: DiaChi.HOI,
+                ThienCan.QUY: DiaChi.DAN,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="thien_tru",
+        position_fn=pp.position_by_thien_can(
+            {
+                ThienCan.GIAP: DiaChi.TI,
+                ThienCan.AT: DiaChi.NGO,
+                ThienCan.BINH: DiaChi.TY,
+                ThienCan.DINH: DiaChi.TI,
+                ThienCan.MAU: DiaChi.NGO,
+                ThienCan.KY: DiaChi.THAN,
+                ThienCan.CANH: DiaChi.DAN,
+                ThienCan.TAN: DiaChi.NGO,
+                ThienCan.NHAM: DiaChi.DAU,
+                ThienCan.QUY: DiaChi.TUAT,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="thien_quan",
+        position_fn=pp.position_by_thien_can(
+            {
+                ThienCan.GIAP: DiaChi.MUI,
+                ThienCan.AT: DiaChi.MUI,
+                ThienCan.BINH: DiaChi.THIN,
+                ThienCan.DINH: DiaChi.DAN,
+                ThienCan.MAU: DiaChi.MEO,
+                ThienCan.KY: DiaChi.DAU,
+                ThienCan.CANH: DiaChi.HOI,
+                ThienCan.TAN: DiaChi.DAU,
+                ThienCan.NHAM: DiaChi.TUAT,
+                ThienCan.QUY: DiaChi.NGO,
+            }
+        ),
+    ),
+    pp.AbsolutePosition(
+        component_id="thien_phuc",
+        position_fn=pp.position_by_thien_can(
+            {
+                ThienCan.GIAP: DiaChi.DAU,
+                ThienCan.AT: DiaChi.DAU,
+                ThienCan.BINH: DiaChi.THAN,
+                ThienCan.DINH: DiaChi.HOI,
+                ThienCan.MAU: DiaChi.MEO,
+                ThienCan.KY: DiaChi.DAN,
+                ThienCan.CANH: DiaChi.NGO,
+                ThienCan.TAN: DiaChi.TI,
+                ThienCan.NHAM: DiaChi.NGO,
+                ThienCan.QUY: DiaChi.TI,
+            }
+        ),
     ),
 
     # An theo thang

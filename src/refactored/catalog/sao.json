@@ -65,6 +65,36 @@
     "ngu_hanh": "Thủy"
   },
   {
+    "id": "thien_khoi",
+    "name": "Thiên Khôi",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "thien_viet",
+    "name": "Thiên Việt",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "luu_ha",
+    "name": "Lưu Hà",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "thien_tru",
+    "name": "Thiên Trù",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "thien_quan",
+    "name": "Thiên Quan",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "thien_phuc",
+    "name": "Thiên Phúc",
+    "ngu_hanh": "Thổ"
+  },
+  {
     "id": "dia_khong",
     "name": "Địa Không",
     "ngu_hanh": "Hỏa"
