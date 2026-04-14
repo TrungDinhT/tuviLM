@@ -37,13 +37,13 @@ from src.refactored.placement.transforms import (
 ContextStepSelector = Callable[[LaSoContext], int]
 ThienCanPositionMap = Mapping[ThienCan, DiaChi]
 DiaChiGroup = tuple[DiaChi, ...]
-BirthDiaChiGroups = Mapping[DiaChiGroup, DiaChi]
 AnchorResolver = DiaChi | AbsolutePositionResolver
 
 
 # ---------------------------------------------------------------------------
 # Grouping markers for declarative rule blocks
 # ---------------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class SameSlot:
@@ -67,6 +67,7 @@ def same_slot(*component_ids: ComponentId) -> SameSlot:
 # ---------------------------------------------------------------------------
 # Base protocol and concrete rule declarations
 # ---------------------------------------------------------------------------
+
 
 class Rule(Protocol):
     """Protocol for rules to register placement specs on a builder."""
@@ -98,9 +99,7 @@ class RelativePosition(Rule):
 class SamePosition(RelativePosition):
     """Rule to register a component at the same position as another component."""
 
-    def __init__(
-        self, *, component_id: ComponentId, reference_id: ComponentId
-    ):
+    def __init__(self, *, component_id: ComponentId, reference_id: ComponentId):
         super().__init__(
             component_id=component_id,
             reference_id=reference_id,
@@ -111,9 +110,7 @@ class SamePosition(RelativePosition):
 class XungChieu(RelativePosition):
     """Rule to register a component at the opposite position of another component."""
 
-    def __init__(
-        self, *, component_id: ComponentId, reference_id: ComponentId
-    ):
+    def __init__(self, *, component_id: ComponentId, reference_id: ComponentId):
         super().__init__(
             component_id=component_id,
             reference_id=reference_id,
@@ -124,9 +121,7 @@ class XungChieu(RelativePosition):
 class NhiHop(RelativePosition):
     """Rule to register a component at the nhi hop position of another component."""
 
-    def __init__(
-        self, *, component_id: ComponentId, reference_id: ComponentId
-    ):
+    def __init__(self, *, component_id: ComponentId, reference_id: ComponentId):
         super().__init__(
             component_id=component_id,
             reference_id=reference_id,
@@ -137,9 +132,7 @@ class NhiHop(RelativePosition):
 class LucHai(RelativePosition):
     """Rule to register a component at the luc hai position of another component."""
 
-    def __init__(
-        self, *, component_id: ComponentId, reference_id: ComponentId
-    ):
+    def __init__(self, *, component_id: ComponentId, reference_id: ComponentId):
         super().__init__(
             component_id=component_id,
             reference_id=reference_id,
@@ -235,9 +228,7 @@ class Vong(Rule):
                 anchor_id, *same_slot_ids = member.component_ids
                 registry.register_component_lazy(
                     anchor_id,
-                    RelativePositionSpec(
-                        self.principal_id, _offset_transform(idx + 1)
-                    ),
+                    RelativePositionSpec(self.principal_id, _offset_transform(idx + 1)),
                 )
                 for component_id in same_slot_ids:
                     registry.register_component_lazy(
@@ -247,9 +238,7 @@ class Vong(Rule):
             else:
                 registry.register_component_lazy(
                     member,
-                    RelativePositionSpec(
-                        self.principal_id, _offset_transform(idx + 1)
-                    ),
+                    RelativePositionSpec(self.principal_id, _offset_transform(idx + 1)),
                 )
 
 
@@ -272,9 +261,7 @@ class AbsolutePosition(Rule):
 class DefinitivePosition(Rule):
     """Rule to register a component at a definitive position."""
 
-    def __init__(
-        self, *, component_id: ComponentId, position: DiaChi
-    ):
+    def __init__(self, *, component_id: ComponentId, position: DiaChi):
         self.component_id = component_id
         self.position = position
 
@@ -288,53 +275,6 @@ class DefinitivePosition(Rule):
 # ---------------------------------------------------------------------------
 # Domain position factories
 # ---------------------------------------------------------------------------
-
-def thai_tue_position_fn(context: LaSoContext) -> DiaChi:
-    """Thái Tuế an tại cung theo Địa Chi năm sinh."""
-    return context.prior.get_dia_chi()
-
-
-def loc_ton_position_fn(context: LaSoContext) -> DiaChi:
-    """Lộc Tồn an tại cung theo Thiên Can năm sinh."""
-    position_fn = position_by_thien_can({
-        ThienCan.GIAP: DiaChi.DAN,
-        ThienCan.AT: DiaChi.MEO,
-        ThienCan.BINH: DiaChi.TI,
-        ThienCan.DINH: DiaChi.NGO,
-        ThienCan.MAU: DiaChi.TI,
-        ThienCan.KY: DiaChi.NGO,
-        ThienCan.CANH: DiaChi.THAN,
-        ThienCan.TAN: DiaChi.DAU,
-        ThienCan.NHAM: DiaChi.HOI,
-        ThienCan.QUY: DiaChi.TY,
-    })
-    return position_fn(context)
-
-
-def position_by_thien_can(
-    mapping: ThienCanPositionMap,
-) -> AbsolutePositionResolver:
-    """Build an absolute position resolver from a Thiên Can map."""
-
-    return lambda context: mapping[context.prior.get_thien_can()]
-
-
-def position_by_birth_dia_chi_groups(
-    groups: BirthDiaChiGroups,
-) -> AbsolutePositionResolver:
-    """Build an absolute resolver from grouped birth DiaChi declarations."""
-
-    resolved_positions = {
-        birth_dia_chi: position
-        for birth_dia_chis, position in groups.items()
-        for birth_dia_chi in birth_dia_chis
-    }
-
-    expected_size = sum(len(birth_dia_chis) for birth_dia_chis in groups)
-    if len(resolved_positions) != expected_size:
-        raise ValueError("Birth DiaChi groups must not overlap.")
-
-    return lambda context: resolved_positions[context.prior.get_dia_chi()]
 
 
 def tuvi_position_fn(context: LaSoContext) -> DiaChi:
@@ -359,15 +299,66 @@ def tuvi_position_fn(context: LaSoContext) -> DiaChi:
     return DiaChi.DAN + offset
 
 
+def thai_tue_position_fn(context: LaSoContext) -> DiaChi:
+    """Thái Tuế an tại cung theo Địa Chi năm sinh."""
+    return context.prior.get_dia_chi()
+
+
+def loc_ton_position_fn(context: LaSoContext) -> DiaChi:
+    """Lộc Tồn an tại cung theo Thiên Can năm sinh."""
+    position_fn = position_by_thien_can(
+        {
+            ThienCan.GIAP: DiaChi.DAN,
+            ThienCan.AT: DiaChi.MEO,
+            ThienCan.BINH: DiaChi.TI,
+            ThienCan.DINH: DiaChi.NGO,
+            ThienCan.MAU: DiaChi.TI,
+            ThienCan.KY: DiaChi.NGO,
+            ThienCan.CANH: DiaChi.THAN,
+            ThienCan.TAN: DiaChi.DAU,
+            ThienCan.NHAM: DiaChi.HOI,
+            ThienCan.QUY: DiaChi.TY,
+        }
+    )
+    return position_fn(context)
+
+
 def dau_quan_position_fn(context: LaSoContext) -> DiaChi:
     """Đẩu Quân an từ Địa Chi năm sinh, lùi theo tháng rồi tiến theo giờ."""
     month_position = context.prior.get_dia_chi() - (context.prior.month - 1)
     return month_position + context.prior.hour.index
 
 
+def position_by_thien_can(
+    mapping: ThienCanPositionMap,
+) -> AbsolutePositionResolver:
+    """Build an absolute position resolver from a Thiên Can map."""
+
+    return lambda context: mapping[context.prior.get_thien_can()]
+
+
+def position_by_dia_chi_groups(
+    groups: Mapping[DiaChiGroup, DiaChi],
+) -> AbsolutePositionResolver:
+    """Build an absolute resolver from grouped birth DiaChi declarations."""
+
+    resolved_positions = {
+        dia_chi: position
+        for list_dia_chi, position in groups.items()
+        for dia_chi in list_dia_chi
+    }
+
+    expected_size = sum(len(birth_dia_chis) for birth_dia_chis in groups)
+    if len(resolved_positions) != expected_size:
+        raise ValueError("Birth DiaChi groups must not overlap.")
+
+    return lambda context: resolved_positions[context.prior.get_dia_chi()]
+
+
 # ---------------------------------------------------------------------------
 # Reusable transform builders
 # ---------------------------------------------------------------------------
+
 
 def move_by_birth_dia_chi(
     *, direction: CircleDirection, step_multiplier: int = 1
@@ -447,6 +438,7 @@ def offset_by(position: DiaChi, offset: int) -> DiaChi:
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
 
 def _offset_transform(offset: int) -> Callable[[DiaChi], DiaChi]:
     """Adapt a fixed offset into the simple one-argument transform shape."""

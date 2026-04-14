@@ -254,7 +254,7 @@ PHU_TINH_RULES = [
     # An theo dia chi
     pp.AbsolutePosition(
         component_id="co_than",
-        position_fn=pp.position_by_birth_dia_chi_groups(
+        position_fn=pp.position_by_dia_chi_groups(
             {
                 (DiaChi.DAN, DiaChi.MEO, DiaChi.THIN): DiaChi.TI,
                 (DiaChi.TI, DiaChi.NGO, DiaChi.MUI): DiaChi.THAN,
@@ -265,7 +265,7 @@ PHU_TINH_RULES = [
     ),
     pp.AbsolutePosition(
         component_id="qua_tu",
-        position_fn=pp.position_by_birth_dia_chi_groups(
+        position_fn=pp.position_by_dia_chi_groups(
             {
                 (DiaChi.DAN, DiaChi.MEO, DiaChi.THIN): DiaChi.SUU,
                 (DiaChi.TI, DiaChi.NGO, DiaChi.MUI): DiaChi.THIN,
@@ -299,7 +299,7 @@ PHU_TINH_RULES = [
     ),
     pp.AbsolutePosition(
         component_id="thien_ma",
-        position_fn=pp.position_by_birth_dia_chi_groups(
+        position_fn=pp.position_by_dia_chi_groups(
             {
                 (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.DAN,
                 (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.HOI,
@@ -310,7 +310,7 @@ PHU_TINH_RULES = [
     ),
     pp.AbsolutePosition(
         component_id="hoa_cai",
-        position_fn=pp.position_by_birth_dia_chi_groups(
+        position_fn=pp.position_by_dia_chi_groups(
             {
                 (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.THIN,
                 (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.SUU,
@@ -321,7 +321,7 @@ PHU_TINH_RULES = [
     ),
     pp.AbsolutePosition(
         component_id="dao_hoa",
-        position_fn=pp.position_by_birth_dia_chi_groups(
+        position_fn=pp.position_by_dia_chi_groups(
             {
                 (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.DAU,
                 (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.NGO,
@@ -332,7 +332,7 @@ PHU_TINH_RULES = [
     ),
     pp.AbsolutePosition(
         component_id="kiep_sat",
-        position_fn=pp.position_by_birth_dia_chi_groups(
+        position_fn=pp.position_by_dia_chi_groups(
             {
                 (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.TI,
                 (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.DAN,
@@ -343,7 +343,7 @@ PHU_TINH_RULES = [
     ),
     pp.AbsolutePosition(
         component_id="pha_toai",
-        position_fn=pp.position_by_birth_dia_chi_groups(
+        position_fn=pp.position_by_dia_chi_groups(
             {
                 (DiaChi.TY, DiaChi.NGO, DiaChi.MEO, DiaChi.DAU): DiaChi.TI,
                 (DiaChi.THIN, DiaChi.TUAT, DiaChi.SUU, DiaChi.MUI): DiaChi.SUU,
@@ -463,7 +463,7 @@ PHU_TINH_RULES = [
     # An Hoa Tinh, Linh Tinh
     pp.FromAnchor(
         component_id="hoa_tinh",
-        anchor=pp.position_by_birth_dia_chi_groups(
+        anchor=pp.position_by_dia_chi_groups(
             {
                 (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.DAN,
                 (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.MEO,
@@ -478,7 +478,7 @@ PHU_TINH_RULES = [
     ),
     pp.FromAnchor(
         component_id="linh_tinh",
-        anchor=pp.position_by_birth_dia_chi_groups(
+        anchor=pp.position_by_dia_chi_groups(
             {
                 (DiaChi.THAN, DiaChi.TY, DiaChi.THIN): DiaChi.TUAT,
                 (DiaChi.TI, DiaChi.DAU, DiaChi.SUU): DiaChi.TUAT,
