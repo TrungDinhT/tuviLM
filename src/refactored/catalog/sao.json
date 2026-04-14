@@ -195,6 +195,11 @@
     "ngu_hanh": "Thổ"
   },
   {
+    "id": "dau_quan",
+    "name": "Đẩu Quân",
+    "ngu_hanh": "Hỏa"
+  },
+  {
     "id": "tu_vi",
     "name": "Tử Vi",
     "ngu_hanh": "Thổ",

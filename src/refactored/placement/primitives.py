@@ -355,6 +355,12 @@ def tuvi_position_fn(context: LaSoContext) -> DiaChi:
     return DiaChi.DAN + offset
 
 
+def dau_quan_position_fn(context: LaSoContext) -> DiaChi:
+    """Đẩu Quân an từ Địa Chi năm sinh, lùi theo tháng rồi tiến theo giờ."""
+    month_position = context.prior.get_dia_chi() - (context.prior.month - 1)
+    return month_position + context.prior.hour.index
+
+
 # ---------------------------------------------------------------------------
 # Reusable transform builders
 # ---------------------------------------------------------------------------

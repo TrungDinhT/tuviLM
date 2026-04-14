@@ -454,6 +454,12 @@ PHU_TINH_RULES = [
         transform=pp.move_by_birth_hour(direction=CircleDirection.CW),
     ),
 
+    # An Dau Quan
+    pp.AbsolutePosition(
+        component_id="dau_quan",
+        position_fn=pp.dau_quan_position_fn,
+    ),
+
     # An theo cung
     pp.RelativePosition(
         component_id="thien_tai",
