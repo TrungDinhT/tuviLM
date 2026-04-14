@@ -1,12 +1,16 @@
 import datetime as dt
 from dataclasses import dataclass
-import pydantic
-from typing import Literal
 from enum import StrEnum
+import pydantic
 
 from src.external_lib.day_from_js import LunarDate, get_lunar_date
 from src.refactored.component.cuc import Cuc, LIST_CUC
-from src.refactored.component.elementary import DiaChi, LuongNghi, ThienCan
+from src.refactored.component.elementary import (
+    CircleDirection,
+    DiaChi,
+    LuongNghi,
+    ThienCan,
+)
 
 
 class LunarYear(pydantic.BaseModel):
@@ -80,9 +84,9 @@ class LaSoContext:
     def get_am_duong(self) -> LuongNghi:
         return LuongNghi(self.prior.year.dia_chi.index % 2)
 
-    def van_direction(self) -> Literal[1, -1]:
+    def van_direction(self) -> CircleDirection:
         return (
-            1
+            CircleDirection.CW
             if (
                 self.prior.gender == Gender.MALE
                 and self.get_am_duong() == LuongNghi.DUONG
@@ -91,7 +95,7 @@ class LaSoContext:
                 self.prior.gender == Gender.FEMALE
                 and self.get_am_duong() == LuongNghi.AM
             )
-            else -1
+            else CircleDirection.CCW
         )
 
     @property

@@ -1,4 +1,4 @@
-from src.refactored.component.elementary import DiaChi
+from src.refactored.component.elementary import CircleDirection, DiaChi
 
 
 def get_xung_chieu(position: DiaChi) -> DiaChi:
@@ -25,15 +25,5 @@ def get_luc_hai(position: DiaChi) -> DiaChi:
     return DiaChi.from_index(7 - index)
 
 
-def get_tam_hop_thuan(position: DiaChi) -> DiaChi:
-    # Increase clockwise
-    return position + 4
-
-
-def get_tam_hop_nghich(position: DiaChi) -> DiaChi:
-    # Decrease counter-clockwise
-    return position - 4
-
-
-def get_tam_hop(position: DiaChi) -> tuple[DiaChi, DiaChi]:
-    return get_tam_hop_thuan(position), get_tam_hop_nghich(position)
+def get_tam_hop(position: DiaChi, direction: CircleDirection) -> DiaChi:
+    return position + 4 * direction

@@ -8,10 +8,13 @@ This module is organized in four layers:
 """
 
 from dataclasses import dataclass
-from functools import partial
 from typing import Callable, Protocol
 
-from src.refactored.component.elementary import DiaChi, IndexedEnumMixin
+from src.refactored.component.elementary import (
+    CircleDirection,
+    DiaChi,
+    IndexedEnumMixin,
+)
 from src.refactored.component.prior import LaSoContext
 from src.refactored.placement.registry import (
     AbsolutePositionResolver,
@@ -20,14 +23,14 @@ from src.refactored.placement.registry import (
     PlacementRegistry,
     PositionTransform,
     RelativePositionSpec,
+    normalize_position_transform,
 )
 from src.refactored.placement.transforms import (
     get_luc_hai,
-    mirror_across,
     get_nhi_hop,
-    get_tam_hop_nghich,
-    get_tam_hop_thuan,
+    get_tam_hop,
     get_xung_chieu,
+    mirror_across,
 )
 
 ContextStepSelector = Callable[[LaSoContext], int]
@@ -139,29 +142,20 @@ class LucHai(RelativePosition):
         )
 
 
-class TamHopThuan(RelativePosition):
-    """Rule to register a component at the tam hop position of another component."""
+class TamHop(RelativePosition):
+    """Rule to register a component at the directional tam hop position."""
 
     def __init__(
-        self, *, component_id: ComponentId, reference_id: ComponentId
+        self,
+        *,
+        component_id: ComponentId,
+        reference_id: ComponentId,
+        direction: CircleDirection,
     ):
         super().__init__(
             component_id=component_id,
             reference_id=reference_id,
-            transform=get_tam_hop_thuan,
-        )
-
-
-class TamHopNghich(RelativePosition):
-    """Rule to register a component at the tam hop nghich position of another component."""
-
-    def __init__(
-        self, *, component_id: ComponentId, reference_id: ComponentId
-    ):
-        super().__init__(
-            component_id=component_id,
-            reference_id=reference_id,
-            transform=get_tam_hop_nghich,
+            transform=lambda position: get_tam_hop(position, direction),
         )
 
 
@@ -179,6 +173,29 @@ class MirrorAcross(RelativePosition):
             component_id=component_id,
             reference_id=reference_id,
             transform=lambda position: mirror_across(position, axis),
+        )
+
+
+class FromAnchor(Rule):
+    """Rule to register a component relative to a fixed DiaChi anchor."""
+
+    def __init__(
+        self,
+        *,
+        component_id: ComponentId,
+        anchor: DiaChi,
+        transform: PositionTransform,
+    ):
+        self.component_id = component_id
+        self.anchor = anchor
+        self.transform = normalize_position_transform(transform)
+
+    def register_components(self, registry: PlacementRegistry):
+        registry.register_component_lazy(
+            self.component_id,
+            AbsolutePositionSpec(
+                lambda context: self.transform(self.anchor, context)
+            ),
         )
 
 
@@ -311,36 +328,64 @@ def tuvi_position_fn(context: LaSoContext) -> DiaChi:
 # Reusable transform builders
 # ---------------------------------------------------------------------------
 
-def move_by_birth_dia_chi(step_multiplier: int = 1):
-    return move_by_van_direction(
+def move_by_birth_dia_chi(
+    *, direction: CircleDirection, step_multiplier: int = 1
+) -> PositionTransform:
+    return move_with(
         lambda context: context.prior.get_dia_chi().index,
-        multiplier=step_multiplier,
+        direction=direction,
+        step_multiplier=step_multiplier,
     )
 
 
-def move_by_birth_hour(step_multiplier: int = 1):
-    return move_by_la_so_attr("hour", step_multiplier=step_multiplier)
+def move_by_birth_hour(
+    *, direction: CircleDirection, step_multiplier: int = 1
+) -> PositionTransform:
+    return move_by_attr(
+        "hour",
+        direction=direction,
+        step_multiplier=step_multiplier,
+    )
+
+
+def move_with(
+    step_selector: ContextStepSelector,
+    *,
+    direction: CircleDirection,
+    step_multiplier: int = 1,
+) -> PositionTransform:
+    """Move from a reference position using a fixed circular direction."""
+
+    def transform(reference_position: DiaChi, context: LaSoContext) -> DiaChi:
+        steps = step_selector(context) * step_multiplier
+        return reference_position + direction * steps
+
+    return transform
 
 
 def move_by_van_direction(
-    step_selector: ContextStepSelector, *, multiplier: int = 1
+    step_selector: ContextStepSelector, *, step_multiplier: int = 1
 ) -> PositionTransform:
     """Move from a reference position using van direction and context-derived steps."""
 
     def transform(reference_position: DiaChi, context: LaSoContext) -> DiaChi:
-        steps = step_selector(context) * multiplier
+        steps = step_selector(context) * step_multiplier
         return reference_position + context.van_direction() * steps
 
     return transform
 
 
-def move_by_la_so_attr(
-    attribute_name: str, *, step_multiplier: int = 1
+def move_by_attr(
+    attribute_name: str,
+    *,
+    direction: CircleDirection,
+    step_multiplier: int = 1,
 ) -> PositionTransform:
-    """Build a relative transform from a prior attribute such as `month` or `hour`."""
-    return move_by_van_direction(
-        partial(_get_prior_attr_steps, attribute_name=attribute_name),
-        multiplier=step_multiplier,
+    """Build a fixed-direction transform from a prior attribute."""
+    return move_with(
+        lambda context: _get_prior_attr_steps(context, attribute_name),
+        direction=direction,
+        step_multiplier=step_multiplier,
     )
 
 

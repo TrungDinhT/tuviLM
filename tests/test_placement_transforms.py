@@ -1,12 +1,10 @@
 import pytest
 
-from src.refactored.component.elementary import DiaChi
+from src.refactored.component.elementary import CircleDirection, DiaChi
 from src.refactored.placement.transforms import (
     get_luc_hai,
     get_nhi_hop,
     get_tam_hop,
-    get_tam_hop_nghich,
-    get_tam_hop_thuan,
     get_xung_chieu,
     mirror_across,
 )
@@ -124,39 +122,46 @@ def test_get_luc_hai():
     assert get_luc_hai(DiaChi.HOI) == DiaChi.THAN
 
 
-def test_get_tam_hop_thuan():
-    assert get_tam_hop_thuan(DiaChi.TY) == DiaChi.THIN
-    assert get_tam_hop_thuan(DiaChi.SUU) == DiaChi.TI
-    assert get_tam_hop_thuan(DiaChi.DAN) == DiaChi.NGO
-    assert get_tam_hop_thuan(DiaChi.MEO) == DiaChi.MUI
-    assert get_tam_hop_thuan(DiaChi.THIN) == DiaChi.THAN
-    assert get_tam_hop_thuan(DiaChi.TI) == DiaChi.DAU
-    assert get_tam_hop_thuan(DiaChi.NGO) == DiaChi.TUAT
-    assert get_tam_hop_thuan(DiaChi.MUI) == DiaChi.HOI
-    assert get_tam_hop_thuan(DiaChi.THAN) == DiaChi.TY
-    assert get_tam_hop_thuan(DiaChi.DAU) == DiaChi.SUU
-    assert get_tam_hop_thuan(DiaChi.TUAT) == DiaChi.DAN
-    assert get_tam_hop_thuan(DiaChi.HOI) == DiaChi.MEO
-
-
-def test_get_tam_hop_nghich():
-    assert get_tam_hop_nghich(DiaChi.TY) == DiaChi.THAN
-    assert get_tam_hop_nghich(DiaChi.SUU) == DiaChi.DAU
-    assert get_tam_hop_nghich(DiaChi.DAN) == DiaChi.TUAT
-    assert get_tam_hop_nghich(DiaChi.MEO) == DiaChi.HOI
-    assert get_tam_hop_nghich(DiaChi.THIN) == DiaChi.TY
-    assert get_tam_hop_nghich(DiaChi.TI) == DiaChi.SUU
-    assert get_tam_hop_nghich(DiaChi.NGO) == DiaChi.DAN
-    assert get_tam_hop_nghich(DiaChi.MUI) == DiaChi.MEO
-    assert get_tam_hop_nghich(DiaChi.THAN) == DiaChi.THIN
-    assert get_tam_hop_nghich(DiaChi.DAU) == DiaChi.TI
-    assert get_tam_hop_nghich(DiaChi.TUAT) == DiaChi.NGO
-    assert get_tam_hop_nghich(DiaChi.HOI) == DiaChi.MUI
-
-
-@pytest.mark.parametrize("position", DiaChi.list_dia_chi())
-def test_get_tam_hop(position: DiaChi):
-    assert get_tam_hop(position) == (
-        get_tam_hop_thuan(position),
-        get_tam_hop_nghich(position),
-    )
+@pytest.mark.parametrize(
+    "direction, position, expected",
+    [
+        *[
+            (CircleDirection.CW, position, expected)
+            for position, expected in {
+                DiaChi.TY: DiaChi.THIN,
+                DiaChi.SUU: DiaChi.TI,
+                DiaChi.DAN: DiaChi.NGO,
+                DiaChi.MEO: DiaChi.MUI,
+                DiaChi.THIN: DiaChi.THAN,
+                DiaChi.TI: DiaChi.DAU,
+                DiaChi.NGO: DiaChi.TUAT,
+                DiaChi.MUI: DiaChi.HOI,
+                DiaChi.THAN: DiaChi.TY,
+                DiaChi.DAU: DiaChi.SUU,
+                DiaChi.TUAT: DiaChi.DAN,
+                DiaChi.HOI: DiaChi.MEO,
+            }.items()
+        ],
+        *[
+            (CircleDirection.CCW, position, expected)
+            for position, expected in {
+                DiaChi.TY: DiaChi.THAN,
+                DiaChi.SUU: DiaChi.DAU,
+                DiaChi.DAN: DiaChi.TUAT,
+                DiaChi.MEO: DiaChi.HOI,
+                DiaChi.THIN: DiaChi.TY,
+                DiaChi.TI: DiaChi.SUU,
+                DiaChi.NGO: DiaChi.DAN,
+                DiaChi.MUI: DiaChi.MEO,
+                DiaChi.THAN: DiaChi.THIN,
+                DiaChi.DAU: DiaChi.TI,
+                DiaChi.TUAT: DiaChi.NGO,
+                DiaChi.HOI: DiaChi.MUI,
+            }.items()
+        ],
+    ],
+)
+def test_get_tam_hop(
+    direction: CircleDirection, position: DiaChi, expected: DiaChi
+):
+    assert get_tam_hop(position, direction) == expected

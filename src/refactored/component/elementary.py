@@ -1,4 +1,4 @@
-from enum import Enum, StrEnum
+from enum import Enum, IntEnum, StrEnum
 from pydantic import BaseModel
 from typing import Optional
 
@@ -56,6 +56,29 @@ class DiaChi(CyclicEnumMixin, StrEnum):
     @classmethod
     def list_dia_chi(cls) -> list["DiaChi"]:
         return list(cls)
+
+
+class CircleDirection(IntEnum):
+    CW = 1
+    CCW = -1
+
+    @property
+    def multiplier(self) -> int:
+        return int(self)
+
+    def __str__(self) -> str:
+        return "CLOCKWISE" if self is type(self).CW else "COUNTER-CLOCKWISE"
+
+    def __mul__(self, other: int) -> int:
+        if not isinstance(other, int):
+            return NotImplemented
+        return self.multiplier * other
+
+    def __rmul__(self, other: int) -> int:
+        return self * other
+
+    def __neg__(self) -> "CircleDirection":
+        return type(self).CCW if self is type(self).CW else type(self).CW
 
 
 class LuongNghi(Enum):

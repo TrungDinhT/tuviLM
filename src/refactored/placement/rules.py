@@ -1,5 +1,5 @@
 import src.refactored.placement.primitives as pp
-from src.refactored.component.elementary import DiaChi
+from src.refactored.component.elementary import CircleDirection, DiaChi
 
 
 CUNG_RULES = [
@@ -23,7 +23,10 @@ CUNG_RULES = [
     pp.RelativePosition(
         component_id="than",
         reference_id="menh",
-        transform=pp.move_by_birth_hour(step_multiplier=2),
+        transform=pp.move_by_birth_hour(
+            direction=CircleDirection.CW,
+            step_multiplier=2,
+        ),
     ),
 ]
 
@@ -33,26 +36,30 @@ CHINH_TINH_RULES = [
         component_id="tu_vi",
         position_fn=pp.tuvi_position_fn,
     ),
-    pp.TamHopNghich(
+    pp.TamHop(
         component_id="vu_khuc",
         reference_id="tu_vi",
+        direction=CircleDirection.CCW,
     ),
-    pp.TamHopThuan(
+    pp.TamHop(
         component_id="liem_trinh",
         reference_id="tu_vi",
+        direction=CircleDirection.CW,
     ),
     # sat, pha, tham
     pp.XungChieu(
         component_id="that_sat",
         reference_id="thien_phu",
     ),
-    pp.TamHopThuan(
+    pp.TamHop(
         component_id="pha_quan",
         reference_id="that_sat",
+        direction=CircleDirection.CW,
     ),
-    pp.TamHopNghich(
+    pp.TamHop(
         component_id="tham_lang",
         reference_id="that_sat",
+        direction=CircleDirection.CCW,
     ),
     # co, nguyet, dong, luong
     pp.NhiHop(
@@ -144,12 +151,12 @@ PHU_TINH_RULES = [
     pp.RelativePosition(
         component_id="thien_tai",
         reference_id="menh",
-        transform=pp.move_by_birth_dia_chi(),
+        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CW),
     ),
     pp.RelativePosition(
         component_id="thien_tho",
         reference_id="than",
-        transform=pp.move_by_birth_dia_chi(),
+        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CW),
     ),
     pp.SamePosition(
         component_id="thien_su",

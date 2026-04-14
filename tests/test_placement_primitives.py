@@ -1,21 +1,28 @@
 
 import pytest
 
-from src.refactored.placement.primitives import move_by_la_so_attr
-from src.refactored.component.elementary import DiaChi, ThienCan
+from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCan
 from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior, LunarYear
+from src.refactored.placement.primitives import (
+    move_by_attr,
+    move_by_van_direction,
+    move_with,
+)
 
 
 @pytest.mark.parametrize(
-    "gender, attribute_name, multiplier, expected",
+    "attribute_name, direction, multiplier, expected",
     [
-        (Gender.MALE, "month", 1, DiaChi.TI),
-        (Gender.FEMALE, "month", 2, DiaChi.THAN),
-        (Gender.MALE, "hour", 1, DiaChi.TUAT),
+        ("month", CircleDirection.CW, 1, DiaChi.TI),
+        ("month", CircleDirection.CCW, 2, DiaChi.THAN),
+        ("hour", CircleDirection.CW, 1, DiaChi.TUAT),
     ],
 )
-def test_move_by_prior_attr(
-    gender: Gender, attribute_name: str, multiplier: int, expected: DiaChi
+def test_move_by_attr(
+    attribute_name: str,
+    direction: CircleDirection,
+    multiplier: int,
+    expected: DiaChi,
 ):
     context = LaSoContext.from_prior(
         LaSoPrior(
@@ -23,16 +30,20 @@ def test_move_by_prior_attr(
             date=1,
             month=3,
             year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.GIAP),
-            gender=gender,
+            gender=Gender.MALE,
         )
     )
 
-    transform = move_by_la_so_attr(attribute_name, step_multiplier=multiplier)
+    transform = move_by_attr(
+        attribute_name,
+        direction=direction,
+        step_multiplier=multiplier,
+    )
 
     assert transform(DiaChi.DAN, context) == expected
 
 
-def test_move_by_prior_attr_uses_prior_inside_context():
+def test_move_with_uses_context_derived_steps():
     context = LaSoContext.from_prior(
         LaSoPrior(
             hour=DiaChi.MEO,
@@ -42,6 +53,33 @@ def test_move_by_prior_attr_uses_prior_inside_context():
             gender=Gender.MALE,
         )
     )
-    transform = move_by_la_so_attr("month", step_multiplier=1)
+    transform = move_with(
+        lambda current_context: current_context.prior.month,
+        direction=CircleDirection.CW,
+    )
 
     assert transform(DiaChi.DAN, context) == DiaChi.NGO
+
+
+@pytest.mark.parametrize(
+    "gender, expected",
+    [
+        (Gender.MALE, DiaChi.MEO),
+        (Gender.FEMALE, DiaChi.SUU),
+    ],
+)
+def test_move_by_van_direction_uses_chart_direction(
+    gender: Gender, expected: DiaChi
+):
+    context = LaSoContext.from_prior(
+        LaSoPrior(
+            hour=DiaChi.TY,
+            date=1,
+            month=1,
+            year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.GIAP),
+            gender=gender,
+        )
+    )
+    transform = move_by_van_direction(lambda _context: 1)
+
+    assert transform(DiaChi.DAN, context) == expected

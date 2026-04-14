@@ -2,8 +2,21 @@ from types import SimpleNamespace
 
 import pytest
 
-from src.refactored.component.elementary import DiaChi, NguHanh, ThienCan
+from src.refactored.component.elementary import (
+    CircleDirection,
+    DiaChi,
+    NguHanh,
+    ThienCan,
+)
 from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior, LunarYear
+
+
+def test_circle_direction_supports_multiplier_semantics():
+    assert CircleDirection.CW.multiplier == 1
+    assert CircleDirection.CCW.multiplier == -1
+    assert CircleDirection.CW * 3 == 3
+    assert 2 * CircleDirection.CCW == -2
+    assert -CircleDirection.CW == CircleDirection.CCW
 
 
 @pytest.mark.parametrize(
@@ -57,4 +70,4 @@ def test_laso_context_moves_am_duong_and_van_direction_from_prior():
     context = LaSoContext.from_prior(prior)
 
     assert context.get_am_duong().value == 1
-    assert context.van_direction() == 1
+    assert context.van_direction() == CircleDirection.CW
