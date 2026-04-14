@@ -26,10 +26,10 @@ def search(query: str, k: int = 10):
 
     return results
 
-def search_start_info(name : str) -> dict[str, str]:
+def search_star_info(name : str) -> dict[str, str]:
     return search(f"Đặc tính sao {name}", k=1)
 
-def search_start_role_info(name : str, role : str) -> dict[str, str]:
+def search_star_role_info(name : str, role : str) -> dict[str, str]:
     return search(f"sao {name} tại cung {role}", k=3)
 
 def search_role_info(role : str) -> dict[str, str]:
