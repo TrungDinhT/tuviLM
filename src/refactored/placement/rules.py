@@ -1,8 +1,5 @@
 import src.refactored.placement.primitives as pp
-
-_move_by_year_dia_chi = pp.move_by_van_direction(
-    lambda context: context.prior.get_dia_chi().index
-)
+from src.refactored.component.elementary import DiaChi
 
 
 CUNG_RULES = [
@@ -26,21 +23,133 @@ CUNG_RULES = [
     pp.RelativePosition(
         component_id="than",
         reference_id="menh",
-        transform=pp.move_by_la_so_attr("hour", step_multiplier=2),
+        transform=pp.move_by_birth_hour(step_multiplier=2),
     ),
 ]
 
-SAO_RULES = [
+CHINH_TINH_RULES = [
+    # tu, vu, liem
+    pp.AbsolutePosition(
+        component_id="tu_vi",
+        position_fn=pp.tuvi_position_fn,
+    ),
+    pp.TamHopNghich(
+        component_id="vu_khuc",
+        reference_id="tu_vi",
+    ),
+    pp.TamHopThuan(
+        component_id="liem_trinh",
+        reference_id="tu_vi",
+    ),
+    # sat, pha, tham
+    pp.XungChieu(
+        component_id="that_sat",
+        reference_id="thien_phu",
+    ),
+    pp.TamHopThuan(
+        component_id="pha_quan",
+        reference_id="that_sat",
+    ),
+    pp.TamHopNghich(
+        component_id="tham_lang",
+        reference_id="that_sat",
+    ),
+    # co, nguyet, dong, luong
+    pp.NhiHop(
+        component_id="thien_co",
+        reference_id="pha_quan",
+    ),
+    pp.NhiHop(
+        component_id="thai_am",
+        reference_id="vu_khuc",
+    ),
+    pp.NhiHop(
+        component_id="thien_dong",
+        reference_id="tham_lang",
+    ),
+    pp.NhiHop(
+        component_id="thien_luong",
+        reference_id="liem_trinh",
+    ),
+    # cu, nhat
+    pp.LucHai(
+        component_id="cu_mon",
+        reference_id="tu_vi",
+    ),
+    pp.NhiHop(
+        component_id="thai_duong",
+        reference_id="thien_phu",
+    ),
+    # phu, tuong
+    pp.MirrorAcross(
+        component_id="thien_phu",
+        reference_id="tu_vi",
+        axis=(DiaChi.DAN, DiaChi.THAN),
+    ),
+    pp.XungChieu(
+        component_id="thien_tuong",
+        reference_id="pha_quan",
+    ),
+]
+
+PHU_TINH_RULES = [
+    # Vong Loc Ton
+    pp.Vong(
+        principal_id="loc_ton",
+        principal_position_fn=pp.loc_ton_position_fn,
+        others=[
+            "kinh_duong",
+            "thanh_long",
+            pp.same_slot("tieu_hao", "ln_van_tinh"),
+            "tuong_quan",
+            pp.same_slot("tau_thu", "duong_phu"),
+            "phi_liem",
+            "hy_than",
+            pp.same_slot("benh_phu", "quoc_an"),
+            "dai_hao",
+            "phuc_binh",
+            pp.same_slot("da_la", "quan_phur"),
+        ],
+    ),
+    pp.SamePosition(
+        component_id="bac_si",
+        reference_id="loc_ton",
+    ),
+    pp.RelativePosition(
+        component_id="luc_si",
+        reference_id="loc_ton",
+        transform=pp.move_by_van_direction(lambda _context: 1),
+    ),
+
+    # Vong Thai Tue
+    pp.Vong(
+        principal_id="thai_tue",
+        principal_position_fn=pp.thai_tue_position_fn,
+        others=[
+            pp.same_slot("thieu_duong", "thien_khong"),
+            "tang_mon",
+            "thieu_am",
+            pp.same_slot("quan_phuf", "long_tri"),
+            pp.same_slot("tu_phu", "nguyet_duc"),
+            pp.same_slot("tue_pha", "thien_hu"),
+            "long_duc",
+            "bach_ho",
+            pp.same_slot("sao_phuc_duc", "thien_duc"),
+            "dieu_khach",
+            "truc_phu",
+        ],
+    ),
+
     # An theo cung
     pp.RelativePosition(
         component_id="thien_tai",
         reference_id="menh",
-        transform=_move_by_year_dia_chi,
+        transform=pp.move_by_birth_dia_chi(),
     ),
     pp.RelativePosition(
         component_id="thien_tho",
         reference_id="than",
-        transform=_move_by_year_dia_chi,
+        transform=pp.move_by_birth_dia_chi(),
     ),
     pp.SamePosition(
         component_id="thien_su",
@@ -50,5 +159,14 @@ SAO_RULES = [
         component_id="thien_thuong",
         reference_id="no_boc",
     ),
-    # Chinh tinh
+
+    # Thien La, Dia Vong
+    pp.DefinitivePosition(
+        component_id="thien_la",
+        position=DiaChi.THIN,
+    ),
+    pp.DefinitivePosition(
+        component_id="dia_vong",
+        position=DiaChi.TUAT,
+    ),
 ]

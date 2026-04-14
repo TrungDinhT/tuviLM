@@ -18,5 +18,274 @@
     "id": "thien_thuong",
     "name": "Thiên Thuơng",
     "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "tu_vi",
+    "name": "Tử Vi",
+    "ngu_hanh": "Thổ",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "vu_khuc",
+    "name": "Vũ Khúc",
+    "ngu_hanh": "Kim",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "liem_trinh",
+    "name": "Liêm Trinh",
+    "ngu_hanh": "Hỏa",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "that_sat",
+    "name": "Thất Sát",
+    "ngu_hanh": "Kim",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "pha_quan",
+    "name": "Phá Quân",
+    "ngu_hanh": "Thủy",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "tham_lang",
+    "name": "Tham Lang",
+    "ngu_hanh": "Thủy",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "thien_co",
+    "name": "Thiên Cơ",
+    "ngu_hanh": "Mộc",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "thai_am",
+    "name": "Thái Âm",
+    "ngu_hanh": "Thủy",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "thien_dong",
+    "name": "Thiên Đồng",
+    "ngu_hanh": "Thủy",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "thien_luong",
+    "name": "Thiên Lương",
+    "ngu_hanh": "Mộc",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "cu_mon",
+    "name": "Cự Môn",
+    "ngu_hanh": "Thủy",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "thai_duong",
+    "name": "Thái Dương",
+    "ngu_hanh": "Hỏa",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "thien_phu",
+    "name": "Thiên Phủ",
+    "ngu_hanh": "Thổ",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "thien_tuong",
+    "name": "Thiên Tướng",
+    "ngu_hanh": "Thủy",
+    "is_chinh_tinh": true
+  },
+  {
+    "id": "loc_ton",
+    "name": "Lộc Tồn",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "bac_si",
+    "name": "Bác Sĩ",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "luc_si",
+    "name": "Lực Sĩ",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "kinh_duong",
+    "name": "Kình Dương",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "thanh_long",
+    "name": "Thanh Long",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "tieu_hao",
+    "name": "Tiểu Hao",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "ln_van_tinh",
+    "name": "LN Văn Tinh",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "tuong_quan",
+    "name": "Tướng Quân",
+    "ngu_hanh": "Mộc"
+  },
+  {
+    "id": "tau_thu",
+    "name": "Tấu Thư",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "duong_phu",
+    "name": "Đường Phù",
+    "ngu_hanh": "Mộc"
+  },
+  {
+    "id": "phi_liem",
+    "name": "Phi Liêm",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "hy_than",
+    "name": "Hỷ Thần",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "benh_phu",
+    "name": "Bệnh Phù",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "quoc_an",
+    "name": "Quốc Ấn",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "dai_hao",
+    "name": "Đại Hao",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "phuc_binh",
+    "name": "Phục Binh",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "da_la",
+    "name": "Đà La",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "quan_phur",
+    "name": "Quan Phủ",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "thai_tue",
+    "name": "Thái Tuế",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "thieu_duong",
+    "name": "Thiếu Dương",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "thien_khong",
+    "name": "Thiên Không",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "tang_mon",
+    "name": "Tang Môn",
+    "ngu_hanh": "Mộc"
+  },
+  {
+    "id": "thieu_am",
+    "name": "Thiếu Âm",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "quan_phuf",
+    "name": "Quan Phù",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "long_tri",
+    "name": "Long Trì",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "tu_phu",
+    "name": "Tử Phù",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "nguyet_duc",
+    "name": "Nguyệt Đức",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "tue_pha",
+    "name": "Tuế Phá",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "thien_hu",
+    "name": "Thiên Hư",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "long_duc",
+    "name": "Long Đức",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "bach_ho",
+    "name": "Bạch Hổ",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "sao_phuc_duc",
+    "name": "Phúc Đức",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "thien_duc",
+    "name": "Thiên Đức",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "dieu_khach",
+    "name": "Điếu Khách",
+    "ngu_hanh": "Hỏa"
+  },
+  {
+    "id": "truc_phu",
+    "name": "Trực Phù",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "thien_la",
+    "name": "Thiên La",
+    "ngu_hanh": "Kim"
+  },
+  {
+    "id": "dia_vong",
+    "name": "Địa Võng",
+    "ngu_hanh": "Kim"
   }
 ]

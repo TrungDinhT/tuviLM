@@ -45,7 +45,7 @@ class DiaChi(CyclicEnumMixin, StrEnum):
     DAN = "Dần"
     MEO = "Mão"
     THIN = "Thìn"
-    TI = "Tỵ"
+    TI = "Tị"
     NGO = "Ngọ"
     MUI = "Mùi"
     THAN = "Thân"

@@ -8,7 +8,75 @@ from src.refactored.placement.transforms import (
     get_tam_hop_nghich,
     get_tam_hop_thuan,
     get_xung_chieu,
+    mirror_across,
 )
+
+
+@pytest.mark.parametrize(
+    "axis, position, expected",
+    [
+        *[
+            ((DiaChi.DAN, DiaChi.THAN), position, expected)
+            for position, expected in {
+                DiaChi.DAN: DiaChi.DAN,
+                DiaChi.MEO: DiaChi.SUU,
+                DiaChi.THIN: DiaChi.TY,
+                DiaChi.TI: DiaChi.HOI,
+                DiaChi.NGO: DiaChi.TUAT,
+                DiaChi.MUI: DiaChi.DAU,
+                DiaChi.THAN: DiaChi.THAN,
+                DiaChi.DAU: DiaChi.MUI,
+                DiaChi.TUAT: DiaChi.NGO,
+                DiaChi.HOI: DiaChi.TI,
+                DiaChi.TY: DiaChi.THIN,
+                DiaChi.SUU: DiaChi.MEO,
+            }.items()
+        ],
+        *[
+            ((DiaChi.TI, DiaChi.HOI), position, expected)
+            for position, expected in {
+                DiaChi.TI: DiaChi.TI,
+                DiaChi.NGO: DiaChi.THIN,
+                DiaChi.MUI: DiaChi.MEO,
+                DiaChi.THAN: DiaChi.DAN,
+                DiaChi.DAU: DiaChi.SUU,
+                DiaChi.TUAT: DiaChi.TY,
+                DiaChi.HOI: DiaChi.HOI,
+                DiaChi.TY: DiaChi.TUAT,
+                DiaChi.SUU: DiaChi.DAU,
+                DiaChi.DAN: DiaChi.THAN,
+                DiaChi.MEO: DiaChi.MUI,
+                DiaChi.THIN: DiaChi.NGO,
+            }.items()
+        ],
+    ],
+)
+def test_mirror_across_axis_expected_mapping(
+    axis: tuple[DiaChi, DiaChi], position: DiaChi, expected: DiaChi
+):
+    assert mirror_across(position, axis) == expected
+
+
+@pytest.mark.parametrize(
+    "position, axis",
+    [
+        (position, axis)
+        for axis in (
+            (DiaChi.DAN, DiaChi.THAN),
+            (DiaChi.TI, DiaChi.HOI),
+        )
+        for position in DiaChi
+    ],
+)
+def test_mirror_across_is_involution(
+    position: DiaChi, axis: tuple[DiaChi, DiaChi]
+):
+    assert mirror_across(mirror_across(position, axis), axis) == position
+
+
+def test_mirror_across_rejects_non_opposite_axis():
+    with pytest.raises(ValueError):
+        mirror_across(DiaChi.TY, (DiaChi.DAN, DiaChi.DAU))
 
 
 def test_get_xung_chieu():

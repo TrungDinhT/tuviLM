@@ -1,3 +1,13 @@
+"""Placement DSL primitives used by declarative rule sets.
+
+This module is organized in four layers:
+1. Small marker/value objects that help rules stay readable.
+2. Rule classes that register absolute or relative placement specs.
+3. Reusable position factories that encode common domain formulas.
+4. Tiny internal helpers used to adapt offsets and context-derived steps.
+"""
+
+from dataclasses import dataclass
 from functools import partial
 from typing import Callable, Protocol
 
@@ -13,6 +23,7 @@ from src.refactored.placement.registry import (
 )
 from src.refactored.placement.transforms import (
     get_luc_hai,
+    mirror_across,
     get_nhi_hop,
     get_tam_hop_nghich,
     get_tam_hop_thuan,
@@ -21,6 +32,33 @@ from src.refactored.placement.transforms import (
 
 ContextStepSelector = Callable[[LaSoContext], int]
 
+
+# ---------------------------------------------------------------------------
+# Grouping markers for declarative rule blocks
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class SameSlot:
+    """Marker for multiple components that intentionally share one ring slot."""
+
+    component_ids: tuple[ComponentId, ...]
+
+
+# `Vong` accepts either a single component ID or a grouped same-slot marker.
+VongMember = ComponentId | SameSlot
+
+
+def same_slot(*component_ids: ComponentId) -> SameSlot:
+    """Build a same-slot marker for grouped ring declarations."""
+
+    if len(component_ids) < 2:
+        raise ValueError("same_slot requires at least 2 component ids")
+    return SameSlot(component_ids)
+
+
+# ---------------------------------------------------------------------------
+# Base protocol and concrete rule declarations
+# ---------------------------------------------------------------------------
 
 class Rule(Protocol):
     """Protocol for rules to register placement specs on a builder."""
@@ -58,7 +96,7 @@ class SamePosition(RelativePosition):
         super().__init__(
             component_id=component_id,
             reference_id=reference_id,
-            transform=partial(offset_by, offset=0),
+            transform=_offset_transform(0),
         )
 
 
@@ -127,14 +165,36 @@ class TamHopNghich(RelativePosition):
         )
 
 
+class MirrorAcross(RelativePosition):
+    """Rule to mirror a component across an axis from another component."""
+
+    def __init__(
+        self,
+        *,
+        component_id: ComponentId,
+        reference_id: ComponentId,
+        axis: tuple[DiaChi, DiaChi],
+    ):
+        super().__init__(
+            component_id=component_id,
+            reference_id=reference_id,
+            transform=lambda position: mirror_across(position, axis),
+        )
+
+
 class Vong(Rule):
-    """Rule to register a group of components in a circular order."""
+    """Register a circular sequence of components from one principal anchor.
+
+    `others` advances one DiaChi step at a time, clockwise from the principal
+    position.
+    A `same_slot(...)` entry means all listed components share that same step.
+    """
 
     def __init__(
         self,
         principal_id: ComponentId,
         principal_position_fn: AbsolutePositionResolver,
-        others: list[ComponentId],
+        others: list[VongMember],
     ):
         self.principal_id = principal_id
         self.principal_position_fn = principal_position_fn
@@ -145,13 +205,27 @@ class Vong(Rule):
             self.principal_id,
             AbsolutePositionSpec(self.principal_position_fn),
         )
-        for idx, component_id in enumerate(self.others):
-            registry.register_component_lazy(
-                component_id,
-                RelativePositionSpec(
-                    self.principal_id, partial(offset_by, offset=idx + 1)
-                ),
-            )
+        for idx, member in enumerate(self.others):
+            if isinstance(member, SameSlot):
+                anchor_id, *same_slot_ids = member.component_ids
+                registry.register_component_lazy(
+                    anchor_id,
+                    RelativePositionSpec(
+                        self.principal_id, _offset_transform(idx + 1)
+                    ),
+                )
+                for component_id in same_slot_ids:
+                    registry.register_component_lazy(
+                        component_id,
+                        RelativePositionSpec(anchor_id, _offset_transform(0)),
+                    )
+            else:
+                registry.register_component_lazy(
+                    member,
+                    RelativePositionSpec(
+                        self.principal_id, _offset_transform(idx + 1)
+                    ),
+                )
 
 
 class AbsolutePosition(Rule):
@@ -170,9 +244,45 @@ class AbsolutePosition(Rule):
         )
 
 
+class DefinitivePosition(Rule):
+    """Rule to register a component at a definitive position."""
+
+    def __init__(
+        self, *, component_id: ComponentId, position: DiaChi
+    ):
+        self.component_id = component_id
+        self.position = position
+
+    def register_components(self, registry: PlacementRegistry):
+        registry.register_component(
+            self.component_id,
+            self.position,
+        )
+
+
+# ---------------------------------------------------------------------------
+# Domain position factories
+# ---------------------------------------------------------------------------
+
 def thai_tue_position_fn(context: LaSoContext) -> DiaChi:
     """Thái Tuế an tại cung theo Địa Chi năm sinh."""
     return context.prior.get_dia_chi()
+
+
+def loc_ton_position_fn(context: LaSoContext) -> DiaChi:
+    """Lộc Tồn an tại cung theo Thiên Can năm sinh."""
+    return {
+        "Giáp": DiaChi.DAN,
+        "Ất": DiaChi.MEO,
+        "Bính": DiaChi.TI,
+        "Đinh": DiaChi.NGO,
+        "Mậu": DiaChi.TI,
+        "Kỷ": DiaChi.NGO,
+        "Canh": DiaChi.THAN,
+        "Tân": DiaChi.DAU,
+        "Nhâm": DiaChi.HOI,
+        "Quý": DiaChi.TY,
+    }[context.prior.get_thien_can()]
 
 
 def tuvi_position_fn(context: LaSoContext) -> DiaChi:
@@ -195,6 +305,21 @@ def tuvi_position_fn(context: LaSoContext) -> DiaChi:
 
     offset = (div - 1 + borrow) if div % 2 == 0 else (div - 1 - borrow)
     return DiaChi.DAN + offset
+
+
+# ---------------------------------------------------------------------------
+# Reusable transform builders
+# ---------------------------------------------------------------------------
+
+def move_by_birth_dia_chi(step_multiplier: int = 1):
+    return move_by_van_direction(
+        lambda context: context.prior.get_dia_chi().index,
+        multiplier=step_multiplier,
+    )
+
+
+def move_by_birth_hour(step_multiplier: int = 1):
+    return move_by_la_so_attr("hour", step_multiplier=step_multiplier)
 
 
 def move_by_van_direction(
@@ -223,7 +348,17 @@ def offset_by(position: DiaChi, offset: int) -> DiaChi:
     return position + offset
 
 
+# ---------------------------------------------------------------------------
+# Internal helpers
+# ---------------------------------------------------------------------------
+
+def _offset_transform(offset: int) -> Callable[[DiaChi], DiaChi]:
+    """Adapt a fixed offset into the simple one-argument transform shape."""
+    return lambda position: offset_by(position, offset)
+
+
 def _get_prior_attr_steps(context: LaSoContext, attribute_name: str) -> int:
+    """Read an integer-like step value from `LaSoContext.prior`."""
     value = getattr(context.prior, attribute_name)
     if isinstance(value, int):
         return value
