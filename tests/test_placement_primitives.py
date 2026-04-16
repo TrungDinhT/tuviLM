@@ -124,7 +124,7 @@ def test_move_by_birth_month_uses_zero_based_month_offset(
             gender=Gender.MALE,
         )
     )
-    transform = move_by_birth_month(direction=direction)
+    transform = move_by_birth_month(direction)
 
     assert transform(DiaChi.DAN, context) == expected
 

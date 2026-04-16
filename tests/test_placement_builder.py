@@ -3,7 +3,7 @@ import datetime as dt
 import pytest
 
 from src.refactored.builder.placement_builder import PlacementBuilder
-from src.refactored.placement.primitives import Vong, same_slot
+from src.refactored.placement.primitives import SamePosition, Vong
 from src.refactored.placement.rules import CHINH_TINH_RULES, PHU_TINH_RULES
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
@@ -193,14 +193,14 @@ def test_builder_resolves_chained_specs_in_any_order():
     assert builder.get_or_resolve_position(component_c) == DiaChi.THIN
 
 
-def test_vong_supports_same_slot_groups():
+def test_vong_supports_same_position_groups():
     builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
     rules = [
         Vong(
             principal_id="anchor",
             principal_position_fn=lambda _context: DiaChi.DAN,
             others=[
-                same_slot("slot_one_a", "slot_one_b"),
+                SamePosition("slot_one_a", "slot_one_b"),
                 "slot_two",
             ],
         )
@@ -213,6 +213,29 @@ def test_vong_supports_same_slot_groups():
     assert builder.get_or_resolve_position("slot_one_a") == DiaChi.MEO
     assert builder.get_or_resolve_position("slot_one_b") == DiaChi.MEO
     assert builder.get_or_resolve_position("slot_two") == DiaChi.THIN
+
+
+def test_vong_can_follow_van_direction():
+    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.FEMALE)
+    rules = [
+        Vong(
+            principal_id="anchor",
+            principal_position_fn=lambda _context: DiaChi.DAN,
+            direction=Vong.Direction.VAN,
+            others=[
+                "slot_one",
+                SamePosition("slot_two_a", "slot_two_b"),
+            ],
+        )
+    ]
+
+    builder.register_rules(rules)
+    builder.resolve_pending()
+
+    assert builder.get_or_resolve_position("anchor") == DiaChi.DAN
+    assert builder.get_or_resolve_position("slot_one") == DiaChi.SUU
+    assert builder.get_or_resolve_position("slot_two_a") == DiaChi.TY
+    assert builder.get_or_resolve_position("slot_two_b") == DiaChi.TY
 
 
 def test_builder_supports_prior_aware_relative_specs():
@@ -271,7 +294,7 @@ def test_builder_resolves_chinh_tinh_rules_like_legacy_builder():
 def test_builder_resolves_thai_tue_ring_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
     builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules([PHU_TINH_RULES[3]])
+    builder.register_rules([PHU_TINH_RULES[2]])
 
     positions = builder.resolve_all()
     legacy_positions = _build_legacy_phu_tinh_positions(time, THAI_TUE_COMPONENT_IDS)
@@ -290,7 +313,7 @@ def test_builder_resolves_thai_tue_ring_like_legacy_builder():
 def test_builder_resolves_loc_ton_ring_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
     builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(PHU_TINH_RULES[:3])
+    builder.register_rules(PHU_TINH_RULES[:2])
 
     positions = builder.resolve_all()
     legacy_positions = _build_legacy_phu_tinh_positions(time, LOC_TON_COMPONENT_IDS)

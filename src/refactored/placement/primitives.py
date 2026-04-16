@@ -7,7 +7,7 @@ This module is organized in four layers:
 4. Tiny internal helpers used to adapt offsets and context-derived steps.
 """
 
-from dataclasses import dataclass
+from enum import Enum
 from typing import Callable, Mapping, Protocol
 
 from src.refactored.component.elementary import (
@@ -38,30 +38,6 @@ ContextStepSelector = Callable[[LaSoContext], int]
 ThienCanPositionMap = Mapping[ThienCan, DiaChi]
 DiaChiGroup = tuple[DiaChi, ...]
 AnchorResolver = DiaChi | AbsolutePositionResolver
-
-
-# ---------------------------------------------------------------------------
-# Grouping markers for declarative rule blocks
-# ---------------------------------------------------------------------------
-
-
-@dataclass(frozen=True)
-class SameSlot:
-    """Marker for multiple components that intentionally share one ring slot."""
-
-    component_ids: tuple[ComponentId, ...]
-
-
-# `Vong` accepts either a single component ID or a grouped same-slot marker.
-VongMember = ComponentId | SameSlot
-
-
-def same_slot(*component_ids: ComponentId) -> SameSlot:
-    """Build a same-slot marker for grouped ring declarations."""
-
-    if len(component_ids) < 2:
-        raise ValueError("same_slot requires at least 2 component ids")
-    return SameSlot(component_ids)
 
 
 # ---------------------------------------------------------------------------
@@ -99,11 +75,11 @@ class RelativePosition(Rule):
 class SamePosition(RelativePosition):
     """Rule to register a component at the same position as another component."""
 
-    def __init__(self, *, component_id: ComponentId, reference_id: ComponentId):
+    def __init__(self, component_id: ComponentId, reference_id: ComponentId):
         super().__init__(
             component_id=component_id,
             reference_id=reference_id,
-            transform=_offset_transform(0),
+            transform=lambda pos: pos,
         )
 
 
@@ -200,48 +176,6 @@ class FromAnchor(Rule):
         )
 
 
-class Vong(Rule):
-    """Register a circular sequence of components from one principal anchor.
-
-    `others` advances one DiaChi step at a time, clockwise from the principal
-    position.
-    A `same_slot(...)` entry means all listed components share that same step.
-    """
-
-    def __init__(
-        self,
-        principal_id: ComponentId,
-        principal_position_fn: AbsolutePositionResolver,
-        others: list[VongMember],
-    ):
-        self.principal_id = principal_id
-        self.principal_position_fn = principal_position_fn
-        self.others = others
-
-    def register_components(self, registry: PlacementRegistry):
-        registry.register_component_lazy(
-            self.principal_id,
-            AbsolutePositionSpec(self.principal_position_fn),
-        )
-        for idx, member in enumerate(self.others):
-            if isinstance(member, SameSlot):
-                anchor_id, *same_slot_ids = member.component_ids
-                registry.register_component_lazy(
-                    anchor_id,
-                    RelativePositionSpec(self.principal_id, _offset_transform(idx + 1)),
-                )
-                for component_id in same_slot_ids:
-                    registry.register_component_lazy(
-                        component_id,
-                        RelativePositionSpec(anchor_id, _offset_transform(0)),
-                    )
-            else:
-                registry.register_component_lazy(
-                    member,
-                    RelativePositionSpec(self.principal_id, _offset_transform(idx + 1)),
-                )
-
-
 class AbsolutePosition(Rule):
     """Rule to register a component at an absolute position."""
 
@@ -270,6 +204,100 @@ class DefinitivePosition(Rule):
             self.component_id,
             self.position,
         )
+
+
+class OffsetGroup(Rule):
+    """Register components at fixed offsets from an anchor."""
+
+    def __init__(
+        self,
+        anchor_id: ComponentId,
+        anchor_position_fn: AbsolutePositionResolver,
+        offsets: dict[ComponentId, int],
+    ):
+        self.anchor_id = anchor_id
+        self.anchor_position_fn = anchor_position_fn
+        self.offsets = offsets
+
+    def register_components(self, registry: PlacementRegistry):
+        registry.register_component_lazy(
+            self.anchor_id,
+            AbsolutePositionSpec(self.anchor_position_fn),
+        )
+        for component_id, offset in self.offsets.items():
+            registry.register_component_lazy(
+                component_id,
+                RelativePositionSpec(self.anchor_id, _offset_transform(offset)),
+            )
+
+
+VongMember = ComponentId | SamePosition
+
+
+class Vong(Rule):
+    """Register a circular sequence of components from one principal anchor.
+
+    `others` advances one DiaChi step at a time from the principal following
+    the specified direction.
+    """
+
+    class Direction(Enum):
+        CW = "cw"
+        CCW = "ccw"
+        VAN = "van"
+
+    def __init__(
+        self,
+        principal_id: ComponentId,
+        principal_position_fn: AbsolutePositionResolver,
+        others: list[VongMember],
+        direction: "Vong.Direction" = Direction.CW,
+    ):
+        self.principal_id = principal_id
+        self.principal_position_fn = principal_position_fn
+        self.others = others
+        self.direction = direction
+
+    def _member_offset_transform(self, offset: int) -> PositionTransform:
+        if self.direction is Vong.Direction.CW:
+            return move_with(_constant_step(offset), direction=CircleDirection.CW)
+        if self.direction is Vong.Direction.CCW:
+            return move_with(_constant_step(offset), direction=CircleDirection.CCW)
+        if self.direction is Vong.Direction.VAN:
+            return move_by_van_direction(_constant_step(offset))
+        raise ValueError(f"Invalid vong direction: {self.direction}")
+
+    def _register_vong_member(
+        self, registry: PlacementRegistry, member: VongMember, offset: int
+    ):
+        if isinstance(member, ComponentId):
+            registry.register_component_lazy(
+                member,
+                RelativePositionSpec(
+                    self.principal_id,
+                    self._member_offset_transform(offset),
+                ),
+            )
+        elif isinstance(member, SamePosition):
+            member.register_components(registry)
+            registry.register_component_lazy(
+                member.reference_id,
+                RelativePositionSpec(
+                    self.principal_id,
+                    self._member_offset_transform(offset),
+                ),
+            )
+        else:
+            raise ValueError(f"Invalid vong member type: {type(member)}")
+
+    def register_components(self, registry: PlacementRegistry):
+        registry.register_component_lazy(
+            self.principal_id,
+            AbsolutePositionSpec(self.principal_position_fn),
+        )
+        for idx, member in enumerate(self.others):
+            offset = idx + 1
+            self._register_vong_member(registry, member, offset)
 
 
 # ---------------------------------------------------------------------------
@@ -360,8 +388,8 @@ def position_by_dia_chi_groups(
 # ---------------------------------------------------------------------------
 
 
-def move_by_birth_dia_chi(
-    *, direction: CircleDirection, step_multiplier: int = 1
+def move_by_dia_chi(
+    direction: CircleDirection, step_multiplier: int = 1
 ) -> PositionTransform:
     return move_with(
         lambda context: context.prior.get_dia_chi().index,
@@ -371,7 +399,7 @@ def move_by_birth_dia_chi(
 
 
 def move_by_birth_hour(
-    *, direction: CircleDirection, step_multiplier: int = 1
+    direction: CircleDirection, step_multiplier: int = 1
 ) -> PositionTransform:
     return move_by_attr(
         "hour",
@@ -381,7 +409,7 @@ def move_by_birth_hour(
 
 
 def move_by_birth_month(
-    *, direction: CircleDirection, step_multiplier: int = 1
+    direction: CircleDirection, step_multiplier: int = 1
 ) -> PositionTransform:
     return move_with(
         lambda context: context.prior.month - 1,
@@ -431,18 +459,17 @@ def move_by_attr(
     )
 
 
-def offset_by(position: DiaChi, offset: int) -> DiaChi:
-    return position + offset
-
-
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
 
+def _constant_step(offset: int) -> ContextStepSelector:
+    return lambda _: offset
+
 
 def _offset_transform(offset: int) -> Callable[[DiaChi], DiaChi]:
     """Adapt a fixed offset into the simple one-argument transform shape."""
-    return lambda position: offset_by(position, offset)
+    return lambda position: position + offset
 
 
 def _get_prior_attr_steps(context: LaSoContext, attribute_name: str) -> int:

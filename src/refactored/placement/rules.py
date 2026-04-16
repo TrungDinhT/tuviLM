@@ -100,32 +100,36 @@ CHINH_TINH_RULES = [
 ]
 
 PHU_TINH_RULES = [
-    # Vong Loc Ton
+    # Vong Bac Si
     pp.Vong(
-        principal_id="loc_ton",
+        principal_id="bac_si",
         principal_position_fn=pp.loc_ton_position_fn,
         others=[
-            "kinh_duong",
+            "luc_si",
             "thanh_long",
-            pp.same_slot("tieu_hao", "ln_van_tinh"),
+            "tieu_hao",
             "tuong_quan",
-            pp.same_slot("tau_thu", "duong_phu"),
+            "tau_thu",
             "phi_liem",
             "hy_than",
-            pp.same_slot("benh_phu", "quoc_an"),
+            "benh_phu",
             "dai_hao",
             "phuc_binh",
-            pp.same_slot("da_la", "quan_phur"),
+            "quan_phur",
         ],
+        direction=pp.Vong.Direction.VAN,
     ),
-    pp.SamePosition(
-        component_id="bac_si",
-        reference_id="loc_ton",
-    ),
-    pp.RelativePosition(
-        component_id="luc_si",
-        reference_id="loc_ton",
-        transform=pp.move_by_van_direction(lambda _context: 1),
+    # Group Loc Ton
+    pp.OffsetGroup(
+        anchor_id="loc_ton",
+        anchor_position_fn=pp.loc_ton_position_fn,
+        offsets={
+            "kinh_duong": 1,
+            "da_la": -1,
+            "ln_van_tinh": 3,
+            "duong_phu": 5,
+            "quoc_an": 8,
+        },
     ),
 
     # Vong Thai Tue
@@ -133,15 +137,15 @@ PHU_TINH_RULES = [
         principal_id="thai_tue",
         principal_position_fn=pp.thai_tue_position_fn,
         others=[
-            pp.same_slot("thieu_duong", "thien_khong"),
+            pp.SamePosition("thieu_duong", "thien_khong"),
             "tang_mon",
             "thieu_am",
-            pp.same_slot("quan_phuf", "long_tri"),
-            pp.same_slot("tu_phu", "nguyet_duc"),
-            pp.same_slot("tue_pha", "thien_hu"),
+            pp.SamePosition("quan_phuf", "long_tri"),
+            pp.SamePosition("tu_phu", "nguyet_duc"),
+            pp.SamePosition("tue_pha", "thien_hu"),
             "long_duc",
             "bach_ho",
-            pp.same_slot("sao_phuc_duc", "thien_duc"),
+            pp.SamePosition("sao_phuc_duc", "thien_duc"),
             "dieu_khach",
             "truc_phu",
         ],
@@ -277,7 +281,7 @@ PHU_TINH_RULES = [
     pp.FromAnchor(
         component_id="thien_hi",
         anchor=DiaChi.DAU,
-        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CCW),
+        transform=pp.move_by_dia_chi(CircleDirection.CCW),
     ),
     pp.XungChieu(
         component_id="hong_loan",
@@ -286,7 +290,7 @@ PHU_TINH_RULES = [
     pp.FromAnchor(
         component_id="giai_than",
         anchor=DiaChi.TUAT,
-        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CCW),
+        transform=pp.move_by_dia_chi(CircleDirection.CCW),
     ),
     pp.SamePosition(
         component_id="phuong_cac",
@@ -295,7 +299,7 @@ PHU_TINH_RULES = [
     pp.FromAnchor(
         component_id="thien_khoc",
         anchor=DiaChi.NGO,
-        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CCW),
+        transform=pp.move_by_dia_chi(CircleDirection.CCW),
     ),
     pp.AbsolutePosition(
         component_id="thien_ma",
@@ -356,32 +360,32 @@ PHU_TINH_RULES = [
     pp.FromAnchor(
         component_id="ta_phu",
         anchor=DiaChi.THIN,
-        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+        transform=pp.move_by_birth_month(CircleDirection.CW),
     ),
     pp.FromAnchor(
         component_id="huu_bat",
         anchor=DiaChi.TUAT,
-        transform=pp.move_by_birth_month(direction=CircleDirection.CCW),
+        transform=pp.move_by_birth_month(CircleDirection.CCW),
     ),
     pp.FromAnchor(
         component_id="thien_giai",
         anchor=DiaChi.THAN,
-        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+        transform=pp.move_by_birth_month(CircleDirection.CW),
     ),
     pp.FromAnchor(
         component_id="dia_giai",
         anchor=DiaChi.MUI,
-        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+        transform=pp.move_by_birth_month(CircleDirection.CW),
     ),
     pp.FromAnchor(
         component_id="thien_hinh",
         anchor=DiaChi.DAU,
-        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+        transform=pp.move_by_birth_month(CircleDirection.CW),
     ),
     pp.FromAnchor(
         component_id="thien_dieu",
         anchor=DiaChi.SUU,
-        transform=pp.move_by_birth_month(direction=CircleDirection.CW),
+        transform=pp.move_by_birth_month(CircleDirection.CW),
     ),
     pp.SamePosition(
         component_id="thien_y",
@@ -426,32 +430,32 @@ PHU_TINH_RULES = [
     pp.FromAnchor(
         component_id="dia_khong",
         anchor=DiaChi.HOI,
-        transform=pp.move_by_birth_hour(direction=CircleDirection.CCW),
+        transform=pp.move_by_birth_hour(CircleDirection.CCW),
     ),
     pp.FromAnchor(
         component_id="dia_kiep",
         anchor=DiaChi.HOI,
-        transform=pp.move_by_birth_hour(direction=CircleDirection.CW),
+        transform=pp.move_by_birth_hour(CircleDirection.CW),
     ),
     pp.FromAnchor(
         component_id="van_xuong",
         anchor=DiaChi.TUAT,
-        transform=pp.move_by_birth_hour(direction=CircleDirection.CCW),
+        transform=pp.move_by_birth_hour(CircleDirection.CCW),
     ),
     pp.FromAnchor(
         component_id="van_khuc",
         anchor=DiaChi.THIN,
-        transform=pp.move_by_birth_hour(direction=CircleDirection.CW),
+        transform=pp.move_by_birth_hour(CircleDirection.CW),
     ),
     pp.FromAnchor(
         component_id="thai_phu",
         anchor=DiaChi.NGO,
-        transform=pp.move_by_birth_hour(direction=CircleDirection.CW),
+        transform=pp.move_by_birth_hour(CircleDirection.CW),
     ),
     pp.FromAnchor(
         component_id="phong_cao",
         anchor=DiaChi.DAN,
-        transform=pp.move_by_birth_hour(direction=CircleDirection.CW),
+        transform=pp.move_by_birth_hour(CircleDirection.CW),
     ),
 
     # An Dau Quan
@@ -496,12 +500,12 @@ PHU_TINH_RULES = [
     pp.RelativePosition(
         component_id="thien_tai",
         reference_id="menh",
-        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CW),
+        transform=pp.move_by_dia_chi(CircleDirection.CW),
     ),
     pp.RelativePosition(
         component_id="thien_tho",
         reference_id="than",
-        transform=pp.move_by_birth_dia_chi(direction=CircleDirection.CW),
+        transform=pp.move_by_dia_chi(CircleDirection.CW),
     ),
     pp.SamePosition(
         component_id="thien_su",
