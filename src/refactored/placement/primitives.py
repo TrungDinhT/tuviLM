@@ -338,6 +338,10 @@ class Circle(Rule):
 # ---------------------------------------------------------------------------
 
 
+def menh_position_fn(context: LaSoContext) -> DiaChi:
+    return context.menh_position
+
+
 def tuvi_position_fn(context: LaSoContext) -> DiaChi:
     """An Tử Vi khởi tại Dần, tính theo ngày sinh và cục số.
 

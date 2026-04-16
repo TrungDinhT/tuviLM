@@ -5,7 +5,7 @@ from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCa
 CUNG_RULES = [
     pp.Circle(
         principal_id="menh",
-        principal_position_fn=lambda context: context.menh_position,
+        principal_position_fn=pp.menh_position_fn,
         others=[
             "phu_mau",
             "phuc_duc",
