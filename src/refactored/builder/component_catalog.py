@@ -8,11 +8,13 @@ from pydantic import TypeAdapter
 from src.refactored.component import Component
 from src.refactored.component.cung import Cung
 from src.refactored.component.sao import Sao
+from src.refactored.component.tuan_triet import TuanTriet
 
 
 class ComponentCatalog:
     _cung_adapter = TypeAdapter(list[Cung])
     _sao_adapter = TypeAdapter(list[Sao])
+    _tuan_triet_adapter = TypeAdapter(list[TuanTriet])
 
     def __init__(self, catalog_dir: Path | None = None) -> None:
         self._catalog_dir = (
@@ -38,6 +40,8 @@ class ComponentCatalog:
             self._register(components, component)
         for component in self._load_saos():
             self._register(components, component)
+        for component in self._load_tuan_triet():
+            self._register(components, component)
 
         return components
 
@@ -48,6 +52,10 @@ class ComponentCatalog:
     def _load_saos(self) -> list[Sao]:
         raw_json = (self._catalog_dir / "sao.json").read_text(encoding="utf-8")
         return self._sao_adapter.validate_json(raw_json)
+
+    def _load_tuan_triet(self) -> list[TuanTriet]:
+        raw_json = (self._catalog_dir / "tuan_triet.json").read_text(encoding="utf-8")
+        return self._tuan_triet_adapter.validate_json(raw_json)
 
     def _register(self, components: dict[str, Component], component: Component) -> None:
         if component.id in components:

@@ -2,8 +2,16 @@ import datetime as dt
 
 import pytest
 
+from src.refactored.builder.component_catalog import get_default_catalog
 from src.refactored.builder.placement_builder import PlacementBuilder
-from src.refactored.placement.primitives import SamePosition, Circle
+from src.refactored.component.tuan_triet import TuanTriet
+from src.refactored.placement.primitives import (
+    Circle,
+    SamePosition,
+    TuanTrietPosition,
+    triet_positions_fn,
+    tuan_positions_fn,
+)
 from src.refactored.placement.rules import CHINH_TINH_RULES, PHU_TINH_RULES
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
@@ -13,6 +21,8 @@ from src.refactored.component.elementary import DiaChi
 from src.refactored.component.prior import Gender
 from src.tuvi.birth import BirthTime
 from src.tuvi.builder import Builder as LegacyBuilder
+from src.tuvi.constant import MAP_TRIET, MAP_TUAN
+from src.tuvi.element.types import LIST_DIA_CHI, LIST_THIEN_CAN
 
 
 CHINH_TINH_COMPONENT_IDS = {
@@ -129,6 +139,21 @@ LINH_HOA_COMPONENT_IDS = {
     "Linh Tinh": "linh_tinh",
 }
 
+TRANG_SINH_COMPONENT_IDS = {
+    "Tràng Sinh": "trang_sinh",
+    "Mộc Dục": "moc_duc",
+    "Quan Đới": "quan_doi",
+    "Lâm Quan": "lam_quan",
+    "Đế  Vương": "de_vuong",
+    "Suy": "suy",
+    "Bệnh": "benh",
+    "Tử": "tu",
+    "Mộ": "mo",
+    "Tuyệt": "tuyet",
+    "Thai": "thai",
+    "Dưỡng": "duong",
+}
+
 
 def _select_rules_by_component_ids(component_ids: set[str]):
     return [
@@ -164,6 +189,39 @@ def _build_legacy_phu_tinh_positions(
                 positions[component_id] = position
 
     return positions
+
+
+def _build_legacy_trang_sinh_positions(
+    time: dt.datetime, component_ids: dict[str, str]
+) -> dict[str, DiaChi]:
+    tinh_ban = LegacyBuilder().build(BirthTime.from_solar_day(time, "M"))
+    positions: dict[str, DiaChi] = {}
+
+    for dia_chi_text, cung in tinh_ban.map_cung.items():
+        position = DiaChi(dia_chi_text)
+        if cung.trang_sinh is None:
+            continue
+        component_id = component_ids.get(cung.trang_sinh.name)
+        if component_id is not None:
+            positions[component_id] = position
+
+    return positions
+
+
+def _legacy_tuan_triet_expected(time: dt.datetime, gender: Gender) -> dict[str, DiaChi]:
+    g = "M" if gender == Gender.MALE else "F"
+    bt = BirthTime.from_solar_day(time, g)
+    triet_names = MAP_TRIET[bt.thien_can]
+    tuan_key = LIST_DIA_CHI[
+        (LIST_DIA_CHI.index(bt.dia_chi) - LIST_THIEN_CAN.index(bt.thien_can)) % 12
+    ]
+    tuan_names = MAP_TUAN[tuan_key]
+    return {
+        "triet_1": DiaChi(triet_names[0]),
+        "triet_2": DiaChi(triet_names[1]),
+        "tuan_1": DiaChi(tuan_names[0]),
+        "tuan_2": DiaChi(tuan_names[1]),
+    }
 
 
 def test_builder_resolves_chained_specs_in_any_order():
@@ -327,6 +385,59 @@ def test_builder_resolves_loc_ton_ring_like_legacy_builder():
     assert positions["tau_thu"] == positions["duong_phu"]
     assert positions["benh_phu"] == positions["quoc_an"]
     assert positions["da_la"] == positions["quan_phur"]
+
+
+def test_builder_resolves_trang_sinh_circle_like_legacy_builder():
+    time = dt.datetime(1996, 12, 19, 6, 30)
+    builder = PlacementBuilder(time, Gender.MALE)
+    trang_sinh_rule = next(
+        rule for rule in PHU_TINH_RULES if getattr(rule, "principal_id", "") == "trang_sinh"
+    )
+    builder.register_rules([trang_sinh_rule])
+
+    positions = builder.resolve_all()
+    legacy_positions = _build_legacy_trang_sinh_positions(time, TRANG_SINH_COMPONENT_IDS)
+
+    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
+        legacy_positions
+    )
+
+
+def test_catalog_loads_tuan_triet_entries():
+    catalog = get_default_catalog()
+    t1 = catalog.get("tuan_1")
+    assert isinstance(t1, TuanTriet)
+    assert t1.name == "Tuần"
+    assert catalog.get("triet_1").name == "Triệt"
+
+
+def test_builder_resolves_tuan_triet_like_legacy_maps():
+    time = dt.datetime(1996, 12, 19, 6, 30)
+    gender = Gender.MALE
+    expected = _legacy_tuan_triet_expected(time, gender)
+
+    builder = PlacementBuilder(time, gender)
+    builder.register_rules(
+        [
+            TuanTrietPosition(
+                pair_ids=("triet_1", "triet_2"),
+                pair_position_fn=triet_positions_fn,
+            ),
+            TuanTrietPosition(
+                pair_ids=("tuan_1", "tuan_2"),
+                pair_position_fn=tuan_positions_fn,
+            ),
+        ]
+    )
+    builder.resolve_pending()
+
+    for component_id, dia_chi in expected.items():
+        assert builder.get_or_resolve_position(component_id) == dia_chi
+
+
+def test_phu_tinh_rules_include_tuan_triet_position_rules():
+    tuan_triet_rules = [r for r in PHU_TINH_RULES if isinstance(r, TuanTrietPosition)]
+    assert len(tuan_triet_rules) == 2
 
 
 def test_builder_resolves_month_rules_like_legacy_builder():

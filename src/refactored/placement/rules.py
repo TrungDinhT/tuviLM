@@ -150,6 +150,25 @@ PHU_TINH_RULES = [
             "truc_phu",
         ],
     ),
+    # Vong Trang Sinh
+    pp.Circle(
+        principal_id="trang_sinh",
+        principal_position_fn=pp.trang_sinh_position_fn,
+        others=[
+            "moc_duc",
+            "quan_doi",
+            "lam_quan",
+            "de_vuong",
+            "suy",
+            "benh",
+            "tu",
+            "mo",
+            "tuyet",
+            "thai",
+            "duong",
+        ],
+        direction=pp.Circle.Direction.VAN,
+    ),
 
     # An theo thien can
     pp.AbsolutePosition(
@@ -514,6 +533,16 @@ PHU_TINH_RULES = [
     pp.SamePosition(
         component_id="thien_thuong",
         reference_id="no_boc",
+    ),
+
+    # Tuan, Triet
+    pp.TuanTrietPosition(
+        pair_ids=("triet_1", "triet_2"),
+        pair_position_fn=pp.triet_positions_fn,
+    ),
+    pp.TuanTrietPosition(
+        pair_ids=("tuan_1", "tuan_2"),
+        pair_position_fn=pp.tuan_positions_fn,
     ),
 
     # Thien La, Dia Vong

@@ -477,5 +477,53 @@
     "id": "dia_vong",
     "name": "Địa Võng",
     "ngu_hanh": "Kim"
+  },
+  {
+    "id": "trang_sinh",
+    "name": "Tràng Sinh"
+  },
+  {
+    "id": "moc_duc",
+    "name": "Mộc Dục"
+  },
+  {
+    "id": "quan_doi",
+    "name": "Quan Đới"
+  },
+  {
+    "id": "lam_quan",
+    "name": "Lâm Quan"
+  },
+  {
+    "id": "de_vuong",
+    "name": "Đế Vượng"
+  },
+  {
+    "id": "suy",
+    "name": "Suy"
+  },
+  {
+    "id": "benh",
+    "name": "Bệnh"
+  },
+  {
+    "id": "tu",
+    "name": "Tử"
+  },
+  {
+    "id": "mo",
+    "name": "Mộ"
+  },
+  {
+    "id": "tuyet",
+    "name": "Tuyệt"
+  },
+  {
+    "id": "thai",
+    "name": "Thai"
+  },
+  {
+    "id": "duong",
+    "name": "Dưỡng"
   }
 ]

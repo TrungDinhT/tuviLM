@@ -14,6 +14,7 @@ from src.refactored.component.elementary import (
     CircleDirection,
     DiaChi,
     IndexedEnumMixin,
+    NguHanh,
     ThienCan,
 )
 from src.refactored.component.prior import LaSoContext
@@ -38,6 +39,7 @@ ContextStepSelector = Callable[[LaSoContext], int]
 ThienCanPositionMap = Mapping[ThienCan, DiaChi]
 DiaChiGroup = tuple[DiaChi, ...]
 AnchorResolver = DiaChi | AbsolutePositionResolver
+PairPositionResolver = Callable[[LaSoContext], tuple[DiaChi, DiaChi]]
 
 
 # ---------------------------------------------------------------------------
@@ -189,6 +191,37 @@ class AbsolutePosition(Rule):
         registry.register_component_lazy(
             self.component_id,
             AbsolutePositionSpec(self.position_fn),
+        )
+
+
+class TuanTrietPosition(Rule):
+    """Register two component ids that share one pair-position computation."""
+
+    def __init__(
+        self,
+        *,
+        pair_ids: tuple[ComponentId, ComponentId],
+        pair_position_fn: PairPositionResolver,
+    ):
+        self.pair_ids = pair_ids
+        self.pair_position_fn = pair_position_fn
+
+    def register_components(self, registry: PlacementRegistry):
+        cache: list[tuple[DiaChi, DiaChi] | None] = [None]
+
+        def _pair(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
+            if cache[0] is None:
+                cache[0] = self.pair_position_fn(context)
+            return cache[0]
+
+        first_id, second_id = self.pair_ids
+        registry.register_component_lazy(
+            first_id,
+            AbsolutePositionSpec(lambda ctx: _pair(ctx)[0]),
+        )
+        registry.register_component_lazy(
+            second_id,
+            AbsolutePositionSpec(lambda ctx: _pair(ctx)[1]),
         )
 
 
@@ -355,6 +388,49 @@ def dau_quan_position_fn(context: LaSoContext) -> DiaChi:
     """Đẩu Quân an từ Địa Chi năm sinh, lùi theo tháng rồi tiến theo giờ."""
     month_position = context.prior.get_dia_chi() - (context.prior.month - 1)
     return month_position + context.prior.hour.index
+
+
+def trang_sinh_position_fn(context: LaSoContext) -> DiaChi:
+    """Tràng Sinh anchor by cục ngũ hành."""
+    return {
+        NguHanh.KIM: DiaChi.TI,
+        NguHanh.MOC: DiaChi.HOI,
+        NguHanh.HOA: DiaChi.DAN,
+        NguHanh.THO: DiaChi.THAN,
+        NguHanh.THUY: DiaChi.THAN,
+    }[context.cuc.ngu_hanh]
+
+
+def triet_positions_fn(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
+    """Two Triệt positions from year Thiên Can (legacy MAP_TRIET)."""
+    _TRIET_POSITIONS: dict[ThienCan, tuple[DiaChi, DiaChi]] = {
+        ThienCan.GIAP: (DiaChi.THAN, DiaChi.DAU),
+        ThienCan.AT: (DiaChi.NGO, DiaChi.MUI),
+        ThienCan.BINH: (DiaChi.THIN, DiaChi.TI),
+        ThienCan.DINH: (DiaChi.DAN, DiaChi.MEO),
+        ThienCan.MAU: (DiaChi.TY, DiaChi.SUU),
+        ThienCan.KY: (DiaChi.THAN, DiaChi.DAU),
+        ThienCan.CANH: (DiaChi.NGO, DiaChi.MUI),
+        ThienCan.TAN: (DiaChi.THIN, DiaChi.TI),
+        ThienCan.NHAM: (DiaChi.DAN, DiaChi.MEO),
+        ThienCan.QUY: (DiaChi.TY, DiaChi.SUU),
+    }
+    return _TRIET_POSITIONS[context.prior.get_thien_can()]
+
+
+def tuan_positions_fn(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
+    """Two Tuần positions from (year Địa Chi index − year Thiên Can index) mod 12."""
+    _TUAN_POSITIONS: dict[DiaChi, tuple[DiaChi, DiaChi]] = {
+        DiaChi.TY: (DiaChi.TUAT, DiaChi.HOI),
+        DiaChi.DAN: (DiaChi.TY, DiaChi.SUU),
+        DiaChi.THIN: (DiaChi.DAN, DiaChi.MEO),
+        DiaChi.NGO: (DiaChi.THIN, DiaChi.TI),
+        DiaChi.THAN: (DiaChi.NGO, DiaChi.MUI),
+        DiaChi.TUAT: (DiaChi.THAN, DiaChi.DAU),
+    }
+    dia_chi = context.prior.get_dia_chi()
+    thien_can_index = context.prior.get_thien_can().index
+    return _TUAN_POSITIONS[dia_chi - thien_can_index]
 
 
 def position_by_thien_can(
