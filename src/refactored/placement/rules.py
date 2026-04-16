@@ -3,7 +3,7 @@ from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCa
 
 
 CUNG_RULES = [
-    pp.Vong(
+    pp.Circle(
         principal_id="menh",
         principal_position_fn=lambda context: context.menh_position,
         others=[
@@ -101,7 +101,7 @@ CHINH_TINH_RULES = [
 
 PHU_TINH_RULES = [
     # Vong Bac Si
-    pp.Vong(
+    pp.Circle(
         principal_id="bac_si",
         principal_position_fn=pp.loc_ton_position_fn,
         others=[
@@ -117,7 +117,7 @@ PHU_TINH_RULES = [
             "phuc_binh",
             "quan_phur",
         ],
-        direction=pp.Vong.Direction.VAN,
+        direction=pp.Circle.Direction.VAN,
     ),
     # Group Loc Ton
     pp.OffsetGroup(
@@ -133,7 +133,7 @@ PHU_TINH_RULES = [
     ),
 
     # Vong Thai Tue
-    pp.Vong(
+    pp.Circle(
         principal_id="thai_tue",
         principal_position_fn=pp.thai_tue_position_fn,
         others=[

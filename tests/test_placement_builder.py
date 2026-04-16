@@ -3,7 +3,7 @@ import datetime as dt
 import pytest
 
 from src.refactored.builder.placement_builder import PlacementBuilder
-from src.refactored.placement.primitives import SamePosition, Vong
+from src.refactored.placement.primitives import SamePosition, Circle
 from src.refactored.placement.rules import CHINH_TINH_RULES, PHU_TINH_RULES
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
@@ -196,7 +196,7 @@ def test_builder_resolves_chained_specs_in_any_order():
 def test_vong_supports_same_position_groups():
     builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
     rules = [
-        Vong(
+        Circle(
             principal_id="anchor",
             principal_position_fn=lambda _context: DiaChi.DAN,
             others=[
@@ -218,10 +218,10 @@ def test_vong_supports_same_position_groups():
 def test_vong_can_follow_van_direction():
     builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.FEMALE)
     rules = [
-        Vong(
+        Circle(
             principal_id="anchor",
             principal_position_fn=lambda _context: DiaChi.DAN,
-            direction=Vong.Direction.VAN,
+            direction=Circle.Direction.VAN,
             others=[
                 "slot_one",
                 SamePosition("slot_two_a", "slot_two_b"),

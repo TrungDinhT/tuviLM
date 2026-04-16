@@ -231,10 +231,10 @@ class OffsetGroup(Rule):
             )
 
 
-VongMember = ComponentId | SamePosition
+CircleMember = ComponentId | SamePosition
 
 
-class Vong(Rule):
+class Circle(Rule):
     """Register a circular sequence of components from one principal anchor.
 
     `others` advances one DiaChi step at a time from the principal following
@@ -250,8 +250,8 @@ class Vong(Rule):
         self,
         principal_id: ComponentId,
         principal_position_fn: AbsolutePositionResolver,
-        others: list[VongMember],
-        direction: "Vong.Direction" = Direction.CW,
+        others: list[CircleMember],
+        direction: "Circle.Direction" = Direction.CW,
     ):
         self.principal_id = principal_id
         self.principal_position_fn = principal_position_fn
@@ -259,16 +259,16 @@ class Vong(Rule):
         self.direction = direction
 
     def _member_offset_transform(self, offset: int) -> PositionTransform:
-        if self.direction is Vong.Direction.CW:
+        if self.direction is Circle.Direction.CW:
             return move_with(_constant_step(offset), direction=CircleDirection.CW)
-        if self.direction is Vong.Direction.CCW:
+        if self.direction is Circle.Direction.CCW:
             return move_with(_constant_step(offset), direction=CircleDirection.CCW)
-        if self.direction is Vong.Direction.VAN:
+        if self.direction is Circle.Direction.VAN:
             return move_by_van_direction(_constant_step(offset))
         raise ValueError(f"Invalid vong direction: {self.direction}")
 
     def _register_vong_member(
-        self, registry: PlacementRegistry, member: VongMember, offset: int
+        self, registry: PlacementRegistry, member: CircleMember, offset: int
     ):
         if isinstance(member, ComponentId):
             registry.register_component_lazy(
