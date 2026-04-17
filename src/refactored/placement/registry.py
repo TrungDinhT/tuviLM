@@ -7,6 +7,8 @@ from src.refactored.component.prior import LaSoContext
 
 ComponentId = str
 
+ContextReferenceResolver = Callable[[LaSoContext], ComponentId]
+
 
 SimplePositionTransform = Callable[[DiaChi], DiaChi]
 RelativePositionTransform = Callable[[DiaChi, LaSoContext], DiaChi]
@@ -56,7 +58,25 @@ class RelativePositionSpec:
         )
 
 
-PositionSpec = AbsolutePositionSpec | RelativePositionSpec
+@dataclass(frozen=True)
+class DynamicRelativePositionSpec:
+    """Spec for a position derived from another component chosen at resolve time."""
+
+    reference_id_fn: ContextReferenceResolver
+    transform: RelativePositionTransform = field(repr=False)
+
+    def __init__(
+        self, reference_id_fn: ContextReferenceResolver, transform: PositionTransform
+    ) -> None:
+        object.__setattr__(self, "reference_id_fn", reference_id_fn)
+        object.__setattr__(
+            self,
+            "transform",
+            normalize_position_transform(transform),
+        )
+
+
+PositionSpec = AbsolutePositionSpec | RelativePositionSpec | DynamicRelativePositionSpec
 
 
 class PlacementRegistry(Protocol):

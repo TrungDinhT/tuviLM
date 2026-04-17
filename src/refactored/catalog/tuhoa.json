@@ -1,0 +1,22 @@
+[
+  {
+    "id": "hoa_loc",
+    "name": "Hóa Lộc",
+    "ngu_hanh": "Thổ"
+  },
+  {
+    "id": "hoa_quyen",
+    "name": "Hóa Quyền",
+    "ngu_hanh": "Mộc"
+  },
+  {
+    "id": "hoa_khoa",
+    "name": "Hóa Khoa",
+    "ngu_hanh": "Thủy"
+  },
+  {
+    "id": "hoa_ky",
+    "name": "Hóa Kỵ",
+    "ngu_hanh": "Thủy"
+  }
+]

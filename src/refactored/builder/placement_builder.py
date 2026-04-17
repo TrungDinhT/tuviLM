@@ -3,6 +3,7 @@ import datetime as dt
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
     ComponentId,
+    DynamicRelativePositionSpec,
     PlacementRegistry,
     PositionSpec,
     RelativePositionSpec,
@@ -66,6 +67,10 @@ class PlacementBuilder(PlacementRegistry):
             spec = self._position_specs[component_id]
             if isinstance(spec, RelativePositionSpec):
                 reference_position = self.get_or_resolve_position(spec.reference_id)
+                position = spec.transform(reference_position, self._la_so_context)
+            elif isinstance(spec, DynamicRelativePositionSpec):
+                reference_id = spec.reference_id_fn(self._la_so_context)
+                reference_position = self.get_or_resolve_position(reference_id)
                 position = spec.transform(reference_position, self._la_so_context)
             elif isinstance(spec, AbsolutePositionSpec):
                 position = spec.position_fn(self._la_so_context)

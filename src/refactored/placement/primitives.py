@@ -8,7 +8,7 @@ This module is organized in four layers:
 """
 
 from enum import Enum
-from typing import Callable, Mapping, Protocol
+from typing import Callable, Literal, Mapping, Protocol
 
 from src.refactored.component.elementary import (
     CircleDirection,
@@ -22,6 +22,7 @@ from src.refactored.placement.registry import (
     AbsolutePositionResolver,
     AbsolutePositionSpec,
     ComponentId,
+    DynamicRelativePositionSpec,
     PlacementRegistry,
     PositionTransform,
     RelativePositionSpec,
@@ -40,6 +41,14 @@ ThienCanPositionMap = Mapping[ThienCan, DiaChi]
 DiaChiGroup = tuple[DiaChi, ...]
 AnchorResolver = DiaChi | AbsolutePositionResolver
 PairPositionResolver = Callable[[LaSoContext], tuple[DiaChi, DiaChi]]
+
+TuHoaEntity = Literal["hoa_loc", "hoa_quyen", "hoa_khoa", "hoa_ky"]
+TUHOA_ENTITIES: tuple[TuHoaEntity, ...] = (
+    "hoa_loc",
+    "hoa_quyen",
+    "hoa_khoa",
+    "hoa_ky",
+)
 
 
 # ---------------------------------------------------------------------------
@@ -81,7 +90,7 @@ class SamePosition(RelativePosition):
         super().__init__(
             component_id=component_id,
             reference_id=reference_id,
-            transform=lambda pos: pos,
+            transform=_same_position,
         )
 
 
@@ -223,6 +232,46 @@ class TuanTrietPosition(Rule):
             second_id,
             AbsolutePositionSpec(lambda ctx: _pair(ctx)[1]),
         )
+
+
+class TuHoaPosition(Rule):
+    """Register all four Tứ Hóa positions from one Thiên Can → target sao table."""
+
+    def __init__(
+        self, *, mapping: dict[ThienCan, dict[TuHoaEntity, ComponentId]]
+    ) -> None:
+        self._validate(mapping)
+        self.mapping = mapping
+
+    def register_components(self, registry: PlacementRegistry):
+        for entity in TUHOA_ENTITIES:
+            registry.register_component_lazy(
+                entity,
+                DynamicRelativePositionSpec(
+                    reference_id_fn=lambda ctx, e=entity: self.mapping[
+                        ctx.prior.get_thien_can()
+                    ][e],
+                    transform=_same_position,
+                ),
+            )
+
+    @staticmethod
+    def _validate(mapping: dict[ThienCan, dict[TuHoaEntity, ComponentId]]) -> None:
+        for thien_can in ThienCan:
+            if thien_can not in mapping:
+                raise ValueError(f"Missing Tứ Hóa mapping for {thien_can!r}")
+            entities = mapping[thien_can]
+            for entity in TUHOA_ENTITIES:
+                if entity not in entities:
+                    raise ValueError(
+                        f"Missing `{entity}` for {thien_can!r} in Tứ Hóa mapping."
+                    )
+                target = entities[entity]
+                if target in TUHOA_ENTITIES:
+                    raise ValueError(
+                        "Tứ Hóa target cannot be another Tứ Hóa entity: "
+                        f"{target!r} for {thien_can!r} `{entity}`"
+                    )
 
 
 class DefinitivePosition(Rule):
@@ -550,6 +599,10 @@ def _constant_step(offset: int) -> ContextStepSelector:
 def _offset_transform(offset: int) -> Callable[[DiaChi], DiaChi]:
     """Adapt a fixed offset into the simple one-argument transform shape."""
     return lambda position: position + offset
+
+
+def _same_position(position: DiaChi) -> DiaChi:
+    return position
 
 
 def _get_prior_attr_steps(context: LaSoContext, attribute_name: str) -> int:

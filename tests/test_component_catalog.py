@@ -1,7 +1,7 @@
 from src.refactored.builder.component_catalog import get_default_catalog
 from src.refactored.component.cung import Cung, Role
 from src.refactored.component.elementary import NguHanh
-from src.refactored.component.sao import Sao
+from src.refactored.component.sao import Sao, TuHoa
 
 
 def test_default_catalog_loads_cung_and_sao_components():
@@ -17,6 +17,10 @@ def test_default_catalog_loads_cung_and_sao_components():
     dia_khong = catalog.get("dia_khong")
     tu_vi = catalog.get("tu_vi")
     loc_ton = catalog.get("loc_ton")
+    hoa_loc = catalog.get("hoa_loc")
+    hoa_quyen = catalog.get("hoa_quyen")
+    hoa_khoa = catalog.get("hoa_khoa")
+    hoa_ky = catalog.get("hoa_ky")
 
     assert isinstance(menh, Cung)
     assert menh.id == "menh"
@@ -77,6 +81,26 @@ def test_default_catalog_loads_cung_and_sao_components():
     assert loc_ton.name == "Lộc Tồn"
     assert loc_ton.ngu_hanh == NguHanh.THO
     assert loc_ton.is_chinh_tinh is False
+
+    assert isinstance(hoa_loc, TuHoa)
+    assert hoa_loc.id == "hoa_loc"
+    assert hoa_loc.name == "Hóa Lộc"
+    assert hoa_loc.ngu_hanh == NguHanh.THO
+
+    assert isinstance(hoa_quyen, TuHoa)
+    assert hoa_quyen.id == "hoa_quyen"
+    assert hoa_quyen.name == "Hóa Quyền"
+    assert hoa_quyen.ngu_hanh == NguHanh.MOC
+
+    assert isinstance(hoa_khoa, TuHoa)
+    assert hoa_khoa.id == "hoa_khoa"
+    assert hoa_khoa.name == "Hóa Khoa"
+    assert hoa_khoa.ngu_hanh == NguHanh.THUY
+
+    assert isinstance(hoa_ky, TuHoa)
+    assert hoa_ky.id == "hoa_ky"
+    assert hoa_ky.name == "Hóa Kỵ"
+    assert hoa_ky.ngu_hanh == NguHanh.THUY
 
 
 def test_default_catalog_get_many_preserves_requested_order():

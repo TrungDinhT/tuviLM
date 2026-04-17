@@ -12,13 +12,20 @@ from src.refactored.placement.primitives import (
     triet_positions_fn,
     tuan_positions_fn,
 )
-from src.refactored.placement.rules import CHINH_TINH_RULES, PHU_TINH_RULES
+from src.refactored.placement.rules import (
+    CHINH_TINH_RULES,
+    CUNG_RULES,
+    PHU_TINH_RULES,
+    TU_HOA_RULES,
+    TU_HOA_TARGET_BY_THIEN_CAN,
+)
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
+    DynamicRelativePositionSpec,
     RelativePositionSpec,
 )
 from src.refactored.component.elementary import DiaChi
-from src.refactored.component.prior import Gender
+from src.refactored.component.prior import Gender, LaSoPrior
 from src.tuvi.birth import BirthTime
 from src.tuvi.builder import Builder as LegacyBuilder
 from src.tuvi.constant import MAP_TRIET, MAP_TUAN
@@ -139,6 +146,13 @@ LINH_HOA_COMPONENT_IDS = {
     "Linh Tinh": "linh_tinh",
 }
 
+TUHOA_COMPONENT_IDS = {
+    "Hóa Lộc": "hoa_loc",
+    "Hóa Quyền": "hoa_quyen",
+    "Hóa Khoa": "hoa_khoa",
+    "Hóa Kỵ": "hoa_ky",
+}
+
 TRANG_SINH_COMPONENT_IDS = {
     "Tràng Sinh": "trang_sinh",
     "Mộc Dục": "moc_duc",
@@ -188,6 +202,17 @@ def _build_legacy_phu_tinh_positions(
             if component_id is not None:
                 positions[component_id] = position
 
+    return positions
+
+
+def _build_legacy_tuhoa_positions(time: dt.datetime) -> dict[str, DiaChi]:
+    tinh_ban = LegacyBuilder().build(BirthTime.from_solar_day(time, "M"))
+    positions: dict[str, DiaChi] = {}
+    for dia_chi_text, cung in tinh_ban.map_cung.items():
+        position = DiaChi(dia_chi_text)
+        for tuhoa in cung.tuhoa:
+            component_id = TUHOA_COMPONENT_IDS[tuhoa.name]
+            positions[component_id] = position
     return positions
 
 
@@ -533,3 +558,68 @@ def test_builder_resolves_linh_hoa_rules_like_legacy_builder():
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
         legacy_positions
     )
+
+
+def test_dynamic_relative_position_spec_resolves():
+    time = dt.datetime(1996, 12, 19, 6, 30)
+    prior = LaSoPrior.from_solar_day(time, Gender.MALE)
+    builder = PlacementBuilder(time, Gender.MALE)
+    builder.register_component_lazy(
+        "ref",
+        AbsolutePositionSpec(lambda _ctx: DiaChi.THIN),
+    )
+    builder.register_component_lazy(
+        "child",
+        DynamicRelativePositionSpec(
+            reference_id_fn=lambda _ctx: "ref",
+            transform=lambda pos: pos,
+        ),
+    )
+    builder.register_component_lazy(
+        "child_two_arg_transform",
+        DynamicRelativePositionSpec(
+            reference_id_fn=lambda _ctx: "ref",
+            transform=lambda pos, ctx: pos + ctx.prior.hour.index,
+        ),
+    )
+    builder.resolve_pending()
+
+    assert builder.get_or_resolve_position("child") == DiaChi.THIN
+    assert builder.get_or_resolve_position("child_two_arg_transform") == (
+        DiaChi.THIN + prior.hour.index
+    )
+
+
+def test_builder_resolves_tuhoa_like_legacy_builder():
+    time = dt.datetime(1996, 12, 19, 6, 30)
+    builder = PlacementBuilder(time, Gender.MALE)
+    builder.register_rules(
+        CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES + TU_HOA_RULES
+    )
+
+    positions = builder.resolve_all()
+    legacy_positions = _build_legacy_tuhoa_positions(time)
+
+    for hoa_id in ("hoa_loc", "hoa_quyen", "hoa_khoa", "hoa_ky"):
+        assert positions[hoa_id] == legacy_positions[hoa_id]
+
+
+def test_tuhoa_without_star_rules_raises_key_error():
+    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
+    builder.register_rules(TU_HOA_RULES)
+
+    with pytest.raises(KeyError):
+        builder.resolve_all()
+
+
+def test_tuhoa_targets_are_registered_components():
+    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
+    builder.register_rules(CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES)
+    resolved = builder.resolve_all()
+
+    for thien_can, entities in TU_HOA_TARGET_BY_THIEN_CAN.items():
+        for entity, target_id in entities.items():
+            assert target_id in resolved, (
+                f"Tứ Hóa target `{target_id}` for {thien_can} `{entity}` "
+                "is not produced by CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES"
+            )
