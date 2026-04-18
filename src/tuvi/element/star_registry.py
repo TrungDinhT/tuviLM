@@ -115,6 +115,7 @@ STAR_REGISTRY: dict[str, StarDefinition] = {
     "Trực Phù": StarDefinition(name="Trực Phù", elemental="Kim", star_type="phu_tinh"),
 }
 
+STAR_NAME = Literal[tuple(STAR_REGISTRY.keys())]
 
 def _get_star_definition(star_name: str) -> StarDefinition:
     if star_name not in STAR_REGISTRY:
