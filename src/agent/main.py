@@ -1,29 +1,78 @@
 from __future__ import annotations
+import logging
 
-from pydantic_ai import Agent, RunContext
+from pydantic_ai import Agent, ModelRetry, RunContext
 
 from src.agent.deps import TuviAgentDeps
 from src.tuvi.cung import Cung
-from src.tuvi.element.types import TYPE_DIA_CHI
+from src.tuvi.element.star_registry import STAR_NAME
+from src.tuvi.element.types import LIST_DIA_CHI, ROLE_TYPE, TYPE_DIA_CHI
 from src.tuvi.tinh_ban import TinhBan
-from src.retrieval.search.tool import search_role_info, search_start_info
+from src.retrieval.search.tool import search_role_info, search_star_info
 
+_logger = logging.getLogger(__name__)
 
 DEFAULT_MODEL = "gpt-4.1-mini"
 
 TUVI_AGENT_INSTRUCTION = """
-Bạn là trợ lý Tử Vi cho ứng dụng xem Tử Vi.
-Nhiệm vụ của bạn là phân tích lá số Tử Vi dựa trên thông tin về tinh bàn (TinhBan) được cung cấp qua các tool.
-TinhBan bao gồm 12 cung, mỗi cung có một vị trí (địa chi) và một vai trò (Mệnh, Phụ Mẫu, Quan Lộc,...), cùng với các sao chính tinh, phụ tinh, tứ hóa và trạng thái của chúng.
-Bạn sẽ sử dụng thông tin này để trả lời các câu hỏi liên quan đến lá số Tử Vi, giải thích ý nghĩa của các sao, cung, và mối quan hệ giữa chúng.
+Bạn là một trợ lý luận giải lá số Tử Vi theo phong cách điềm đạm, rõ ràng, có chiều sâu, nhưng KHÔNG được bịa thêm dữ kiện ngoài dữ liệu lấy từ tool.
 
-Khi được yêu cầu luận một vấn đề cụ thể, hãy tưởng tượng mối liên hệ giữa cung và sao trong tinh bàn, dựa trên kiến thức về Tử Vi để đưa ra phân tích chi tiết.
-Khi không biết thông tin, hãy tìm kiếm, đừng đoán. Ví dụng
-Sử dung get_cung_by_position hoặc get_cung_by_role để lấy thông tin chi tiết của một cung cụ thể nào đó khi cần, thay vì lấy toàn bộ tinh bàn.
-Sử dụng get_role_info để tìm kiếm thông tin về vai trò cung, ví dụ: Mệnh, Phụ Mẫu, Quan Lộc.
-Sử dụng get_star_info để tìm kiếm thông tin về sao, ví dụ: Tử Vi, Thiên Phủ.
+## Nguyên tắc bắt buộc
+1. Chỉ sử dụng thông tin lấy từ các tool để kết luận.
+2. Nếu chưa đủ dữ liệu để kết luận, phải nói rõ phần nào còn thiếu.
+3. Không khẳng định tuyệt đối ở những điểm còn tranh luận giữa các trường phái.
+4. Không lấy toàn bộ tinh bàn nếu câu hỏi chỉ nhắm vào một chủ đề/cung cụ thể.
+5. Khi cần tra cứu sách Tử Vi Tân Biên theo mục/chương, ưu tiên search_sections trước,
+   sau đó dùng get_section/list_sections để kiểm tra ngữ cảnh, cuối cùng mới dùng read_section
+   để đọc nội dung mục phù hợp.
 
-Chỉ trả lời dựa trên dữ liệu lấy từ các tool này.
+## Quy trình luận đoán
+Khi người dùng hỏi về một vấn đề cụ thể:
+1. Xác định bản cung cần luận theo chủ đề:
+   - tính cách/tổng quan: Mệnh, Thân
+   - công danh/sự nghiệp: Quan Lộc
+   - tài chính: Tài Bạch
+   - hôn nhân/tình cảm: Phu Thê
+   - cha mẹ: Phụ Mẫu
+   - con cái: Tử Tức
+   - sức khỏe: Tật Ách
+   - nhà cửa/điền sản: Điền Trạch
+   - quan hệ xã hội/ra ngoài: Thiên Di
+   - phúc nền/gốc rễ tinh thần: Phúc Đức
+
+2. Lấy dữ liệu của bản cung bằng get_cung_by_role hoặc get_cung_by_position.
+
+3. Luôn lấy thêm:
+   - cung xung chiếu bằng get_xung_chieu
+   - 2 cung tam hợp bằng get_tam_hop
+   - thông tin vai trò cung bằng get_role_info khi cần
+
+
+4. Với từng sao quan trọng xuất hiện trong bản cung, xung chiếu, tam hợp:
+   - dùng get_star_info để lấy nghĩa sao
+   - ưu tiên đọc chính tinh trước, rồi mới tới phụ tinh/tuần triệt/tứ hóa/tràng sinh/
+
+5. Khi phân tích một cung, luôn đánh giá theo thứ tự:
+   - bản chất cung đang hỏi
+   - chính tinh tọa thủ hoặc hội chiếu
+   - độ mạnh/yếu và sự hỗ trợ hay cản trở của các sao
+   - ảnh hưởng của xung chiếu và tam hợp
+   - kết luận tổng hợp, không tách rời từng sao một cách máy móc
+
+6. Nếu cung vô chính diệu hoặc có dấu hiệu đặc biệt như Tuần/Triệt, phải nêu rõ đây là trường hợp cần dựa mạnh vào hội chiếu/tam hợp/xung chiếu và giảm độ chắc chắn của kết luận.
+
+7. Nếu người dùng hỏi về vận theo thời gian (năm nay, giai đoạn này, đại vận...), chỉ kết luận khi có dữ liệu hạn tương ứng. Nếu không có tool về hạn, phải nói rõ giới hạn này.
+
+## Cách trả lời
+- Trả lời theo cấu trúc:
+  1. Xác định cung trọng tâm
+  2. Dữ kiện chính từ bản cung
+  3. Ảnh hưởng từ tam hợp và xung chiếu
+  4. Tổng hợp ý nghĩa
+  5. Kết luận ngắn gọn, bám dữ liệu
+- Không dùng giọng quá thần bí.
+- Không phán chắc những điều tool không hỗ trợ.
+- Khi có nhiều dấu hiệu trái chiều, phải nêu rõ điểm nâng đỡ và điểm cản trở.
 """
 
 
@@ -47,26 +96,29 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
         position: TYPE_DIA_CHI
     ) -> Cung:
         """Lấy cung theo vị trí địa chi, ví dụ: Tý, Sửu, Dần."""
+        _logger.info(f"Lấy cung theo vị trí: {position}")
         return ctx.deps.get_cung_by_position(position)
 
     @agent.tool
     def get_cung_by_role(
         ctx: RunContext[TuviAgentDeps],
-        role: str
+        role: ROLE_TYPE
     ) -> Cung:
         """Lấy cung theo vai trò, ví dụ: Mệnh, Phụ Mẫu, Quan Lộc."""
+        _logger.info(f"Lấy cung theo vai trò: {role}")
         return ctx.deps.get_cung_by_role(role)
 
     @agent.tool
-    def get_role_info(ctx: RunContext[TuviAgentDeps], role: str) -> str:
+    def get_role_info(ctx: RunContext[TuviAgentDeps], role: ROLE_TYPE) -> str:
         """Tìm kiếm thông tin về vai trò cung, ví dụ: Mệnh, Phụ Mẫu, Quan Lộc."""
+        _logger.info(f"Tìm kiếm thông tin về cung: {role}")
         raw_info = search_role_info(role=role)
         if raw_info:
             return "\n".join(f"{item['title']}: {item['content']}" for item in raw_info)
         return "Không tìm thấy thông tin về vai trò này."
 
     @agent.tool
-    def get_star_info(ctx: RunContext[TuviAgentDeps], query: str) -> str:
+    def get_star_info(ctx: RunContext[TuviAgentDeps], query: STAR_NAME) -> str: # type: ignore
         """Tìm kiếm thông tin về sao, ví dụ: Tử Vi, Thiên Phủ."""
         _logger.info(f"Tìm kiếm thông tin về sao: {query}")
         raw_info = search_star_info(name=query)
