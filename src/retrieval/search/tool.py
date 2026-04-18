@@ -4,7 +4,6 @@ from whoosh.qparser import MultifieldParser
 from src.retrieval.constant import WHOOSH_DIR
 
 def search(query: str, k: int = 10):
-    print(f"Searching for: '{query}'")
 
     results = []
 
