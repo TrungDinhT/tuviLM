@@ -3,6 +3,12 @@ import logging
 
 from pydantic_ai import Agent, ModelRetry, RunContext
 
+from src.agent.book_index import (
+    ListSectionsResult,
+    SearchSectionsResult,
+    SectionContent,
+    SectionMeta,
+)
 from src.agent.deps import TuviAgentDeps
 from src.tuvi.cung import Cung
 from src.tuvi.element.star_registry import STAR_NAME
@@ -125,6 +131,114 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
         if raw_info:
             return "\n".join(f"{item['title']}: {item['content']}" for item in raw_info)
         return "Không tìm thấy thông tin về sao này."
+
+    @agent.tool
+    def list_sections(
+        ctx: RunContext[TuviAgentDeps],
+        parent_id: str | None = None,
+        part_id: str | None = None,
+    ) -> ListSectionsResult:
+        """
+        List immediate child sections in the structured book.
+
+        Use parent_id=None to list top-level sections. If the book has multiple
+        parts, pass part_id such as "part_2", or pass parent_id="part_2" as a
+        shortcut. Returned ids are canonical ids that can be used by get_section
+        and read_section.
+        """
+        _logger.info(f"Liệt kê mục sách: parent_id={parent_id}, part_id={part_id}")
+        try:
+            book = ctx.deps.require_book()
+            sections = book.list_sections(parent_id=parent_id, part_id=part_id)
+            return ListSectionsResult(
+                sections=[book.get_meta(section.id) for section in sections]
+            )
+        except ValueError as exc:
+            raise ModelRetry(str(exc)) from exc
+
+    @agent.tool
+    def get_section(ctx: RunContext[TuviAgentDeps], section_id: str) -> SectionMeta:
+        """
+        Get metadata for one book section, including breadcrumb, summary, parent,
+        and immediate children.
+
+        Section ids may be canonical like "part_2/1.1". If a default part exists,
+        local ids such as "1.1" also work for that part.
+        """
+        _logger.info(f"Lấy metadata mục sách: {section_id}")
+        try:
+            return ctx.deps.require_book().get_meta(section_id)
+        except ValueError as exc:
+            raise ModelRetry(str(exc)) from exc
+
+    @agent.tool
+    def read_section(
+        ctx: RunContext[TuviAgentDeps],
+        section_id: str,
+        include_children: bool = False,
+        max_chars: int | None = 8000,
+    ) -> SectionContent:
+        """
+        Read the content of one book section.
+
+        Set include_children=True to append immediate child subsection content.
+        Use max_chars to keep long sections bounded.
+        """
+        _logger.info(
+            "Đọc mục sách: section_id=%s, include_children=%s, max_chars=%s",
+            section_id,
+            include_children,
+            max_chars,
+        )
+        try:
+            return ctx.deps.require_book().read_section(
+                section_id,
+                include_children=include_children,
+                max_chars=max_chars,
+            )
+        except ValueError as exc:
+            raise ModelRetry(str(exc)) from exc
+
+    @agent.tool
+    def search_sections(
+        ctx: RunContext[TuviAgentDeps],
+        query: str,
+        top_k: int = 5,
+    ) -> SearchSectionsResult:
+        """
+        Search section ids, titles, summaries, and partial content in the book.
+
+        This is the best first tool when the user asks about a doctrine, rule,
+        star combination, or section title from Tử Vi Tân Biên.
+        """
+        bounded_top_k = max(1, min(top_k, 20))
+        _logger.info(f"Tìm kiếm mục sách: query={query}, top_k={bounded_top_k}")
+        return SearchSectionsResult(
+            hits=ctx.deps.require_book().search_sections(query, top_k=bounded_top_k)
+        )
+
+    @agent.tool
+    def get_tam_hop(
+        ctx: RunContext[TuviAgentDeps],
+        position: TYPE_DIA_CHI
+    ) -> TYPE_DIA_CHI:
+        """Lấy cung tam hợp của một cung cụ thể."""
+        index = LIST_DIA_CHI.index(position)
+        tam_hop_index = ((index + 4) % 12, (index + 8) % 12)
+        tam_hop_position = (LIST_DIA_CHI[tam_hop_index[0]], LIST_DIA_CHI[tam_hop_index[1]])
+        return f"Cung tam hợp của {position} là {tam_hop_position}."
+
+
+    @agent.tool
+    def get_xung_chieu(
+        ctx: RunContext[TuviAgentDeps],
+        position: TYPE_DIA_CHI
+    ) -> TYPE_DIA_CHI:
+        """Lấy cung xung chiếu của một cung cụ thể."""
+        index = LIST_DIA_CHI.index(position)
+        xung_chieu_index = (index + 6) % 12
+        xung_chieu_position = LIST_DIA_CHI[xung_chieu_index]
+        return f"Cung xung chiếu của {position} là {xung_chieu_position}."
 
     return agent
 
