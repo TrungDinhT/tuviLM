@@ -25,6 +25,12 @@ from src.tuvi.birth import TuviTime
 from src.tuvi.builder import Builder
 from src.tuvi.tinh_ban import TinhBan
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s %(message)s",
+    force=True,
+)
+
 
 @dataclass(slots=True)
 class ApiState:
