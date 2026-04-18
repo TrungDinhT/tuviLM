@@ -2,7 +2,7 @@ import httpx
 from typing import Iterable
 
 from src.agent.prompt import CUNG_AGENT_INSTRUCTION
-from src.retrieval.search.tool import search_role_info, search_start_info, search_start_role_info
+from src.retrieval.search.tool import search_role_info, search_star_info
 from src.tuvi.cung import Cung
 from src.tuvi.tinh_ban import TinhBan
 from pydantic_ai import Agent
@@ -66,19 +66,19 @@ class CungAnalyzer:
 
         # Search main stars information
         for star in cung.chinhTinh:
-            documents.extend(self._format_docs(search_start_role_info(star.name, cung.role)))
+            documents.extend(self._format_docs(search_star_info(star.name)))
 
         # Search transformation stars information
         for tuhoa in cung.tuhoa:
-            documents.extend(self._format_docs(search_start_info(tuhoa.name)))
+            documents.extend(self._format_docs(search_star_info(tuhoa.name)))
 
         # Search longevity star information
         if cung.trang_sinh:
-            documents.extend(self._format_docs(search_start_info(cung.trang_sinh.name)))
+            documents.extend(self._format_docs(search_star_info(cung.trang_sinh.name)))
 
         # Search auxiliary stars information
         for star in cung.phuTinh:
-            documents.extend(self._format_docs(search_start_info(star.name)))
+            documents.extend(self._format_docs(search_star_info(star.name)))
 
         # De-duplicate while preserving order
         seen = set()
