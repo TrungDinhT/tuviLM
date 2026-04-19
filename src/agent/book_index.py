@@ -128,10 +128,13 @@ class SectionRecord:
 
 class SectionMeta(BaseModel):
     id: str = Field(
-        description="Canonical section id. Multi-part books use ids like 'part_2/1.1'."
+        description="Section id usable by the book tools, for example '1.1'."
     )
     local_id: str = Field(description="Section id inside its part, for example '1.1'.")
-    part_id: str | None = Field(default=None, description="Book part folder, if any.")
+    part_id: str | None = Field(
+        default=None,
+        description="Book part folder when it is not the default part.",
+    )
     title: str
     parent_id: str | None
     level: int
@@ -183,6 +186,27 @@ class BookIndex:
     @property
     def part_ids(self) -> list[str]:
         return sorted(self._part_ids, key=_part_sort_key)
+
+    def _default_part_id(self) -> str | None:
+        if self.default_part_id in self._part_ids:
+            return self.default_part_id
+        return None
+
+    def _public_section_id(self, section_id: str | None) -> str | None:
+        if section_id is None:
+            return None
+
+        default_part_id = self._default_part_id()
+        if default_part_id:
+            prefix = f"{default_part_id}/"
+            if section_id.startswith(prefix):
+                return section_id[len(prefix):]
+        return section_id
+
+    def _public_part_id(self, part_id: str | None) -> str | None:
+        if part_id == self._default_part_id():
+            return None
+        return part_id
 
     def _iter_section_files(self) -> list[tuple[Path, str | None]]:
         direct_files = [
@@ -341,8 +365,11 @@ class BookIndex:
             ]
             if len(default_candidates) == 1:
                 return self._sections_by_id[default_candidates[0]]
+        public_candidates = [
+            self._public_section_id(candidate) or candidate for candidate in candidates
+        ]
         raise ValueError(
-            f"Ambiguous section id '{section_id}'. Use one of: {', '.join(candidates)}"
+            f"Ambiguous section id '{section_id}'. Use one of: {', '.join(public_candidates)}"
         )
 
     def list_sections(
@@ -356,6 +383,8 @@ class BookIndex:
             parent_id = None
 
         if parent_id is None:
+            if part_id is None:
+                part_id = self._default_part_id()
             top_level = [
                 section for section in self._sections_by_id.values()
                 if section.parent_id is None
@@ -376,7 +405,7 @@ class BookIndex:
             parts.append(f"{current.local_id} {current.title}")
             current_id = current.parent_id
 
-        if record.part_id:
+        if record.part_id and record.part_id != self._default_part_id():
             parts.append(record.part_id)
 
         return " > ".join(reversed(parts))
@@ -384,14 +413,17 @@ class BookIndex:
     def get_meta(self, section_id: str) -> SectionMeta:
         record = self.get_record(section_id)
         return SectionMeta(
-            id=record.id,
+            id=self._public_section_id(record.id) or record.id,
             local_id=record.local_id,
-            part_id=record.part_id,
+            part_id=self._public_part_id(record.part_id),
             title=record.title,
-            parent_id=record.parent_id,
+            parent_id=self._public_section_id(record.parent_id),
             level=record.level,
             breadcrumb=self.breadcrumb(record.id),
-            children=record.children_ids,
+            children=[
+                self._public_section_id(child_id) or child_id
+                for child_id in record.children_ids
+            ],
             summary=record.summary,
         )
 
@@ -416,9 +448,9 @@ class BookIndex:
             content = content[: max_chars - 3].rstrip() + "..."
 
         return SectionContent(
-            id=record.id,
+            id=self._public_section_id(record.id) or record.id,
             local_id=record.local_id,
-            part_id=record.part_id,
+            part_id=self._public_part_id(record.part_id),
             title=record.title,
             breadcrumb=self.breadcrumb(record.id),
             content=content,
@@ -429,9 +461,14 @@ class BookIndex:
         query_tokens = set(re.findall(r"\w+", query_norm))
 
         hits: list[SectionSearchHit] = []
+        default_part_id = self._default_part_id()
 
         for record in self._sections_by_id.values():
-            hay_id = _normalize_text(record.id)
+            if default_part_id and record.part_id != default_part_id:
+                continue
+
+            public_id = self._public_section_id(record.id) or record.id
+            hay_id = _normalize_text(public_id)
             hay_local_id = _normalize_text(record.local_id)
             hay_title = _normalize_text(record.title)
             hay_summary = _normalize_text(record.summary)
@@ -463,9 +500,9 @@ class BookIndex:
             if score > 0:
                 hits.append(
                     SectionSearchHit(
-                        id=record.id,
+                        id=public_id,
                         local_id=record.local_id,
-                        part_id=record.part_id,
+                        part_id=self._public_part_id(record.part_id),
                         title=record.title,
                         breadcrumb=self.breadcrumb(record.id),
                         score=round(score, 3),

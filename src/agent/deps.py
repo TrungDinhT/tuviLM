@@ -52,7 +52,7 @@ class TuviAgentDeps:
             )
         return tinh_ban.map_cung[normalized_position].to_detail()
 
-    def get_cung_by_role(self, role: str) -> Cung:
+    def get_cung_by_role(self, role: str) -> str:
         tinh_ban = self.require_tinh_ban()
         normalized_role = role.strip()
         position = tinh_ban.get_role_position(normalized_role)
