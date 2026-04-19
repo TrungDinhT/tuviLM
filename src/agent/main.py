@@ -1,22 +1,18 @@
 from __future__ import annotations
-import logging
 
-from pydantic_ai import Agent, ModelRetry, RunContext
+from pydantic_ai import Agent, RunContext
 
-from src.agent.book_index import (
-    ListSectionsResult,
-    SearchSectionsResult,
-    SectionContent,
-    SectionMeta,
-)
 from src.agent.deps import TuviAgentDeps
-from src.tuvi.cung import Cung
-from src.tuvi.element.star_registry import STAR_NAME
-from src.tuvi.element.types import LIST_DIA_CHI, ROLE_TYPE, TYPE_DIA_CHI
-from src.tuvi.tinh_ban import TinhBan
-from src.retrieval.search.tool import search_role_info, search_star_info
-
-_logger = logging.getLogger(__name__)
+from .tool import (
+    get_cung_by_position,
+    get_cung_by_role,
+    get_tam_hop,
+    get_section,
+    get_xung_chieu,
+    list_sections,
+    read_section,
+    search_sections,
+)
 
 DEFAULT_MODEL = "gpt-4.1-mini"
 
@@ -31,6 +27,34 @@ Bạn là một trợ lý luận giải lá số Tử Vi theo phong cách điề
 5. Khi cần tra cứu sách Tử Vi Tân Biên theo mục/chương, ưu tiên search_sections trước,
    sau đó dùng get_section/list_sections để kiểm tra ngữ cảnh, cuối cùng mới dùng read_section
    để đọc nội dung mục phù hợp.
+6. Khi dùng nội dung sách, phải nêu rõ mục sách đã dùng bằng id hoặc breadcrumb,
+   ví dụ: 1.1 hoặc 1 ... > 1.1 ...
+
+## Công cụ tra cứu sách Tử Vi Tân Biên
+Sách đã được tách thành các section markdown, mỗi section có id, title, breadcrumb,
+summary, children và content. Các id có thể có dạng:
+- id mục: 1.1, 4.2.24
+- nếu trùng id trong cùng một phần, dùng id có hậu tố slug như 11.2.14#hoa-linh
+Không thêm tiền tố phần sách vào section_id; phần sách mặc định đã được chọn sẵn.
+
+Khi người dùng hỏi về học thuyết, nguyên tắc luận đoán, tên mục, tên cách cục,
+tổ hợp sao, hoặc muốn đối chiếu với sách:
+1. Dùng search_sections(query, top_k) trước để tìm các mục liên quan.
+2. Nếu kết quả chưa rõ thuộc nhánh nào, dùng get_section(section_id) để xem breadcrumb,
+   summary và children; hoặc dùng list_sections(parent_id) để duyệt mục con.
+3. Dùng read_section(section_id, include_children=False) để đọc nội dung mục phù hợp.
+4. Chỉ đặt include_children=True khi mục cha quá ngắn hoặc câu hỏi cần bao quát
+   các mục con trực tiếp.
+5. Nếu search_sections trả nhiều mục gần giống nhau, đọc 2-3 mục có điểm cao nhất
+   trước khi tổng hợp; không tự chọn một mục nếu title/breadcrumb không khớp câu hỏi.
+6. Nếu người dùng đưa id cụ thể, gọi get_section hoặc read_section trực tiếp với id đó.
+7. Nếu không tìm thấy section phù hợp, nói rõ là chưa tìm thấy trong sách, không bịa.
+
+Khi trả lời bằng dữ liệu sách:
+- Tóm tắt ý chính bằng lời của bạn, không chép nguyên văn dài.
+- Gắn nhận định với section đã đọc, ví dụ: "Theo mục 1.1..."
+- Nếu nội dung sách chỉ là một quy tắc hẹp, không mở rộng thành kết luận lá số
+  nếu chưa có dữ kiện tinh bàn tương ứng.
 
 ## Quy trình luận đoán
 Khi người dùng hỏi về một vấn đề cụ thể:
@@ -51,11 +75,10 @@ Khi người dùng hỏi về một vấn đề cụ thể:
 3. Luôn lấy thêm:
    - cung xung chiếu bằng get_xung_chieu
    - 2 cung tam hợp bằng get_tam_hop
-   - thông tin vai trò cung bằng get_role_info khi cần
-
+   - nếu cần thông tin về vai trò cung, tra trong sách bằng search_sections rồi read_section
 
 4. Với từng sao quan trọng xuất hiện trong bản cung, xung chiếu, tam hợp:
-   - dùng get_star_info để lấy nghĩa sao
+   - tra nghĩa sao trong sách bằng search_sections rồi read_section
    - ưu tiên đọc chính tinh trước, rồi mới tới phụ tinh/tuần triệt/tứ hóa/tràng sinh/
 
 5. Khi phân tích một cung, luôn đánh giá theo thứ tự:
@@ -83,164 +106,24 @@ Khi người dùng hỏi về một vấn đề cụ thể:
 
 
 def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
-    agent = Agent(
+    return Agent(
         model=model,
         deps_type=TuviAgentDeps,
         output_type=str,
         system_prompt=TUVI_AGENT_INSTRUCTION,
         retries=2,
+        tools=[
+            get_cung_by_position,
+            get_cung_by_role,
+            get_tam_hop,
+            get_section,
+            get_xung_chieu,
+            list_sections,
+            read_section,
+            search_sections,
+        ]
     )
 
-    @agent.tool
-    def get_tinh_ban(ctx: RunContext[TuviAgentDeps]) -> TinhBan:
-        """Lấy toàn bộ cấu trúc TinhBan hiện có trong deps."""
-        return ctx.deps.require_tinh_ban()
-
-    @agent.tool
-    def get_cung_by_position(
-        ctx: RunContext[TuviAgentDeps],
-        position: TYPE_DIA_CHI
-    ) -> Cung:
-        """Lấy cung theo vị trí địa chi, ví dụ: Tý, Sửu, Dần."""
-        _logger.info(f"Lấy cung theo vị trí: {position}")
-        return ctx.deps.get_cung_by_position(position)
-
-    @agent.tool
-    def get_cung_by_role(
-        ctx: RunContext[TuviAgentDeps],
-        role: ROLE_TYPE
-    ) -> Cung:
-        """Lấy cung theo vai trò, ví dụ: Mệnh, Phụ Mẫu, Quan Lộc."""
-        _logger.info(f"Lấy cung theo vai trò: {role}")
-        return ctx.deps.get_cung_by_role(role)
-
-    @agent.tool
-    def get_role_info(ctx: RunContext[TuviAgentDeps], role: ROLE_TYPE) -> str:
-        """Tìm kiếm thông tin về vai trò cung, ví dụ: Mệnh, Phụ Mẫu, Quan Lộc."""
-        _logger.info(f"Tìm kiếm thông tin về cung: {role}")
-        raw_info = search_role_info(role=role)
-        if raw_info:
-            return "\n".join(f"{item['title']}: {item['content']}" for item in raw_info)
-        return "Không tìm thấy thông tin về vai trò này."
-
-    @agent.tool
-    def get_star_info(ctx: RunContext[TuviAgentDeps], query: STAR_NAME) -> str: # type: ignore
-        """Tìm kiếm thông tin về sao, ví dụ: Tử Vi, Thiên Phủ."""
-        _logger.info(f"Tìm kiếm thông tin về sao: {query}")
-        raw_info = search_star_info(name=query)
-        if raw_info:
-            return "\n".join(f"{item['title']}: {item['content']}" for item in raw_info)
-        return "Không tìm thấy thông tin về sao này."
-
-    @agent.tool
-    def list_sections(
-        ctx: RunContext[TuviAgentDeps],
-        parent_id: str | None = None,
-        part_id: str | None = None,
-    ) -> ListSectionsResult:
-        """
-        List immediate child sections in the structured book.
-
-        Use parent_id=None to list top-level sections. If the book has multiple
-        parts, pass part_id such as "part_2", or pass parent_id="part_2" as a
-        shortcut. Returned ids are canonical ids that can be used by get_section
-        and read_section.
-        """
-        _logger.info(f"Liệt kê mục sách: parent_id={parent_id}, part_id={part_id}")
-        try:
-            book = ctx.deps.require_book()
-            sections = book.list_sections(parent_id=parent_id, part_id=part_id)
-            return ListSectionsResult(
-                sections=[book.get_meta(section.id) for section in sections]
-            )
-        except ValueError as exc:
-            raise ModelRetry(str(exc)) from exc
-
-    @agent.tool
-    def get_section(ctx: RunContext[TuviAgentDeps], section_id: str) -> SectionMeta:
-        """
-        Get metadata for one book section, including breadcrumb, summary, parent,
-        and immediate children.
-
-        Section ids may be canonical like "part_2/1.1". If a default part exists,
-        local ids such as "1.1" also work for that part.
-        """
-        _logger.info(f"Lấy metadata mục sách: {section_id}")
-        try:
-            return ctx.deps.require_book().get_meta(section_id)
-        except ValueError as exc:
-            raise ModelRetry(str(exc)) from exc
-
-    @agent.tool
-    def read_section(
-        ctx: RunContext[TuviAgentDeps],
-        section_id: str,
-        include_children: bool = False,
-        max_chars: int | None = 8000,
-    ) -> SectionContent:
-        """
-        Read the content of one book section.
-
-        Set include_children=True to append immediate child subsection content.
-        Use max_chars to keep long sections bounded.
-        """
-        _logger.info(
-            "Đọc mục sách: section_id=%s, include_children=%s, max_chars=%s",
-            section_id,
-            include_children,
-            max_chars,
-        )
-        try:
-            return ctx.deps.require_book().read_section(
-                section_id,
-                include_children=include_children,
-                max_chars=max_chars,
-            )
-        except ValueError as exc:
-            raise ModelRetry(str(exc)) from exc
-
-    @agent.tool
-    def search_sections(
-        ctx: RunContext[TuviAgentDeps],
-        query: str,
-        top_k: int = 5,
-    ) -> SearchSectionsResult:
-        """
-        Search section ids, titles, summaries, and partial content in the book.
-
-        This is the best first tool when the user asks about a doctrine, rule,
-        star combination, or section title from Tử Vi Tân Biên.
-        """
-        bounded_top_k = max(1, min(top_k, 20))
-        _logger.info(f"Tìm kiếm mục sách: query={query}, top_k={bounded_top_k}")
-        return SearchSectionsResult(
-            hits=ctx.deps.require_book().search_sections(query, top_k=bounded_top_k)
-        )
-
-    @agent.tool
-    def get_tam_hop(
-        ctx: RunContext[TuviAgentDeps],
-        position: TYPE_DIA_CHI
-    ) -> TYPE_DIA_CHI:
-        """Lấy cung tam hợp của một cung cụ thể."""
-        index = LIST_DIA_CHI.index(position)
-        tam_hop_index = ((index + 4) % 12, (index + 8) % 12)
-        tam_hop_position = (LIST_DIA_CHI[tam_hop_index[0]], LIST_DIA_CHI[tam_hop_index[1]])
-        return f"Cung tam hợp của {position} là {tam_hop_position}."
-
-
-    @agent.tool
-    def get_xung_chieu(
-        ctx: RunContext[TuviAgentDeps],
-        position: TYPE_DIA_CHI
-    ) -> TYPE_DIA_CHI:
-        """Lấy cung xung chiếu của một cung cụ thể."""
-        index = LIST_DIA_CHI.index(position)
-        xung_chieu_index = (index + 6) % 12
-        xung_chieu_position = LIST_DIA_CHI[xung_chieu_index]
-        return f"Cung xung chiếu của {position} là {xung_chieu_position}."
-
-    return agent
 
 
 async def run_tuvi_agent(
