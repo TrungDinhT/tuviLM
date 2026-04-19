@@ -1,4 +1,4 @@
-import type { BirthInput, BuildSaoLuuInput, ChatMessage, CungData, LasoData } from "../types";
+import type { BirthInput, BuildSaoLuuInput, ChatMessage, ChatToolCall, CungData, LasoData } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -226,7 +226,7 @@ export async function getAnalysis(input: BirthInput, position: string): Promise<
 export async function streamChatReply(
   messages: ChatMessage[],
   onChunk: (chunk: string) => void
-): Promise<void> {
+): Promise<ChatToolCall[]> {
   const userMessages = messages.filter((m) => m.role === "user");
   const latest = userMessages.length > 0 ? userMessages[userMessages.length - 1].content : "";
 
@@ -245,12 +245,26 @@ export async function streamChatReply(
 
   const payload = await response.json() as {
     answer: string;
+    tool_calls?: Array<{
+      id?: string | null;
+      name?: string;
+      tool_name?: string;
+      arguments?: unknown;
+      args?: unknown;
+    }>;
   };
 
   const full = payload.answer;
+  const toolCalls = (payload.tool_calls ?? []).map((call, index) => ({
+    id: call.id ?? null,
+    name: call.name ?? call.tool_name ?? `tool_${index + 1}`,
+    arguments: call.arguments ?? call.args ?? {}
+  }));
 
   for (let i = 0; i < full.length; i += 6) {
     await new Promise((r) => setTimeout(r, 24));
     onChunk(full.slice(i, i + 6));
   }
+
+  return toolCalls;
 }
