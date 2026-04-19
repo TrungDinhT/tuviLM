@@ -129,7 +129,7 @@ export default function App() {
     setChatBusy(true);
 
     try {
-      await streamChatReply([...messages, userMsg], (chunk) => {
+      const toolCalls = await streamChatReply([...messages, userMsg], (chunk) => {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsg.id
@@ -141,6 +141,17 @@ export default function App() {
           )
         );
       });
+
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantMsg.id
+            ? {
+                ...m,
+                toolCalls
+              }
+            : m
+        )
+      );
     } finally {
       setChatBusy(false);
     }

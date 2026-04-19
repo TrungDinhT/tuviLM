@@ -1,11 +1,37 @@
 import { useState } from "react";
-import type { ChatMessage } from "../types";
+import type { ChatMessage, ChatToolCall } from "../types";
 
 type Props = {
   messages: ChatMessage[];
   onSend: (text: string) => Promise<void>;
   busy: boolean;
 };
+
+function formatToolCallLabel(toolCall: ChatToolCall): string {
+  const args = toolCall.arguments;
+  if (args === null || args === undefined) return `${toolCall.name}()`;
+
+  if (typeof args === "string") {
+    try {
+      return formatToolCallLabel({ ...toolCall, arguments: JSON.parse(args) });
+    } catch {
+      return `${toolCall.name}(${args})`;
+    }
+  }
+
+  if (Array.isArray(args)) {
+    return `${toolCall.name}(${args.map(String).join(", ")})`;
+  }
+
+  if (typeof args === "object") {
+    const values = Object.values(args as Record<string, unknown>)
+      .filter((value) => value !== null && value !== undefined)
+      .map(String);
+    return `${toolCall.name}(${values.join(", ")})`;
+  }
+
+  return `${toolCall.name}(${String(args)})`;
+}
 
 export default function ChatPanel({ messages, onSend, busy }: Props) {
   const [text, setText] = useState("");
@@ -28,6 +54,15 @@ export default function ChatPanel({ messages, onSend, busy }: Props) {
         {messages.map((m) => (
           <article key={m.id} className={`msg ${m.role}`}>
             <header>{m.role === "user" ? "Bạn" : "Trợ lý"}</header>
+            {m.toolCalls?.length ? (
+              <div className="tool-call-list">
+                {m.toolCalls.map((toolCall, index) => (
+                  <span className="tool-call" key={toolCall.id ?? `${toolCall.name}-${index}`}>
+                    {formatToolCallLabel(toolCall)}
+                  </span>
+                ))}
+              </div>
+            ) : null}
             <p>{m.content}</p>
           </article>
         ))}
