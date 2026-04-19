@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import logging
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.schemas import (
@@ -18,6 +21,7 @@ from api.schemas import (
     CungPayload,
     ChatRequest,
     ChatResponse,
+    ChatToolCall,
     StarPayload,
 )
 from src.agent.deps import TuviAgentDeps
@@ -51,7 +55,7 @@ class ApiState:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     agent_deps = TuviAgentDeps()
-    agent_deps.agent = build_tuvi_agent()
+    agent_deps.agent = build_tuvi_agent(model="openai:gpt-5.4-mini")
     app.state.api_state = ApiState(
         agent_deps=agent_deps,
     )
@@ -71,6 +75,75 @@ app.add_middleware(
 
 def get_api_state(request: Request) -> ApiState:
     return request.app.state.api_state
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return value
+
+    try:
+        return jsonable_encoder(value)
+    except Exception:
+        return repr(value)
+
+
+def _get_field(value: Any, name: str, default: Any = None) -> Any:
+    if isinstance(value, dict):
+        return value.get(name, default)
+    return getattr(value, name, default)
+
+
+def _get_tool_args(part: Any) -> Any:
+    args_as_dict = getattr(part, "args_as_dict", None)
+    if callable(args_as_dict):
+        try:
+            return args_as_dict()
+        except Exception:
+            pass
+
+    args_as_json_str = getattr(part, "args_as_json_str", None)
+    if callable(args_as_json_str):
+        try:
+            return args_as_json_str()
+        except Exception:
+            pass
+
+    return _get_field(part, "args")
+
+
+def _extract_tool_calls(result: Any) -> list[ChatToolCall]:
+    get_messages = getattr(result, "new_messages", None)
+    if not callable(get_messages):
+        get_messages = getattr(result, "all_messages", None)
+
+    messages = get_messages() if callable(get_messages) else []
+    tool_calls: list[ChatToolCall] = []
+
+    for message in messages:
+        for part in _get_field(message, "parts", []):
+            part_kind = _get_field(part, "part_kind") or _get_field(part, "kind")
+            tool_name = _get_field(part, "tool_name")
+            args = _get_tool_args(part)
+
+            if not tool_name:
+                continue
+            if part_kind and part_kind not in {"tool-call", "tool_call"}:
+                continue
+            if args is None:
+                continue
+
+            tool_calls.append(
+                ChatToolCall(
+                    id=_get_field(part, "tool_call_id"),
+                    name=tool_name,
+                    arguments=_json_safe(args),
+                )
+            )
+
+    return tool_calls
 
 
 @app.get("/api/v1/health")
@@ -219,4 +292,5 @@ async def chat_dummy(payload: ChatRequest, request: Request) -> ChatResponse:
     result = await agent.run(payload.message, deps=api_state.agent_deps)
     return ChatResponse(
         answer=result.output,
+        tool_calls=_extract_tool_calls(result),
     )

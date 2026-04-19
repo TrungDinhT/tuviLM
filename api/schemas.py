@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 from src.tuvi.tinh_ban import TinhBan
@@ -70,5 +70,12 @@ class ChatRequest(BaseModel):
     message: str
 
 
+class ChatToolCall(BaseModel):
+    id: str | None = None
+    name: str
+    arguments: Any
+
+
 class ChatResponse(BaseModel):
     answer: str
+    tool_calls: list[ChatToolCall] = Field(default_factory=list)
