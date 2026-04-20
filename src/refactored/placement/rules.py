@@ -1,5 +1,6 @@
 import src.refactored.placement.primitives as pp
 from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCan
+from src.refactored.placement.compiler import PlacementRuleCompiler
 
 
 CUNG_RULES = [
@@ -621,3 +622,17 @@ TU_HOA_TARGET_BY_THIEN_CAN: dict[ThienCan, dict[pp.TuHoaEntity, str]] = {
 }
 
 TU_HOA_RULES = [pp.TuHoaPosition(mapping=TU_HOA_TARGET_BY_THIEN_CAN)]
+
+
+# ---------------------------------------------------------------------------
+# Default placement rule compiler factory
+# ---------------------------------------------------------------------------
+
+
+def get_default_placement_rule_compiler() -> PlacementRuleCompiler:
+    compiler = PlacementRuleCompiler()
+    compiler.register_rules(CUNG_RULES)
+    compiler.register_rules(CHINH_TINH_RULES)
+    compiler.register_rules(PHU_TINH_RULES)
+    compiler.register_rules(TU_HOA_RULES)
+    return compiler

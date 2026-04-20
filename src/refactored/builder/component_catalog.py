@@ -7,13 +7,12 @@ from pydantic import TypeAdapter
 
 from src.refactored.component import Component
 from src.refactored.component.cung import Cung
-from src.refactored.component.sao import Sao, TuHoa
-from src.refactored.component.tuan_triet import TuanTriet
+from src.refactored.component.sao import Sao, TuanTriet, TuHoa, VongTrangSinh
 
 
 class ComponentCatalog:
     _cung_adapter = TypeAdapter(list[Cung])
-    _sao_adapter = TypeAdapter(list[Sao])
+    _sao_adapter = TypeAdapter(list[Sao | VongTrangSinh])
     _tuhoa_adapter = TypeAdapter(list[TuHoa])
     _tuan_triet_adapter = TypeAdapter(list[TuanTriet])
 
@@ -52,7 +51,7 @@ class ComponentCatalog:
         raw_json = (self._catalog_dir / "cung.json").read_text(encoding="utf-8")
         return self._cung_adapter.validate_json(raw_json)
 
-    def _load_saos(self) -> list[Sao]:
+    def _load_saos(self) -> list[Sao | VongTrangSinh]:
         raw_json = (self._catalog_dir / "sao.json").read_text(encoding="utf-8")
         return self._sao_adapter.validate_json(raw_json)
 

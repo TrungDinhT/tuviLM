@@ -8,6 +8,7 @@ from src.refactored.component.prior import LaSoContext
 ComponentId = str
 
 ContextReferenceResolver = Callable[[LaSoContext], ComponentId]
+ReferenceResolverInput = ComponentId | ContextReferenceResolver
 
 
 SimplePositionTransform = Callable[[DiaChi], DiaChi]
@@ -44,43 +45,36 @@ class AbsolutePositionSpec:
 class RelativePositionSpec:
     """Declarative spec for positions derived from another component."""
 
-    reference_id: ComponentId
+    reference: ReferenceResolverInput = field(repr=False)
     transform: RelativePositionTransform = field(repr=False)
 
     def __init__(
-        self, reference_id: ComponentId, transform: PositionTransform
+        self,
+        reference: ReferenceResolverInput,
+        transform: PositionTransform,
     ) -> None:
-        object.__setattr__(self, "reference_id", reference_id)
+        object.__setattr__(self, "reference", reference)
         object.__setattr__(
             self,
             "transform",
             normalize_position_transform(transform),
         )
 
-
-@dataclass(frozen=True)
-class DynamicRelativePositionSpec:
-    """Spec for a position derived from another component chosen at resolve time."""
-
-    reference_id_fn: ContextReferenceResolver
-    transform: RelativePositionTransform = field(repr=False)
-
-    def __init__(
-        self, reference_id_fn: ContextReferenceResolver, transform: PositionTransform
-    ) -> None:
-        object.__setattr__(self, "reference_id_fn", reference_id_fn)
-        object.__setattr__(
-            self,
-            "transform",
-            normalize_position_transform(transform),
-        )
+    def resolve_reference_id(self, context: LaSoContext) -> ComponentId:
+        if isinstance(self.reference, str):
+            return self.reference
+        return self.reference(context)
 
 
-PositionSpec = AbsolutePositionSpec | RelativePositionSpec | DynamicRelativePositionSpec
+PositionSpec = AbsolutePositionSpec | RelativePositionSpec
 
 
 class PlacementRegistry(Protocol):
     """Protocol for registering declarative component placement specs."""
+
+    def register_component(self, component_id: ComponentId, position: DiaChi) -> None:
+        """Register a component with a definitive position."""
+        ...
 
     def register_component_lazy(
         self, component_id: ComponentId, spec: PositionSpec

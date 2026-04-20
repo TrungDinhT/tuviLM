@@ -8,7 +8,7 @@ This module is organized in four layers:
 """
 
 from enum import Enum
-from typing import Callable, Literal, Mapping, Protocol
+from typing import Callable, Literal, Mapping, Protocol, get_args
 
 from src.refactored.component.elementary import (
     CircleDirection,
@@ -22,7 +22,6 @@ from src.refactored.placement.registry import (
     AbsolutePositionResolver,
     AbsolutePositionSpec,
     ComponentId,
-    DynamicRelativePositionSpec,
     PlacementRegistry,
     PositionTransform,
     RelativePositionSpec,
@@ -43,12 +42,7 @@ AnchorResolver = DiaChi | AbsolutePositionResolver
 PairPositionResolver = Callable[[LaSoContext], tuple[DiaChi, DiaChi]]
 
 TuHoaEntity = Literal["hoa_loc", "hoa_quyen", "hoa_khoa", "hoa_ky"]
-TUHOA_ENTITIES: tuple[TuHoaEntity, ...] = (
-    "hoa_loc",
-    "hoa_quyen",
-    "hoa_khoa",
-    "hoa_ky",
-)
+TUHOA_ENTITIES: tuple[TuHoaEntity, ...] = get_args(TuHoaEntity)
 
 
 # ---------------------------------------------------------------------------
@@ -247,10 +241,8 @@ class TuHoaPosition(Rule):
         for entity in TUHOA_ENTITIES:
             registry.register_component_lazy(
                 entity,
-                DynamicRelativePositionSpec(
-                    reference_id_fn=lambda ctx, e=entity: self.mapping[
-                        ctx.prior.get_thien_can()
-                    ][e],
+                RelativePositionSpec(
+                    lambda ctx, e=entity: self.mapping[ctx.prior.get_thien_can()][e],
                     transform=_same_position,
                 ),
             )
@@ -355,19 +347,13 @@ class Circle(Rule):
         if isinstance(member, ComponentId):
             registry.register_component_lazy(
                 member,
-                RelativePositionSpec(
-                    self.principal_id,
-                    self._member_offset_transform(offset),
-                ),
+                RelativePositionSpec(self.principal_id, self._member_offset_transform(offset)),
             )
         elif isinstance(member, SamePosition):
             member.register_components(registry)
             registry.register_component_lazy(
                 member.reference_id,
-                RelativePositionSpec(
-                    self.principal_id,
-                    self._member_offset_transform(offset),
-                ),
+                RelativePositionSpec(self.principal_id, self._member_offset_transform(offset)),
             )
         else:
             raise ValueError(f"Invalid vong member type: {type(member)}")
@@ -472,7 +458,7 @@ def triet_positions_fn(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
 
 
 def tuan_positions_fn(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
-    """Two Tuần positions from (year Địa Chi index − year Thiên Can index) mod 12."""
+    """Two Tuần positions from (year Địa Chi index - year Thiên Can index) mod 12."""
     _TUAN_POSITIONS: dict[DiaChi, tuple[DiaChi, DiaChi]] = {
         DiaChi.TY: (DiaChi.TUAT, DiaChi.HOI),
         DiaChi.DAN: (DiaChi.TY, DiaChi.SUU),

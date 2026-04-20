@@ -3,11 +3,12 @@ from pathlib import Path
 
 from pydantic import TypeAdapter
 
-from src.refactored.component.elementary import ComponentBase
+from src.refactored.component.elementary import ComponentBase, NguHanh
 
 
 class Cuc(ComponentBase):
     number: int
+    ngu_hanh: NguHanh
 
 
 _CUC_ADAPTER = TypeAdapter(list[Cuc])

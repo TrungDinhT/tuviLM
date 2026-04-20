@@ -1,6 +1,5 @@
 from enum import Enum, IntEnum, StrEnum
 from pydantic import BaseModel
-from typing import Optional
 
 
 class IndexedEnumMixin:
@@ -124,7 +123,6 @@ class ComponentBase(BaseModel):
 
     id: str
     name: str
-    ngu_hanh: Optional[NguHanh] = None
 
     def __hash__(self) -> int:
         return hash(self.id)

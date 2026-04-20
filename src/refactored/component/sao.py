@@ -2,7 +2,7 @@ from enum import StrEnum
 
 from pydantic import Field
 
-from src.refactored.component.elementary import ComponentBase
+from src.refactored.component.elementary import ComponentBase, NguHanh
 
 
 class Status(StrEnum):
@@ -25,7 +25,16 @@ class SaoType(StrEnum):
 class Sao(ComponentBase):
     is_chinh_tinh: bool = False
     sao_type: list[SaoType] = Field(default_factory=list)
+    ngu_hanh: NguHanh
 
 
 class TuHoa(ComponentBase):
-    pass
+    ngu_hanh: NguHanh
+
+
+class VongTrangSinh(ComponentBase):
+    """Catalog entry for Tràng Sinh stars (no ngũ hành)."""
+
+
+class TuanTriet(ComponentBase):
+    """Catalog entry for Tuần / Triệt split markers (no ngũ hành)."""

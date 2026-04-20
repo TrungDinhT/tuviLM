@@ -4,7 +4,14 @@ import pytest
 
 from src.refactored.builder.component_catalog import get_default_catalog
 from src.refactored.builder.placement_builder import PlacementBuilder
-from src.refactored.component.tuan_triet import TuanTriet
+from src.refactored.component.sao import TuanTriet
+from src.refactored.placement.compiler import (
+    PlacementRuleCompiler,
+    SpecializedAbsoluteSpec,
+    SpecializedPlacementRules,
+    SpecializedRelativeSpec,
+)
+from src.refactored.placement.engine import PlacementEngine
 from src.refactored.placement.primitives import (
     Circle,
     SamePosition,
@@ -18,14 +25,14 @@ from src.refactored.placement.rules import (
     PHU_TINH_RULES,
     TU_HOA_RULES,
     TU_HOA_TARGET_BY_THIEN_CAN,
+    get_default_placement_rule_compiler,
 )
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
-    DynamicRelativePositionSpec,
     RelativePositionSpec,
 )
 from src.refactored.component.elementary import DiaChi
-from src.refactored.component.prior import Gender, LaSoPrior
+from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior
 from src.tuvi.birth import BirthTime
 from src.tuvi.builder import Builder as LegacyBuilder
 from src.tuvi.constant import MAP_TRIET, MAP_TUAN
@@ -249,35 +256,52 @@ def _legacy_tuan_triet_expected(time: dt.datetime, gender: Gender) -> dict[str, 
     }
 
 
+def _resolve_positions_with_rules(
+    *,
+    time: dt.datetime,
+    gender: Gender,
+    rules,
+) -> dict[str, DiaChi]:
+    compiler = PlacementRuleCompiler()
+    compiler.register_rules(rules)
+    context = LaSoContext.from_prior(LaSoPrior.from_solar_day(time, gender))
+    return PlacementBuilder(context, compiler=compiler).resolve_all()
+
+
+def _resolve_positions_with_specs(
+    *,
+    time: dt.datetime,
+    gender: Gender,
+    specs: dict[str, AbsolutePositionSpec | RelativePositionSpec],
+) -> dict[str, DiaChi]:
+    compiler = PlacementRuleCompiler()
+    for component_id, spec in specs.items():
+        compiler.register_component_lazy(component_id, spec)
+    context = LaSoContext.from_prior(LaSoPrior.from_solar_day(time, gender))
+    return PlacementBuilder(context, compiler=compiler).resolve_all()
+
+
 def test_builder_resolves_chained_specs_in_any_order():
     component_a = "A"
     component_b = "B"
     component_c = "C"
 
-    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
-
-    builder.register_component_lazy(
-        component_c,
-        RelativePositionSpec(component_b, lambda position: position + 1),
-    )
-    builder.register_component_lazy(
-        component_b,
-        RelativePositionSpec(component_a, lambda position: position + 1),
-    )
-    builder.register_component_lazy(
-        component_a,
-        AbsolutePositionSpec(lambda _context: DiaChi.DAN),
+    positions = _resolve_positions_with_specs(
+        time=dt.datetime(1996, 12, 19, 6, 30),
+        gender=Gender.MALE,
+        specs={
+            component_c: RelativePositionSpec(component_b, lambda position: position + 1),
+            component_b: RelativePositionSpec(component_a, lambda position: position + 1),
+            component_a: AbsolutePositionSpec(lambda _context: DiaChi.DAN),
+        },
     )
 
-    builder.resolve_pending()
-
-    assert builder.get_or_resolve_position(component_a) == DiaChi.DAN
-    assert builder.get_or_resolve_position(component_b) == DiaChi.MEO
-    assert builder.get_or_resolve_position(component_c) == DiaChi.THIN
+    assert positions[component_a] == DiaChi.DAN
+    assert positions[component_b] == DiaChi.MEO
+    assert positions[component_c] == DiaChi.THIN
 
 
 def test_vong_supports_same_position_groups():
-    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
     rules = [
         Circle(
             principal_id="anchor",
@@ -289,17 +313,19 @@ def test_vong_supports_same_position_groups():
         )
     ]
 
-    builder.register_rules(rules)
-    builder.resolve_pending()
+    positions = _resolve_positions_with_rules(
+        time=dt.datetime(1996, 12, 19, 6, 30),
+        gender=Gender.MALE,
+        rules=rules,
+    )
 
-    assert builder.get_or_resolve_position("anchor") == DiaChi.DAN
-    assert builder.get_or_resolve_position("slot_one_a") == DiaChi.MEO
-    assert builder.get_or_resolve_position("slot_one_b") == DiaChi.MEO
-    assert builder.get_or_resolve_position("slot_two") == DiaChi.THIN
+    assert positions["anchor"] == DiaChi.DAN
+    assert positions["slot_one_a"] == DiaChi.MEO
+    assert positions["slot_one_b"] == DiaChi.MEO
+    assert positions["slot_two"] == DiaChi.THIN
 
 
 def test_vong_can_follow_van_direction():
-    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.FEMALE)
     rules = [
         Circle(
             principal_id="anchor",
@@ -312,61 +338,63 @@ def test_vong_can_follow_van_direction():
         )
     ]
 
-    builder.register_rules(rules)
-    builder.resolve_pending()
+    positions = _resolve_positions_with_rules(
+        time=dt.datetime(1996, 12, 19, 6, 30),
+        gender=Gender.FEMALE,
+        rules=rules,
+    )
 
-    assert builder.get_or_resolve_position("anchor") == DiaChi.DAN
-    assert builder.get_or_resolve_position("slot_one") == DiaChi.SUU
-    assert builder.get_or_resolve_position("slot_two_a") == DiaChi.TY
-    assert builder.get_or_resolve_position("slot_two_b") == DiaChi.TY
+    assert positions["anchor"] == DiaChi.DAN
+    assert positions["slot_one"] == DiaChi.SUU
+    assert positions["slot_two_a"] == DiaChi.TY
+    assert positions["slot_two_b"] == DiaChi.TY
 
 
 def test_builder_supports_prior_aware_relative_specs():
     component_a = "A"
     component_b = "B"
 
-    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
-    builder.register_component_lazy(
-        component_b,
-        RelativePositionSpec(
-            component_a,
-            lambda position, context: position + context.van_direction(),
-        ),
-    )
-    builder.register_component_lazy(
-        component_a,
-        AbsolutePositionSpec(lambda _context: DiaChi.DAN),
+    positions = _resolve_positions_with_specs(
+        time=dt.datetime(1996, 12, 19, 6, 30),
+        gender=Gender.MALE,
+        specs={
+            component_b: RelativePositionSpec(
+                lambda _ctx: component_a,
+                lambda position, context: position + context.van_direction(),
+            ),
+            component_a: AbsolutePositionSpec(lambda _context: DiaChi.DAN),
+        },
     )
 
-    builder.resolve_pending()
-
-    assert builder.get_or_resolve_position(component_b) == DiaChi.MEO
+    assert positions[component_b] == DiaChi.MEO
 
 
 def test_builder_detects_circular_position_dependencies():
     component_a = "A"
     component_b = "B"
 
-    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
-    builder.register_component_lazy(
+    compiler = PlacementRuleCompiler()
+    compiler.register_component_lazy(
         component_a,
         RelativePositionSpec(component_b, lambda position: position + 1),
     )
-    builder.register_component_lazy(
+    compiler.register_component_lazy(
         component_b,
         RelativePositionSpec(component_a, lambda position: position + 1),
     )
-
+    context = LaSoContext.from_prior(
+        LaSoPrior.from_solar_day(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
+    )
+    builder = PlacementBuilder(context, compiler=compiler)
     with pytest.raises(ValueError, match="Circular position dependency detected"):
-        builder.resolve_pending()
+        builder.resolve_all()
 
 
 def test_builder_resolves_chinh_tinh_rules_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(CHINH_TINH_RULES)
-
-    positions = builder.resolve_all()
+    positions = _resolve_positions_with_rules(
+        time=time, gender=Gender.MALE, rules=CHINH_TINH_RULES
+    )
     legacy_positions = _build_legacy_chinh_tinh_positions(time)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -376,10 +404,9 @@ def test_builder_resolves_chinh_tinh_rules_like_legacy_builder():
 
 def test_builder_resolves_thai_tue_ring_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules([PHU_TINH_RULES[2]])
-
-    positions = builder.resolve_all()
+    positions = _resolve_positions_with_rules(
+        time=time, gender=Gender.MALE, rules=[PHU_TINH_RULES[2]]
+    )
     legacy_positions = _build_legacy_phu_tinh_positions(time, THAI_TUE_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -395,10 +422,9 @@ def test_builder_resolves_thai_tue_ring_like_legacy_builder():
 
 def test_builder_resolves_loc_ton_ring_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(PHU_TINH_RULES[:2])
-
-    positions = builder.resolve_all()
+    positions = _resolve_positions_with_rules(
+        time=time, gender=Gender.MALE, rules=PHU_TINH_RULES[:2]
+    )
     legacy_positions = _build_legacy_phu_tinh_positions(time, LOC_TON_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -414,13 +440,12 @@ def test_builder_resolves_loc_ton_ring_like_legacy_builder():
 
 def test_builder_resolves_trang_sinh_circle_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
     trang_sinh_rule = next(
         rule for rule in PHU_TINH_RULES if getattr(rule, "principal_id", "") == "trang_sinh"
     )
-    builder.register_rules([trang_sinh_rule])
-
-    positions = builder.resolve_all()
+    positions = _resolve_positions_with_rules(
+        time=time, gender=Gender.MALE, rules=[trang_sinh_rule]
+    )
     legacy_positions = _build_legacy_trang_sinh_positions(time, TRANG_SINH_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -441,9 +466,10 @@ def test_builder_resolves_tuan_triet_like_legacy_maps():
     gender = Gender.MALE
     expected = _legacy_tuan_triet_expected(time, gender)
 
-    builder = PlacementBuilder(time, gender)
-    builder.register_rules(
-        [
+    positions = _resolve_positions_with_rules(
+        time=time,
+        gender=gender,
+        rules=[
             TuanTrietPosition(
                 pair_ids=("triet_1", "triet_2"),
                 pair_position_fn=triet_positions_fn,
@@ -452,12 +478,11 @@ def test_builder_resolves_tuan_triet_like_legacy_maps():
                 pair_ids=("tuan_1", "tuan_2"),
                 pair_position_fn=tuan_positions_fn,
             ),
-        ]
+        ],
     )
-    builder.resolve_pending()
 
     for component_id, dia_chi in expected.items():
-        assert builder.get_or_resolve_position(component_id) == dia_chi
+        assert positions[component_id] == dia_chi
 
 
 def test_phu_tinh_rules_include_tuan_triet_position_rules():
@@ -467,12 +492,11 @@ def test_phu_tinh_rules_include_tuan_triet_position_rules():
 
 def test_builder_resolves_month_rules_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(
-        _select_rules_by_component_ids(set(MONTH_COMPONENT_IDS.values()))
+    positions = _resolve_positions_with_rules(
+        time=time,
+        gender=Gender.MALE,
+        rules=_select_rules_by_component_ids(set(MONTH_COMPONENT_IDS.values())),
     )
-
-    positions = builder.resolve_all()
     legacy_positions = _build_legacy_phu_tinh_positions(time, MONTH_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -484,12 +508,11 @@ def test_builder_resolves_month_rules_like_legacy_builder():
 
 def test_builder_resolves_hour_rules_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(
-        _select_rules_by_component_ids(set(HOUR_COMPONENT_IDS.values()))
+    positions = _resolve_positions_with_rules(
+        time=time,
+        gender=Gender.MALE,
+        rules=_select_rules_by_component_ids(set(HOUR_COMPONENT_IDS.values())),
     )
-
-    positions = builder.resolve_all()
     legacy_positions = _build_legacy_phu_tinh_positions(time, HOUR_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -499,12 +522,11 @@ def test_builder_resolves_hour_rules_like_legacy_builder():
 
 def test_builder_resolves_thien_can_rules_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(
-        _select_rules_by_component_ids(set(THIEN_CAN_COMPONENT_IDS.values()))
+    positions = _resolve_positions_with_rules(
+        time=time,
+        gender=Gender.MALE,
+        rules=_select_rules_by_component_ids(set(THIEN_CAN_COMPONENT_IDS.values())),
     )
-
-    positions = builder.resolve_all()
     legacy_positions = _build_legacy_phu_tinh_positions(time, THIEN_CAN_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -514,12 +536,11 @@ def test_builder_resolves_thien_can_rules_like_legacy_builder():
 
 def test_builder_resolves_year_branch_rules_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(
-        _select_rules_by_component_ids(set(YEAR_BRANCH_COMPONENT_IDS.values()))
+    positions = _resolve_positions_with_rules(
+        time=time,
+        gender=Gender.MALE,
+        rules=_select_rules_by_component_ids(set(YEAR_BRANCH_COMPONENT_IDS.values())),
     )
-
-    positions = builder.resolve_all()
     legacy_positions = _build_legacy_phu_tinh_positions(time, YEAR_BRANCH_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -532,12 +553,11 @@ def test_builder_resolves_year_branch_rules_like_legacy_builder():
 
 def test_builder_resolves_dau_quan_rule_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(
-        _select_rules_by_component_ids(set(DAU_QUAN_COMPONENT_IDS.values()))
+    positions = _resolve_positions_with_rules(
+        time=time,
+        gender=Gender.MALE,
+        rules=_select_rules_by_component_ids(set(DAU_QUAN_COMPONENT_IDS.values())),
     )
-
-    positions = builder.resolve_all()
     legacy_positions = _build_legacy_phu_tinh_positions(time, DAU_QUAN_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -547,12 +567,11 @@ def test_builder_resolves_dau_quan_rule_like_legacy_builder():
 
 def test_builder_resolves_linh_hoa_rules_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(
-        _select_rules_by_component_ids(set(LINH_HOA_COMPONENT_IDS.values()))
+    positions = _resolve_positions_with_rules(
+        time=time,
+        gender=Gender.MALE,
+        rules=_select_rules_by_component_ids(set(LINH_HOA_COMPONENT_IDS.values())),
     )
-
-    positions = builder.resolve_all()
     legacy_positions = _build_legacy_phu_tinh_positions(time, LINH_HOA_COMPONENT_IDS)
 
     assert {component_id: positions[component_id] for component_id in legacy_positions} == (
@@ -560,44 +579,36 @@ def test_builder_resolves_linh_hoa_rules_like_legacy_builder():
     )
 
 
-def test_dynamic_relative_position_spec_resolves():
+def test_context_relative_position_spec_resolves():
     time = dt.datetime(1996, 12, 19, 6, 30)
     prior = LaSoPrior.from_solar_day(time, Gender.MALE)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_component_lazy(
-        "ref",
-        AbsolutePositionSpec(lambda _ctx: DiaChi.THIN),
+    positions = _resolve_positions_with_specs(
+        time=time,
+        gender=Gender.MALE,
+        specs={
+            "ref": AbsolutePositionSpec(lambda _ctx: DiaChi.THIN),
+            "child": RelativePositionSpec(
+                reference=lambda _ctx: "ref",
+                transform=lambda pos: pos,
+            ),
+            "child_two_arg_transform": RelativePositionSpec(
+                reference=lambda _ctx: "ref",
+                transform=lambda pos, ctx: pos + ctx.prior.hour.index,
+            ),
+        },
     )
-    builder.register_component_lazy(
-        "child",
-        DynamicRelativePositionSpec(
-            reference_id_fn=lambda _ctx: "ref",
-            transform=lambda pos: pos,
-        ),
-    )
-    builder.register_component_lazy(
-        "child_two_arg_transform",
-        DynamicRelativePositionSpec(
-            reference_id_fn=lambda _ctx: "ref",
-            transform=lambda pos, ctx: pos + ctx.prior.hour.index,
-        ),
-    )
-    builder.resolve_pending()
 
-    assert builder.get_or_resolve_position("child") == DiaChi.THIN
-    assert builder.get_or_resolve_position("child_two_arg_transform") == (
-        DiaChi.THIN + prior.hour.index
-    )
+    assert positions["child"] == DiaChi.THIN
+    assert positions["child_two_arg_transform"] == (DiaChi.THIN + prior.hour.index)
 
 
 def test_builder_resolves_tuhoa_like_legacy_builder():
     time = dt.datetime(1996, 12, 19, 6, 30)
-    builder = PlacementBuilder(time, Gender.MALE)
-    builder.register_rules(
-        CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES + TU_HOA_RULES
+    positions = _resolve_positions_with_rules(
+        time=time,
+        gender=Gender.MALE,
+        rules=CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES + TU_HOA_RULES,
     )
-
-    positions = builder.resolve_all()
     legacy_positions = _build_legacy_tuhoa_positions(time)
 
     for hoa_id in ("hoa_loc", "hoa_quyen", "hoa_khoa", "hoa_ky"):
@@ -605,17 +616,22 @@ def test_builder_resolves_tuhoa_like_legacy_builder():
 
 
 def test_tuhoa_without_star_rules_raises_key_error():
-    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
-    builder.register_rules(TU_HOA_RULES)
-
+    compiler = PlacementRuleCompiler()
+    compiler.register_rules(TU_HOA_RULES)
+    context = LaSoContext.from_prior(
+        LaSoPrior.from_solar_day(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
+    )
+    builder = PlacementBuilder(context, compiler=compiler)
     with pytest.raises(KeyError):
         builder.resolve_all()
 
 
 def test_tuhoa_targets_are_registered_components():
-    builder = PlacementBuilder(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
-    builder.register_rules(CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES)
-    resolved = builder.resolve_all()
+    resolved = _resolve_positions_with_rules(
+        time=dt.datetime(1996, 12, 19, 6, 30),
+        gender=Gender.MALE,
+        rules=CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES,
+    )
 
     for thien_can, entities in TU_HOA_TARGET_BY_THIEN_CAN.items():
         for entity, target_id in entities.items():
@@ -623,3 +639,50 @@ def test_tuhoa_targets_are_registered_components():
                 f"Tứ Hóa target `{target_id}` for {thien_can} `{entity}` "
                 "is not produced by CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES"
             )
+
+
+def test_default_placement_rule_compiler_factory_returns_independent_instances():
+    first = get_default_placement_rule_compiler()
+    second = get_default_placement_rule_compiler()
+
+    assert first is not second
+
+
+def test_compiler_compile_validates_missing_reference():
+    compiler = PlacementRuleCompiler()
+    context = LaSoContext.from_prior(
+        LaSoPrior.from_solar_day(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
+    )
+    compiler.register_component_lazy(
+        "child",
+        RelativePositionSpec(
+            reference=lambda _ctx: "missing_ref",
+            transform=lambda pos: pos,
+        ),
+    )
+
+    with pytest.raises(KeyError):
+        compiler.compile(context)
+
+
+def test_engine_resolve_one_reuses_cached_dependencies():
+    calls = {"base": 0}
+
+    def _base_position() -> DiaChi:
+        calls["base"] += 1
+        return DiaChi.DAN
+
+    rules = SpecializedPlacementRules(
+        specs={
+            "base": SpecializedAbsoluteSpec(position_fn=_base_position),
+            "child": SpecializedRelativeSpec(
+                reference_id="base",
+                transform=lambda position: position + 1,
+            ),
+        }
+    )
+    engine = PlacementEngine(rules)
+
+    assert engine.resolve_one("child") == DiaChi.MEO
+    assert engine.resolve_one("child") == DiaChi.MEO
+    assert calls["base"] == 1
