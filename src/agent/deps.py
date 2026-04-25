@@ -6,7 +6,6 @@ from pathlib import Path
 from pydantic_ai import Agent, ModelRetry
 
 from src.agent.book_index import BookIndex
-from src.tuvi.cung import Cung
 from src.tuvi.tinh_ban import TinhBan
 
 
@@ -42,7 +41,7 @@ class TuviAgentDeps:
                 raise ModelRetry(str(exc)) from exc
         return self.book
 
-    def get_cung_by_position(self, position: str) -> Cung:
+    def get_cung_by_position(self, position: str) -> str:
         tinh_ban = self.require_tinh_ban()
         normalized_position = position.strip()
         if normalized_position not in tinh_ban.map_cung:

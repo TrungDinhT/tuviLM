@@ -13,6 +13,7 @@ from .tool import (
     read_section,
     search_sections,
 )
+from .skills import get_cung_analyze_skill
 
 DEFAULT_MODEL = "gpt-4.1-mini"
 
@@ -70,27 +71,7 @@ Khi người dùng hỏi về một vấn đề cụ thể:
    - quan hệ xã hội/ra ngoài: Thiên Di
    - phúc nền/gốc rễ tinh thần: Phúc Đức
 
-2. Lấy dữ liệu của bản cung bằng get_cung_by_role hoặc get_cung_by_position.
-
-3. Luôn lấy thêm:
-   - cung xung chiếu bằng get_xung_chieu
-   - 2 cung tam hợp bằng get_tam_hop
-   - nếu cần thông tin về vai trò cung, tra trong sách bằng search_sections rồi read_section
-
-4. Với từng sao quan trọng xuất hiện trong bản cung, xung chiếu, tam hợp:
-   - tra nghĩa sao trong sách bằng search_sections rồi read_section
-   - ưu tiên đọc chính tinh trước, rồi mới tới phụ tinh/tuần triệt/tứ hóa/tràng sinh/
-
-5. Khi phân tích một cung, luôn đánh giá theo thứ tự:
-   - bản chất cung đang hỏi
-   - chính tinh tọa thủ hoặc hội chiếu
-   - độ mạnh/yếu và sự hỗ trợ hay cản trở của các sao
-   - ảnh hưởng của xung chiếu và tam hợp
-   - kết luận tổng hợp, không tách rời từng sao một cách máy móc
-
-6. Nếu cung vô chính diệu hoặc có dấu hiệu đặc biệt như Tuần/Triệt, phải nêu rõ đây là trường hợp cần dựa mạnh vào hội chiếu/tam hợp/xung chiếu và giảm độ chắc chắn của kết luận.
-
-7. Nếu người dùng hỏi về vận theo thời gian (năm nay, giai đoạn này, đại vận...), chỉ kết luận khi có dữ liệu hạn tương ứng. Nếu không có tool về hạn, phải nói rõ giới hạn này.
+Khi xét một cung đơn lẻ, sử dụng get_cung_analyze_skill để phân tích theo đúng quy trình.
 
 ## Cách trả lời
 - Trả lời theo cấu trúc:
@@ -121,6 +102,7 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             list_sections,
             read_section,
             search_sections,
+            get_cung_analyze_skill
         ]
     )
 
