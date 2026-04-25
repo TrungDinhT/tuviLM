@@ -176,6 +176,23 @@ TRANG_SINH_COMPONENT_IDS = {
 }
 
 
+def _legacy_dia_chi(text: str) -> DiaChi:
+    return {
+        "Tý": DiaChi.TY,
+        "Sửu": DiaChi.SUU,
+        "Dần": DiaChi.DAN,
+        "Mão": DiaChi.MEO,
+        "Thìn": DiaChi.THIN,
+        "Tị": DiaChi.TI,
+        "Ngọ": DiaChi.NGO,
+        "Mùi": DiaChi.MUI,
+        "Thân": DiaChi.THAN,
+        "Dậu": DiaChi.DAU,
+        "Tuất": DiaChi.TUAT,
+        "Hợi": DiaChi.HOI,
+    }[text]
+
+
 def _select_rules_by_component_ids(component_ids: set[str]):
     return [
         rule
@@ -189,7 +206,7 @@ def _build_legacy_chinh_tinh_positions(time: dt.datetime) -> dict[str, DiaChi]:
     positions: dict[str, DiaChi] = {}
 
     for dia_chi_text, cung in tinh_ban.map_cung.items():
-        position = DiaChi(dia_chi_text)
+        position = _legacy_dia_chi(dia_chi_text)
         for sao in cung.chinhTinh:
             positions[CHINH_TINH_COMPONENT_IDS[sao.name]] = position
 
@@ -203,7 +220,7 @@ def _build_legacy_phu_tinh_positions(
     positions: dict[str, DiaChi] = {}
 
     for dia_chi_text, cung in tinh_ban.map_cung.items():
-        position = DiaChi(dia_chi_text)
+        position = _legacy_dia_chi(dia_chi_text)
         for sao in cung.phuTinh:
             component_id = component_ids.get(sao.name)
             if component_id is not None:
@@ -216,7 +233,7 @@ def _build_legacy_tuhoa_positions(time: dt.datetime) -> dict[str, DiaChi]:
     tinh_ban = LegacyBuilder().build(BirthTime.from_solar_day(time, "M"))
     positions: dict[str, DiaChi] = {}
     for dia_chi_text, cung in tinh_ban.map_cung.items():
-        position = DiaChi(dia_chi_text)
+        position = _legacy_dia_chi(dia_chi_text)
         for tuhoa in cung.tuhoa:
             component_id = TUHOA_COMPONENT_IDS[tuhoa.name]
             positions[component_id] = position
@@ -230,7 +247,7 @@ def _build_legacy_trang_sinh_positions(
     positions: dict[str, DiaChi] = {}
 
     for dia_chi_text, cung in tinh_ban.map_cung.items():
-        position = DiaChi(dia_chi_text)
+        position = _legacy_dia_chi(dia_chi_text)
         if cung.trang_sinh is None:
             continue
         component_id = component_ids.get(cung.trang_sinh.name)
@@ -249,10 +266,10 @@ def _legacy_tuan_triet_expected(time: dt.datetime, gender: Gender) -> dict[str, 
     ]
     tuan_names = MAP_TUAN[tuan_key]
     return {
-        "triet_1": DiaChi(triet_names[0]),
-        "triet_2": DiaChi(triet_names[1]),
-        "tuan_1": DiaChi(tuan_names[0]),
-        "tuan_2": DiaChi(tuan_names[1]),
+        "triet_1": _legacy_dia_chi(triet_names[0]),
+        "triet_2": _legacy_dia_chi(triet_names[1]),
+        "tuan_1": _legacy_dia_chi(tuan_names[0]),
+        "tuan_2": _legacy_dia_chi(tuan_names[1]),
     }
 
 

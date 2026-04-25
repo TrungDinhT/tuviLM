@@ -1,0 +1,14 @@
+[
+  { "id": "ty", "name": "Tý", "ngu_hanh": "Thủy" },
+  { "id": "suu", "name": "Sửu", "ngu_hanh": "Thổ" },
+  { "id": "dan", "name": "Dần", "ngu_hanh": "Mộc" },
+  { "id": "meo", "name": "Mão", "ngu_hanh": "Mộc" },
+  { "id": "thin", "name": "Thìn", "ngu_hanh": "Thổ" },
+  { "id": "ti", "name": "Tị", "ngu_hanh": "Hỏa" },
+  { "id": "ngo", "name": "Ngọ", "ngu_hanh": "Hỏa" },
+  { "id": "mui", "name": "Mùi", "ngu_hanh": "Thổ" },
+  { "id": "than", "name": "Thân", "ngu_hanh": "Kim" },
+  { "id": "dau", "name": "Dậu", "ngu_hanh": "Kim" },
+  { "id": "tuat", "name": "Tuất", "ngu_hanh": "Thổ" },
+  { "id": "hoi", "name": "Hợi", "ngu_hanh": "Thủy" }
+]

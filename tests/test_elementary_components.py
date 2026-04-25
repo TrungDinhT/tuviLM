@@ -1,6 +1,12 @@
 import pytest
 
-from src.refactored.component.elementary import DiaChi, NguHanh, ThienCan
+from src.refactored.component.elementary import (
+    DiaChi,
+    DiaChiEntity,
+    NguHanh,
+    ThienCan,
+    ThienCanEntity,
+)
 
 
 def test_dia_chi():
@@ -14,20 +20,20 @@ def test_dia_chi():
 
 
 def test_dia_chi_str_enum_and_cyclic_index():
-    assert DiaChi.TY.value == "Tý"
-    assert str(DiaChi.TY) == "Tý"
+    assert DiaChi.TY.value == "ty"
+    assert str(DiaChi.TY) == "ty"
     assert DiaChi.TY.index == 0
-    assert DiaChi("Tý") == DiaChi.TY
+    assert DiaChi("ty") == DiaChi.TY
     assert DiaChi.from_index(12) == DiaChi.TY
     assert DiaChi.from_index(-1) == DiaChi.HOI
     assert DiaChi.DAN.index == 2
 
 
 def test_thien_can_str_enum_and_cyclic_index():
-    assert ThienCan.GIAP.value == "Giáp"
-    assert str(ThienCan.GIAP) == "Giáp"
+    assert ThienCan.GIAP.value == "giap"
+    assert str(ThienCan.GIAP) == "giap"
     assert ThienCan.GIAP.index == 0
-    assert ThienCan("Giáp") == ThienCan.GIAP
+    assert ThienCan("giap") == ThienCan.GIAP
     assert ThienCan.from_index(10) == ThienCan.GIAP
     assert ThienCan.from_index(-1) == ThienCan.QUY
     assert ThienCan.CANH.index == 6
@@ -64,3 +70,23 @@ def test_ngu_hanh_directional_relationships():
     assert NguHanh.THO.tuong_sinh(NguHanh.HOA)
     assert NguHanh.THO.tuong_khac(NguHanh.THUY)
     assert NguHanh.THUY.tuong_khac(NguHanh.THO)
+
+
+def test_thien_can_entity_missing_id_raises():
+    with pytest.raises(Exception):
+        ThienCanEntity(name="Giáp", ngu_hanh=NguHanh.MOC)
+
+
+def test_thien_can_entity_missing_name_raises():
+    with pytest.raises(Exception):
+        ThienCanEntity(id="giap", ngu_hanh=NguHanh.MOC)
+
+
+def test_dia_chi_entity_missing_id_raises():
+    with pytest.raises(Exception):
+        DiaChiEntity(name="Tý", ngu_hanh=NguHanh.THUY)
+
+
+def test_dia_chi_entity_missing_name_raises():
+    with pytest.raises(Exception):
+        DiaChiEntity(id="ty", ngu_hanh=NguHanh.THUY)

@@ -22,7 +22,7 @@ CUNG_RULES = [
         ],
     ),
     pp.RelativePosition(
-        component_id="than",
+        component_id="cung_than",
         reference_id="menh",
         transform=pp.move_by_birth_hour(
             direction=CircleDirection.CW,
@@ -524,7 +524,7 @@ PHU_TINH_RULES = [
     ),
     pp.RelativePosition(
         component_id="thien_tho",
-        reference_id="than",
+        reference_id="cung_than",
         transform=pp.move_by_dia_chi(CircleDirection.CW),
     ),
     pp.SamePosition(
@@ -622,6 +622,19 @@ TU_HOA_TARGET_BY_THIEN_CAN: dict[ThienCan, dict[pp.TuHoaEntity, str]] = {
 }
 
 TU_HOA_RULES = [pp.TuHoaPosition(mapping=TU_HOA_TARGET_BY_THIEN_CAN)]
+
+
+LIST_SAO_LUU = [
+    "thai_tue",
+    "bach_ho",
+    "tang_mon",
+    "thien_ma",
+    "loc_ton",
+    "kinh_duong",
+    "da_la",
+    "thien_khoc",
+    "thien_hu",
+]
 
 
 # ---------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 from enum import Enum, IntEnum, StrEnum
-from pydantic import BaseModel
+
+from pydantic import BaseModel, model_validator
 
 
 class IndexedEnumMixin:
@@ -26,31 +27,30 @@ class CyclicEnumMixin(IndexedEnumMixin):
 
 
 class ThienCan(CyclicEnumMixin, StrEnum):
-    GIAP = "Giáp"
-    AT = "Ất"
-    BINH = "Bính"
-    DINH = "Đinh"
-    MAU = "Mậu"
-    KY = "Kỷ"
-    CANH = "Canh"
-    TAN = "Tân"
-    NHAM = "Nhâm"
-    QUY = "Quý"
-
+    GIAP = "giap"
+    AT = "at"
+    BINH = "binh"
+    DINH = "dinh"
+    MAU = "mau"
+    KY = "ky"
+    CANH = "canh"
+    TAN = "tan"
+    NHAM = "nham"
+    QUY = "quy"
 
 class DiaChi(CyclicEnumMixin, StrEnum):
-    TY = "Tý"
-    SUU = "Sửu"
-    DAN = "Dần"
-    MEO = "Mão"
-    THIN = "Thìn"
-    TI = "Tị"
-    NGO = "Ngọ"
-    MUI = "Mùi"
-    THAN = "Thân"
-    DAU = "Dậu"
-    TUAT = "Tuất"
-    HOI = "Hợi"
+    TY = "ty"
+    SUU = "suu"
+    DAN = "dan"
+    MEO = "meo"
+    THIN = "thin"
+    TI = "ti"
+    NGO = "ngo"
+    MUI = "mui"
+    THAN = "than"
+    DAU = "dau"
+    TUAT = "tuat"
+    HOI = "hoi"
 
     @classmethod
     def list_dia_chi(cls) -> list["DiaChi"]:
@@ -126,3 +126,31 @@ class ComponentBase(BaseModel):
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+
+class ThienCanEntity(ComponentBase):
+    model_config = {"frozen": True}
+
+    ngu_hanh: NguHanh
+    value: ThienCan
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_identity(cls, data: object):
+        if not isinstance(data, dict):
+            return data
+        return {**data, "value": ThienCan(data["id"])}
+
+
+class DiaChiEntity(ComponentBase):
+    model_config = {"frozen": True}
+
+    ngu_hanh: NguHanh
+    value: DiaChi
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_identity(cls, data: object):
+        if not isinstance(data, dict):
+            return data
+        return {**data, "value": DiaChi(data["id"])}
