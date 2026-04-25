@@ -8,7 +8,7 @@ MAP_START_STATUS: dict[str, dict[str, Optional[str]]] = {
         "Ngọ": "Miếu", "Mùi": "Đắc", "Thân": "Miếu", "Dậu": "Bình", "Tuất": "Miếu", "Hợi": "Đắc"
     },
     "Thiên Phủ": {
-        "Tý": "Miếu", "Sửu": "Bình", "Dần": "Miếu", "Mão": "Bình", "Thìn": "Miếu", "Tị": None,
+        "Tý": "Miếu", "Sửu": "Bình", "Dần": "Miếu", "Mão": "Bình", "Thìn": "Miếu", "Tị": "Đắc",
         "Ngọ": "Miếu", "Mùi": "Đắc", "Thân": "Miếu", "Dậu": "Bình", "Tuất": "Miếu", "Hợi": "Đắc"
     },
     "Vũ Khúc": {
@@ -37,7 +37,7 @@ MAP_START_STATUS: dict[str, dict[str, Optional[str]]] = {
     },
     "Thiên Cơ": {
         "Tý": "Đắc", "Sửu": "Đắc", "Dần": "Hãm", "Mão": "Miếu", "Thìn": "Miếu", "Tị": "Miếu",
-        "Ngọ": "Đắc", "Mùi": "Miếu", "Thân": None, "Dậu": "Miếu", "Tuất": "Miếu", "Hợi": "Hãm"
+        "Ngọ": "Đắc", "Mùi": "Miếu", "Thân": "Miếu", "Dậu": "Miếu", "Tuất": "Miếu", "Hợi": "Hãm"
     },
     "Thái Âm": {
         "Tý": "Miếu", "Sửu": "Đắc", "Dần": "Hãm", "Mão": "Hãm", "Thìn": "Hãm", "Tị": "Hãm",
