@@ -8,6 +8,7 @@ from src.tuvi.cung import Cung
 from src.tuvi.element.types import LIST_DIA_CHI, ROLE_TYPE, TYPE_DIA_CHI
 from src.tuvi.tinh_ban import TinhBan
 
+
 _logger = logging.getLogger(__name__)
 
 def get_tinh_ban(ctx: RunContext[TuviAgentDeps]) -> TinhBan:
@@ -119,21 +120,28 @@ def search_sections(
 def get_tam_hop(
     ctx: RunContext[TuviAgentDeps],
     position: TYPE_DIA_CHI
-) -> TYPE_DIA_CHI:
+) -> str:
     """Lấy cung tam hợp của một cung cụ thể."""
     index = LIST_DIA_CHI.index(position)
     tam_hop_index = ((index + 4) % 12, (index + 8) % 12)
     tam_hop_position = (LIST_DIA_CHI[tam_hop_index[0]], LIST_DIA_CHI[tam_hop_index[1]])
-    return f"Cung tam hợp của {position} là {tam_hop_position}."
+    info = ""
+    info += f"Cung tam hợp của {position} là {tam_hop_position[0]}."
+    info += get_cung_by_position(ctx, tam_hop_position[0])
+    info += f"\nCung tam hợp còn lại của {position} là {tam_hop_position[1]}."
+    info += get_cung_by_position(ctx, tam_hop_position[1])
+    return info
 
 
 
 def get_xung_chieu(
     ctx: RunContext[TuviAgentDeps],
     position: TYPE_DIA_CHI
-) -> TYPE_DIA_CHI:
+) -> str:
     """Lấy cung xung chiếu của một cung cụ thể."""
     index = LIST_DIA_CHI.index(position)
     xung_chieu_index = (index + 6) % 12
     xung_chieu_position = LIST_DIA_CHI[xung_chieu_index]
-    return f"Cung xung chiếu của {position} là {xung_chieu_position}."
+    info = f"Cung xung chiếu của {position} là {xung_chieu_position}."
+    info += get_cung_by_position(ctx, xung_chieu_position)
+    return info
