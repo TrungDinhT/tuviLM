@@ -2,7 +2,9 @@ from __future__ import annotations
 import logging
 
 from pydantic_ai import ModelRetry, RunContext
-from src.agent.book_index import ListSectionsResult, SearchSectionsResult, SectionContent, SectionMeta
+from src.agent.book_index import (
+    SectionContent,
+)
 from src.agent.deps import TuviAgentDeps
 from src.tuvi.cung import Cung
 from src.tuvi.element.types import LIST_DIA_CHI, ROLE_TYPE, TYPE_DIA_CHI
@@ -34,38 +36,31 @@ def get_cung_by_role(
     return ctx.deps.get_cung_by_role(role)
 
 
-def list_sections(
+
+
+def read_catalog(
     ctx: RunContext[TuviAgentDeps],
-    parent_id: str | None = None,
-) -> ListSectionsResult:
+    section_id: str | None = None,
+    depth: int | None = 3,
+) -> str:
     """
-    List immediate child sections in the structured book.
+    Read the Tử Vi Tân Biên catalog as a plain-text tree.
 
-    Use parent_id=None to list top-level sections in the default book part.
-    Returned ids can be used directly by get_section and read_section.
+    Use section_id=None to browse the book from the root. Pass a section_id
+    such as "1.1" or "11.2.14#hoa-linh" to browse only that branch. Increase
+    depth when more descendant levels are needed; pass None to read all levels.
     """
-    _logger.info(f"Liệt kê mục sách: parent_id={parent_id}")
+    _logger.info(
+        "Đọc catalog sách: section_id=%s, depth=%s",
+        section_id,
+        depth,
+    )
     try:
-        book = ctx.deps.require_book()
-        sections = book.list_sections(parent_id=parent_id)
-        return ListSectionsResult(
-            sections=[book.get_meta(section.id) for section in sections]
+        bounded_depth = None if depth is None else max(1, min(depth, 8))
+        return ctx.deps.require_book().get_catalog(
+            section_id=section_id,
+            depth=bounded_depth,
         )
-    except ValueError as exc:
-        raise ModelRetry(str(exc)) from exc
-
-
-def get_section(ctx: RunContext[TuviAgentDeps], section_id: str) -> SectionMeta:
-    """
-    Get metadata for one book section, including breadcrumb, summary, parent,
-    and immediate children.
-
-    Use ids such as "1.1" or "11.2.14#hoa-linh". The default book part is
-    already selected by the index.
-    """
-    _logger.info(f"Lấy metadata mục sách: {section_id}")
-    try:
-        return ctx.deps.require_book().get_meta(section_id)
     except ValueError as exc:
         raise ModelRetry(str(exc)) from exc
 
@@ -74,47 +69,24 @@ def get_section(ctx: RunContext[TuviAgentDeps], section_id: str) -> SectionMeta:
 def read_section(
     ctx: RunContext[TuviAgentDeps],
     section_id: str,
-    include_children: bool = False,
     max_chars: int | None = 8000,
 ) -> SectionContent:
     """
     Read the content of one book section.
 
-    Set include_children=True to append immediate child subsection content.
-    Use max_chars to keep long sections bounded.
+    section_id must be a valid id such as "3", "3.4", "3.4.5", or "8.11".
     """
     _logger.info(
-        "Đọc mục sách: section_id=%s, include_children=%s, max_chars=%s",
-        section_id,
-        include_children,
-        max_chars,
+        f"Đọc mục sách: section_id={section_id}, max_chars={max_chars}",
     )
     try:
         return ctx.deps.require_book().read_section(
             section_id,
-            include_children=include_children,
             max_chars=max_chars,
         )
     except ValueError as exc:
         raise ModelRetry(str(exc)) from exc
 
-
-def search_sections(
-    ctx: RunContext[TuviAgentDeps],
-    query: str,
-    top_k: int = 5,
-) -> SearchSectionsResult:
-    """
-    Search section ids, titles, summaries, and partial content in the book.
-
-    This is the best first tool when the user asks about a doctrine, rule,
-    star combination, or section title from Tử Vi Tân Biên.
-    """
-    bounded_top_k = max(1, min(top_k, 20))
-    _logger.info(f"Tìm kiếm mục sách: query={query}, top_k={bounded_top_k}")
-    return SearchSectionsResult(
-        hits=ctx.deps.require_book().search_sections(query, top_k=bounded_top_k)
-    )
 
 
 def get_tam_hop(
