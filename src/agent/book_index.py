@@ -17,6 +17,7 @@ except ImportError:  # pragma: no cover - dependency exists in this project.
 
 SECTION_FILE_RE = re.compile(r"^(?P<raw_id>\d+(?:_\d+)*)_(?P<slug>.+)\.md$")
 NUMBERED_TITLE_RE = re.compile(r"^(?P<section_id>\d+(?:\.\d+)*)(?:\.)?\s+(?P<title>.+)$")
+SECTION_ID_RE = re.compile(r"^\d+(?:\.\d+)*$")
 
 
 def _slug_to_title(slug: str) -> str:
@@ -41,6 +42,16 @@ def _section_level(display_id: str) -> int:
 def _display_sort_key(display_id: str) -> tuple[int, ...]:
     numeric_id = display_id.split("#")[0]
     return tuple(int(part) for part in numeric_id.split("."))
+
+
+def _normalize_section_id(section_id: str) -> str:
+    normalized = section_id.strip().replace("_", ".").split("#", 1)[0]
+    if not SECTION_ID_RE.fullmatch(normalized):
+        raise ValueError(
+            "section_id must use numeric format, for example '3', '3.4', "
+            "'3.4.5', or '8.11'."
+        )
+    return normalized
 
 
 def _normalize_text(value: str) -> str:
@@ -248,14 +259,29 @@ class BookIndex:
         return None
 
     def has_section(self, section_id: str) -> bool:
-        return section_id.strip() in self._sections_by_id
+        try:
+            normalized = _normalize_section_id(section_id)
+        except ValueError:
+            return False
+        return normalized in self._sections_by_id
 
     def get_record(self, section_id: str) -> SectionRecord:
-        normalized = section_id.strip().replace("_", ".")
+        normalized = _normalize_section_id(section_id)
         record = self._sections_by_id.get(normalized)
         if record is None:
             raise ValueError(f"Unknown section id: {section_id}")
         return record
+
+    def _ancestor_records(self, record: SectionRecord) -> list[SectionRecord]:
+        records: list[SectionRecord] = []
+        current_id: str | None = record.id
+
+        while current_id is not None:
+            current = self.get_record(current_id)
+            records.append(current)
+            current_id = current.parent_id
+
+        return list(reversed(records))
 
     def list_sections(self, parent_id: str | None = None) -> list[SectionRecord]:
         if parent_id is None:
@@ -350,18 +376,25 @@ class BookIndex:
         self,
         section_id: str,
         *,
-        include_children: bool = False,
         max_chars: int | None = None,
     ) -> SectionContent:
+        """
+        Read a section and its parent context.
+
+        section_id must be a numeric id such as "3", "3.4", "3.4.5", or
+        "8.11". If a slug suffix is provided, for example
+        "8.11#bo-sao-khoc-hu-thien-khoc-thien-hu", only "8.11" is used.
+        The returned content includes all parent section content before the
+        requested section content, for example read_section("3.5") returns
+        content from section "3" followed by section "3.5".
+        """
         record = self.get_record(section_id)
 
-        content = record.content
-        if include_children and record.children_ids:
-            parts = [content]
-            for child_id in record.children_ids:
-                child = self.get_record(child_id)
-                parts.append(f"\n\n## {child.id} {child.title}\n\n{child.content}")
-            content = "".join(parts).strip()
+        parts = [
+            f"## {ancestor.id} {ancestor.title}\n\n{ancestor.content}"
+            for ancestor in self._ancestor_records(record)
+        ]
+        content = "\n\n".join(parts).strip()
 
         if max_chars is not None and max_chars > 3 and len(content) > max_chars:
             content = content[: max_chars - 3].rstrip() + "..."
@@ -373,34 +406,42 @@ class BookIndex:
             content=content,
         )
 
-    def get_catalog(self, section_id: str | None = None) -> str:
-        def render_node(record: SectionRecord, prefix: str, is_last: bool) -> list[str]:
+    def get_catalog(self, section_id: str | None = None, depth: int | None = None) -> str:
+        def render_node(record: SectionRecord, prefix: str, is_last: bool, remaining_depth: int | None) -> list[str]:
             connector = "└── " if is_last else "├── "
             lines = [f"{prefix}{connector}{record.id} {record.title}"]
+            if remaining_depth is not None and remaining_depth <= 0:
+                return lines
             child_prefix = prefix + ("    " if is_last else "│   ")
+            next_depth = None if remaining_depth is None else remaining_depth - 1
             for i, child_id in enumerate(record.children_ids):
                 child = self.get_record(child_id)
-                lines.extend(render_node(child, child_prefix, i == len(record.children_ids) - 1))
+                lines.extend(render_node(child, child_prefix, i == len(record.children_ids) - 1, next_depth))
             return lines
 
         if section_id is None:
             roots = self.list_sections(parent_id=None)
             lines: list[str] = []
+            next_depth = None if depth is None else depth - 1
             for i, record in enumerate(roots):
                 is_last = i == len(roots) - 1
                 connector = "└── " if is_last else "├── "
                 lines.append(f"{connector}{record.id} {record.title}")
-                child_prefix = "    " if is_last else "│   "
-                for j, child_id in enumerate(record.children_ids):
-                    child = self.get_record(child_id)
-                    lines.extend(render_node(child, child_prefix, j == len(record.children_ids) - 1))
+                if next_depth is None or next_depth > 0:
+                    child_prefix = "    " if is_last else "│   "
+                    child_next_depth = None if next_depth is None else next_depth - 1
+                    for j, child_id in enumerate(record.children_ids):
+                        child = self.get_record(child_id)
+                        lines.extend(render_node(child, child_prefix, j == len(record.children_ids) - 1, child_next_depth))
             return "\n".join(lines)
 
         record = self.get_record(section_id)
         lines = [f"{record.id} {record.title}"]
-        for i, child_id in enumerate(record.children_ids):
-            child = self.get_record(child_id)
-            lines.extend(render_node(child, "", i == len(record.children_ids) - 1))
+        if depth is None or depth > 0:
+            next_depth = None if depth is None else depth - 1
+            for i, child_id in enumerate(record.children_ids):
+                child = self.get_record(child_id)
+                lines.extend(render_node(child, "", i == len(record.children_ids) - 1, next_depth))
         return "\n".join(lines)
 
     def search_sections(self, query: str, top_k: int = 5) -> list[SectionSearchHit]:
