@@ -7,13 +7,11 @@ from .tool import (
     get_cung_by_position,
     get_cung_by_role,
     get_tam_hop,
-    get_section,
+    read_catalog,
     get_xung_chieu,
-    list_sections,
     read_section,
-    search_sections,
 )
-from .skills import get_cung_analyze_skill
+from .skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
 
 DEFAULT_MODEL = "gpt-4.1-mini"
 
@@ -25,31 +23,13 @@ Bạn là một trợ lý luận giải lá số Tử Vi theo phong cách điề
 2. Nếu chưa đủ dữ liệu để kết luận, phải nói rõ phần nào còn thiếu.
 3. Không khẳng định tuyệt đối ở những điểm còn tranh luận giữa các trường phái.
 4. Không lấy toàn bộ tinh bàn nếu câu hỏi chỉ nhắm vào một chủ đề/cung cụ thể.
-5. Khi cần tra cứu sách Tử Vi Tân Biên theo mục/chương, ưu tiên search_sections trước,
-   sau đó dùng get_section/list_sections để kiểm tra ngữ cảnh, cuối cùng mới dùng read_section
-   để đọc nội dung mục phù hợp.
+5. Khi cần tra cứu sách Tử Vi Tân Biên, dùng read_book_tuvi_tan_bien để nắm quy trình.
+   Chỉ dùng read_catalog để xem mục lục và read_section để đọc nội dung mục phù hợp.
 6. Khi dùng nội dung sách, phải nêu rõ mục sách đã dùng bằng id hoặc breadcrumb,
    ví dụ: 1.1 hoặc 1 ... > 1.1 ...
 
 ## Công cụ tra cứu sách Tử Vi Tân Biên
-Sách đã được tách thành các section markdown, mỗi section có id, title, breadcrumb,
-summary, children và content. Các id có thể có dạng:
-- id mục: 1.1, 4.2.24
-- nếu trùng id trong cùng một phần, dùng id có hậu tố slug như 11.2.14#hoa-linh
-Không thêm tiền tố phần sách vào section_id; phần sách mặc định đã được chọn sẵn.
-
-Khi người dùng hỏi về học thuyết, nguyên tắc luận đoán, tên mục, tên cách cục,
-tổ hợp sao, hoặc muốn đối chiếu với sách:
-1. Dùng search_sections(query, top_k) trước để tìm các mục liên quan.
-2. Nếu kết quả chưa rõ thuộc nhánh nào, dùng get_section(section_id) để xem breadcrumb,
-   summary và children; hoặc dùng list_sections(parent_id) để duyệt mục con.
-3. Dùng read_section(section_id, include_children=False) để đọc nội dung mục phù hợp.
-4. Chỉ đặt include_children=True khi mục cha quá ngắn hoặc câu hỏi cần bao quát
-   các mục con trực tiếp.
-5. Nếu search_sections trả nhiều mục gần giống nhau, đọc 2-3 mục có điểm cao nhất
-   trước khi tổng hợp; không tự chọn một mục nếu title/breadcrumb không khớp câu hỏi.
-6. Nếu người dùng đưa id cụ thể, gọi get_section hoặc read_section trực tiếp với id đó.
-7. Nếu không tìm thấy section phù hợp, nói rõ là chưa tìm thấy trong sách, không bịa.
+- Sử dụng read_book_tuvi_tan_bien để tìm hiểu cách tra cứu sách hiệu quả.
 
 Khi trả lời bằng dữ liệu sách:
 - Tóm tắt ý chính bằng lời của bạn, không chép nguyên văn dài.
@@ -97,12 +77,11 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_cung_by_position,
             get_cung_by_role,
             get_tam_hop,
-            get_section,
             get_xung_chieu,
-            list_sections,
+            read_catalog,
             read_section,
-            search_sections,
-            get_cung_analyze_skill
+            get_cung_analyze_skill,
+            read_book_tuvi_tan_bien,
         ]
     )
 
