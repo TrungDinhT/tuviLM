@@ -18,7 +18,6 @@ class TuviAgentDeps:
     tinh_ban: TinhBan | None = None
     book: BookIndex | None = None
     book_root: Path = DEFAULT_BOOK_ROOT
-    default_book_part_id: str | None = "part_2"
 
     def require_agent(self) -> Agent:
         if self.agent is None:
@@ -33,10 +32,7 @@ class TuviAgentDeps:
     def require_book(self) -> BookIndex:
         if self.book is None:
             try:
-                self.book = BookIndex(
-                    self.book_root,
-                    default_part_id=self.default_book_part_id,
-                )
+                self.book = BookIndex(self.book_root)
             except FileNotFoundError as exc:
                 raise ModelRetry(str(exc)) from exc
         return self.book
