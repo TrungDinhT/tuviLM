@@ -77,6 +77,4 @@ class Cung(pydantic.BaseModel):
         info += f"\nTuổi Đại Vận: {self.age_daivan}" if self.age_daivan else ""
         info += "\nSao Lưu: " + "\n - ".join([star.name for star in self.saoLuu]) if self.saoLuu else ""
 
-        print(info)
-
         return info
