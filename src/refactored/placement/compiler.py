@@ -61,9 +61,9 @@ class PlacementRuleCompiler(PlacementRegistry):
             rule.register_components(self)
 
     def compile(self, context: LaSoContext) -> SpecializedPlacementRules:
-        specs = self._specialize(context)
-        self._validate_references_exist(specs)
-        return SpecializedPlacementRules(specs=specs)
+        specialized_specs = self._specialize(context)
+        self._validate_references_exist(specialized_specs)
+        return SpecializedPlacementRules(specs=specialized_specs)
 
     def _specialize(self, context: LaSoContext) -> SpecializedPlacementSpecMap:
         specialized: SpecializedPlacementSpecMap = {}

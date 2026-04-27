@@ -7,7 +7,7 @@ from src.refactored.placement.compiler import PlacementRuleCompiler
 # Cung role placement rules
 # ---------------------------------------------------------------------------
 
-CUNG_RULES = [
+ROLE_RULES = [
     pp.Circle(
         principal_id="menh",
         principal_position_fn=pp.menh_position_fn,
@@ -653,7 +653,7 @@ LIST_SAO_LUU = [
 
 def get_default_placement_rule_compiler() -> PlacementRuleCompiler:
     compiler = PlacementRuleCompiler()
-    compiler.register_rules(CUNG_RULES)
+    compiler.register_rules(ROLE_RULES)
     compiler.register_rules(CHINH_TINH_RULES)
     compiler.register_rules(PHU_TINH_RULES)
     compiler.register_rules(TU_HOA_RULES)

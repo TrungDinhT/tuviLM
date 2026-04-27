@@ -1,6 +1,6 @@
 from src.refactored.builder.component_catalog import get_default_catalog
-from src.refactored.component.cung import Cung, Role
-from src.refactored.component.elementary import NguHanh
+from src.refactored.component.cung import CungRole, Role
+from src.refactored.component.elementary import DiaChi, NguHanh, ThienCan
 from src.refactored.component.sao import Sao, TuHoa
 
 
@@ -22,7 +22,7 @@ def test_default_catalog_loads_cung_and_sao_components():
     hoa_khoa = catalog.get("hoa_khoa")
     hoa_ky = catalog.get("hoa_ky")
 
-    assert isinstance(menh, Cung)
+    assert isinstance(menh, CungRole)
     assert menh.id == "menh"
     assert menh.name == "Mệnh"
     assert menh.role == Role.MENH
@@ -109,3 +109,20 @@ def test_default_catalog_get_many_preserves_requested_order():
     components = catalog.get_many(["thien_tho", "menh"])
 
     assert [component.name for component in components] == ["Thiên Thọ", "Mệnh"]
+
+
+def test_default_catalog_loads_structural_entities():
+    catalog = get_default_catalog()
+
+    ty = catalog.get_dia_chi(DiaChi.TY)
+    giap = catalog.get_thien_can(ThienCan.GIAP)
+
+    assert ty.id == "ty"
+    assert ty.name == "Tý"
+    assert ty.value == DiaChi.TY
+    assert ty.ngu_hanh == NguHanh.THUY
+
+    assert giap.id == "giap"
+    assert giap.name == "Giáp"
+    assert giap.value == ThienCan.GIAP
+    assert giap.ngu_hanh == NguHanh.MOC

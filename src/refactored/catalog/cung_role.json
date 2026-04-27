@@ -1,0 +1,15 @@
+[
+  { "id": "menh", "name": "Mệnh" },
+  { "id": "phu_mau", "name": "Phụ Mẫu" },
+  { "id": "phuc_duc", "name": "Phúc Đức" },
+  { "id": "dien_trach", "name": "Điền Trạch" },
+  { "id": "quan_loc", "name": "Quan Lộc" },
+  { "id": "no_boc", "name": "Nô Bộc" },
+  { "id": "thien_di", "name": "Thiên Di" },
+  { "id": "tat_ach", "name": "Tật Ách" },
+  { "id": "tai_bach", "name": "Tài Bạch" },
+  { "id": "tu_tuc", "name": "Tử Tức" },
+  { "id": "phu_the", "name": "Phu Thê" },
+  { "id": "huynh_de", "name": "Huynh Đệ" },
+  { "id": "cung_than", "name": "Thân" }
+]
