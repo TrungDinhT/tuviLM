@@ -358,6 +358,25 @@ textarea {
   white-space: pre-wrap;
 }
 
+.msg-markdown {
+  line-height: 1.45;
+}
+
+.msg-markdown p,
+.msg-markdown ol,
+.msg-markdown ul {
+  margin: 0 0 8px 0;
+}
+
+.msg-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.msg-markdown ol,
+.msg-markdown ul {
+  padding-left: 20px;
+}
+
 .tool-call-list {
   display: flex;
   flex-wrap: wrap;

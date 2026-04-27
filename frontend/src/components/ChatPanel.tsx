@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import type { ChatMessage, ChatToolCall } from "../types";
 
 type Props = {
@@ -63,7 +64,13 @@ export default function ChatPanel({ messages, onSend, busy }: Props) {
                 ))}
               </div>
             ) : null}
-            <p>{m.content}</p>
+            {m.role === "assistant" ? (
+              <div className="msg-markdown">
+                <ReactMarkdown>{m.content}</ReactMarkdown>
+              </div>
+            ) : (
+              <p>{m.content}</p>
+            )}
           </article>
         ))}
       </div>
