@@ -26,8 +26,7 @@ class Sao(Element):
 
     def star_name_with_status(self, position : TYPE_DIA_CHI) -> str:
         if status := self.get_status(position):
-            short_status = STATUS_SHORT_LABEL.get(status, status)
-            return f"{self.name} ({short_status})"
+            return f"{self.name} ({status})"
         return self.name
 
 
