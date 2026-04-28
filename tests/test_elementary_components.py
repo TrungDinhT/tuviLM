@@ -19,6 +19,25 @@ def test_dia_chi():
     assert DiaChi.THIN + 36 == DiaChi.THIN
 
 
+def test_cyclic_same_type_subtraction_returns_int_offset():
+    assert DiaChi.DAN - DiaChi.DAN == 0
+    assert DiaChi.MEO - DiaChi.DAN == 1
+    assert DiaChi.SUU - DiaChi.DAN == 11
+    assert DiaChi.TY - DiaChi.DAN == 10
+
+    assert ThienCan.GIAP - ThienCan.GIAP == 0
+    assert ThienCan.AT - ThienCan.GIAP == 1
+    assert ThienCan.GIAP - ThienCan.QUY == 1
+    assert ThienCan.QUY - ThienCan.GIAP == 9
+
+
+def test_cyclic_subtraction_rejects_other_types():
+    with pytest.raises(TypeError):
+        _ = DiaChi.DAN - ThienCan.GIAP
+    with pytest.raises(TypeError):
+        _ = DiaChi.DAN - "dan"
+
+
 def test_dia_chi_str_enum_and_cyclic_index():
     assert DiaChi.TY.value == "ty"
     assert str(DiaChi.TY) == "ty"

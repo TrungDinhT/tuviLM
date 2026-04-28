@@ -21,7 +21,7 @@ from src.refactored.placement.primitives import (
 )
 from src.refactored.placement.rules import (
     CHINH_TINH_RULES,
-    CUNG_RULES,
+    ROLE_RULES,
     PHU_TINH_RULES,
     TU_HOA_RULES,
     TU_HOA_TARGET_BY_THIEN_CAN,
@@ -624,7 +624,7 @@ def test_builder_resolves_tuhoa_like_legacy_builder():
     positions = _resolve_positions_with_rules(
         time=time,
         gender=Gender.MALE,
-        rules=CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES + TU_HOA_RULES,
+        rules=ROLE_RULES + CHINH_TINH_RULES + PHU_TINH_RULES + TU_HOA_RULES,
     )
     legacy_positions = _build_legacy_tuhoa_positions(time)
 
@@ -647,14 +647,14 @@ def test_tuhoa_targets_are_registered_components():
     resolved = _resolve_positions_with_rules(
         time=dt.datetime(1996, 12, 19, 6, 30),
         gender=Gender.MALE,
-        rules=CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES,
+        rules=ROLE_RULES + CHINH_TINH_RULES + PHU_TINH_RULES,
     )
 
     for thien_can, entities in TU_HOA_TARGET_BY_THIEN_CAN.items():
         for entity, target_id in entities.items():
             assert target_id in resolved, (
                 f"Tứ Hóa target `{target_id}` for {thien_can} `{entity}` "
-                "is not produced by CUNG_RULES + CHINH_TINH_RULES + PHU_TINH_RULES"
+                "is not produced by ROLE_RULES + CHINH_TINH_RULES + PHU_TINH_RULES"
             )
 
 

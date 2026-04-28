@@ -472,6 +472,31 @@ def tuan_positions_fn(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
     return _TUAN_POSITIONS[dia_chi - thien_can_index]
 
 
+# Each Cung carries a Thiên Can derived from the year's Thiên Can per the
+# Ngũ Hổ Độn rule (see "Phối hợp với mười can"):
+#
+#   - The Thiên Can at Dần is fixed by the year's Thiên Can.
+#   - From Dần, the Thiên Can advances one step clockwise per Địa Chi,
+#   giving every Cung its Thiên Can.
+DAN_THIEN_CAN_BY_YEAR: dict[ThienCan, ThienCan] = {
+    ThienCan.GIAP: ThienCan.BINH,
+    ThienCan.KY: ThienCan.BINH,
+    ThienCan.AT: ThienCan.MAU,
+    ThienCan.CANH: ThienCan.MAU,
+    ThienCan.BINH: ThienCan.CANH,
+    ThienCan.TAN: ThienCan.CANH,
+    ThienCan.DINH: ThienCan.NHAM,
+    ThienCan.NHAM: ThienCan.NHAM,
+    ThienCan.MAU: ThienCan.GIAP,
+    ThienCan.QUY: ThienCan.GIAP,
+}
+
+def cung_thien_can_for(year_thien_can: ThienCan, position: DiaChi) -> ThienCan:
+    """Resolve the Thiên Can of the Cung at ``position`` per Ngũ Hổ Độn."""
+    dan_thien_can = DAN_THIEN_CAN_BY_YEAR[year_thien_can]
+    return dan_thien_can + (position - DiaChi.DAN)
+
+
 def position_by_thien_can(
     mapping: ThienCanPositionMap,
 ) -> AbsolutePositionResolver:

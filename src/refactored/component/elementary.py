@@ -1,4 +1,5 @@
 from enum import Enum, IntEnum, StrEnum
+from typing import Self
 
 from pydantic import BaseModel, model_validator
 
@@ -15,15 +16,17 @@ class CyclicEnumMixin(IndexedEnumMixin):
         members = tuple(cls)
         return members[index % len(members)]
 
-    def __add__(self, val: int):
+    def __add__(self, val: int) -> "Self":
         if not isinstance(val, int):
             return NotImplemented
         return type(self).from_index(self.index + val)
 
-    def __sub__(self, val: int):
-        if not isinstance(val, int):
-            return NotImplemented
-        return self + (-1) * val
+    def __sub__(self, val: "Self | int") -> "Self | int":
+        if isinstance(val, type(self)):
+            return (self.index - val.index) % len(type(self))
+        if isinstance(val, int):
+            return self + (-1) * val
+        return NotImplemented
 
 
 class ThienCan(CyclicEnumMixin, StrEnum):

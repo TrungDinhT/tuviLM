@@ -3,6 +3,10 @@ from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCa
 from src.refactored.placement.compiler import PlacementRuleCompiler
 
 
+# ---------------------------------------------------------------------------
+# Cung role placement rules
+# ---------------------------------------------------------------------------
+
 CUNG_RULES = [
     pp.Circle(
         principal_id="menh",
@@ -30,6 +34,11 @@ CUNG_RULES = [
         ),
     ),
 ]
+
+
+# ---------------------------------------------------------------------------
+# Sao placement rules
+# ---------------------------------------------------------------------------
 
 CHINH_TINH_RULES = [
     # tu, vu, liem
