@@ -6,6 +6,7 @@ from src.agent.deps import TuviAgentDeps
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
+    get_role_instruction,
     get_tam_hop,
     read_catalog,
     get_xung_chieu,
@@ -68,6 +69,7 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             read_section,
             get_cung_analyze_skill,
             read_book_tuvi_tan_bien,
+            get_role_instruction
         ]
     )
 

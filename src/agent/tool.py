@@ -1,11 +1,26 @@
 from __future__ import annotations
 import logging
+from typing import assert_never
 
 from pydantic_ai import ModelRetry, RunContext
 from src.agent.book_index import (
     SectionContent,
 )
 from src.agent.deps import TuviAgentDeps
+from src.agent.prompt.skill_analyze_cung import (
+    CUNG_DIEN_TRACH_INSTRUCTION,
+    CUNG_HUYNH_DE_INSTRUCTION,
+    CUNG_MENH_INSTRUCTION,
+    CUNG_NO_BOC_INSTRUCTION,
+    CUNG_PHU_MAU_INSTRUCTION,
+    CUNG_PHU_THE_INSTRUCTION,
+    CUNG_PHUC_DUC_INSTRUCION,
+    CUNG_QUAN_LOC_INSTRUCTION,
+    CUNG_TAI_BACH_INSTRUCTION,
+    CUNG_TAT_ACH_INSTRUCTION,
+    CUNG_THIEN_DI_INSTRUCTION,
+    CUNG_TU_TUC_INSTRUCTION,
+)
 from src.tuvi.cung import Cung
 from src.tuvi.element.types import LIST_DIA_CHI, ROLE_TYPE, TYPE_DIA_CHI
 from src.tuvi.tinh_ban import TinhBan
@@ -47,7 +62,7 @@ def read_catalog(
     Read the Tử Vi Tân Biên catalog as a plain-text tree.
 
     Use section_id=None to browse the book from the root. Pass a section_id
-    such as "1.1" or "11.2.14#hoa-linh" to browse only that branch. Increase
+    such as "1.1" or "11.2.14" to browse only that branch. Increase
     depth when more descendant levels are needed; pass None to read all levels.
     """
     _logger.info(
@@ -117,3 +132,25 @@ def get_xung_chieu(
     info = f"Cung xung chiếu của {position} là {xung_chieu_position}."
     info += get_cung_by_position(ctx, xung_chieu_position)
     return info
+
+
+_ROLE_INSTRUCTION_MAP: dict[ROLE_TYPE, str] = {
+    "Mệnh": CUNG_MENH_INSTRUCTION,
+    "Quan Lộc": CUNG_QUAN_LOC_INSTRUCTION,
+    "Tài Bạch": CUNG_TAI_BACH_INSTRUCTION,
+    "Phụ Mẫu": CUNG_PHU_MAU_INSTRUCTION,
+    "Huynh Đệ": CUNG_HUYNH_DE_INSTRUCTION,
+    "Nô Bộc": CUNG_NO_BOC_INSTRUCTION,
+    "Phu Thê": CUNG_PHU_THE_INSTRUCTION,
+    "Phúc Đức": CUNG_PHUC_DUC_INSTRUCION,
+    "Thiên Di": CUNG_THIEN_DI_INSTRUCTION,
+    "Tật Ách": CUNG_TAT_ACH_INSTRUCTION,
+    "Tử Tức": CUNG_TU_TUC_INSTRUCTION,
+    "Điền Trạch": CUNG_DIEN_TRACH_INSTRUCTION,
+}
+
+
+def get_role_instruction(role: ROLE_TYPE) -> str:
+    if role not in _ROLE_INSTRUCTION_MAP:
+        assert_never(role)
+    return _ROLE_INSTRUCTION_MAP[role]
