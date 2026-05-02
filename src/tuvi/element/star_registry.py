@@ -73,7 +73,7 @@ STAR_REGISTRY: dict[str, StarDefinition] = {
     "Giải Thần": StarDefinition(name="Giải Thần", elemental="Mộc", star_type="phu_tinh"),
     "Phượng Các": StarDefinition(name="Phượng Các", elemental="Thổ", star_type="phu_tinh"),
     "Phá Toái": StarDefinition(name="Phá Toái", elemental="Hỏa", star_type="phu_tinh"),
-    "Hỏa Cái": StarDefinition(name="Hỏa Cái", elemental="Kim", star_type="phu_tinh"),
+    "Hoa Cái": StarDefinition(name="Hoa Cái", elemental="Kim", star_type="phu_tinh"),
     "Đào Hoa": StarDefinition(name="Đào Hoa", elemental="Mộc", star_type="phu_tinh"),
     "Thiên Khốc": StarDefinition(name="Thiên Khốc", elemental="Thủy", star_type="phu_tinh", having_luu=True),
     "Kiếp Sát": StarDefinition(name="Kiếp Sát", elemental="Hỏa", star_type="phu_tinh"),

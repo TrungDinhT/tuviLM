@@ -113,7 +113,7 @@ def get_star_by_dia_chi_position(dia_chi: TYPE_DIA_CHI) -> list[tuple[str, TYPE_
         ("Giải Thần", giai_than_position),
         ("Phượng Các", get_phuong_cac_position(giai_than_position)),
         ("Phá Toái", get_pha_toai_position(dia_chi)),
-        ("Hỏa Cái", get_hoa_cai_position(dia_chi)),
+        ("Hoa Cái", get_hoa_cai_position(dia_chi)),
         ("Đào Hoa", get_dao_hoa_position(dia_chi)),
         ("Thiên Khốc", get_thien_khoc_position(dia_chi)),
         ("Kiếp Sát", get_kiep_sat_position(dia_chi)),
