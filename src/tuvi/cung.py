@@ -67,8 +67,8 @@ class Cung(pydantic.BaseModel):
     def to_detail(self) -> str:
         info = f"Cung: {self.role} ({self.dia_chi})\n"
 
-        info += "\nChinh Tinh : " + "\n - ".join([star.star_name_with_status(self.dia_chi) for star in self.chinhTinh]) if self.chinhTinh else "Vô Chính Diệu"
-        info += "\nPhụ Tinh : " + "\n - ".join([star.star_name_with_status(self.dia_chi) for star in self.phuTinh]) if self.phuTinh else ""
+        info += "\nChinh Tinh : " + "\n - ".join([star.star_name_with_status(self.dia_chi, with_short_name=True) for star in self.chinhTinh]) if self.chinhTinh else "Vô Chính Diệu"
+        info += "\nPhụ Tinh : " + "\n - ".join([star.star_name_with_status(self.dia_chi, with_short_name=True) for star in self.phuTinh]) if self.phuTinh else ""
         info += "\nTứ Hỏa : " + "\n - ".join([tuhoa.name for tuhoa in self.tuhoa]) if self.tuhoa else ""
         info += f"\nTràng Sinh : {self.trang_sinh.name}"
         info += "\n Có Tuần" if self.is_tuan else ""
