@@ -6,7 +6,7 @@
 
 ## Goal
 
-Introduce a `PlacementContext` Protocol as a structural marker (no required members) so primitives have a meaningful parameter type. Refactor [primitives.py](../../placement/primitives.py) so they read context fields uniformly (e.g. `ctx.thien_can`) rather than dotting into `context.prior.get_*()`. Rename `LaSoContext` to `NatalContext`, keeping a back-compat alias.
+Introduce a `PlacementContext` Protocol as a structural marker (no required members) so primitives have a meaningful parameter type. Refactor [primitives.py](../../placement/primitives.py) so they read context fields uniformly (e.g. `ctx.thien_can`) rather than dotting into `context.prior.get_*()`. Rename `LaSoContext` to `NatalContext` (prior types live in `context/prior.py`).
 
 This is the wedge that makes period-context overrides clean for later workstreams.
 
@@ -54,15 +54,15 @@ class NatalContext:  # satisfies PlacementContext
     def thien_can(self) -> ThienCan: return self.prior.year.thien_can
     @property
     def cuc(self) -> Cuc: ...                       # same logic as today's LaSoContext
+    @property
+    def am_duong(self) -> LuongNghi: ...
+    @property
     def van_direction(self) -> CircleDirection: ... # same logic as today's LaSoContext
 ```
 
-`src/refactored/component/prior.py`:
-- Keep `LaSoContext` as a back-compat alias re-exporting `NatalContext` so other workstreams can land independently. Mark deprecated in a comment.
-
 ## Specific changes
 
-- New module `src/refactored/context/` with `protocol.py`, `natal.py`, `__init__.py`.
+- New module `src/refactored/context/` with `protocol.py`, `prior.py` (`LaSoPrior` / birth helpers), `natal.py`, `__init__.py`.
 - Refactor [primitives.py](../../placement/primitives.py) so context reads are flat field access:
   - `context.prior.get_dia_chi()` → `context.dia_chi`.
   - `context.prior.get_thien_can()` → `context.thien_can`.
@@ -86,14 +86,13 @@ This keeps the set of stamping sites bounded to one file when Option 4 is adopte
 
 - `PeriodContext` (workstream 03).
 - Any change to engine.py.
-- Moving `LaSoPrior` out of `component/prior.py`.
 - Capability Protocols and runtime auditing — see "Future upgrade" below.
 
 ## Acceptance criteria
 
 - All existing tests in `tests/test_placement_primitives.py` and `tests/test_elementary_components.py` pass with no behavioral change for natal placements.
 - `grep` for `context.prior.get_dia_chi`, `context.prior.get_thien_can`, `year_dia_chi`, and `year_thien_can` outside `NatalContext` returns no hits.
-- `LaSoContext` continues to import from `src.refactored.component.prior` as a back-compat alias to `NatalContext`.
+- `NatalContext` and `LaSoPrior` live under `src/refactored/context/`; the old `LaSoContext` name is retired in code (use `NatalContext`).
 - Type-check passes; primitives are typed against `PlacementContext`.
 - No new lambdas appear at `position_fn=` / `transform=` call sites in [rules.py](../../placement/rules.py).
 

@@ -37,7 +37,7 @@ These snapshots can be cross-checked against the legacy `src/tuvi/` builder befo
 
 | Workstream | Test file | Key assertions |
 |---|---|---|
-| 01 | extend `tests/test_placement_primitives.py` | Primitives still match legacy outputs for `FIXTURE_PRIOR_A`. `LaSoContext` import alias still works. |
+| 01 | `tests/test_laso_fixtures.py` (+ primitives tests) | `FIXTURE_PRIOR_A` snapshot vs `PlacementBuilder`; `NatalContext` / `context.prior`. |
 | 02 | new `tests/test_specialized_rules.py` | Structural invariant raises on dangling reference; `restrict_to` round-trips with self-contained ids; `restrict_to` rewrites externals from seed; `restrict_to` raises a precise error on missing seed. |
 | 03 | new `tests/test_period_context.py` | Field overrides reflect; non-overridden fields fall back to natal; satisfies `PlacementContext` Protocol. |
 | 04 | new `tests/test_compiler_split.py` | Two factories produce distinct compilers; default registration compiles and resolves for a known `NatalContext`; typed `(roles_map, saos_map)` output. |

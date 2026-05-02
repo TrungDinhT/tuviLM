@@ -17,7 +17,7 @@ from src.refactored.component.elementary import (
     NguHanh,
     ThienCan,
 )
-from src.refactored.component.prior import LaSoContext
+from src.refactored.context.protocol import PlacementContext
 from src.refactored.placement.registry import (
     AbsolutePositionResolver,
     AbsolutePositionSpec,
@@ -35,11 +35,11 @@ from src.refactored.placement.transforms import (
     mirror_across,
 )
 
-ContextStepSelector = Callable[[LaSoContext], int]
+ContextStepSelector = Callable[[PlacementContext], int]
 ThienCanPositionMap = Mapping[ThienCan, DiaChi]
 DiaChiGroup = tuple[DiaChi, ...]
 AnchorResolver = DiaChi | AbsolutePositionResolver
-PairPositionResolver = Callable[[LaSoContext], tuple[DiaChi, DiaChi]]
+PairPositionResolver = Callable[[PlacementContext], tuple[DiaChi, DiaChi]]
 
 TuHoaEntity = Literal["hoa_loc", "hoa_quyen", "hoa_khoa", "hoa_ky"]
 TUHOA_ENTITIES: tuple[TuHoaEntity, ...] = get_args(TuHoaEntity)
@@ -212,7 +212,7 @@ class TuanTrietPosition(Rule):
     def register_components(self, registry: PlacementRegistry):
         cache: list[tuple[DiaChi, DiaChi] | None] = [None]
 
-        def _pair(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
+        def _pair(context: PlacementContext) -> tuple[DiaChi, DiaChi]:
             if cache[0] is None:
                 cache[0] = self.pair_position_fn(context)
             return cache[0]
@@ -242,7 +242,7 @@ class TuHoaPosition(Rule):
             registry.register_component_lazy(
                 entity,
                 RelativePositionSpec(
-                    lambda ctx, e=entity: self.mapping[ctx.prior.get_thien_can()][e],
+                    lambda ctx, e=entity: self.mapping[ctx.thien_can][e],
                     transform=_same_position,
                 ),
             )
@@ -373,11 +373,11 @@ class Circle(Rule):
 # ---------------------------------------------------------------------------
 
 
-def menh_position_fn(context: LaSoContext) -> DiaChi:
+def menh_position_fn(context: PlacementContext) -> DiaChi:
     return context.menh_position
 
 
-def tuvi_position_fn(context: LaSoContext) -> DiaChi:
+def tuvi_position_fn(context: PlacementContext) -> DiaChi:
     """An Tử Vi khởi tại Dần, tính theo ngày sinh và cục số.
 
     Ceiling-divides the birth date by the cục number to find how many
@@ -399,12 +399,12 @@ def tuvi_position_fn(context: LaSoContext) -> DiaChi:
     return DiaChi.DAN + offset
 
 
-def thai_tue_position_fn(context: LaSoContext) -> DiaChi:
+def thai_tue_position_fn(context: PlacementContext) -> DiaChi:
     """Thái Tuế an tại cung theo Địa Chi năm sinh."""
-    return context.prior.get_dia_chi()
+    return context.dia_chi
 
 
-def loc_ton_position_fn(context: LaSoContext) -> DiaChi:
+def loc_ton_position_fn(context: PlacementContext) -> DiaChi:
     """Lộc Tồn an tại cung theo Thiên Can năm sinh."""
     position_fn = position_by_thien_can(
         {
@@ -423,13 +423,13 @@ def loc_ton_position_fn(context: LaSoContext) -> DiaChi:
     return position_fn(context)
 
 
-def dau_quan_position_fn(context: LaSoContext) -> DiaChi:
+def dau_quan_position_fn(context: PlacementContext) -> DiaChi:
     """Đẩu Quân an từ Địa Chi năm sinh, lùi theo tháng rồi tiến theo giờ."""
-    month_position = context.prior.get_dia_chi() - (context.prior.month - 1)
+    month_position = context.dia_chi - (context.prior.month - 1)
     return month_position + context.prior.hour.index
 
 
-def trang_sinh_position_fn(context: LaSoContext) -> DiaChi:
+def trang_sinh_position_fn(context: PlacementContext) -> DiaChi:
     """Tràng Sinh anchor by cục ngũ hành."""
     return {
         NguHanh.KIM: DiaChi.TI,
@@ -440,7 +440,7 @@ def trang_sinh_position_fn(context: LaSoContext) -> DiaChi:
     }[context.cuc.ngu_hanh]
 
 
-def triet_positions_fn(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
+def triet_positions_fn(context: PlacementContext) -> tuple[DiaChi, DiaChi]:
     """Two Triệt positions from year Thiên Can (legacy MAP_TRIET)."""
     _TRIET_POSITIONS: dict[ThienCan, tuple[DiaChi, DiaChi]] = {
         ThienCan.GIAP: (DiaChi.THAN, DiaChi.DAU),
@@ -454,10 +454,10 @@ def triet_positions_fn(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
         ThienCan.NHAM: (DiaChi.DAN, DiaChi.MEO),
         ThienCan.QUY: (DiaChi.TY, DiaChi.SUU),
     }
-    return _TRIET_POSITIONS[context.prior.get_thien_can()]
+    return _TRIET_POSITIONS[context.thien_can]
 
 
-def tuan_positions_fn(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
+def tuan_positions_fn(context: PlacementContext) -> tuple[DiaChi, DiaChi]:
     """Two Tuần positions from (year Địa Chi index - year Thiên Can index) mod 12."""
     _TUAN_POSITIONS: dict[DiaChi, tuple[DiaChi, DiaChi]] = {
         DiaChi.TY: (DiaChi.TUAT, DiaChi.HOI),
@@ -467,9 +467,7 @@ def tuan_positions_fn(context: LaSoContext) -> tuple[DiaChi, DiaChi]:
         DiaChi.THAN: (DiaChi.NGO, DiaChi.MUI),
         DiaChi.TUAT: (DiaChi.THAN, DiaChi.DAU),
     }
-    dia_chi = context.prior.get_dia_chi()
-    thien_can_index = context.prior.get_thien_can().index
-    return _TUAN_POSITIONS[dia_chi - thien_can_index]
+    return _TUAN_POSITIONS[context.dia_chi - context.thien_can.index]
 
 
 # Each Cung carries a Thiên Can derived from the year's Thiên Can per the
@@ -502,7 +500,7 @@ def position_by_thien_can(
 ) -> AbsolutePositionResolver:
     """Build an absolute position resolver from a Thiên Can map."""
 
-    return lambda context: mapping[context.prior.get_thien_can()]
+    return lambda context: mapping[context.thien_can]
 
 
 def position_by_dia_chi_groups(
@@ -520,7 +518,7 @@ def position_by_dia_chi_groups(
     if len(resolved_positions) != expected_size:
         raise ValueError("Birth DiaChi groups must not overlap.")
 
-    return lambda context: resolved_positions[context.prior.get_dia_chi()]
+    return lambda context: resolved_positions[context.dia_chi]
 
 
 # ---------------------------------------------------------------------------
@@ -532,7 +530,7 @@ def move_by_dia_chi(
     direction: CircleDirection, step_multiplier: int = 1
 ) -> PositionTransform:
     return move_with(
-        lambda context: context.prior.get_dia_chi().index,
+        lambda context: context.dia_chi.index,
         direction=direction,
         step_multiplier=step_multiplier,
     )
@@ -566,7 +564,7 @@ def move_with(
 ) -> PositionTransform:
     """Move from a reference position using a fixed circular direction."""
 
-    def transform(reference_position: DiaChi, context: LaSoContext) -> DiaChi:
+    def transform(reference_position: DiaChi, context: PlacementContext) -> DiaChi:
         steps = step_selector(context) * step_multiplier
         return reference_position + direction * steps
 
@@ -578,9 +576,9 @@ def move_by_van_direction(
 ) -> PositionTransform:
     """Move from a reference position using van direction and context-derived steps."""
 
-    def transform(reference_position: DiaChi, context: LaSoContext) -> DiaChi:
+    def transform(reference_position: DiaChi, context: PlacementContext) -> DiaChi:
         steps = step_selector(context) * step_multiplier
-        return reference_position + context.van_direction() * steps
+        return reference_position + context.van_direction * steps
 
     return transform
 
@@ -616,8 +614,8 @@ def _same_position(position: DiaChi) -> DiaChi:
     return position
 
 
-def _get_prior_attr_steps(context: LaSoContext, attribute_name: str) -> int:
-    """Read an integer-like step value from `LaSoContext.prior`."""
+def _get_prior_attr_steps(context: PlacementContext, attribute_name: str) -> int:
+    """Read an integer-like step value from the context's `prior` (natal fields)."""
     value = getattr(context.prior, attribute_name)
     if isinstance(value, int):
         return value

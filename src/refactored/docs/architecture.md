@@ -55,7 +55,7 @@ flowchart TB
 
 ## Key design decisions
 
-- **Decision 1 — `PlacementContext` marker Protocol.** Define a structural marker Protocol with no required members so primitives have a meaningful parameter type. Each context class advertises the surface it actually has (e.g. `dia_chi`, `thien_can`, `menh_position`, `cuc`, `van_direction()`, `prior`); primitives access whatever they need ad hoc. Property names drop the `year_` prefix so they remain accurate when a future context (e.g. TuHoaPhái) supplies a non-year `thien_can`. See [workstreams/01_placement_context.md](workstreams/01_placement_context.md).
+- **Decision 1 — `PlacementContext` marker Protocol.** Define a structural marker Protocol with no required members so primitives have a meaningful parameter type. Each context class advertises the surface it actually has (e.g. `dia_chi`, `thien_can`, `menh_position`, `cuc`, `am_duong`, `van_direction`, `prior`); primitives access whatever they need ad hoc. Property names drop the `year_` prefix so they remain accurate when a future context (e.g. TuHoaPhái) supplies a non-year `thien_can`. See [workstreams/01_placement_context.md](workstreams/01_placement_context.md).
 - **Decision 2 — Dynamic contexts are per-`LayerKind`, self-contained, built by their LayerCompiler.** No shared `PeriodContext` base, no fallback-to-natal delegation. Each future `LayerCompiler` defines its own frozen context value class exposing only the fields its primitives consume; all such classes structurally satisfy the marker `PlacementContext` from Decision 1. See [workstreams/03_period_context.md](workstreams/03_period_context.md) for the recorded constraints.
 - **Decision 3 — `Layer` is single-anchor and flat; multi-anchor patterns produce multiple layers; cross-layer dependencies are explicit in compiler signatures.** A `Layer` contains `kind: LayerKind`, `anchor: LayerAnchor` (a tagged union: `PeriodAnchor` for vận hạn, `CungAnchor` for TuHoaPhái), `saos: dict[ComponentId, DiaChi]`, and `roles: dict[Role, DiaChi]` (where each `Role` maps to the `DiaChi` of that role label in this layer’s frame; empty when the kind does not rotate roles, e.g. TuHoaPhái). **Naming note:** this is not the same shape as `Cung.saos` (a `tuple` of catalog Sao entities on a palace); on `Layer`, `saos` is a position map keyed by id. **`LayerRef`** is the frozen `(kind, anchor)` identity; **`Layer.ref()`** returns it so `Layer` need not embed a stored ref (payload can evolve). Compiler↔kind shape: TIEU_HAN, DAI_HAN, LUU_NIEN_DAI_HAN compilers each produce 1 layer; TUHOA_PHAI produces 12 (one per natal Cung) atomically in one compile pass. The lưu niên đại hạn compiler accepts the built đại hạn `Layer` as an input parameter, making the cross-layer data dependency explicit in its type signature instead of being baked into class identity. Same component id (e.g. `hoa_loc`) can appear in multiple layers; consumers see them as distinct entries by their anchor. See [workstreams/07_layer_skeleton.md](workstreams/07_layer_skeleton.md).
 - **Decision 4 — `LaSo` is fully immutable.** `Cung.saos: tuple[Sao, ...]` (not `list`), no setters. Re-resolution = build a new `LaSo`. See [workstreams/05_static_chart.md](workstreams/05_static_chart.md).
@@ -78,7 +78,7 @@ flowchart TB
 
 ```
 src/refactored/
-  component/...                       (unchanged — entities, prior already there)
+  component/...                       (unchanged — entities; birth prior in `context/prior.py`)
   placement/
     primitives.py                     (refactor: read via PlacementContext protocol)
     rules.py                          (unchanged file, but expose role rules and component rules as separate lists)
@@ -87,6 +87,7 @@ src/refactored/
     engine.py                         (unchanged)
   context/                            (NEW)
     protocol.py                       (PlacementContext Protocol)
+    prior.py                          (LaSoPrior, birth helpers)
     natal.py                          (NatalContext implements PlacementContext; replaces LaSoContext)
     period.py                         (PeriodAnchor, PeriodContext placeholder)
   chart/                              (NEW)
@@ -105,7 +106,7 @@ Static end-to-end + dynamic types declared (compilers stubbed):
 
 - Naming baseline first: apply [workstreams/09_domain_naming_alignment.md](workstreams/09_domain_naming_alignment.md) before behavior work so all subsequent implementation uses stable vocabulary (`Component` / `Sao` as type aliases, `CungRole`, `saos`, `sao_positions`).
 - `PlacementContext` Protocol; primitives refactored to consume it.
-- `NatalContext` (replaces `LaSoContext`, back-compat alias kept during migration).
+- `NatalContext` (replaces `LaSoContext`; birth models in `context/prior.py`).
 - Two instances of the existing `PlacementRuleCompiler` on the same engine; `LaSoBuilder.build` runs the single catalog guard over registered ids from both compilers.
 - `SpecializedPlacementRules` self-validates structurally; `restrict_to(ids, seed)` implemented and unit-tested (incl. seed-coverage contract check).
 - `LaSo`, `Cung` populated, `LaSoBuilder` working — `Cung.role` from role compiler output, `Cung.saos` from component compiler output.

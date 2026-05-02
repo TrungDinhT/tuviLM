@@ -32,7 +32,8 @@ from src.refactored.placement.registry import (
     RelativePositionSpec,
 )
 from src.refactored.component.elementary import DiaChi
-from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior
+from src.refactored.context.prior import Gender, LaSoPrior
+from src.refactored.context.natal import NatalContext
 from src.tuvi.birth import BirthTime
 from src.tuvi.builder import Builder as LegacyBuilder
 from src.tuvi.constant import MAP_TRIET, MAP_TUAN
@@ -281,7 +282,7 @@ def _resolve_positions_with_rules(
 ) -> dict[str, DiaChi]:
     compiler = PlacementRuleCompiler()
     compiler.register_rules(rules)
-    context = LaSoContext.from_prior(LaSoPrior.from_solar_day(time, gender))
+    context = NatalContext.from_prior(LaSoPrior.from_solar_day(time, gender))
     return PlacementBuilder(context, compiler=compiler).resolve_all()
 
 
@@ -294,7 +295,7 @@ def _resolve_positions_with_specs(
     compiler = PlacementRuleCompiler()
     for component_id, spec in specs.items():
         compiler.register_component_lazy(component_id, spec)
-    context = LaSoContext.from_prior(LaSoPrior.from_solar_day(time, gender))
+    context = NatalContext.from_prior(LaSoPrior.from_solar_day(time, gender))
     return PlacementBuilder(context, compiler=compiler).resolve_all()
 
 
@@ -377,7 +378,7 @@ def test_builder_supports_prior_aware_relative_specs():
         specs={
             component_b: RelativePositionSpec(
                 lambda _ctx: component_a,
-                lambda position, context: position + context.van_direction(),
+                lambda position, context: position + context.van_direction,
             ),
             component_a: AbsolutePositionSpec(lambda _context: DiaChi.DAN),
         },
@@ -399,7 +400,7 @@ def test_builder_detects_circular_position_dependencies():
         component_b,
         RelativePositionSpec(component_a, lambda position: position + 1),
     )
-    context = LaSoContext.from_prior(
+    context = NatalContext.from_prior(
         LaSoPrior.from_solar_day(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
     )
     builder = PlacementBuilder(context, compiler=compiler)
@@ -635,7 +636,7 @@ def test_builder_resolves_tuhoa_like_legacy_builder():
 def test_tuhoa_without_star_rules_raises_key_error():
     compiler = PlacementRuleCompiler()
     compiler.register_rules(TU_HOA_RULES)
-    context = LaSoContext.from_prior(
+    context = NatalContext.from_prior(
         LaSoPrior.from_solar_day(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
     )
     builder = PlacementBuilder(context, compiler=compiler)
@@ -667,7 +668,7 @@ def test_default_placement_rule_compiler_factory_returns_independent_instances()
 
 def test_compiler_compile_validates_missing_reference():
     compiler = PlacementRuleCompiler()
-    context = LaSoContext.from_prior(
+    context = NatalContext.from_prior(
         LaSoPrior.from_solar_day(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
     )
     compiler.register_component_lazy(

@@ -2,7 +2,8 @@
 import pytest
 
 from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCan
-from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior, LunarYear
+from src.refactored.context.prior import Gender, LaSoPrior, LunarYear
+from src.refactored.context.natal import NatalContext
 from src.refactored.placement.primitives import (
     DAN_THIEN_CAN_BY_YEAR,
     cung_thien_can_for,
@@ -13,8 +14,6 @@ from src.refactored.placement.primitives import (
     position_by_dia_chi_groups,
     position_by_thien_can,
 )
-
-
 @pytest.mark.parametrize(
     "attribute_name, direction, multiplier, expected",
     [
@@ -29,7 +28,7 @@ def test_move_by_attr(
     multiplier: int,
     expected: DiaChi,
 ):
-    context = LaSoContext.from_prior(
+    context = NatalContext.from_prior(
         LaSoPrior(
             hour=DiaChi.THAN,
             date=1,
@@ -49,7 +48,7 @@ def test_move_by_attr(
 
 
 def test_move_with_uses_context_derived_steps():
-    context = LaSoContext.from_prior(
+    context = NatalContext.from_prior(
         LaSoPrior(
             hour=DiaChi.MEO,
             date=1,
@@ -67,7 +66,7 @@ def test_move_with_uses_context_derived_steps():
 
 
 def test_position_by_thien_can_uses_prior_thien_can():
-    context = LaSoContext.from_prior(
+    context = NatalContext.from_prior(
         LaSoPrior(
             hour=DiaChi.TY,
             date=1,
@@ -87,7 +86,7 @@ def test_position_by_thien_can_uses_prior_thien_can():
 
 
 def test_position_by_dia_chi_groups_uses_group_membership():
-    context = LaSoContext.from_prior(
+    context = NatalContext.from_prior(
         LaSoPrior(
             hour=DiaChi.TY,
             date=1,
@@ -117,7 +116,7 @@ def test_position_by_dia_chi_groups_uses_group_membership():
 def test_move_by_birth_month_uses_zero_based_month_offset(
     month: int, direction: CircleDirection, expected: DiaChi
 ):
-    context = LaSoContext.from_prior(
+    context = NatalContext.from_prior(
         LaSoPrior(
             hour=DiaChi.TY,
             date=1,
@@ -141,7 +140,7 @@ def test_move_by_birth_month_uses_zero_based_month_offset(
 def test_move_by_van_direction_uses_chart_direction(
     gender: Gender, expected: DiaChi
 ):
-    context = LaSoContext.from_prior(
+    context = NatalContext.from_prior(
         LaSoPrior(
             hour=DiaChi.TY,
             date=1,

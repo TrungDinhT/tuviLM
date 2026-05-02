@@ -3,18 +3,18 @@ from dataclasses import dataclass, field
 from typing import Callable, Protocol
 
 from src.refactored.component.elementary import DiaChi
-from src.refactored.component.prior import LaSoContext
+from src.refactored.context.protocol import PlacementContext
 
 ComponentId = str
 
-ContextReferenceResolver = Callable[[LaSoContext], ComponentId]
+ContextReferenceResolver = Callable[[PlacementContext], ComponentId]
 ReferenceResolverInput = ComponentId | ContextReferenceResolver
 
 
 SimplePositionTransform = Callable[[DiaChi], DiaChi]
-RelativePositionTransform = Callable[[DiaChi, LaSoContext], DiaChi]
+RelativePositionTransform = Callable[[DiaChi, PlacementContext], DiaChi]
 PositionTransform = SimplePositionTransform | RelativePositionTransform
-AbsolutePositionResolver = Callable[[LaSoContext], DiaChi]
+AbsolutePositionResolver = Callable[[PlacementContext], DiaChi]
 
 
 def normalize_position_transform(
@@ -60,7 +60,7 @@ class RelativePositionSpec:
             normalize_position_transform(transform),
         )
 
-    def resolve_reference_id(self, context: LaSoContext) -> ComponentId:
+    def resolve_reference_id(self, context: PlacementContext) -> ComponentId:
         if isinstance(self.reference, str):
             return self.reference
         return self.reference(context)

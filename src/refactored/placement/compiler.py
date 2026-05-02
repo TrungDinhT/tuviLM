@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Mapping, Set
 
 from src.refactored.component.elementary import DiaChi
-from src.refactored.component.prior import LaSoContext
+from src.refactored.context.protocol import PlacementContext
 from src.refactored.placement.primitives import Rule
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
@@ -38,6 +38,60 @@ SpecializedPlacementSpecMap = dict[ComponentId, SpecializedPositionSpec]
 class SpecializedPlacementRules:
     specs: SpecializedPlacementSpecMap
 
+    def __post_init__(self) -> None:
+        self._validate_structural_integrity()
+
+    def restrict_to(
+        self,
+        ids: Set[ComponentId],
+        seed: Mapping[ComponentId, DiaChi],
+    ) -> SpecializedPlacementRules:
+        """Return only `ids` specs, rewriting external references as constants from `seed`."""
+        self._check_seed_covers_external_refs(ids, seed)
+        new_specs: SpecializedPlacementSpecMap = {}
+        for component_id in ids:
+            spec = self.specs[component_id]
+            if isinstance(spec, SpecializedAbsoluteSpec):
+                new_specs[component_id] = spec
+            elif isinstance(spec, SpecializedRelativeSpec):
+                ref_id = spec.reference_id
+                if ref_id in ids:
+                    new_specs[component_id] = spec
+                else:
+                    anchor_position = seed[ref_id]
+                    tr = spec.transform
+                    new_specs[component_id] = SpecializedAbsoluteSpec(
+                        position_fn=lambda p=anchor_position, fn=tr: fn(p),
+                    )
+            else:
+                raise ValueError(f"Invalid position spec: {spec}")
+        return SpecializedPlacementRules(specs=new_specs)
+
+    def _validate_structural_integrity(self) -> None:
+        for component_id, spec in self.specs.items():
+            if isinstance(spec, SpecializedRelativeSpec):
+                reference_id = spec.reference_id
+                if reference_id not in self.specs:
+                    raise KeyError(
+                        "Component reference has no registered position spec: "
+                        f"{component_id} -> {reference_id}"
+                    )
+
+    def _check_seed_covers_external_refs(
+        self, ids: Set[ComponentId], seed: Mapping[ComponentId, DiaChi]
+    ) -> None:
+        for consumer_id in ids:
+            spec = self.specs[consumer_id]
+            if not isinstance(spec, SpecializedRelativeSpec):
+                continue
+            ref_id = spec.reference_id
+            if ref_id in ids:
+                continue
+            if ref_id not in seed:
+                raise KeyError(
+                    f"Restricted spec {consumer_id!r} requires reference {ref_id!r} which is not in `ids` and not in `seed`."
+                )
+
 
 class PlacementRuleCompiler(PlacementRegistry):
     """Incrementally register rules, then compile them for one context."""
@@ -60,12 +114,11 @@ class PlacementRuleCompiler(PlacementRegistry):
         for rule in rules:
             rule.register_components(self)
 
-    def compile(self, context: LaSoContext) -> SpecializedPlacementRules:
+    def compile(self, context: PlacementContext) -> SpecializedPlacementRules:
         specialized_specs = self._specialize(context)
-        self._validate_references_exist(specialized_specs)
         return SpecializedPlacementRules(specs=specialized_specs)
 
-    def _specialize(self, context: LaSoContext) -> SpecializedPlacementSpecMap:
+    def _specialize(self, context: PlacementContext) -> SpecializedPlacementSpecMap:
         specialized: SpecializedPlacementSpecMap = {}
         for component_id, spec in self._specs.items():
             if isinstance(spec, RelativePositionSpec):
@@ -83,15 +136,3 @@ class PlacementRuleCompiler(PlacementRegistry):
             else:
                 raise ValueError(f"Invalid position spec: {spec}")
         return specialized
-
-    @staticmethod
-    def _validate_references_exist(specs: SpecializedPlacementSpecMap) -> None:
-        for component_id, spec in specs.items():
-            if isinstance(spec, SpecializedRelativeSpec):
-                reference_id = spec.reference_id
-                if reference_id not in specs:
-                    raise KeyError(
-                        "Component reference has no registered position spec: "
-                        f"{component_id} -> {reference_id}"
-                    )
-

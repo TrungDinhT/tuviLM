@@ -8,7 +8,8 @@ from src.refactored.component.elementary import (
     NguHanh,
     ThienCan,
 )
-from src.refactored.component.prior import Gender, LaSoContext, LaSoPrior, LunarYear
+from src.refactored.context.prior import Gender, LaSoPrior, LunarYear
+from src.refactored.context.natal import NatalContext
 
 
 def test_circle_direction_supports_multiplier_semantics():
@@ -40,7 +41,7 @@ def test_lunar_year_from_solar_year_uses_cyclic_enum_indexes(
     assert lunar_year.dia_chi == expected_dia_chi
 
 
-def test_laso_context_from_prior_derives_menh_position_and_cuc():
+def test_natal_context_from_prior_derives_menh_position_and_cuc():
     prior = LaSoPrior(
         hour=DiaChi.MEO,
         date=10,
@@ -49,7 +50,7 @@ def test_laso_context_from_prior_derives_menh_position_and_cuc():
         gender=Gender.MALE,
     )
 
-    context = LaSoContext.from_prior(prior)
+    context = NatalContext.from_prior(prior)
 
     assert context.menh_position == DiaChi.DAU
     assert context.cuc.id == "hoa_luc_cuc"
@@ -58,7 +59,7 @@ def test_laso_context_from_prior_derives_menh_position_and_cuc():
     assert context.cuc.ngu_hanh == NguHanh.HOA
 
 
-def test_laso_context_moves_am_duong_and_van_direction_from_prior():
+def test_natal_context_moves_am_duong_and_van_direction_from_prior():
     prior = LaSoPrior(
         hour=DiaChi.TY,
         date=1,
@@ -67,7 +68,7 @@ def test_laso_context_moves_am_duong_and_van_direction_from_prior():
         gender=Gender.FEMALE,
     )
 
-    context = LaSoContext.from_prior(prior)
+    context = NatalContext.from_prior(prior)
 
-    assert context.get_am_duong().value == 1
-    assert context.van_direction() == CircleDirection.CW
+    assert context.am_duong.value == 1
+    assert context.van_direction == CircleDirection.CW
