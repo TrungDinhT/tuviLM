@@ -10,7 +10,6 @@ from src.evals.dataset import load_dataset
 from src.evals.tasks import build_tuvi_eval_task
 
 
-DEFAULT_DATASET_PATH = Path(__file__).with_name("data.yaml")
 
 app = App(help="Run and render Tu Vi agent evals.")
 
@@ -20,7 +19,7 @@ def run(
     data: Annotated[
         Path,
         Parameter(help="Path to eval dataset YAML."),
-    ] = DEFAULT_DATASET_PATH,
+    ],
     model: Annotated[
         str,
         Parameter(help="Pydantic AI model name passed to the Tu Vi agent."),
