@@ -1,3 +1,4 @@
+
 from src.tuvi.element.types import NGU_HANH, STAR_STATUS, TYPE_DIA_CHI
 from src.tuvi.element.base import Element
 from .map_star_status import MAP_START_STATUS
@@ -24,11 +25,24 @@ class Sao(Element):
             return None
         return MAP_START_STATUS[self.name].get(position, None)
 
-    def star_name_with_status(self, position : TYPE_DIA_CHI) -> str:
-        if status := self.get_status(position):
-            return f"{self.name} ({status})"
-        return self.name
+    def star_name_with_status(
+        self,
+        position : TYPE_DIA_CHI,
+        with_short_name : bool = False
+    ) -> str:
+        if with_short_name:
+            name_str = self.__str__()
+        else:
+            name_str = self.name
 
+        if status := self.get_status(position):
+            return f"{name_str} ({status})"
+        return name_str
+
+    def __str__(self):
+        if self.short_names:
+            return f"{self.name} (Thường được gọi là {', '.join(self.short_names)})"
+        return self.name
 
 class ChinhTinh(Sao):
 
