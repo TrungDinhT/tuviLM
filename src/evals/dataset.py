@@ -10,10 +10,8 @@ from src.evals.evaluators import TuviAgentQuality
 from src.evals.schema import AgentResult, TuviEvalExpected, TuviEvalInput
 
 
-DEFAULT_DATASET_PATH = Path(__file__).with_name("data.yaml")
 
-
-def load_dataset(path: str | Path = DEFAULT_DATASET_PATH) -> Dataset[TuviEvalInput, AgentResult, dict]:
+def load_dataset(path: str | Path) -> Dataset[TuviEvalInput, AgentResult, dict]:
     data = _load_yaml(path)
     cases = [
         Case(
