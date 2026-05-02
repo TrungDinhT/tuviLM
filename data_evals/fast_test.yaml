@@ -1,0 +1,45 @@
+name: tuvi_agent_eval
+cases:
+  - name: menh_overview
+    inputs:
+      tuvi_time:
+        hour: Tý
+        date: 10
+        month: 3
+        thien_can: Giấp
+        dia_chi: Tý
+        gender: M
+      query: Luận giải ngắn gọn cung Mệnh, tập trung vào chính tinh và điểm cần thận trọng.
+    expected_output:
+      min_output_chars: 120
+      required_substrings:
+        - Mệnh
+      forbidden_substrings:
+        - tôi không có dữ liệu
+      required_tools:
+        - get_cung_analyze_skill
+        - get_cung_by_role
+    metadata:
+      topic: cung_menh
+
+  - name: quan_loc_career
+    inputs:
+      tuvi_time:
+        hour: Mão
+        date: 18
+        month: 8
+        thien_can: Quý
+        dia_chi: Dậu
+        gender: F
+      query: Cung Quan Lộc cho thấy khuynh hướng nghề nghiệp nào? Nêu cả điểm mạnh và rủi ro.
+    expected_output:
+      min_output_chars: 120
+      required_substrings:
+        - Quan Lộc
+      forbidden_substrings:
+        - chắc chắn
+      required_tools:
+        - get_cung_analyze_skill
+        - get_cung_by_role
+    metadata:
+      topic: career
