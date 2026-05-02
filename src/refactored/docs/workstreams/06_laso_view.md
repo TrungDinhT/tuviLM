@@ -103,8 +103,8 @@ class LaSoView:
 - New file `src/refactored/chart/view.py`.
 - Implement `RelatedPositions` using [transforms.py](../../placement/transforms.py): `get_xung_chieu`, `get_nhi_hop`, `get_luc_hai`, `get_tam_hop` (twice for tam hợp).
 - `DEFAULT_SAO_STATUS_RESOLVER` adapts [map_sao_status.py](../../builder/map_sao_status.py); document the key used (`MAP_SAO_STATUS` is keyed by sao display name — confirm at boundary).
-- Layer composition rules: `components_in(dia_chi, include_dynamic=True)` returns static components first,
-then for each layer it appends every `(component_id → DiaChi)` pair where DiaChi ==
+- Layer composition rules: `components_in(dia_chi, include_dynamic=True)` returns static sao entities first,
+then for each layer it appends every `(component_id → DiaChi)` pair from `layer.saos` where DiaChi ==
 dia_chi, resolved via catalog.
 
 ## Out of scope

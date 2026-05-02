@@ -6,7 +6,7 @@ This document captures the architecture and the design decisions that the workst
 
 - Make the static-vs-dynamic invariant explicit in the type system: a built `LaSo` is immutable; vận hạn information lives in separate `Layer` values overlaid via a `LaSoView`.
 - Reuse the **single existing rule set** in [src/refactored/placement/rules.py](../placement/rules.py) for both static and dynamic computation. The architecture pivots on **context parameterization plus restriction-with-seed**, not on splitting the rule set.
-- Within that single rule set, role rules and component rules are routed to **two instances of the existing `PlacementRuleCompiler`** so outputs naturally mirror `Cung.role: CungRole` vs `Cung.components: list[Component]`.
+- Within that single rule set, role rules and component rules are routed to **two instances of the existing `PlacementRuleCompiler`** so outputs naturally mirror `Cung.role: CungRole` vs `Cung.saos: tuple[Sao, ...]`.
 - Land a static vertical slice that already fits the layered shape, so dynamic layers slot in later without reshaping core types.
 
 ## Pivotal clarifications
@@ -27,18 +27,18 @@ flowchart TB
     RoleCompiler --> Engine[PlacementEngine]
     CompCompiler --> Engine
     Engine --> RolePos["roles: Role to DiaChi"]
-    Engine --> CompPos["components: ComponentId to DiaChi"]
+    Engine --> SaoPos["saos: ComponentId to DiaChi"]
 
     Catalog[ComponentCatalog] --> Builder[LaSoBuilder]
     RolePos --> Builder
-    CompPos --> Builder
+    SaoPos --> Builder
     Builder --> LaSo["LaSo (immutable static aggregate)"]
 
-    CompPos -. seed .-> LayerCompiler
+    SaoPos -. seed .-> LayerCompiler
     RolePos -. seed .-> LayerCompiler
     Period --> LayerCompiler[LayerCompiler]
     LayerCompiler --> Restrict["restrict_to(projection_ids, seed)"]
-    Restrict --> Layer["Layer (kind + anchor + components + roles maps)"]
+    Restrict --> Layer["Layer (kind + anchor + saos + roles maps)"]
 
     LaSo --> View[LaSoView]
     Layer --> View
@@ -50,15 +50,15 @@ flowchart TB
 1. **Context layer** — `NatalContext` (today's `LaSoContext` refined) and `PeriodContext` (a `NatalContext`-derived value with selected fields overridden). Both implement a single `PlacementContext` Protocol that all rule primitives consume.
 2. **Rule layer** — one rule set in [rules.py](../placement/rules.py), one engine, two instances of the existing `PlacementRuleCompiler` differing only in which rules they receive: a *role compiler* fed with `ROLE_RULES`, a *component compiler* fed with `CHINH_TINH_RULES + PHU_TINH_RULES + TU_HOA_RULES`.
 3. **Static aggregate** — `LaSoBuilder` consumes positions maps and the `ComponentCatalog`, returns an immutable `LaSo` with 12 populated `Cung`.
-4. **Dynamic layer** — `Layer` value object + one `LayerCompiler` per `LayerKind`. Each `Layer` is single-anchor with flat `components` (`dict[ComponentId, DiaChi]`) and `roles` (`dict[Role, DiaChi]`, the rotated cung-role frame for that slice; empty for kinds like TuHoaPhái that do not rotate roles). Multi-anchor patterns (TuHoaPhái) produce multiple `Layer`s atomically in one compile call. Cross-layer dependencies (e.g. lưu niên đại hạn → đại hạn) are expressed by the dependent compiler taking the prerequisite `Layer` as a typed input parameter. Static `LaSo` is never mutated.
+4. **Dynamic layer** — `Layer` value object + one `LayerCompiler` per `LayerKind`. Each `Layer` is single-anchor with flat `saos` (`dict[ComponentId, DiaChi]`) and `roles` (`dict[Role, DiaChi]`, the rotated cung-role frame for that slice; empty for kinds like TuHoaPhái that do not rotate roles). Multi-anchor patterns (TuHoaPhái) produce multiple `Layer`s atomically in one compile call. Cross-layer dependencies (e.g. lưu niên đại hạn → đại hạn) are expressed by the dependent compiler taking the prerequisite `Layer` as a typed input parameter. Static `LaSo` is never mutated.
 5. **Query facade** — `LaSoView` composes one `LaSo` with dynamic layers stored as **`Mapping[LayerRef, Layer]`**, exposing the domain questions with explicit provenance (`LayerRef | None` for natal).
 
 ## Key design decisions
 
 - **Decision 1 — `PlacementContext` marker Protocol.** Define a structural marker Protocol with no required members so primitives have a meaningful parameter type. Each context class advertises the surface it actually has (e.g. `dia_chi`, `thien_can`, `menh_position`, `cuc`, `van_direction()`, `prior`); primitives access whatever they need ad hoc. Property names drop the `year_` prefix so they remain accurate when a future context (e.g. TuHoaPhái) supplies a non-year `thien_can`. See [workstreams/01_placement_context.md](workstreams/01_placement_context.md).
 - **Decision 2 — Dynamic contexts are per-`LayerKind`, self-contained, built by their LayerCompiler.** No shared `PeriodContext` base, no fallback-to-natal delegation. Each future `LayerCompiler` defines its own frozen context value class exposing only the fields its primitives consume; all such classes structurally satisfy the marker `PlacementContext` from Decision 1. See [workstreams/03_period_context.md](workstreams/03_period_context.md) for the recorded constraints.
-- **Decision 3 — `Layer` is single-anchor and flat; multi-anchor patterns produce multiple layers; cross-layer dependencies are explicit in compiler signatures.** A `Layer` contains `kind: LayerKind`, `anchor: LayerAnchor` (a tagged union: `PeriodAnchor` for vận hạn, `CungAnchor` for TuHoaPhái), `components: dict[ComponentId, DiaChi]`, and `roles: dict[Role, DiaChi]` (where each `Role` maps to the `DiaChi` of that role label in this layer’s frame; empty when the kind does not rotate roles, e.g. TuHoaPhái). **Naming note:** this is not the same shape as `Cung.components` (a `tuple` of catalog entities on a palace); on `Layer`, `components` is a position map keyed by id. **`LayerRef`** is the frozen `(kind, anchor)` identity; **`Layer.ref()`** returns it so `Layer` need not embed a stored ref (payload can evolve). Compiler↔kind shape: TIEU_HAN, DAI_HAN, LUU_NIEN_DAI_HAN compilers each produce 1 layer; TUHOA_PHAI produces 12 (one per natal Cung) atomically in one compile pass. The lưu niên đại hạn compiler accepts the built đại hạn `Layer` as an input parameter, making the cross-layer data dependency explicit in its type signature instead of being baked into class identity. Same component id (e.g. `hoa_loc`) can appear in multiple layers; consumers see them as distinct entries by their anchor. See [workstreams/07_layer_skeleton.md](workstreams/07_layer_skeleton.md).
-- **Decision 4 — `LaSo` is fully immutable.** `Cung.components: tuple[Component, ...]` (not `list`), no setters. Re-resolution = build a new `LaSo`. See [workstreams/05_static_chart.md](workstreams/05_static_chart.md).
+- **Decision 3 — `Layer` is single-anchor and flat; multi-anchor patterns produce multiple layers; cross-layer dependencies are explicit in compiler signatures.** A `Layer` contains `kind: LayerKind`, `anchor: LayerAnchor` (a tagged union: `PeriodAnchor` for vận hạn, `CungAnchor` for TuHoaPhái), `saos: dict[ComponentId, DiaChi]`, and `roles: dict[Role, DiaChi]` (where each `Role` maps to the `DiaChi` of that role label in this layer’s frame; empty when the kind does not rotate roles, e.g. TuHoaPhái). **Naming note:** this is not the same shape as `Cung.saos` (a `tuple` of catalog Sao entities on a palace); on `Layer`, `saos` is a position map keyed by id. **`LayerRef`** is the frozen `(kind, anchor)` identity; **`Layer.ref()`** returns it so `Layer` need not embed a stored ref (payload can evolve). Compiler↔kind shape: TIEU_HAN, DAI_HAN, LUU_NIEN_DAI_HAN compilers each produce 1 layer; TUHOA_PHAI produces 12 (one per natal Cung) atomically in one compile pass. The lưu niên đại hạn compiler accepts the built đại hạn `Layer` as an input parameter, making the cross-layer data dependency explicit in its type signature instead of being baked into class identity. Same component id (e.g. `hoa_loc`) can appear in multiple layers; consumers see them as distinct entries by their anchor. See [workstreams/07_layer_skeleton.md](workstreams/07_layer_skeleton.md).
+- **Decision 4 — `LaSo` is fully immutable.** `Cung.saos: tuple[Sao, ...]` (not `list`), no setters. Re-resolution = build a new `LaSo`. See [workstreams/05_static_chart.md](workstreams/05_static_chart.md).
 - **Decision 5 — Sao status resolved at view time.** `MAP_SAO_STATUS` becomes a `SaoStatusResolver` injected into `LaSoView`. The same `LaSo` can be rendered with different status tables (production swap-ability, testability). See [workstreams/06_laso_view.md](workstreams/06_laso_view.md).
 - **Decision 6 — Two compiler instances, no new classes.** The single rule set is partitioned by ontology at registration time and fed into two instances of the existing `PlacementRuleCompiler`. No subclasses, no wrappers. Catalog id coverage is enforced at chart build (Decision 7), not as duplicate validators in workstream 04. See [workstreams/04_compiler_split_integrity.md](workstreams/04_compiler_split_integrity.md).
 - **Decision 7 — Catalog vs rules, one check at `LaSo` build.** When building a `LaSo`, assert **one** invariant: every placement id registered on **both** compilers (roles + components) resolves in [component_catalog.py](../builder/component_catalog.py)’s JSON-backed id map (which already includes `CungRole` alongside sao / tu hoa / etc.). Call site: `LaSoBuilder.build` (workstream 05), not a separate pre-flight in workstream 04. **Not required:** every catalog JSON row must have a placement rule (unused rows are allowed). See [workstreams/05_static_chart.md](workstreams/05_static_chart.md).
@@ -72,6 +72,7 @@ flowchart TB
   - For `TIEU_HAN` / `DAI_HAN` / `LUU_NIEN_DAI_HAN`: a Tu Hoa overlay is part of that period's single Layer (alongside lưu sao `components` and rotated `roles`), so one `restrict_to` run feeds into the same Layer.
   - For `TUHOA_PHAI`: 12 separate Layers, one per natal Cung, each anchored on `CungAnchor` and produced by one `restrict_to` run that supplies that Cung's `cung_thien_can_for(natal.thien_can, dia_chi)` value as the context's `thien_can`. All 12 are produced atomically in one compile call.
 - **Decision 11 — Projection contract.** Each `LayerKind`'s projection set must be self-contained or every external reference must be in the natal seed. The natal seed produced by the static run is canonical; layers consume it as data, not as rules.
+- **Decision 12 — Domain naming alignment.** `Component` and `Sao` are **`TypeAlias`** names, not superclasses. **`Sao = ChinhPhuTinh | TuHoa | VongTrangSinh | TuanTriet`**. **`Component = DiaChiEntity | ThienCanEntity | Cuc | CungRole | Sao`** (strict union for catalog/chart typing). Concrete models still subclass **`ComponentBase`**. `ComponentId` and `component_id` in placement APIs stay unchanged. See [workstreams/09_domain_naming_alignment.md](workstreams/09_domain_naming_alignment.md).
 
 ## New module layout
 
@@ -102,11 +103,12 @@ src/refactored/
 
 Static end-to-end + dynamic types declared (compilers stubbed):
 
+- Naming baseline first: apply [workstreams/09_domain_naming_alignment.md](workstreams/09_domain_naming_alignment.md) before behavior work so all subsequent implementation uses stable vocabulary (`Component` / `Sao` as type aliases, `CungRole`, `saos`, `sao_positions`).
 - `PlacementContext` Protocol; primitives refactored to consume it.
 - `NatalContext` (replaces `LaSoContext`, back-compat alias kept during migration).
 - Two instances of the existing `PlacementRuleCompiler` on the same engine; `LaSoBuilder.build` runs the single catalog guard over registered ids from both compilers.
 - `SpecializedPlacementRules` self-validates structurally; `restrict_to(ids, seed)` implemented and unit-tested (incl. seed-coverage contract check).
-- `LaSo`, `Cung` populated, `LaSoBuilder` working — `Cung.role` from role compiler output, `Cung.components` from component compiler output.
+- `LaSo`, `Cung` populated, `LaSoBuilder` working — `Cung.role` from role compiler output, `Cung.saos` from component compiler output.
 - `LaSoView` with static query API: `cung_at`, `role_of`, `related(dia_chi)`, plus layer-aware queries per [workstreams/06_laso_view.md](workstreams/06_laso_view.md) (`PlacedComponent`, `positions_of`, `dict[LayerRef, Layer]` / `build`, etc.).
 - `Layer`, `LayerRef`, `LayerKind` (incl. `TUHOA_PHAI`), `PeriodAnchor`, `CungAnchor`, `LayerAnchor`, `LayerCompiler` protocol declared; `Layer.ref()` returns `LayerRef`. `LIST_SAO_LUU` and `TU_HOA_IDS` live in `layer/types.py` as projection sets.
 - `LaSoView` holds `layers` as `Mapping[LayerRef, Layer]` (built via `LaSoView.build` from a mapping or iterable of `Layer`) so the API is in its final shape.

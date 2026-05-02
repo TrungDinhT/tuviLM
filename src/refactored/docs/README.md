@@ -1,6 +1,6 @@
 # Refactored architecture — plan index
 
-This folder holds the plan for the next refactoring iteration of `src/refactored/`. The plan is split into one architecture overview and seven workstream files designed to be picked up and implemented in parallel by separate agents.
+This folder holds the plan for the next refactoring iteration of `src/refactored/`. The plan is split into one architecture overview and nine workstream files designed to be picked up and implemented in parallel by separate agents.
 
 ## Files
 
@@ -14,15 +14,21 @@ This folder holds the plan for the next refactoring iteration of `src/refactored
 - [workstreams/06_laso_view.md](workstreams/06_laso_view.md) — `LaSoView` query facade + sao status resolver.
 - [workstreams/07_layer_skeleton.md](workstreams/07_layer_skeleton.md) — `Layer`, `LayerKind`, `PeriodAnchor`, `CungAnchor`, projection sets, `LayerCompiler` Protocol (stubs).
 - [workstreams/08_testing_plan.md](workstreams/08_testing_plan.md) — fixtures and acceptance tests.
+- [workstreams/09_domain_naming_alignment.md](workstreams/09_domain_naming_alignment.md) — type-alias naming (`Component` / `Sao`), `ChinhPhuTinh`, and field/API alignment (`saos`, `sao_positions`).
 
 ## Dependency graph
 
 ```mermaid
 flowchart LR
-    W01[01 PlacementContext] --> W04[04 Compiler split]
+    W09[09 Naming alignment] --> W01[01 PlacementContext]
+    W09 --> W02[02 Specialized rules upgrade]
+    W09 --> W04[04 Compiler split]
+    W09 --> W05[05 Static chart]
     W02[02 Specialized rules upgrade] --> W07[07 Layer skeleton]
+    W09 --> W07
     W04 --> W05[05 Static chart]
     W01 --> W05
+    W09 --> W06[06 LaSoView]
     W05 --> W06[06 LaSoView]
     W07 --> W06
     W08[08 Testing plan] -.fixtures used by.-> W05
@@ -35,6 +41,7 @@ WS03 is a deferred placeholder (no code in this iteration); it does not gate any
 
 ## Suggested execution phases
 
+- **Phase 0**: `09_domain_naming_alignment` (naming-first baseline; behavior-neutral).
 - **Phase 1 (parallel)**: `01_placement_context`, `02_specialized_rules_upgrade`, `08_testing_plan`.
 - **Phase 2**: `04_compiler_split_integrity` (after 01).
 - **Phase 3 (parallel)**: `05_static_chart`, `07_layer_skeleton`.

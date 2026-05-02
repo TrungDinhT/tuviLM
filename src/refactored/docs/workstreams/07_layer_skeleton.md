@@ -71,7 +71,7 @@ class Layer:
     to the ref type."""
     kind: LayerKind
     anchor: LayerAnchor
-    components: dict[ComponentId, DiaChi]
+    saos: dict[ComponentId, DiaChi]
     roles: dict[Role, DiaChi]
 
     def ref(self) -> LayerRef:
@@ -93,7 +93,7 @@ Notes on the API shape:
 
 - **No `Source` namespacing inside a `Layer`.** A layer is single-anchor; multi-anchor patterns (TuHoaPhái) produce multiple layers, not one layer with internal sources.
 - **Identity** for indexing and provenance is `LayerRef` (`ref()` on `Layer`). Two layers with the same `ref()` must not appear in one composition; **`LaSoView.build`** rejects duplicates when folding an iterable into `dict[LayerRef, Layer]`. WS07 defines the types; WS06 owns the dict and validation.
-- **`components`** is a flat `dict[ComponentId, DiaChi]`, same shape as the natal component positions map, so restriction-with-seed (workstream 02) plugs in directly. **Not** the same shape as `Cung.components` on a palace (which is a `tuple` of catalog entities); on `Layer`, `components` is always a position map keyed by id.
+- **`saos`** is a flat `dict[ComponentId, DiaChi]`, same shape as the natal `LaSo.sao_positions` map, so restriction-with-seed (workstream 02) plugs in directly. **Not** the same shape as `Cung.saos` on a palace (which is a `tuple` of catalog sao entities); on `Layer`, `saos` is always a position map keyed by id.
 - **`roles`** is `dict[Role, DiaChi]` — for each cung-role label, which `DiaChi` that label occupies in this layer's frame. Empty when the kind does not rotate roles (e.g. TuHoaPhái).
 - **Construction is atomic per `LayerKind`.** `LayerCompiler.compile()` for `TUHOA_PHAI` must return all 12 layers in one call. Lazy or selective generation is rejected to keep the build/query stages cleanly separated.
 
@@ -144,7 +144,7 @@ class TuHoaPhaiCompiler:
 - New `src/refactored/layer/__init__.py`, `layer/types.py`, `layer/compiler.py`.
 - `LIST_SAO_LUU` lives here, *not* in [rules.py](../../placement/rules.py). Coordinate with workstream 04 to ensure the placeholder list is removed from `rules.py`.
 - Each stub compiler's `compile()` body raises `NotImplementedError` and includes a docstring describing in free form what it will eventually do (which projection set, what context shape, how many layers it returns).
-- Document in the module docstring: `Layer.components` / `Layer.roles` are flat per-anchor; multi-anchor patterns produce multiple `Layer` objects; `Layer.ref()` is the stable key for `dict[LayerRef, Layer]` in the view (WS06).
+- Document in the module docstring: `Layer.saos` / `Layer.roles` are flat per-anchor; multi-anchor patterns produce multiple `Layer` objects; `Layer.ref()` is the stable key for `dict[LayerRef, Layer]` in the view (WS06).
 
 ## Implementation hint for follow-up iterations (not this one)
 
@@ -161,7 +161,7 @@ def compile(self, natal: LaSo, year: int) -> tuple[Layer]:
     full = component_compiler.compile(ctx)
     restricted = full.restrict_to(
         ids=LIST_SAO_LUU | TU_HOA_IDS,
-        seed=natal.component_positions,
+        seed=natal.sao_positions,
     )
     resolved_components = PlacementEngine(restricted).resolve_all()
 
@@ -170,7 +170,7 @@ def compile(self, natal: LaSo, year: int) -> tuple[Layer]:
     return (Layer(
         kind=LayerKind.TIEU_HAN,
         anchor=PeriodAnchor(...),
-        components=resolved_components,
+        saos=resolved_components,
         roles=resolved_roles,
     ),)
 ```
@@ -191,7 +191,7 @@ These snippets are illustrative only; do not implement them in this workstream.
 
 - `Layer`, `LayerRef`, `LayerKind`, `PeriodAnchor`, `CungAnchor`, `LayerAnchor`, `LIST_SAO_LUU`, `TU_HOA_IDS` exist and are importable from `src.refactored.layer.types`.
 - `LayerCompiler` Protocol exists; the four stub classes exist and raise `NotImplementedError` from `compile()`.
-- A unit test constructs an empty `Layer(kind=LayerKind.TIEU_HAN, anchor=PeriodAnchor(...), components={}, roles={})` successfully and asserts `layer.ref() == LayerRef(LayerKind.TIEU_HAN, anchor)`.
+- A unit test constructs an empty `Layer(kind=LayerKind.TIEU_HAN, anchor=PeriodAnchor(...), saos={}, roles={})` successfully and asserts `layer.ref() == LayerRef(LayerKind.TIEU_HAN, anchor)`.
 - A unit test builds a `dict[LayerRef, Layer]` with 12 entries (distinct `LayerRef`s, each `TUHOA_PHAI` + unique `CungAnchor`) — e.g. fold a 12-tuple of `Layer` the same way `LaSoView.build` would (no compiler invoked).
 - A unit test asserts `LuuNienDaiHanCompiler.compile`'s signature accepts a `Layer` parameter typed as the đại hạn dependency (signature inspection is enough; the body still raises `NotImplementedError`).
 - Existing tests still pass.
