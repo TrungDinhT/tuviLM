@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import TYPE_CHECKING
-
 from pydantic import model_validator
 
 from src.refactored.component.elementary import (
@@ -11,9 +9,7 @@ from src.refactored.component.elementary import (
     DiaChiEntity,
     ThienCanEntity,
 )
-
-if TYPE_CHECKING:
-    from src.refactored.component import Component
+from src.refactored.component.sao import Sao
 
 
 class Role(StrEnum):
@@ -50,5 +46,5 @@ class Cung:
     dia_chi: DiaChiEntity
     thien_can: ThienCanEntity
     role: CungRole
-    components: list[Component] = field(default_factory=list)
+    saos: tuple[Sao, ...] = field(default_factory=tuple)
     is_cung_than: bool = False

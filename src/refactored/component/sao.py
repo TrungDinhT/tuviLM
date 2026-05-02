@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Optional
+from typing import Optional, TypeAlias
 
 from pydantic import Field
 
@@ -30,7 +30,7 @@ class SaoType(StrEnum):
     PHU = "Phú"
 
 
-class Sao(ComponentBase):
+class ChinhPhuTinh(ComponentBase):
     is_chinh_tinh: bool = False
     sao_type: list[SaoType] = Field(default_factory=list)
     ngu_hanh: NguHanh
@@ -46,3 +46,6 @@ class VongTrangSinh(ComponentBase):
 
 class TuanTriet(ComponentBase):
     """Catalog entry for Tuần / Triệt split markers (no ngũ hành)."""
+
+
+Sao: TypeAlias = ChinhPhuTinh | TuHoa | VongTrangSinh | TuanTriet

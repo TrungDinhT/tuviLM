@@ -37,6 +37,8 @@ flowchart LR
     classDef deferred stroke-dasharray: 5 5
 ```
 
+
+
 WS03 is a deferred placeholder (no code in this iteration); it does not gate any other workstream.
 
 ## Suggested execution phases
@@ -59,3 +61,4 @@ WS03 is a deferred placeholder (no code in this iteration); it does not gate any
 - When in doubt about scope, prefer to declare a TODO in the workstream file rather than expanding scope silently.
 - All public types introduced should be frozen (`@dataclass(frozen=True)` or `pydantic` `model_config = {"frozen": True}`).
 - Every workstream lists its acceptance criteria; treat them as the definition of done.
+

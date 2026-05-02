@@ -1,7 +1,7 @@
 from src.refactored.builder.component_catalog import get_default_catalog
 from src.refactored.component.cung import CungRole, Role
 from src.refactored.component.elementary import DiaChi, NguHanh, ThienCan
-from src.refactored.component.sao import Sao, TuHoa
+from src.refactored.component.sao import ChinhPhuTinh, TuHoa
 
 
 def test_default_catalog_loads_cung_and_sao_components():
@@ -27,56 +27,56 @@ def test_default_catalog_loads_cung_and_sao_components():
     assert menh.name == "Mệnh"
     assert menh.role == Role.MENH
 
-    assert isinstance(thien_tai, Sao)
+    assert isinstance(thien_tai, ChinhPhuTinh)
     assert thien_tai.id == "thien_tai"
     assert thien_tai.name == "Thiên Tài"
     assert thien_tai.ngu_hanh == NguHanh.THO
     assert thien_tai.is_chinh_tinh is False
     assert thien_tai.sao_type == []
 
-    assert isinstance(ta_phu, Sao)
+    assert isinstance(ta_phu, ChinhPhuTinh)
     assert ta_phu.id == "ta_phu"
     assert ta_phu.name == "Tả Phù"
     assert ta_phu.ngu_hanh == NguHanh.THO
     assert ta_phu.is_chinh_tinh is False
 
-    assert isinstance(thien_khoi, Sao)
+    assert isinstance(thien_khoi, ChinhPhuTinh)
     assert thien_khoi.id == "thien_khoi"
     assert thien_khoi.name == "Thiên Khôi"
     assert thien_khoi.ngu_hanh == NguHanh.HOA
     assert thien_khoi.is_chinh_tinh is False
 
-    assert isinstance(co_than, Sao)
+    assert isinstance(co_than, ChinhPhuTinh)
     assert co_than.id == "co_than"
     assert co_than.name == "Cô Thần"
     assert co_than.ngu_hanh == NguHanh.THO
     assert co_than.is_chinh_tinh is False
 
-    assert isinstance(dau_quan, Sao)
+    assert isinstance(dau_quan, ChinhPhuTinh)
     assert dau_quan.id == "dau_quan"
     assert dau_quan.name == "Đẩu Quân"
     assert dau_quan.ngu_hanh == NguHanh.HOA
     assert dau_quan.is_chinh_tinh is False
 
-    assert isinstance(hoa_tinh, Sao)
+    assert isinstance(hoa_tinh, ChinhPhuTinh)
     assert hoa_tinh.id == "hoa_tinh"
     assert hoa_tinh.name == "Hỏa Tinh"
     assert hoa_tinh.ngu_hanh == NguHanh.HOA
     assert hoa_tinh.is_chinh_tinh is False
 
-    assert isinstance(dia_khong, Sao)
+    assert isinstance(dia_khong, ChinhPhuTinh)
     assert dia_khong.id == "dia_khong"
     assert dia_khong.name == "Địa Không"
     assert dia_khong.ngu_hanh == NguHanh.HOA
     assert dia_khong.is_chinh_tinh is False
 
-    assert isinstance(tu_vi, Sao)
+    assert isinstance(tu_vi, ChinhPhuTinh)
     assert tu_vi.id == "tu_vi"
     assert tu_vi.name == "Tử Vi"
     assert tu_vi.ngu_hanh == NguHanh.THO
     assert tu_vi.is_chinh_tinh is True
 
-    assert isinstance(loc_ton, Sao)
+    assert isinstance(loc_ton, ChinhPhuTinh)
     assert loc_ton.id == "loc_ton"
     assert loc_ton.name == "Lộc Tồn"
     assert loc_ton.ngu_hanh == NguHanh.THO
