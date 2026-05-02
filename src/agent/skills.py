@@ -57,4 +57,15 @@ Mục tiêu: dùng sách như nguồn tham chiếu có cấu trúc, không đọ
 ## Note
 - Nên bắt đầu bằng read_catalog(None, depth=2) để xem các phần sách chính, sau đó đi sâu dần vào các mục con.
 - Luôn luôn dùng read_section để đọc nội dung mục đã chọn, không tự ý tóm tắt dựa trên title mà chưa đọc nội dung.
+- Chương 4 đến 11 chứa thông tin về các cung khác nhau và ảnh hưởng của sao khi ở tại cung đó, nên ưu tiên xem các mục này khi phân tích cung trước khi nhìn vào phần thông tin chung ở chương 3.
+- Chương 3 sẽ nói về thông tin chung của các sao, fallback nếu không tìm thấy sao trong phần cung cụ thể.
+- Đối với chinh tinh, thông tin trong chương 3 luôn quan trọng
+
+## Các khái niệm thường gặp
+- Sao gặp Sao : Hai sao nằm trong cùng một cung.
+- Hội hợp : từ hai sao trở lên gặp nhau trong cung một cung, trong xung chiếu hoặc trong tam hợp
+- Đồng cung : hai sao nằm trong cùng một cung
+- Xung chiếu : hai sao nằm ở cung đối diện nhau
+- Tam hợp : hai sao nằm ở cung tam hợp của nhau
+
 """
