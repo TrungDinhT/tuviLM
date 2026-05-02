@@ -23,7 +23,7 @@ pandas = "^2.3.1"
 httpx = "^0.28.1"
 fastapi = "^0.116.1"
 uvicorn = { version = "^0.35.0", extras = ["standard"] }
-pydantic-ai = "^1.65.0"
+pydantic-ai = { version = "^1.65.0", extras = ["evals"] }
 
 
 [build-system]
