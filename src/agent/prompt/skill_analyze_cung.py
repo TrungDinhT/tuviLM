@@ -96,6 +96,8 @@ Trả lời theo cấu trúc:
 
 ## Mức độ chắc chắn
 Nêu rõ phần nào chắc, phần nào cần thêm dữ liệu.
+
+Cần đọc chương 3 và 4 trong Tử Vi Tân Biên để có thêm thông tin về các sao tại Cung Mệnh, cũng như cách chúng tương tác với nhau. Nếu có thông tin về tam phương tứ chính, cần đọc thêm chương 5-7 để hiểu rõ hơn về ảnh hưởng của chúng đến Cung Mệnh.
 </output_format>
 """
 
