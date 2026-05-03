@@ -62,6 +62,12 @@ class TuviAgentQuality(Evaluator[TuviEvalInput, AgentResult, dict]):
                 reason=f"Tools used: {', '.join(ctx.output.tools_used) or '(none captured)'}",
             )
 
+        for section in expected.required_read_sections:
+            checks[f"read_section:{section}"] = EvaluationReason(
+                section in ctx.output.read_sections,
+                reason=f"Read sections: {', '.join(ctx.output.read_sections) or '(none captured)'}",
+            )
+
         return checks
 
 

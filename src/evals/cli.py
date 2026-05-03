@@ -24,6 +24,10 @@ def run(
         str,
         Parameter(help="Pydantic AI model name passed to the Tu Vi agent."),
     ] = "openai:gpt-4.1-mini",
+    book_root: Annotated[
+        str,
+        Parameter(help="Path to the root of the book data used by the agent."),
+    ] = "./data/tuvitanbien_chunking_compact/part_2",
     case_names: Annotated[
         list[str] | None,
         Parameter(name="--case", help="Run only the named case. Can be passed multiple times."),
@@ -59,7 +63,7 @@ def run(
         if missing:
             raise SystemExit(f"Unknown case name(s): {', '.join(sorted(missing))}")
 
-    task = build_tuvi_eval_task(model=model)
+    task = build_tuvi_eval_task(model=model, book_root=book_root)
     report = dataset.evaluate_sync(
         task,
         max_concurrency=max_concurrency,
