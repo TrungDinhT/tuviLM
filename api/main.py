@@ -54,7 +54,7 @@ class ApiState:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    agent_deps = TuviAgentDeps()
+    agent_deps = TuviAgentDeps(book_root="./data/tuvitanbien_chunking_compact/part_2")
     agent_deps.agent = build_tuvi_agent(model="openai:gpt-5.4-mini")
     app.state.api_state = ApiState(
         agent_deps=agent_deps,
