@@ -62,7 +62,7 @@ Mục tiêu: dùng sách như nguồn tham chiếu có cấu trúc, không đọ
 - Luôn luôn dùng read_section để đọc nội dung mục đã chọn, không tự ý tóm tắt dựa trên title mà chưa đọc nội dung.
 - Chương 4 đến 11 chứa thông tin về các cung khác nhau và ảnh hưởng của sao khi ở tại cung đó, nên ưu tiên xem các mục này khi phân tích cung trước khi nhìn vào phần thông tin chung ở chương 3.
 - Trong mỗi section của chương 4-11, sẽ có thông tin về các sao khi ở tại cung đó, bao gồm chính tinh, phụ tinh, tuần triệt, tứ hóa, tràng sinh. Đây là những thông tin quan trọng nhất cần tìm kiếm khi phân tích cung, vì chúng có ảnh hưởng trực tiếp đến ý nghĩa của cung đó. Ưu tiên tìm kiếm thông tin về các sao này trước khi tìm kiếm thông tin chung về sao ở chương 3.
-- Chương 3 sẽ nói về thông tin chung của các sao, fallback nếu không tìm thấy sao trong phần cung cụ thể.
+- Chương 3 sẽ nói về thông tin chung của các sao. Nhiều trường hợp không thể tìm thấy thông tin của Sao trong phần cung cụ thể, thì có thể phải xem thông tin chung của sao ở chương 3 để luận đoán. Tuy nhiên, nếu đã tìm thấy thông tin của sao ở phần cung cụ thể, thì nên ưu tiên dùng thông tin đó để luận đoán, vì nó sẽ có ngữ cảnh cụ thể hơn so với thông tin chung ở chương 3.
 - Đối với chinh tinh, thông tin trong chương 3 luôn quan trọng
 - Tên của tiêu đề đôi khi được dùng với tên rút gọn của sao thay vì tên chính thức, lưu ý để không bỏ sót thông tin khi tìm kiếm. Tên rút gọn của sao sẽ được cung cấp trong lá số.
 
