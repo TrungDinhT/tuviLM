@@ -96,7 +96,7 @@ def read_section(
     try:
         return ctx.deps.require_book().read_section(section_id,)
     except ValueError as exc:
-        raise ModelRetry(str(exc)) from exc
+        raise ModelRetry(f"Failed to read section {section_id}") from exc
 
 
 
