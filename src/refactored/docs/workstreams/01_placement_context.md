@@ -1,6 +1,6 @@
 # Workstream 01 — `PlacementContext` marker + primitives refactor
 
-**Status**: pending
+**Status**: implemented
 **Depends on**: nothing (foundation)
 **Unblocks**: 03, 04, 05
 

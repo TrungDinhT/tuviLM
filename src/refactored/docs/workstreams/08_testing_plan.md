@@ -1,6 +1,6 @@
 # Workstream 08 — Testing plan
 
-**Status**: pending
+**Status**: implemented (shared fixtures + placement/natal tests; extend with `LaSo` / `LaSoView` when WS05/06 land)
 **Depends on**: nothing (can start in parallel from day one)
 **Unblocks**: faster sign-off on 05, 06
 

@@ -1,6 +1,6 @@
 # Workstream 02 — Self-validating `SpecializedPlacementRules` + `restrict_to`
 
-**Status**: pending
+**Status**: implemented
 **Depends on**: nothing (can run in parallel with 01)
 **Unblocks**: 07
 

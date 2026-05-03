@@ -1,6 +1,6 @@
 # Workstream 09 — Domain naming alignment (`Component` / `Sao` / `CungRole`)
 
-**Status**: pending  
+**Status**: implemented  
 **Depends on**: none  
 **Unblocks**: 01, 02, 04, 05, 06, 07
 
