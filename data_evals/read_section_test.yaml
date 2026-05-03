@@ -1,0 +1,96 @@
+name: read_section_test
+cases:
+  - name: case_1
+    inputs:
+      tuvi_time:
+        hour: Thìn
+        date: 8
+        month: 3
+        thien_can: Mậu
+        dia_chi: Dần
+        gender: M
+      query: Luận giải ngắn gọn cung Mệnh
+    expected_output:
+      required_tools:
+        - get_cung_analyze_skill
+        - get_cung_by_role
+        - read_section
+      required_read_sections:
+        - "4.2.5"
+  - name: case_2
+    inputs:
+      tuvi_time:
+        hour: Thìn
+        date: 8
+        month: 3
+        thien_can: Mậu
+        dia_chi: Dần
+        gender: M
+      query: Nói về sao Thái Dương
+    expected_output:
+      required_tools:
+        - read_section
+      required_read_sections:
+        - "3.5"
+
+  - name: case_3
+    inputs:
+      tuvi_time:
+        hour: Thìn
+        date: 8
+        month: 3
+        thien_can: Mậu
+        dia_chi: Dần
+        gender: M
+      query: Cung quan lộc của lá số này có đặt điểm gì
+    expected_output:
+      required_tools:
+        - read_section
+        - get_cung_analyze_skill
+        - get_cung_by_role
+      required_read_sections:
+        - "8.10"
+        - "8.15"
+
+  - name: case_4
+    inputs:
+      tuvi_time:
+        hour: Thìn
+        date: 8
+        month: 3
+        thien_can: Mậu
+        dia_chi: Dần
+        gender: M
+      query: Luận về sao cung tài bạch của lá số này
+    expected_output:
+      required_tools:
+        - read_section
+        - get_cung_analyze_skill
+        - get_cung_by_role
+      required_read_sections:
+        - "12.18"
+        - "12.20"
+        - "12.24"
+  - name: case_5
+    inputs:
+      tuvi_time:
+        hour: Thìn
+        date: 8
+        month: 3
+        thien_can: Mậu
+        dia_chi: Dần
+        gender: M
+      query: Cung điền trạch của lá số này có đặt điểm gì
+    expected_output:
+      required_tools:
+        - read_section
+        - get_cung_analyze_skill
+        - get_cung_by_role
+        - read_book_tuvi_tan_bien
+      required_read_sections:
+        - "7.1"
+        - "7.8"
+        - "7.18"
+        - "3.23"
+        - "3.32"
+        - "3.36"
