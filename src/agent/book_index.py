@@ -135,6 +135,7 @@ class SectionContent(BaseModel):
     title: str
     breadcrumb: str
     content: str
+    children: list[str]
 
 
 class SectionSearchHit(BaseModel):
@@ -375,18 +376,17 @@ class BookIndex:
     def read_section(
         self,
         section_id: str,
-        *,
-        max_chars: int | None = None,
     ) -> SectionContent:
         """
         Read a section and its parent context.
 
         section_id must be a numeric id such as "3", "3.4", "3.4.5", or
-        "8.11". If a slug suffix is provided, for example
-        "8.11#bo-sao-khoc-hu-thien-khoc-thien-hu", only "8.11" is used.
-        The returned content includes all parent section content before the
+        "8.11". The returned content includes all parent section content before the
         requested section content, for example read_section("3.5") returns
         content from section "3" followed by section "3.5".
+
+        If the section has children, their ids and titles will be added in the content,
+        but their full content will not be included.
         """
         record = self.get_record(section_id)
 
@@ -396,8 +396,10 @@ class BookIndex:
         ]
         content = "\n\n".join(parts).strip()
 
-        if max_chars is not None and max_chars > 3 and len(content) > max_chars:
-            content = content[: max_chars - 3].rstrip() + "..."
+        content += "\n\n## Các mục con\n"
+        for child_id in record.children_ids:
+            child = self.get_record(child_id)
+            content += f"\n- {child.id} {child.title}\n"
 
         return SectionContent(
             id=record.id,
