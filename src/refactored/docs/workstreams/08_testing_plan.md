@@ -37,10 +37,10 @@ These snapshots can be cross-checked against the legacy `src/tuvi/` builder befo
 
 | Workstream | Test file | Key assertions |
 |---|---|---|
-| 01 | `tests/test_laso_fixtures.py` (+ primitives tests) | `FIXTURE_PRIOR_A` snapshot vs `PlacementBuilder`; `NatalContext` / `context.prior`. |
+| 01 | `tests/test_laso_fixtures.py` (+ primitives tests) | `FIXTURE_PRIOR_A` snapshot vs `resolve_natal_placement` / `NatalPlacement`; `NatalContext` / `context.prior`. |
 | 02 | new `tests/test_specialized_rules.py` | Structural invariant raises on dangling reference; `restrict_to` round-trips with self-contained ids; `restrict_to` rewrites externals from seed; `restrict_to` raises a precise error on missing seed. |
 | 03 | new `tests/test_period_context.py` | Field overrides reflect; non-overridden fields fall back to natal; satisfies `PlacementContext` Protocol. |
-| 04 | new `tests/test_compiler_split.py` | Two factories produce distinct compilers; default registration compiles and resolves for a known `NatalContext`; typed `(roles_map, saos_map)` output. |
+| 04 | `tests/test_placement_builder.py` (partition / default compiler tests) | `placement.bundle.get_default_placement_rule_compiler` independent instances + nonempty compile; `resolve_natal_placement` yields `NatalPlacement` with typed `role_positions` / `sao_positions`. |
 | 05 | new `tests/test_static_chart.py` | `LaSoBuilder.build(FIXTURE_PRIOR_A)` returns a `LaSo` whose forward/reverse indices match `EXPECTED_A`. `Cung.saos` is a tuple and `sao_positions` resolves known ids. Catalog guard: `build` fails with named missing ids when a compiler is seeded with a rule id absent from the catalog. |
 | 09 | new `tests/test_domain_naming_alignment.py` | `Component` / `Sao` are `TypeAlias` unions (`Component` includes `DiaChiEntity`, `ThienCanEntity`, `Cuc`, `CungRole`, `Sao`; `Sao` is `ChinhPhuTinh | TuHoa | VongTrangSinh | TuanTriet`); star class is `ChinhPhuTinh`; `ComponentId` / `component_id` unchanged in placement APIs. |
 | 06 | new `tests/test_laso_view.py` | All query methods round-trip; `related(menh_position)` matches expected tam hợp / xung chiếu / nhị hợp / lục hại; status resolver returns correct values; empty `layers` tuple works. |

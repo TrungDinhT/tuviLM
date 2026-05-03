@@ -9,7 +9,7 @@ This folder holds the plan for the next refactoring iteration of `src/refactored
 - [workstreams/01_placement_context.md](workstreams/01_placement_context.md) — `PlacementContext` Protocol + primitives refactor + `NatalContext`.
 - [workstreams/02_specialized_rules_upgrade.md](workstreams/02_specialized_rules_upgrade.md) — self-validating `SpecializedPlacementRules` + `restrict_to(ids, seed)`.
 - [workstreams/03_period_context.md](workstreams/03_period_context.md) — placeholder recording the constraints for future per-`LayerKind` dynamic context types. No code in this iteration.
-- [workstreams/04_compiler_split_integrity.md](workstreams/04_compiler_split_integrity.md) — two `PlacementRuleCompiler` instances; catalog id guard lives in `LaSoBuilder` (WS05).
+- [workstreams/04_compiler_split_integrity.md](workstreams/04_compiler_split_integrity.md) — named rule lists (`ROLE_RULES`, chính/phụ/tứ hóa) + one compiler + typed maps; catalog id guard in `LaSoBuilder` (WS05).
 - [workstreams/05_static_chart.md](workstreams/05_static_chart.md) — `LaSo` immutable aggregate + `LaSoBuilder` + `Cung` population.
 - [workstreams/06_laso_view.md](workstreams/06_laso_view.md) — `LaSoView` query facade + sao status resolver.
 - [workstreams/07_layer_skeleton.md](workstreams/07_layer_skeleton.md) — `Layer`, `LayerKind`, `PeriodAnchor`, `CungAnchor`, projection sets, `LayerCompiler` Protocol (stubs).
@@ -22,7 +22,7 @@ This folder holds the plan for the next refactoring iteration of `src/refactored
 flowchart LR
     W09[09 Naming alignment] --> W01[01 PlacementContext]
     W09 --> W02[02 Specialized rules upgrade]
-    W09 --> W04[04 Compiler split]
+    W09 --> W04[04 Rule partition + maps]
     W09 --> W05[05 Static chart]
     W02[02 Specialized rules upgrade] --> W07[07 Layer skeleton]
     W09 --> W07

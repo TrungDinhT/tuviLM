@@ -1,67 +1,51 @@
-# Workstream 04 — Compiler split (two instances)
+# Workstream 04 — Rule partition + typed placement maps
 
-**Status**: pending
-**Depends on**: 01
+**Status**: implemented  
+**Depends on**: 01  
 **Unblocks**: 05
 
 ## Goal
 
-Partition the single rule set in [rules.py](../../placement/rules.py) into two groups (roles, components) registered against two separate instances of the existing `PlacementRuleCompiler`. Downstream (`LaSoBuilder`, workstream 05) receives two typed position maps. **No new compiler classes.**
+Keep **[rules.py](../../placement/rules.py)** as **one logical rule set**, but expose **named partitions** (`ROLE_RULES`, then **`CHINH_TINH_RULES`**, **`PHU_TINH_RULES`**, **`TU_HOA_RULES`**) so the ontology is obvious. Use **one** instance of the existing `PlacementRuleCompiler` for natal placement: register each list on that compiler so relative refs (including sao → palace anchors like `menh`) stay in **one** connected spec map and **`SpecializedPlacementRules`** structural validation stays meaningful.
 
-**Catalog vs rules consistency** (every placement id must exist in the JSON-backed catalog) is **not** implemented here; it runs **once inside `LaSoBuilder.build`** (workstream 05). That keeps a single choke point: nothing is asserted “meaningful” until a `LaSo` is built.
+Downstream (`resolve_natal_placement` → **`NatalPlacement`**, then `LaSoBuilder` in workstream 05) carries **`role_positions: dict[Role, DiaChi]`** and **`sao_positions: dict[ComponentId, DiaChi]`** by **partitioning** the single resolved flat map (ids that match `Role` vs everything else). **No second compiler class.**
+
+**Catalog vs rules consistency** (every placement id exists in the JSON-backed catalog) is **not** implemented here; it runs **once inside `LaSoBuilder.build`** (workstream 05).
 
 ## Background
 
-`Cung` already separates `role: CungRole` and `saos: tuple[Sao, ...]`. The placement pipeline today produces one flat `dict[ComponentId, DiaChi]` mixing both, which forces consumers to know the role-vs-component distinction by string id. By feeding the role rules and component rules to two compiler instances, downstream consumers get two typed maps. [component_catalog.py](../../builder/component_catalog.py) already loads **`CungRole` and other entities** from JSON into one id map; workstream 05’s single check uses that same catalog for **all** registered placement ids (roles + components).
+`Cung` separates `role: CungRole` and `saos: tuple[Sao, ...]`. A flat `dict[ComponentId, DiaChi]` mixes palace labels and star ids. Partitioning after **one** resolve gives typed maps without splitting the dependency graph across two compiler instances (which would duplicate anchors or weaken validation).
 
-## Public API to introduce
+## Public API
 
-In [rules.py](../../placement/rules.py), expose the existing rule lists in a way that makes the partition obvious:
+In [rules.py](../../placement/rules.py): **`ROLE_RULES`**, **`CHINH_TINH_RULES`**, **`PHU_TINH_RULES`**, **`TU_HOA_RULES`** (declarative lists only).
 
-```python
-COMPONENT_RULES: list[Rule] = [
-    *CHINH_TINH_RULES,
-    *PHU_TINH_RULES,
-    *TU_HOA_RULES,
-]
-```
+In [bundle.py](../../placement/bundle.py):
 
-Replace `get_default_placement_rule_compiler()` with two factories:
+- **`get_default_placement_rule_compiler() -> PlacementRuleCompiler`** — registers `ROLE_RULES` then the three sao-side lists on one compiler (supported default factory; no separate role/sao compiler factories).
 
-```python
-def get_default_role_compiler() -> PlacementRuleCompiler:
-    compiler = PlacementRuleCompiler()
-    compiler.register_rules(ROLE_RULES)
-    return compiler
+In [natal_placement_resolver.py](../../builder/natal_placement_resolver.py):
 
-def get_default_component_compiler() -> PlacementRuleCompiler:
-    compiler = PlacementRuleCompiler()
-    compiler.register_rules(COMPONENT_RULES)
-    return compiler
-```
+- **`resolve_natal_placement(context, compiler=...) -> NatalPlacement`** — compile + resolve + partition (default compiler from **`bundle.get_default_placement_rule_compiler`** when `compiler` omitted).
+- **`NatalPlacement`** (`frozen=True`): **`role_positions`**, **`sao_positions`** — partition using `Role` membership on string ids.
 
-**Do not** add `src/refactored/placement/integrity.py` or separate `validate_role_ids` / `validate_component_ids` call sites in this workstream.
+**Do not** add `src/refactored/placement/integrity.py` or separate validate call sites in this workstream.
 
 ## Specific changes
 
-- [rules.py](../../placement/rules.py): introduce `COMPONENT_RULES` aliases. Keep the existing per-section lists (`CHINH_TINH_RULES`, etc.) for clarity.
-- Remove `get_default_placement_rule_compiler` (or keep it as a deprecated shim if any test still uses it; remove on cleanup).
-- Update [placement_builder.py](../../builder/placement_builder.py) to:
-  - Construct the two compilers via the new factories.
-  - Compile each compiler against the same `NatalContext` and resolve into two maps (no catalog validation here):
-    - `roles: dict[Role, DiaChi]` — keys converted from string id to `Role` enum members at this boundary.
-    - `saos: dict[ComponentId, DiaChi]` (name of this map in downstream chart/layer APIs).
-  - Expose both maps to downstream consumers (workstream 05 will read them).
+- [rules.py](../../placement/rules.py): rule lists only.
+- [bundle.py](../../placement/bundle.py): **`get_default_placement_rule_compiler`**.
+- [natal_placement_resolver.py](../../builder/natal_placement_resolver.py): **`resolve_natal_placement`**; **`NatalPlacement`** dataclass.
 
 ## Out of scope
 
-- The actual `LaSoBuilder` aggregate and catalog guard (workstream 05).
-- Any change to primitives or engine.
-- Enforcing the converse (“every JSON catalog row has a placement rule”).
+- `LaSoBuilder` aggregate and catalog guard (workstream 05).
+- Primitives / engine changes beyond using the typed maps.
+- “Every catalog JSON row has a placement rule.”
 
 ## Acceptance criteria
 
-- Two distinct compilers, each registered with its respective rule set; default factories wire the shipped rule lists correctly.
-- Tests (see [08_testing_plan.md](08_testing_plan.md)): two factories produce distinct compilers; default registration round-trips compile+resolve for a known `NatalContext` without requiring catalog validation in this workstream.
-- `placement_builder.PlacementBuilder.resolve_all()` (or its replacement) returns a typed pair `(roles_map, saos_map)`. If this would break existing callers, keep a back-compat wrapper that re-merges into a flat map and mark deprecated.
+- **`get_default_placement_rule_compiler`** (in `bundle.py`) wires `ROLE_RULES` and the three sao-side lists in one registration graph.
+- **`resolve_natal_placement`** returns **`NatalPlacement`** with partitioned **`role_positions`** / **`sao_positions`** for default and custom `compiler=`.
+- Tests: default compiler compiles and resolves for a known `NatalContext`; partition puts palace ids under `Role`, stars under `sao_positions` shape.
 - All existing tests pass.

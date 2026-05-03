@@ -1,6 +1,5 @@
 import src.refactored.placement.primitives as pp
 from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCan
-from src.refactored.placement.compiler import PlacementRuleCompiler
 
 
 # ---------------------------------------------------------------------------
@@ -644,17 +643,3 @@ LIST_SAO_LUU = [
     "thien_khoc",
     "thien_hu",
 ]
-
-
-# ---------------------------------------------------------------------------
-# Default placement rule compiler factory
-# ---------------------------------------------------------------------------
-
-
-def get_default_placement_rule_compiler() -> PlacementRuleCompiler:
-    compiler = PlacementRuleCompiler()
-    compiler.register_rules(ROLE_RULES)
-    compiler.register_rules(CHINH_TINH_RULES)
-    compiler.register_rules(PHU_TINH_RULES)
-    compiler.register_rules(TU_HOA_RULES)
-    return compiler

@@ -3,7 +3,8 @@ import datetime as dt
 import pytest
 
 from src.refactored.builder.component_catalog import get_default_catalog
-from src.refactored.builder.placement_builder import PlacementBuilder
+from src.refactored.builder.natal_placement_resolver import resolve_natal_placement
+from src.refactored.placement.bundle import get_default_placement_rule_compiler
 from src.refactored.component.sao import TuanTriet
 from src.refactored.placement.compiler import (
     PlacementRuleCompiler,
@@ -25,15 +26,16 @@ from src.refactored.placement.rules import (
     PHU_TINH_RULES,
     TU_HOA_RULES,
     TU_HOA_TARGET_BY_THIEN_CAN,
-    get_default_placement_rule_compiler,
 )
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
     RelativePositionSpec,
 )
+from src.refactored.component.cung import Role
 from src.refactored.component.elementary import DiaChi
 from src.refactored.context.prior import Gender, LaSoPrior
 from src.refactored.context.natal import NatalContext
+from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 from src.tuvi.birth import BirthTime
 from src.tuvi.builder import Builder as LegacyBuilder
 from src.tuvi.constant import MAP_TRIET, MAP_TUAN
@@ -283,7 +285,10 @@ def _resolve_positions_with_rules(
     compiler = PlacementRuleCompiler()
     compiler.register_rules(rules)
     context = NatalContext.from_prior(LaSoPrior.from_solar_day(time, gender))
-    return PlacementBuilder(context, compiler=compiler).resolve_all()
+    placement = resolve_natal_placement(context, compiler=compiler)
+    merged = {role.value: pos for role, pos in placement.role_positions.items()}
+    merged.update(placement.sao_positions)
+    return merged
 
 
 def _resolve_positions_with_specs(
@@ -296,7 +301,10 @@ def _resolve_positions_with_specs(
     for component_id, spec in specs.items():
         compiler.register_component_lazy(component_id, spec)
     context = NatalContext.from_prior(LaSoPrior.from_solar_day(time, gender))
-    return PlacementBuilder(context, compiler=compiler).resolve_all()
+    placement = resolve_natal_placement(context, compiler=compiler)
+    merged = {role.value: pos for role, pos in placement.role_positions.items()}
+    merged.update(placement.sao_positions)
+    return merged
 
 
 def test_builder_resolves_chained_specs_in_any_order():
@@ -403,9 +411,8 @@ def test_builder_detects_circular_position_dependencies():
     context = NatalContext.from_prior(
         LaSoPrior.from_solar_day(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
     )
-    builder = PlacementBuilder(context, compiler=compiler)
     with pytest.raises(ValueError, match="Circular position dependency detected"):
-        builder.resolve_all()
+        resolve_natal_placement(context, compiler=compiler)
 
 
 def test_builder_resolves_chinh_tinh_rules_like_legacy_builder():
@@ -639,9 +646,8 @@ def test_tuhoa_without_star_rules_raises_key_error():
     context = NatalContext.from_prior(
         LaSoPrior.from_solar_day(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)
     )
-    builder = PlacementBuilder(context, compiler=compiler)
     with pytest.raises(KeyError):
-        builder.resolve_all()
+        resolve_natal_placement(context, compiler=compiler)
 
 
 def test_tuhoa_targets_are_registered_components():
@@ -659,11 +665,32 @@ def test_tuhoa_targets_are_registered_components():
             )
 
 
-def test_default_placement_rule_compiler_factory_returns_independent_instances():
-    first = get_default_placement_rule_compiler()
-    second = get_default_placement_rule_compiler()
+def test_get_default_placement_rule_compiler_returns_independent_instances():
+    a = get_default_placement_rule_compiler()
+    b = get_default_placement_rule_compiler()
+    assert a is not b
 
-    assert first is not second
+
+def test_default_placement_compiler_compile_nonempty_specs():
+    ctx = NatalContext.from_prior(FIXTURE_PRIOR_A)
+    specs = get_default_placement_rule_compiler().compile(ctx).specs
+    assert len(specs) >= 1
+
+
+def test_resolve_natal_placement_default_partition_shape():
+    ctx = NatalContext.from_prior(FIXTURE_PRIOR_A)
+    placement = resolve_natal_placement(ctx)
+    roles = placement.role_positions
+    saos = placement.sao_positions
+
+    assert isinstance(next(iter(roles.keys())), Role)
+    assert isinstance(next(iter(saos.keys())), str)
+    assert Role.MENH in roles
+    assert "tu_vi" in saos
+    merged = {role.value: pos for role, pos in roles.items()}
+    merged.update(saos)
+    assert merged["tu_vi"] == saos["tu_vi"]
+    assert merged["menh"] == roles[Role.MENH]
 
 
 def test_compiler_compile_validates_missing_reference():

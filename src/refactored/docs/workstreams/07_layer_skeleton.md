@@ -156,9 +156,9 @@ def compile(self, natal: LaSo, year: int) -> tuple[Layer]:
     # 2. Construct a self-contained TieuHanContext per WS03's constraints.
     ctx = TieuHanContext(...)
 
-    # 3. Compile component rules under TieuHanContext, then restrict to projection.
-    component_compiler = get_default_component_compiler()
-    full = component_compiler.compile(ctx)
+    # 3. Compile placement rules under TieuHanContext, then restrict to projection.
+    compiler = get_default_placement_rule_compiler()  # placement/bundle
+    full = compiler.compile(ctx)
     restricted = full.restrict_to(
         ids=LIST_SAO_LUU | TU_HOA_IDS,
         seed=natal.sao_positions,

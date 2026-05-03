@@ -1,6 +1,6 @@
 """Shared birth priors and hand-checked expectation snapshots for refactored tests.
 
-Values for ``EXPECTED_A`` were aligned with ``PlacementBuilder`` / legacy chart runs
+Values for ``EXPECTED_A`` were aligned with ``resolve_natal_placement`` / legacy chart runs
 for the corresponding solar datetime.
 """
 

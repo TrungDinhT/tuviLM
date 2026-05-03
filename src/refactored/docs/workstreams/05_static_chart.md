@@ -36,17 +36,16 @@ In [src/refactored/component/cung.py](../../component/cung.py): change `componen
 @dataclass
 class LaSoBuilder:
     catalog: ComponentCatalog
-    role_compiler_factory: Callable[[], PlacementRuleCompiler] = get_default_role_compiler
-    component_compiler_factory: Callable[[], PlacementRuleCompiler] = get_default_component_compiler
+    placement_compiler_factory: Callable[[], PlacementRuleCompiler] = get_default_placement_rule_compiler  # placement/bundle
 
     def build(self, prior: LaSoPrior) -> LaSo: ...
 ```
 
 `build()` orchestration:
 1. Create `NatalContext.from_prior(prior)`.
-2. Construct role + component compilers via factories.
-3. Run **one** catalog guard (same module or a small helper next to `LaSoBuilder`): every string id registered on **both** compilers must resolve in `ComponentCatalog` (the JSON-backed map already includes `CungRole` and sao / tu hoa / etc.). Aggregate all offending ids into a single error if any are missing. **Explicit non-goal:** do *not* require that every row in JSON catalogs has a placement rule.
-4. `compile(natal)` each → resolve via `PlacementEngine` → two maps.
+2. Construct **one** placement compiler via `placement_compiler_factory()` (registers `ROLE_RULES`, `CHINH_TINH_RULES`, `PHU_TINH_RULES`, `TU_HOA_RULES`).
+3. Run **one** catalog guard: every placement id registered on that compiler must resolve in `ComponentCatalog` (the JSON-backed map already includes `CungRole` and sao / tu hoa / etc.). Aggregate all offending ids into a single error if any are missing. **Explicit non-goal:** do *not* require that every row in JSON catalogs has a placement rule.
+4. `compile(natal)` → `PlacementEngine` → flat map → **partition** into `role_positions` and `sao_positions` (same boundary as **`resolve_natal_placement`** / **`NatalPlacement`**).
 5. Determine `cung_than_position` from `role_positions[Role.CUNG_THAN]`.
 6. For each of the 12 DiaChi positions, build a `Cung`:
    - `dia_chi`: the `DiaChiEntity` from catalog.
@@ -59,7 +58,7 @@ class LaSoBuilder:
 ## Specific changes
 
 - New `src/refactored/chart/__init__.py`, `chart/laso.py`, `chart/builder.py`.
-- Implement the **single** catalog guard in `chart/builder.py` (or `chart/catalog_guard.py` imported by it): union of registered ids from both compilers ⊆ catalog keys; one aggregated error listing every missing id.
+- Implement the **single** catalog guard in `chart/builder.py` (or `chart/catalog_guard.py` imported by it): every id registered on the **placement** compiler ⊆ catalog keys; one aggregated error listing every missing id.
 - Adjust [Cung](../../component/cung.py) to use `saos: tuple[Sao, ...]` and remove the mutable default.
 - Move `cung_thien_can_for` import path if needed (currently in primitives.py per [rules.py](../../placement/rules.py); keep it where it is).
 - Tuần/Triệt: today these resolve to two ids each (`tuan_1`, `tuan_2`, `triet_1`, `triet_2`). The `LaSoBuilder` should treat them as components attached to those two cungs (the catalog already loads `TuanTriet` entities); no special flag on `Cung` is needed unless workstream 06 wants one — defer that decision to 06.
