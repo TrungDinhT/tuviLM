@@ -1,6 +1,6 @@
 from __future__ import annotations
 import logging
-from typing import assert_never
+from typing_extensions import assert_never
 
 from pydantic_ai import ModelRetry, RunContext
 from src.agent.book_index import (
@@ -84,7 +84,6 @@ def read_catalog(
 def read_section(
     ctx: RunContext[TuviAgentDeps],
     section_id: str,
-    max_chars: int | None = 8000,
 ) -> SectionContent:
     """
     Read the content of one book section.
@@ -92,13 +91,10 @@ def read_section(
     section_id must be a valid id such as "3", "3.4", "3.4.5", or "8.11".
     """
     _logger.info(
-        f"Đọc mục sách: section_id={section_id}, max_chars={max_chars}",
+        f"Đọc mục sách: section_id={section_id}",
     )
     try:
-        return ctx.deps.require_book().read_section(
-            section_id,
-            max_chars=max_chars,
-        )
+        return ctx.deps.require_book().read_section(section_id,)
     except ValueError as exc:
         raise ModelRetry(str(exc)) from exc
 
