@@ -630,16 +630,3 @@ TU_HOA_TARGET_BY_THIEN_CAN: dict[ThienCan, dict[pp.TuHoaEntity, str]] = {
 }
 
 TU_HOA_RULES = [pp.TuHoaPosition(mapping=TU_HOA_TARGET_BY_THIEN_CAN)]
-
-
-LIST_SAO_LUU = [
-    "thai_tue",
-    "bach_ho",
-    "tang_mon",
-    "thien_ma",
-    "loc_ton",
-    "kinh_duong",
-    "da_la",
-    "thien_khoc",
-    "thien_hu",
-]

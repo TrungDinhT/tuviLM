@@ -8,7 +8,7 @@ This module is organized in four layers:
 """
 
 from enum import Enum
-from typing import Callable, Literal, Mapping, Protocol, get_args
+from typing import Callable, Mapping, Protocol
 
 from src.refactored.component.elementary import (
     CircleDirection,
@@ -18,6 +18,7 @@ from src.refactored.component.elementary import (
     ThienCan,
 )
 from src.refactored.context.protocol import PlacementContext
+from src.refactored.placement.dynamic_entities import TU_HOA_IDS, TuHoaEntity
 from src.refactored.placement.registry import (
     AbsolutePositionResolver,
     AbsolutePositionSpec,
@@ -40,10 +41,6 @@ ThienCanPositionMap = Mapping[ThienCan, DiaChi]
 DiaChiGroup = tuple[DiaChi, ...]
 AnchorResolver = DiaChi | AbsolutePositionResolver
 PairPositionResolver = Callable[[PlacementContext], tuple[DiaChi, DiaChi]]
-
-TuHoaEntity = Literal["hoa_loc", "hoa_quyen", "hoa_khoa", "hoa_ky"]
-TUHOA_ENTITIES: tuple[TuHoaEntity, ...] = get_args(TuHoaEntity)
-
 
 # ---------------------------------------------------------------------------
 # Base protocol and concrete rule declarations
@@ -238,7 +235,7 @@ class TuHoaPosition(Rule):
         self.mapping = mapping
 
     def register_components(self, registry: PlacementRegistry):
-        for entity in TUHOA_ENTITIES:
+        for entity in TU_HOA_IDS:
             registry.register_component_lazy(
                 entity,
                 RelativePositionSpec(
@@ -253,13 +250,13 @@ class TuHoaPosition(Rule):
             if thien_can not in mapping:
                 raise ValueError(f"Missing Tứ Hóa mapping for {thien_can!r}")
             entities = mapping[thien_can]
-            for entity in TUHOA_ENTITIES:
+            for entity in TU_HOA_IDS:
                 if entity not in entities:
                     raise ValueError(
                         f"Missing `{entity}` for {thien_can!r} in Tứ Hóa mapping."
                     )
                 target = entities[entity]
-                if target in TUHOA_ENTITIES:
+                if target in TU_HOA_IDS:
                     raise ValueError(
                         "Tứ Hóa target cannot be another Tứ Hóa entity: "
                         f"{target!r} for {thien_can!r} `{entity}`"

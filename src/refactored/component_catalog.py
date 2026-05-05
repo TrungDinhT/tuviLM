@@ -7,7 +7,7 @@ from pydantic import TypeAdapter
 
 from src.refactored.component import Component
 from src.refactored.component.cuc import LIST_CUC
-from src.refactored.component.cung import CungRole
+from src.refactored.component.cung_role import CungRole
 from src.refactored.component.elementary import DiaChi, DiaChiEntity, ThienCan, ThienCanEntity
 from src.refactored.component.sao import ChinhPhuTinh, TuanTriet, TuHoa, VongTrangSinh
 

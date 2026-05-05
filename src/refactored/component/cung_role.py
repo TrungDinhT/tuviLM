@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from enum import StrEnum
 
 from pydantic import model_validator
 
-from src.refactored.component.elementary import ComponentBase, DiaChi, ThienCan
-from src.refactored.placement.registry import ComponentId
+from src.refactored.component.elementary import ComponentBase
 
 
 class Role(StrEnum):
@@ -36,12 +34,3 @@ class CungRole(ComponentBase):
         if not isinstance(data, dict):
             return data
         return {**data, "role": Role(data["id"])}
-
-
-@dataclass(frozen=True)
-class Cung:
-    dia_chi: DiaChi
-    thien_can: ThienCan
-    role: Role
-    saos: tuple[ComponentId, ...]
-    is_cung_than: bool
