@@ -1,4 +1,4 @@
-from src.refactored.builder.component_catalog import get_default_catalog
+from src.refactored.component_catalog import get_default_catalog
 from src.refactored.component.cung import CungRole, Role
 from src.refactored.component.elementary import DiaChi, NguHanh, ThienCan
 from src.refactored.component.sao import ChinhPhuTinh, TuHoa

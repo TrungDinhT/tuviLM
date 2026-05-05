@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
+
 from pydantic import model_validator
 
-from src.refactored.component.elementary import (
-    ComponentBase,
-    DiaChiEntity,
-    ThienCanEntity,
-)
-from src.refactored.component.sao import Sao
+from src.refactored.component.elementary import ComponentBase, DiaChi, ThienCan
+from src.refactored.placement.registry import ComponentId
 
 
 class Role(StrEnum):
@@ -43,8 +40,8 @@ class CungRole(ComponentBase):
 
 @dataclass(frozen=True)
 class Cung:
-    dia_chi: DiaChiEntity
-    thien_can: ThienCanEntity
-    role: CungRole
-    saos: tuple[Sao, ...] = field(default_factory=tuple)
-    is_cung_than: bool = False
+    dia_chi: DiaChi
+    thien_can: ThienCan
+    role: Role
+    saos: tuple[ComponentId, ...]
+    is_cung_than: bool

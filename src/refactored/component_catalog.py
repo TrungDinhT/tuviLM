@@ -22,11 +22,12 @@ class ComponentCatalog:
 
     def __init__(self, catalog_dir: Path | None = None) -> None:
         self._catalog_dir = (
-            catalog_dir or Path(__file__).resolve().parent.parent / "catalog"
+            catalog_dir or Path(__file__).resolve().parent / "catalog"
         )
-        dia_chi_entities = self._load_dia_chi_entities()
-        thien_can_entities = self._load_thien_can_entities()
-        self._components = self._load_components(dia_chi_entities, thien_can_entities)
+        self._components = self._load_components()
+
+    def __contains__(self, component_id: str) -> bool:
+        return component_id in self._components
 
     def get(self, component_id: str) -> Component:
         try:
@@ -45,16 +46,11 @@ class ComponentCatalog:
     def get_thien_can(self, thien_can: ThienCan) -> ThienCanEntity:
         return self.get(thien_can.value)
 
-    def _load_components(
-        self,
-        dia_chi_entities: list[DiaChiEntity],
-        thien_can_entities: list[ThienCanEntity],
-    ) -> dict[str, Component]:
+    def _load_components(self) -> dict[str, Component]:
         components: dict[str, Component] = {}
-
-        for component in dia_chi_entities:
+        for component in self._load_dia_chi_entities():
             self._register(components, component)
-        for component in thien_can_entities:
+        for component in self._load_thien_can_entities():
             self._register(components, component)
         for component in LIST_CUC:
             self._register(components, component)

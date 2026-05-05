@@ -2,7 +2,7 @@ import datetime as dt
 
 import pytest
 
-from src.refactored.builder.component_catalog import get_default_catalog
+from src.refactored.component_catalog import get_default_catalog
 from src.refactored.builder.natal_placement_resolver import resolve_natal_placement
 from src.refactored.placement.bundle import get_default_placement_rule_compiler
 from src.refactored.component.sao import TuanTriet

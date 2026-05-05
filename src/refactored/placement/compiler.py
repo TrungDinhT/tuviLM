@@ -89,7 +89,8 @@ class SpecializedPlacementRules:
                 continue
             if ref_id not in seed:
                 raise KeyError(
-                    f"Restricted spec {consumer_id!r} requires reference {ref_id!r} which is not in `ids` and not in `seed`."
+                    f"Restricted spec {consumer_id!r} requires reference {ref_id!r} "
+                    "which is not in `ids` and not in `seed`."
                 )
 
 
@@ -99,9 +100,13 @@ class PlacementRuleCompiler(PlacementRegistry):
     def __init__(self) -> None:
         self._specs: PlacementSpecMap = {}
 
-    def register_component_lazy(self, component_id: ComponentId, spec: PositionSpec) -> None:
+    def register_component_lazy(
+        self, component_id: ComponentId, spec: PositionSpec
+    ) -> None:
         if component_id in self._specs:
-            raise ValueError(f"Duplicate component id in placement specs: {component_id}")
+            raise ValueError(
+                f"Duplicate component id in placement specs: {component_id}"
+            )
         self._specs[component_id] = spec
 
     def register_component(self, component_id: ComponentId, position: DiaChi) -> None:
