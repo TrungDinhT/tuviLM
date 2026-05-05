@@ -23,7 +23,7 @@ class TuviEvalExpected(BaseModel):
     required_substrings: list[str] = Field(default_factory=list)
     forbidden_substrings: list[str] = Field(default_factory=list)
     required_tools: list[str] = Field(default_factory=list)
-    required_read_sections: list[str] = Field(default_factory=list)
+    required_read_sections: set[str] = Field(default_factory=set)
     min_output_chars: int = 80
 
 
@@ -33,7 +33,7 @@ class AgentResult(BaseModel):
     output: str
     tools_used: set[str] = Field(default_factory=set)
     usage: dict[str, Any] | None = None
-    read_sections: list[str] = Field(default_factory=list)
+    read_sections: set[str] = Field(default_factory=set)
     messages: list[dict[str, Any]] = Field(default_factory=list)
 
     @classmethod
@@ -121,14 +121,14 @@ def _extract_tool_call(result: AgentRunResult[str]) -> list[dict[str, Any]]:
 
 
 
-def _extract_read_sections(tool_calls: list[dict[str, Any]]) -> list[str]:
-    sections: list[str] = []
+def _extract_read_sections(tool_calls: list[dict[str, Any]]) -> set[str]:
+    sections: set[str] = set()
 
     for call in tool_calls:
         if call["tool_name"] == "read_section":
             args = call.get("args", {})
             section = args.get("section_id")
             if isinstance(section, str):
-                sections.append(section)
+                sections.add(section)
 
     return sections
