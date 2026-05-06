@@ -20,5 +20,9 @@ dependencies = [
     "pytest>=8.3.5,<9",
 ]
 
-[tool.uv]
-package = false
+## TODO: proper packaging
+#[tool.uv]
+#package = false
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

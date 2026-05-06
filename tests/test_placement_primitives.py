@@ -2,11 +2,10 @@
 import pytest
 
 from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCan
-from src.refactored.context.prior import Gender, LaSoPrior, LunarYear
+from src.refactored.context.prior import Gender, LaSoPrior
 from src.refactored.context.natal import NatalContext
+from src.refactored.cung import NGU_HO_DON_THIEN_CAN, derive_cung_thien_can
 from src.refactored.placement.primitives import (
-    DAN_THIEN_CAN_BY_YEAR,
-    cung_thien_can_for,
     move_by_attr,
     move_by_birth_month,
     move_by_van_direction,
@@ -33,7 +32,7 @@ def test_move_by_attr(
             hour=DiaChi.THAN,
             date=1,
             month=3,
-            year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.GIAP),
+            year=1984,
             gender=Gender.MALE,
         )
     )
@@ -53,7 +52,7 @@ def test_move_with_uses_context_derived_steps():
             hour=DiaChi.MEO,
             date=1,
             month=4,
-            year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.GIAP),
+            year=1984,
             gender=Gender.MALE,
         )
     )
@@ -71,7 +70,7 @@ def test_position_by_thien_can_uses_prior_thien_can():
             hour=DiaChi.TY,
             date=1,
             month=1,
-            year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.CANH),
+            year=1960,
             gender=Gender.MALE,
         )
     )
@@ -91,7 +90,7 @@ def test_position_by_dia_chi_groups_uses_group_membership():
             hour=DiaChi.TY,
             date=1,
             month=1,
-            year=LunarYear(dia_chi=DiaChi.MEO, thien_can=ThienCan.GIAP),
+            year=1987,
             gender=Gender.MALE,
         )
     )
@@ -121,7 +120,7 @@ def test_move_by_birth_month_uses_zero_based_month_offset(
             hour=DiaChi.TY,
             date=1,
             month=month,
-            year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.GIAP),
+            year=1984,
             gender=Gender.MALE,
         )
     )
@@ -145,7 +144,7 @@ def test_move_by_van_direction_uses_chart_direction(
             hour=DiaChi.TY,
             date=1,
             month=1,
-            year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.GIAP),
+            year=1984,
             gender=gender,
         )
     )
@@ -180,13 +179,13 @@ _NGU_HO_DON_TABLE: dict[DiaChi, dict[ThienCan, ThienCan]] = {
         for year, expected in row.items()
     ],
 )
-def test_cung_thien_can_for_matches_ngu_ho_don_table(
+def test_derive_cung_thien_can_matches_ngu_ho_don_table(
     year_thien_can: ThienCan, position: DiaChi, expected: ThienCan
 ):
-    assert cung_thien_can_for(year_thien_can, position) is expected
+    assert derive_cung_thien_can(year_thien_can, position) is expected
 
 
-def test_dan_thien_can_by_year_pairs_match_ngu_ho_don_anchor():
+def test_ngu_ho_don_thien_can_pairs_match_anchor():
     pairs = {
         ThienCan.BINH: (ThienCan.GIAP, ThienCan.KY),
         ThienCan.MAU: (ThienCan.AT, ThienCan.CANH),
@@ -196,4 +195,4 @@ def test_dan_thien_can_by_year_pairs_match_ngu_ho_don_anchor():
     }
     for anchor, year_pair in pairs.items():
         for year in year_pair:
-            assert DAN_THIEN_CAN_BY_YEAR[year] is anchor
+            assert NGU_HO_DON_THIEN_CAN[year] is anchor

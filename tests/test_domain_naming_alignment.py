@@ -6,13 +6,14 @@ import types
 import typing
 from typing import TypeAliasType, get_args, get_origin
 
-from src.refactored.builder.component_catalog import get_default_catalog
+from src.refactored.component_catalog import get_default_catalog
 from src.refactored.component import Component, Sao
 from src.refactored.component import __all__ as component_all
 from src.refactored.component.cuc import Cuc
-from src.refactored.component.cung import Cung, CungRole
+from src.refactored.component.cung_role import CungRole
 from src.refactored.component.elementary import DiaChiEntity, ThienCanEntity
 from src.refactored.component.sao import ChinhPhuTinh, TuanTriet, TuHoa, VongTrangSinh
+from src.refactored.cung import Cung
 from src.refactored.placement import registry as placement_registry
 
 
@@ -63,10 +64,9 @@ def test_chinh_phu_tinh_is_concrete_star_model_class() -> None:
     assert ChinhPhuTinh.__name__ == "ChinhPhuTinh"
 
 
-def test_cung_uses_saos_tuple_not_components() -> None:
+def test_cung_uses_layered_components_tuple() -> None:
     fields = Cung.__dataclass_fields__  # type: ignore[attr-defined]
-    assert "saos" in fields
-    assert "components" not in fields
+    assert "components" in fields
 
 
 def test_component_id_unchanged_in_placement_registry() -> None:
@@ -80,5 +80,4 @@ def test_catalog_get_covers_component_union_examples() -> None:
     assert isinstance(catalog.get("ty"), DiaChiEntity)
     assert isinstance(catalog.get("giap"), ThienCanEntity)
     assert isinstance(catalog.get("hoa_luc_cuc"), Cuc)
-
 

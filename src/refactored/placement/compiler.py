@@ -41,32 +41,6 @@ class SpecializedPlacementRules:
     def __post_init__(self) -> None:
         self._validate_structural_integrity()
 
-    def restrict_to(
-        self,
-        ids: Set[ComponentId],
-        seed: Mapping[ComponentId, DiaChi],
-    ) -> SpecializedPlacementRules:
-        """Return only `ids` specs, rewriting external references as constants from `seed`."""
-        self._check_seed_covers_external_refs(ids, seed)
-        new_specs: SpecializedPlacementSpecMap = {}
-        for component_id in ids:
-            spec = self.specs[component_id]
-            if isinstance(spec, SpecializedAbsoluteSpec):
-                new_specs[component_id] = spec
-            elif isinstance(spec, SpecializedRelativeSpec):
-                ref_id = spec.reference_id
-                if ref_id in ids:
-                    new_specs[component_id] = spec
-                else:
-                    anchor_position = seed[ref_id]
-                    tr = spec.transform
-                    new_specs[component_id] = SpecializedAbsoluteSpec(
-                        position_fn=lambda p=anchor_position, fn=tr: fn(p),
-                    )
-            else:
-                raise ValueError(f"Invalid position spec: {spec}")
-        return SpecializedPlacementRules(specs=new_specs)
-
     def _validate_structural_integrity(self) -> None:
         for component_id, spec in self.specs.items():
             if isinstance(spec, SpecializedRelativeSpec):
@@ -76,22 +50,6 @@ class SpecializedPlacementRules:
                         "Component reference has no registered position spec: "
                         f"{component_id} -> {reference_id}"
                     )
-
-    def _check_seed_covers_external_refs(
-        self, ids: Set[ComponentId], seed: Mapping[ComponentId, DiaChi]
-    ) -> None:
-        for consumer_id in ids:
-            spec = self.specs[consumer_id]
-            if not isinstance(spec, SpecializedRelativeSpec):
-                continue
-            ref_id = spec.reference_id
-            if ref_id in ids:
-                continue
-            if ref_id not in seed:
-                raise KeyError(
-                    f"Restricted spec {consumer_id!r} requires reference {ref_id!r} "
-                    "which is not in `ids` and not in `seed`."
-                )
 
 
 class PlacementRuleCompiler(PlacementRegistry):
@@ -119,25 +77,82 @@ class PlacementRuleCompiler(PlacementRegistry):
         for rule in rules:
             rule.register_components(self)
 
-    def compile(self, context: PlacementContext) -> SpecializedPlacementRules:
-        specialized_specs = self._specialize(context)
+    def compile(
+        self,
+        context: PlacementContext,
+        *,
+        scope: Set[ComponentId] | None = None,
+        seed: Mapping[ComponentId, DiaChi] | None = None,
+    ) -> SpecializedPlacementRules:
+        """Compile registered placement specs for one context.
+
+        When `scope` is provided, only the requested component ids and their
+        unseeded dependency closure are specialized. References outside the
+        compiled graph are rewritten from `seed`.
+        """
+        specialized_specs = self._specialize(
+            context=context,
+            scope=set(self._specs) if scope is None else set(scope),
+            seed=seed or {},
+        )
         return SpecializedPlacementRules(specs=specialized_specs)
 
-    def _specialize(self, context: PlacementContext) -> SpecializedPlacementSpecMap:
+    def _specialize(
+        self,
+        *,
+        context: PlacementContext,
+        scope: Set[ComponentId],
+        seed: Mapping[ComponentId, DiaChi],
+    ) -> SpecializedPlacementSpecMap:
         specialized: SpecializedPlacementSpecMap = {}
-        for component_id, spec in self._specs.items():
-            if isinstance(spec, RelativePositionSpec):
-                reference_id = spec.resolve_reference_id(context)
-                specialized[component_id] = SpecializedRelativeSpec(
-                    reference_id=reference_id,
-                    transform=lambda position, tr=spec.transform, ctx=context: tr(
-                        position, ctx
-                    ),
-                )
-            elif isinstance(spec, AbsolutePositionSpec):
-                specialized[component_id] = SpecializedAbsoluteSpec(
-                    position_fn=lambda fn=spec.position_fn, ctx=context: fn(ctx),
-                )
-            else:
+        resolving: list[ComponentId] = []
+
+        def visit(component_id: ComponentId) -> None:
+            if component_id in specialized:
+                return
+            if component_id in resolving:
+                cycle = " -> ".join([*resolving, component_id])
+                raise ValueError(f"Circular position dependency detected: {cycle}")
+            try:
+                spec = self._specs[component_id]
+            except KeyError as exc:
+                raise KeyError(
+                    f"Component id `{component_id}` has no registered position spec."
+                ) from exc
+
+            resolving.append(component_id)
+            try:
+                if isinstance(spec, AbsolutePositionSpec):
+                    specialized[component_id] = SpecializedAbsoluteSpec(
+                        position_fn=lambda fn=spec.position_fn, ctx=context: fn(ctx),
+                    )
+                    return
+
+                if isinstance(spec, RelativePositionSpec):
+                    reference_id = spec.resolve_reference_id(context)
+                    if reference_id in seed and reference_id not in scope:
+                        anchor_position = seed[reference_id]
+                        tr = spec.transform
+                        specialized[component_id] = SpecializedAbsoluteSpec(
+                            position_fn=lambda p=anchor_position, fn=tr, ctx=context: fn(
+                                p, ctx
+                            ),
+                        )
+                    else:
+                        visit(reference_id)
+                        specialized[component_id] = SpecializedRelativeSpec(
+                            reference_id=reference_id,
+                            transform=lambda position, tr=spec.transform, ctx=context: tr(
+                                position, ctx
+                            ),
+                        )
+                    return
+
                 raise ValueError(f"Invalid position spec: {spec}")
+            finally:
+                resolving.pop()
+
+        for component_id in scope:
+            visit(component_id)
+
         return specialized

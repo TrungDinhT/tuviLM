@@ -1,9 +1,10 @@
 import datetime as dt
 from enum import StrEnum
+from functools import cached_property
 
 import pydantic
 
-from src.external_lib.day_from_js import LunarDate, get_lunar_date
+from src.external_lib.day_from_js import get_lunar_date
 from src.refactored.component.elementary import DiaChi, ThienCan
 
 
@@ -11,10 +12,12 @@ class LunarYear(pydantic.BaseModel):
     dia_chi: DiaChi
     thien_can: ThienCan
 
+    model_config = {"frozen": True}
+
     @classmethod
-    def from_solar_year(cls, lunar_date: LunarDate) -> "LunarYear":
-        dia_chi = DiaChi.from_index(lunar_date.year + 8)
-        thien_can = ThienCan.from_index(lunar_date.year + 6)
+    def from_year(cls, year: int) -> "LunarYear":
+        dia_chi = DiaChi.from_index(year + 8)
+        thien_can = ThienCan.from_index(year + 6)
         return cls(
             dia_chi=dia_chi,
             thien_can=thien_can,
@@ -30,9 +33,15 @@ class LaSoPrior(pydantic.BaseModel):
     hour: DiaChi
     date: int
     month: int
-    year: LunarYear
+    year: int
 
     gender: Gender
+
+    model_config = {"frozen": True}
+
+    @cached_property
+    def lunar_year(self) -> LunarYear:
+        return LunarYear.from_year(self.year)
 
     @classmethod
     def from_solar_day(cls, time: dt.datetime, gender: Gender) -> "LaSoPrior":
@@ -54,12 +63,14 @@ class LaSoPrior(pydantic.BaseModel):
             hour=hour,
             date=lunar_date.day,
             month=lunar_date.month,
-            year=LunarYear.from_solar_year(lunar_date),  # type: ignore
+            year=lunar_date.year,
             gender=gender,
         )
 
-    def get_thien_can(self) -> ThienCan:
-        return self.year.thien_can
+    @property
+    def thien_can(self) -> ThienCan:
+        return self.lunar_year.thien_can
 
-    def get_dia_chi(self) -> DiaChi:
-        return self.year.dia_chi
+    @property
+    def dia_chi(self) -> DiaChi:
+        return self.lunar_year.dia_chi

@@ -30,7 +30,7 @@ EXPECTED_A: dict[str, object] = {
     "tu_vi_position": DiaChi.THAN,
     "thien_phu_position": DiaChi.THAN,
     "loc_ton_position": DiaChi.THAN,
-    "cung_than_position": DiaChi.TUAT,
+    "than_position": DiaChi.TUAT,
     "thai_tue_position": DiaChi.NGO,
     "year_dia_chi": DiaChi.NGO,
     "year_thien_can": ThienCan.CANH,

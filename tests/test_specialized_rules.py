@@ -3,12 +3,11 @@ import pytest
 from src.refactored.component.elementary import DiaChi
 from src.refactored.placement.compiler import (
     PlacementRuleCompiler,
-    SpecializedAbsoluteSpec,
     SpecializedPlacementRules,
     SpecializedRelativeSpec,
 )
 from src.refactored.placement.engine import PlacementEngine
-from src.refactored.placement.registry import RelativePositionSpec
+from src.refactored.placement.registry import AbsolutePositionSpec, RelativePositionSpec
 
 
 def test_specialized_rules_rejects_dangling_reference():
@@ -21,64 +20,6 @@ def test_specialized_rules_rejects_dangling_reference():
                 ),
             }
         )
-
-
-def test_restrict_to_self_contained_matches_full_resolution():
-    rules = SpecializedPlacementRules(
-        specs={
-            "root": SpecializedAbsoluteSpec(position_fn=lambda: DiaChi.DAN),
-            "mid": SpecializedRelativeSpec(
-                reference_id="root",
-                transform=lambda p: p + 1,
-            ),
-            "leaf": SpecializedRelativeSpec(
-                reference_id="mid",
-                transform=lambda p: p + 1,
-            ),
-        }
-    )
-    subset = {"root", "mid", "leaf"}
-    restricted = rules.restrict_to(subset, seed={})
-    full = PlacementEngine(rules).resolve_all()
-    part = PlacementEngine(restricted).resolve_all()
-    for cid in subset:
-        assert part[cid] == full[cid]
-
-
-def test_restrict_to_rewrites_external_reference_from_seed():
-    rules = SpecializedPlacementRules(
-        specs={
-            "anchor": SpecializedAbsoluteSpec(position_fn=lambda: DiaChi.DAN),
-            "satellite": SpecializedRelativeSpec(
-                reference_id="anchor",
-                transform=lambda p: p + 3,
-            ),
-        }
-    )
-    restricted = rules.restrict_to(
-        {"satellite"},
-        seed={"anchor": DiaChi.TY},
-    )
-    assert PlacementEngine(restricted).resolve_all() == {
-        "satellite": DiaChi.TY + 3,
-    }
-
-
-def test_restrict_to_missing_seed_raises_precise_key_error():
-    rules = SpecializedPlacementRules(
-        specs={
-            "parent": SpecializedAbsoluteSpec(position_fn=lambda: DiaChi.DAN),
-            "child": SpecializedRelativeSpec(
-                reference_id="parent",
-                transform=lambda p: p,
-            ),
-        }
-    )
-    with pytest.raises(
-        KeyError,
-        match=r"Restricted spec 'child' requires reference 'parent' which is not in `ids` and not in `seed`",
-    ):
-        rules.restrict_to({"child"}, seed={})
 
 
 def test_compiler_validation_moves_to_rules_constructor():
@@ -97,3 +38,76 @@ def test_compiler_validation_moves_to_rules_constructor():
     )
     with pytest.raises(KeyError):
         compiler.compile(ctx)
+
+
+def test_scoped_compile_includes_unseeded_dependency_closure():
+    compiler = PlacementRuleCompiler()
+    compiler.register_component_lazy(
+        "leaf",
+        RelativePositionSpec("mid", lambda p: p + 1),
+    )
+    compiler.register_component_lazy(
+        "mid",
+        RelativePositionSpec("root", lambda p: p + 1),
+    )
+    compiler.register_component_lazy(
+        "root",
+        AbsolutePositionSpec(lambda _ctx: DiaChi.DAN),
+    )
+
+    rules = compiler.compile(object(), scope={"leaf"}, seed={})
+    resolved = PlacementEngine(rules).resolve_all()
+
+    assert set(resolved) == {"root", "mid", "leaf"}
+    assert resolved["leaf"] == DiaChi.THIN
+
+
+def test_scoped_compile_rewrites_external_reference_from_seed():
+    compiler = PlacementRuleCompiler()
+    compiler.register_component_lazy(
+        "satellite",
+        RelativePositionSpec("anchor", lambda p: p + 3),
+    )
+
+    rules = compiler.compile(
+        object(),
+        scope={"satellite"},
+        seed={"anchor": DiaChi.TY},
+    )
+
+    assert PlacementEngine(rules).resolve_all() == {
+        "satellite": DiaChi.MEO,
+    }
+
+
+def test_scoped_compile_does_not_specialize_unneeded_rules_for_partial_context():
+    class PartialContext:
+        pass
+
+    compiler = PlacementRuleCompiler()
+    compiler.register_component_lazy(
+        "wanted",
+        AbsolutePositionSpec(lambda _ctx: DiaChi.DAN),
+    )
+    compiler.register_component_lazy(
+        "unwanted",
+        AbsolutePositionSpec(lambda ctx: ctx.missing_attribute),
+    )
+
+    rules = compiler.compile(PartialContext(), scope={"wanted"}, seed={})
+
+    assert PlacementEngine(rules).resolve_all() == {"wanted": DiaChi.DAN}
+
+
+def test_scoped_compile_missing_dependency_raises_precise_key_error():
+    compiler = PlacementRuleCompiler()
+    compiler.register_component_lazy(
+        "child",
+        RelativePositionSpec("missing_parent", lambda p: p),
+    )
+
+    with pytest.raises(
+        KeyError,
+        match=r"Component id `missing_parent` has no registered position spec",
+    ):
+        compiler.compile(object(), scope={"child"}, seed={})

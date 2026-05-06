@@ -18,7 +18,7 @@ from src.refactored.component.elementary import (
     ThienCan,
 )
 from src.refactored.context.protocol import PlacementContext
-from src.refactored.placement.dynamic_entities import TU_HOA_IDS, TuHoaEntity
+from src.refactored.placement.component_groups import TU_HOA_IDS, TuHoaEntity
 from src.refactored.placement.registry import (
     AbsolutePositionResolver,
     AbsolutePositionSpec,
@@ -465,31 +465,6 @@ def tuan_positions_fn(context: PlacementContext) -> tuple[DiaChi, DiaChi]:
         DiaChi.TUAT: (DiaChi.THAN, DiaChi.DAU),
     }
     return _TUAN_POSITIONS[context.dia_chi - context.thien_can.index]
-
-
-# Each Cung carries a Thiên Can derived from the year's Thiên Can per the
-# Ngũ Hổ Độn rule (see "Phối hợp với mười can"):
-#
-#   - The Thiên Can at Dần is fixed by the year's Thiên Can.
-#   - From Dần, the Thiên Can advances one step clockwise per Địa Chi,
-#   giving every Cung its Thiên Can.
-DAN_THIEN_CAN_BY_YEAR: dict[ThienCan, ThienCan] = {
-    ThienCan.GIAP: ThienCan.BINH,
-    ThienCan.KY: ThienCan.BINH,
-    ThienCan.AT: ThienCan.MAU,
-    ThienCan.CANH: ThienCan.MAU,
-    ThienCan.BINH: ThienCan.CANH,
-    ThienCan.TAN: ThienCan.CANH,
-    ThienCan.DINH: ThienCan.NHAM,
-    ThienCan.NHAM: ThienCan.NHAM,
-    ThienCan.MAU: ThienCan.GIAP,
-    ThienCan.QUY: ThienCan.GIAP,
-}
-
-def cung_thien_can_for(year_thien_can: ThienCan, position: DiaChi) -> ThienCan:
-    """Resolve the Thiên Can of the Cung at ``position`` per Ngũ Hổ Độn."""
-    dan_thien_can = DAN_THIEN_CAN_BY_YEAR[year_thien_can]
-    return dan_thien_can + (position - DiaChi.DAN)
 
 
 def position_by_thien_can(

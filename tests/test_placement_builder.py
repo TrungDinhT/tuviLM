@@ -3,7 +3,7 @@ import datetime as dt
 import pytest
 
 from src.refactored.component_catalog import get_default_catalog
-from src.refactored.builder.natal_placement_resolver import resolve_natal_placement
+from src.refactored.assembly.natal import resolve_natal_placement
 from src.refactored.placement.bundle import get_default_placement_rule_compiler
 from src.refactored.component.sao import TuanTriet
 from src.refactored.placement.compiler import (
@@ -31,7 +31,7 @@ from src.refactored.placement.registry import (
     AbsolutePositionSpec,
     RelativePositionSpec,
 )
-from src.refactored.component.cung import Role
+from src.refactored.component.cung_role import Role
 from src.refactored.component.elementary import DiaChi
 from src.refactored.context.prior import Gender, LaSoPrior
 from src.refactored.context.natal import NatalContext

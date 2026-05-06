@@ -1,5 +1,3 @@
-from types import SimpleNamespace
-
 import pytest
 
 from src.refactored.component.elementary import (
@@ -28,14 +26,12 @@ def test_circle_direction_supports_multiplier_semantics():
         (2025, ThienCan.AT, DiaChi.TI),
     ],
 )
-def test_lunar_year_from_solar_year_uses_cyclic_enum_indexes(
+def test_lunar_year_from_year_uses_cyclic_enum_indexes(
     year: int,
     expected_thien_can: ThienCan,
     expected_dia_chi: DiaChi,
 ):
-    lunar_date = SimpleNamespace(year=year)
-
-    lunar_year = LunarYear.from_solar_year(lunar_date)  # type: ignore[arg-type]
+    lunar_year = LunarYear.from_year(year)
 
     assert lunar_year.thien_can == expected_thien_can
     assert lunar_year.dia_chi == expected_dia_chi
@@ -46,13 +42,17 @@ def test_natal_context_from_prior_derives_menh_position_and_cuc():
         hour=DiaChi.MEO,
         date=10,
         month=11,
-        year=LunarYear(dia_chi=DiaChi.TY, thien_can=ThienCan.BINH),
+        year=1996,
         gender=Gender.MALE,
     )
 
     context = NatalContext.from_prior(prior)
 
+    assert prior.lunar_year is prior.lunar_year
+    assert prior.lunar_year.thien_can == ThienCan.BINH
+    assert prior.lunar_year.dia_chi == DiaChi.TY
     assert context.menh_position == DiaChi.DAU
+    assert context.age(2002) == 7
     assert context.cuc.id == "hoa_luc_cuc"
     assert context.cuc.name == "Hỏa Lục cục"
     assert context.cuc.number == 6
@@ -64,7 +64,7 @@ def test_natal_context_moves_am_duong_and_van_direction_from_prior():
         hour=DiaChi.TY,
         date=1,
         month=1,
-        year=LunarYear(dia_chi=DiaChi.SUU, thien_can=ThienCan.AT),
+        year=1985,
         gender=Gender.FEMALE,
     )
 

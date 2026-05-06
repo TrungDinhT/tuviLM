@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from src.refactored.component.cuc import Cuc, LIST_CUC
 from src.refactored.component.elementary import CircleDirection, DiaChi, LuongNghi, ThienCan
 from src.refactored.context.prior import Gender, LaSoPrior
+from src.refactored.placement.layer import LayerId, NatalLayerId
 
 
 def _get_menh_position(prior: LaSoPrior) -> DiaChi:
@@ -40,7 +41,7 @@ def _get_cuc(prior: LaSoPrior, menh_position: DiaChi) -> Cuc:
         ThienCan.QUY: [2, 0, 3, 4, 1],
     }
     cuc_group = _match_cuc_group(menh_position)
-    cuc_index = cuc_index_orders[prior.get_thien_can()][cuc_group]
+    cuc_index = cuc_index_orders[prior.thien_can][cuc_group]
     return LIST_CUC[cuc_index]
 
 
@@ -58,15 +59,15 @@ class NatalContext:
 
     @property
     def dia_chi(self) -> DiaChi:
-        return self.prior.year.dia_chi
+        return self.prior.dia_chi
 
     @property
     def thien_can(self) -> ThienCan:
-        return self.prior.year.thien_can
+        return self.prior.thien_can
 
     @property
     def am_duong(self) -> LuongNghi:
-        return LuongNghi(self.prior.year.dia_chi.index % 2)
+        return LuongNghi(self.prior.dia_chi.index % 2)
 
     @property
     def van_direction(self) -> CircleDirection:
@@ -86,3 +87,10 @@ class NatalContext:
     @property
     def cuc(self) -> Cuc:
         return _get_cuc(self.prior, self.menh_position)
+
+    def age(self, year: int) -> int:
+        return year - self.prior.year + 1 # tuổi mụ
+
+    @property
+    def layer_id(self) -> LayerId:
+        return NatalLayerId()
