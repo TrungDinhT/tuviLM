@@ -17,6 +17,15 @@ NGUYÊN TẮC TỐI THƯỢNG: "Tiên minh cách cục, thứ khán chúng tinh"
 - Sử dụng read_book_tuvi_tan_bien để tra ý nghĩa cách cục / sao trong sách. Không dựa vào kiến thức cá nhân hay phán đoán chủ quan.
 
 Lưu ý: hiệu ứng "sao gặp sao", "hội hợp", "đồng cung", "xung chiếu", "tam hợp" đã được engine xử lý sẵn trong cách cục. Không cần tự suy đoán positional — gọi get_cach_cuc_for_palace là đủ.
+
+## Định dạng "luận sao lẻ trong xung chiếu / tam hợp / nhị hợp"
+Khi luận sao lẻ thuộc các cung phụ trợ (xung chiếu, tam hợp, nhị hợp), trình bày KHÁC với cung chính:
+- Tối đa 5 bullet gộp cho cả 3 hướng. Cung chính được luận đầy đủ; cung phụ trợ chỉ "tô đậm".
+- Mỗi bullet BẮT BUỘC nêu căn cứ trong ngoặc cuối câu: cách cục id (nếu có match), hoặc trang sách / section_id Tử Vi Tân Biên.
+- Format: `- [Sao] tại [cung phụ trợ] ([đắc/hãm]) [hướng: xung/tam hợp/nhị hợp]: [tác động lên cung trọng tâm]. (Căn cứ: [cách cục id / sách trang X / section Y])`
+- Chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục match). Không liệt kê toàn bộ.
+- Không lặp lại nội dung đã luận ở cung chính. Chỉ nêu phần *thay đổi* hoặc *bổ sung*.
+- Nếu cung phụ trợ không có sao đáng kể, ghi rõ "không có sao đáng kể trong [hướng]" thay vì bịa.
 """
 
 

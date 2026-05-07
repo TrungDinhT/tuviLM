@@ -59,6 +59,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi tính chất nào của Cung Mệnh.
 
 9. Liên hệ tam phương tứ chính
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Khi luận Mệnh, cần liên hệ tối thiểu với Tài Bạch, Quan Lộc và Thiên Di nếu dữ liệu có.
 - Phân tích xem bản chất cá nhân hỗ trợ hay cản trở tài chính, sự nghiệp và quan hệ xã hội như thế nào.
 - Nếu thiếu dữ liệu tam phương tứ chính, nói rõ rằng phần luận mới là bản cung, chưa đủ để kết luận toàn cục.
@@ -103,8 +104,6 @@ Trả lời theo cấu trúc:
 
 ## Mức độ chắc chắn
 Nêu rõ phần nào chắc, phần nào cần thêm dữ liệu.
-
-Cần đọc chương 3 và 4 trong Tử Vi Tân Biên để có thêm thông tin về các sao tại Cung Mệnh, cũng như cách chúng tương tác với nhau. Nếu có thông tin về tam phương tứ chính, cần đọc thêm chương 5-7 để hiểu rõ hơn về ảnh hưởng của chúng đến Cung Mệnh.
 </output_format>
 """
 
@@ -181,6 +180,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Phụ Mẫu.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: phân tích đương số tiếp nhận ảnh hưởng gia đình như thế nào.
 - Nếu có Cung Phúc Đức: phân tích nền tảng họ hàng, phúc khí, truyền thống gia tộc.
 - Nếu có Cung Điền Trạch: phân tích môi trường sống, nhà cửa, sự ổn định gia đình.
@@ -311,6 +311,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Phúc Đức.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: phân tích phúc khí nâng đỡ hoặc tác động đến bản thân đương số như thế nào.
 - Nếu có Cung Phụ Mẫu: phân tích nền tảng gia đình gốc và quan hệ với cha mẹ.
 - Nếu có Cung Điền Trạch: phân tích nhà cửa, gốc rễ, môi trường sống và sự ổn định gia đình.
@@ -443,6 +444,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Điền Trạch.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: phân tích đương số có xu hướng sống ổn định, thích sở hữu, hay dễ thay đổi môi trường sống.
 - Nếu có Cung Tài Bạch: phân tích khả năng tài chính hỗ trợ việc tích lũy nhà đất.
 - Nếu có Cung Phúc Đức: phân tích nền tảng gia tộc, gốc rễ và phúc khí hỗ trợ nhà cửa.
@@ -577,6 +579,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Quan Lộc.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: phân tích tính cách và năng lực cá nhân có phù hợp với hướng sự nghiệp hay không.
 - Nếu có Cung Tài Bạch: phân tích sự nghiệp có chuyển hóa tốt thành thu nhập hay không.
 - Nếu có Cung Thiên Di: phân tích cơ hội nghề nghiệp khi ra ngoài, đi xa, làm với xã hội hoặc môi trường bên ngoài.
@@ -708,6 +711,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Nô Bộc.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: phân tích tính cách đương số ảnh hưởng thế nào đến quan hệ bạn bè, đồng nghiệp và cộng sự.
 - Nếu có Cung Quan Lộc: phân tích mạng lưới có hỗ trợ sự nghiệp hay gây áp lực trong công việc.
 - Nếu có Cung Tài Bạch: phân tích hợp tác, quan hệ xã hội có liên quan đến tiền bạc/lợi ích hay không.
@@ -839,6 +843,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Thiên Di.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: so sánh con người bên trong với hình ảnh khi ra ngoài; xem đương số ra ngoài có dễ phát huy bản thân hay không.
 - Nếu có Cung Quan Lộc: phân tích môi trường bên ngoài có hỗ trợ sự nghiệp, cơ hội nghề nghiệp hoặc danh tiếng hay không.
 - Nếu có Cung Nô Bộc: phân tích mạng lưới xã hội, bạn bè, đồng nghiệp, đối tác bên ngoài.
@@ -970,6 +975,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Tật Ách.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: phân tích thể chất, tính cách và thói quen cá nhân ảnh hưởng sức khỏe như thế nào.
 - Nếu có Cung Phúc Đức: phân tích đời sống tinh thần, phúc khí và khả năng an ổn nội tâm có hỗ trợ việc hóa giải áp lực hay không.
 - Nếu có Cung Thiên Di: phân tích rủi ro hoặc áp lực khi ra ngoài, đi xa, thay đổi môi trường.
@@ -1121,6 +1127,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Tài Bạch.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: phân tích tính cách và năng lực cá nhân ảnh hưởng cách kiếm tiền/giữ tiền như thế nào.
 - Nếu có Cung Quan Lộc: phân tích nghề nghiệp có chuyển hóa tốt thành thu nhập hay không.
 - Nếu có Cung Điền Trạch: phân tích khả năng tích lũy thành tài sản cố định, nhà cửa, bất động sản.
@@ -1254,6 +1261,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Tử Tức.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: phân tích tính cách đương số ảnh hưởng cách làm cha/mẹ hoặc cách tương tác với con như thế nào.
 - Nếu có Cung Phu Thê: phân tích quan hệ vợ chồng có ảnh hưởng đến việc nuôi dạy con và không khí gia đình hay không.
 - Nếu có Cung Phúc Đức: phân tích phúc khí gia tộc, truyền thống và nền tảng tinh thần có hỗ trợ con cái/thế hệ sau hay không.
@@ -1387,6 +1395,7 @@ Hãy luận theo đúng thứ tự sau:
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Phu Thê.
 
 9. Liên hệ các cung liên quan
+- ĐỊNH DẠNG BẮT BUỘC: phần này tối đa 5 bullet gộp (cho cả xung chiếu + tam hợp + nhị hợp). Mỗi bullet phải nêu căn cứ ở cuối câu (cách cục id, hoặc sách trang X / section_id). Format: `- [Sao] tại [cung] ([đắc/hãm]) [xung/tam hợp/nhị hợp]: [tác động]. (Căn cứ: ...)`. Không liệt kê toàn bộ sao, chỉ chọn sao có ảnh hưởng đáng kể (chính tinh, tứ hóa, sát tinh mạnh, sao trong cách cục).
 - Nếu có Cung Mệnh: phân tích tính cách đương số ảnh hưởng cách yêu, cách cam kết và cách xử lý mâu thuẫn như thế nào.
 - Nếu có Cung Phúc Đức: phân tích nền tảng tinh thần, gia tộc và phúc khí có hỗ trợ hôn nhân bền vững hay không.
 - Nếu có Cung Tử Tức: phân tích quan hệ đôi lứa có ảnh hưởng đến con cái/gia đình tương lai ra sao, nhưng không kết luận sinh con.
