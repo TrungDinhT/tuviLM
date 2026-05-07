@@ -211,7 +211,6 @@ class ConditionType(str, Enum):
     STAR_AT_CHI = "star_at_chi"
     STAR_AT_FIXED_CHI = "star_at_fixed_chi"
     STARS_GIAP = "stars_giap"
-    STARS_GIAP_ORDERED = "stars_giap_ordered"
     BRIGHT_CHINH_TINH = "bright_chinh_tinh"
     ONLY_CHINH_TINH = "only_chinh_tinh"
     STARS_XOR = "stars_xor"
@@ -232,8 +231,6 @@ class Condition(BaseModel):
     in_palace: str | None = None
     at_chi: list[str] | None = None
     mode: str | None = None
-    prev_stars: list[str] | None = None
-    next_stars: list[str] | None = None
 
     model_config = {"extra": "forbid"}
 
@@ -556,17 +553,6 @@ def _eval_inner(cond: Condition, board: BoardIndex, resolver: GroupResolver) -> 
             return (a in prev_set and b in next_set) or (b in prev_set and a in next_set)
         adjacent = prev_set | next_set
         return all(s in adjacent for s in stars)
-
-    if t == ConditionType.STARS_GIAP_ORDERED:
-        prev_set = board.stars_in_palace((anchor - 1) % 12)
-        next_set = board.stars_in_palace((anchor + 1) % 12)
-        prev_resolved = resolver.resolve(cond.prev_stars, None)
-        next_resolved = resolver.resolve(cond.next_stars, None)
-        if not prev_resolved or not next_resolved:
-            return False
-        return any(s in prev_set for s in prev_resolved) and any(
-            s in next_set for s in next_resolved
-        )
 
     if t == ConditionType.BRIGHT_CHINH_TINH:
         chinh = _chinh_tinh_names()
