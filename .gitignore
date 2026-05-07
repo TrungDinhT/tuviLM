@@ -162,6 +162,9 @@ cython_debug/
 #.idea/
 
 .codegpt
-./data
+data/
 ./frontend/node_modules/*
 ./frontend/dist
+node_modules/
+
+CLAUDE.md
