@@ -123,30 +123,53 @@ def _extract_tool_calls(result: Any) -> list[ChatToolCall]:
         get_messages = getattr(result, "all_messages", None)
 
     messages = get_messages() if callable(get_messages) else []
-    tool_calls: list[ChatToolCall] = []
+
+    calls: list[ChatToolCall] = []
+    returns_by_id: dict[str, Any] = {}
+    returns_by_name: dict[str, list[Any]] = {}
 
     for message in messages:
         for part in _get_field(message, "parts", []):
             part_kind = _get_field(part, "part_kind") or _get_field(part, "kind")
             tool_name = _get_field(part, "tool_name")
-            args = _get_tool_args(part)
+            tool_call_id = _get_field(part, "tool_call_id")
 
             if not tool_name:
                 continue
+
+            if part_kind in {"tool-return", "tool_return"}:
+                content = _get_field(part, "content")
+                if tool_call_id:
+                    returns_by_id[tool_call_id] = content
+                else:
+                    returns_by_name.setdefault(tool_name, []).append(content)
+                continue
+
             if part_kind and part_kind not in {"tool-call", "tool_call"}:
                 continue
+
+            args = _get_tool_args(part)
             if args is None:
                 continue
 
-            tool_calls.append(
+            calls.append(
                 ChatToolCall(
-                    id=_get_field(part, "tool_call_id"),
+                    id=tool_call_id,
                     name=tool_name,
                     arguments=_json_safe(args),
                 )
             )
 
-    return tool_calls
+    for call in calls:
+        result_value: Any | None = None
+        if call.id and call.id in returns_by_id:
+            result_value = returns_by_id[call.id]
+        elif returns_by_name.get(call.name):
+            result_value = returns_by_name[call.name].pop(0)
+        if result_value is not None:
+            call.result = _json_safe(result_value)
+
+    return calls
 
 
 @app.get("/api/v1/health")

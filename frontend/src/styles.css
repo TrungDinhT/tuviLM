@@ -397,6 +397,47 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.tool-call-detail {
+  border-radius: 8px;
+  padding: 0;
+  width: 100%;
+}
+
+.tool-call-detail > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 4px 8px;
+  user-select: none;
+}
+
+.tool-call-detail > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tool-call-detail > summary::before {
+  content: "▸ ";
+  color: #6b8aa8;
+}
+
+.tool-call-detail[open] > summary::before {
+  content: "▾ ";
+}
+
+.tool-call-result {
+  margin: 0;
+  padding: 8px 10px;
+  border-top: 1px solid #d6e0ea;
+  background: #ffffff;
+  color: #1f2933;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
 .chat-input-row {
   padding: 10px;
   border-top: 1px solid var(--line);

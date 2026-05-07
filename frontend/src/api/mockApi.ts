@@ -251,6 +251,7 @@ export async function streamChatReply(
       tool_name?: string;
       arguments?: unknown;
       args?: unknown;
+      result?: unknown;
     }>;
   };
 
@@ -258,7 +259,8 @@ export async function streamChatReply(
   const toolCalls = (payload.tool_calls ?? []).map((call, index) => ({
     id: call.id ?? null,
     name: call.name ?? call.tool_name ?? `tool_${index + 1}`,
-    arguments: call.arguments ?? call.args ?? {}
+    arguments: call.arguments ?? call.args ?? {},
+    result: call.result
   }));
 
   for (let i = 0; i < full.length; i += 6) {

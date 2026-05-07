@@ -34,6 +34,16 @@ function formatToolCallLabel(toolCall: ChatToolCall): string {
   return `${toolCall.name}(${String(args)})`;
 }
 
+function formatToolResult(result: unknown): string {
+  if (result === null || result === undefined) return "";
+  if (typeof result === "string") return result;
+  try {
+    return JSON.stringify(result, null, 2);
+  } catch {
+    return String(result);
+  }
+}
+
 export default function ChatPanel({ messages, onSend, busy }: Props) {
   const [text, setText] = useState("");
 
@@ -57,11 +67,23 @@ export default function ChatPanel({ messages, onSend, busy }: Props) {
             <header>{m.role === "user" ? "Bạn" : "Trợ lý"}</header>
             {m.toolCalls?.length ? (
               <div className="tool-call-list">
-                {m.toolCalls.map((toolCall, index) => (
-                  <span className="tool-call" key={toolCall.id ?? `${toolCall.name}-${index}`}>
-                    {formatToolCallLabel(toolCall)}
-                  </span>
-                ))}
+                {m.toolCalls.map((toolCall, index) => {
+                  const resultText = formatToolResult(toolCall.result);
+                  const key = toolCall.id ?? `${toolCall.name}-${index}`;
+                  if (!resultText) {
+                    return (
+                      <span className="tool-call" key={key}>
+                        {formatToolCallLabel(toolCall)}
+                      </span>
+                    );
+                  }
+                  return (
+                    <details className="tool-call tool-call-detail" key={key}>
+                      <summary>{formatToolCallLabel(toolCall)}</summary>
+                      <pre className="tool-call-result">{resultText}</pre>
+                    </details>
+                  );
+                })}
               </div>
             ) : null}
             {m.role === "assistant" ? (

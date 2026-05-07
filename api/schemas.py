@@ -74,6 +74,7 @@ class ChatToolCall(BaseModel):
     id: str | None = None
     name: str
     arguments: Any
+    result: Any | None = None
 
 
 class ChatResponse(BaseModel):

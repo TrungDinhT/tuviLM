@@ -48,6 +48,7 @@ export type ChatToolCall = {
   id?: string | null;
   name: string;
   arguments: unknown;
+  result?: unknown;
 };
 
 export type ChatMessage = {
