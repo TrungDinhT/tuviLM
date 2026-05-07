@@ -21,7 +21,14 @@ Hãy luận theo đúng thứ tự sau:
 2. Xác định ý nghĩa Cung Mệnh
 - Nhắc ngắn gọn Cung Mệnh phản ánh khí chất, tính cách, nền tảng hành động và xu hướng tự thân.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Mệnh.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính mạnh hơn.
@@ -31,32 +38,32 @@ Hãy luận theo đúng thứ tự sau:
   c. Điểm mạnh
   d. Điểm dễ lệch
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để tăng hoặc giảm cường độ diễn giải.
 - Không biến trạng thái sao thành kết luận tuyệt đối.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu chúng giúp đương số ở mặt nào: học hỏi, quý nhân, giao tiếp, ổn định, danh tiếng, năng lực tổ chức.
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng: nóng vội, áp lực, cô độc, biến động, khó ổn định, dễ xung đột.
 - Không dùng ngôn ngữ hù dọa như “chắc chắn tai họa”, “số xấu”, “đại nạn”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: cơ hội, sức hút, tài nguyên, sự thuận lợi.
 - Hóa Quyền: quyền chủ động, uy lực, năng lực kiểm soát.
 - Hóa Khoa: học hỏi, danh tiếng, khả năng hóa giải.
 - Hóa Kỵ: vướng mắc, bài học, điểm nghẽn tâm lý hoặc quan hệ.
 - Luôn giải thích Tứ Hóa đang làm biến đổi tính chất nào của Cung Mệnh.
 
-8. Liên hệ tam phương tứ chính
+9. Liên hệ tam phương tứ chính
 - Khi luận Mệnh, cần liên hệ tối thiểu với Tài Bạch, Quan Lộc và Thiên Di nếu dữ liệu có.
 - Phân tích xem bản chất cá nhân hỗ trợ hay cản trở tài chính, sự nghiệp và quan hệ xã hội như thế nào.
 - Nếu thiếu dữ liệu tam phương tứ chính, nói rõ rằng phần luận mới là bản cung, chưa đủ để kết luận toàn cục.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 4 mục:
 - Chân dung tổng quát
 - Điểm mạnh nên phát huy
@@ -124,7 +131,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Phụ Mẫu phản ánh quan hệ với cha mẹ, sự nâng đỡ từ gia đình gốc, nề nếp giáo dục và mức độ hòa hợp với cha mẹ.
 - Không luận Cung Phụ Mẫu như một kết luận tuyệt đối về số phận cha mẹ.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Phụ Mẫu.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -134,13 +148,13 @@ Hãy luận theo đúng thứ tự sau:
   c. Mức độ nâng đỡ hoặc áp lực
   d. Điểm dễ hòa hợp hoặc bất đồng
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường làm tính chất sao biểu hiện thuận hơn.
 - Hãm thường làm tính chất sao biểu hiện khó hơn, dễ lệch hoặc thiếu ổn định.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Gia đình có nề nếp
@@ -149,7 +163,7 @@ Hãy luận theo đúng thứ tự sau:
   d. Coi trọng học hành, đạo lý, danh dự
   e. Có khả năng hóa giải mâu thuẫn
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Dễ bất đồng quan điểm với cha mẹ
@@ -159,21 +173,21 @@ Hãy luận theo đúng thứ tự sau:
   e. Đương số phải tự lập sớm
 - Không dùng ngôn ngữ gây sợ hãi như “khắc cha mẹ”, “hại cha mẹ”, “cha mẹ chắc chắn gặp nạn”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng duyên nhận hỗ trợ, tình cảm, tài nguyên hoặc sự chăm sóc từ gia đình.
 - Hóa Quyền: cha mẹ có uy, nghiêm, định hướng mạnh, hoặc gia đình đặt kỳ vọng cao.
 - Hóa Khoa: gia đình coi trọng học hành, danh dự, đạo đức; dễ có sự che chở hoặc hóa giải.
 - Hóa Kỵ: dễ có khúc mắc, hiểu lầm, cảm giác khó nói, xa cách hoặc nợ tình cảm với cha mẹ.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Phụ Mẫu.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: phân tích đương số tiếp nhận ảnh hưởng gia đình như thế nào.
 - Nếu có Cung Phúc Đức: phân tích nền tảng họ hàng, phúc khí, truyền thống gia tộc.
 - Nếu có Cung Điền Trạch: phân tích môi trường sống, nhà cửa, sự ổn định gia đình.
 - Nếu có Cung Huynh Đệ: phân tích động lực giữa anh chị em trong gia đình nếu liên quan.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Phụ Mẫu.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 5 mục:
 - Bức tranh gia đình gốc
 - Quan hệ với cha mẹ
@@ -245,7 +259,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Phúc Đức phản ánh nền tảng phúc khí, gia tộc, đời sống tinh thần, khả năng an ổn và một phần hậu vận.
 - Không luận Cung Phúc Đức như một kết luận tuyệt đối về tổ tiên, nghiệp báo, mồ mả hoặc số phận gia tộc.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Phúc Đức.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -255,13 +276,13 @@ Hãy luận theo đúng thứ tự sau:
   c. Ảnh hưởng của gia tộc/dòng họ
   d. Khả năng an ổn, hậu vận hoặc được che chở
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường làm tính chất sao biểu hiện thuận hơn.
 - Hãm thường làm tính chất sao biểu hiện khó hơn, dễ bất an hoặc khó hưởng trọn.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Phúc khí và sự che chở
@@ -271,7 +292,7 @@ Hãy luận theo đúng thứ tự sau:
   e. Khả năng hóa giải tai họa hoặc mâu thuẫn
   f. Hậu vận dễ an hơn
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Nội tâm dễ bất an hoặc lo nghĩ nhiều
@@ -282,14 +303,14 @@ Hãy luận theo đúng thứ tự sau:
   f. Có bài học về buông bỏ, tha thứ hoặc tu dưỡng
 - Không dùng ngôn ngữ gây sợ hãi như “bạc phúc”, “tổ tiên không phù hộ”, “mồ mả xấu”, “dòng họ suy bại”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng phúc khí, sự dễ chịu, duyên được giúp đỡ hoặc đời sống tinh thần có phần thuận.
 - Hóa Quyền: phúc khí đi kèm trách nhiệm, gia tộc có người có uy, hoặc đương số phải gánh trách nhiệm tinh thần/gia đình.
 - Hóa Khoa: tăng khả năng hóa giải, học hỏi đạo lý, danh dự, sự che chở và khả năng vượt qua khó khăn.
 - Hóa Kỵ: dễ có vướng mắc nội tâm, nợ tình cảm, cảm giác khó an, hoặc bài học sâu về gia đình/dòng họ.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Phúc Đức.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: phân tích phúc khí nâng đỡ hoặc tác động đến bản thân đương số như thế nào.
 - Nếu có Cung Phụ Mẫu: phân tích nền tảng gia đình gốc và quan hệ với cha mẹ.
 - Nếu có Cung Điền Trạch: phân tích nhà cửa, gốc rễ, môi trường sống và sự ổn định gia đình.
@@ -297,7 +318,7 @@ Hãy luận theo đúng thứ tự sau:
 - Nếu có Cung Thiên Di: phân tích khi ra ngoài có được nâng đỡ, che chở hoặc gặp quý nhân hay không.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Phúc Đức.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 6 mục:
 - Nền tảng phúc khí
 - Đời sống tinh thần
@@ -372,7 +393,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Điền Trạch phản ánh nhà cửa, nơi ở, bất động sản, tài sản cố định, môi trường sống và khả năng ổn định chỗ ở.
 - Không luận Cung Điền Trạch như một kết luận tuyệt đối về giàu nghèo hoặc chắc chắn có/mất nhà đất.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Điền Trạch.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -382,13 +410,13 @@ Hãy luận theo đúng thứ tự sau:
   c. Mức độ ổn định hoặc biến động chỗ ở
   d. Phong cách sống và môi trường sống phù hợp
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường làm tính chất sao biểu hiện thuận hơn.
 - Hãm thường làm tính chất sao biểu hiện khó hơn, dễ biến động hoặc khó ổn định.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Dễ có nhà cửa ổn định
@@ -397,7 +425,7 @@ Hãy luận theo đúng thứ tự sau:
   d. Môi trường sống có tính che chở, yên ổn
   e. Có khả năng cải thiện điều kiện sống theo thời gian
 
-6. Luận sát tinh và yếu tố gây biến động
+7. Luận sát tinh và yếu tố gây biến động
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Dễ thay đổi chỗ ở
@@ -407,14 +435,14 @@ Hãy luận theo đúng thứ tự sau:
   e. Cần thận trọng khi đầu tư/mua bán nhà đất
 - Không dùng ngôn ngữ gây sợ hãi như “mất nhà”, “phá sản”, “tranh chấp chắc chắn”, “không có đất ở”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng duyên với nhà cửa, tài sản, sự tiện nghi, khả năng tích lũy hoặc được hỗ trợ về nơi ở.
 - Hóa Quyền: tăng xu hướng làm chủ tài sản, muốn kiểm soát không gian sống, có trách nhiệm lớn với nhà cửa.
 - Hóa Khoa: tăng khả năng hóa giải vấn đề nhà đất, môi trường sống có nề nếp, dễ cải thiện bằng tri thức/kế hoạch rõ ràng.
 - Hóa Kỵ: dễ có vướng mắc, lo nghĩ, trì hoãn, áp lực hoặc khúc mắc liên quan đến nhà cửa, nơi ở, tài sản cố định.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Điền Trạch.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: phân tích đương số có xu hướng sống ổn định, thích sở hữu, hay dễ thay đổi môi trường sống.
 - Nếu có Cung Tài Bạch: phân tích khả năng tài chính hỗ trợ việc tích lũy nhà đất.
 - Nếu có Cung Phúc Đức: phân tích nền tảng gia tộc, gốc rễ và phúc khí hỗ trợ nhà cửa.
@@ -422,7 +450,7 @@ Hãy luận theo đúng thứ tự sau:
 - Nếu có Cung Quan Lộc: phân tích sự nghiệp có giúp tạo nền tảng tài sản hay không.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Điền Trạch.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 5 mục:
 - Nền tảng nhà cửa và môi trường sống
 - Khả năng tích lũy bất động sản/tài sản cố định
@@ -496,7 +524,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Quan Lộc phản ánh nghề nghiệp, công danh, môi trường làm việc, năng lực phát triển sự nghiệp và cách đương số tạo thành tựu.
 - Không luận Cung Quan Lộc như một kết luận tuyệt đối về giàu nghèo, địa vị hoặc thành bại.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Quan Lộc.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -507,13 +542,13 @@ Hãy luận theo đúng thứ tự sau:
   d. Môi trường nghề phù hợp
   e. Điểm dễ vướng trong sự nghiệp
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường làm năng lực nghề nghiệp biểu hiện thuận hơn.
 - Hãm thường làm sự nghiệp dễ vòng vèo, áp lực, chậm ổn định hoặc cần rèn luyện nhiều hơn.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Quý nhân trong công việc
@@ -523,7 +558,7 @@ Hãy luận theo đúng thứ tự sau:
   e. Cơ hội thăng tiến
   f. Khả năng hóa giải khó khăn trong sự nghiệp
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Dễ áp lực công việc
@@ -534,14 +569,14 @@ Hãy luận theo đúng thứ tự sau:
   f. Cần thận trọng với quyết định nghề nghiệp lớn
 - Không dùng ngôn ngữ gây sợ hãi như “thất nghiệp”, “sự nghiệp đổ vỡ”, “không có công danh”, “chắc chắn thất bại”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng cơ hội nghề nghiệp, duyên với công việc tốt, khả năng tạo giá trị, được ghi nhận hoặc có lợi ích từ sự nghiệp.
 - Hóa Quyền: tăng quyền chủ động, năng lực lãnh đạo, tham vọng, khả năng nắm quyền hoặc chịu trách nhiệm lớn.
 - Hóa Khoa: tăng uy tín, chuyên môn, học thuật, danh tiếng, khả năng hóa giải khó khăn bằng tri thức hoặc đạo đức nghề nghiệp.
 - Hóa Kỵ: dễ có vướng mắc, áp lực, hiểu lầm, trì hoãn, thị phi hoặc điểm nghẽn trong sự nghiệp.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Quan Lộc.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: phân tích tính cách và năng lực cá nhân có phù hợp với hướng sự nghiệp hay không.
 - Nếu có Cung Tài Bạch: phân tích sự nghiệp có chuyển hóa tốt thành thu nhập hay không.
 - Nếu có Cung Thiên Di: phân tích cơ hội nghề nghiệp khi ra ngoài, đi xa, làm với xã hội hoặc môi trường bên ngoài.
@@ -549,7 +584,7 @@ Hãy luận theo đúng thứ tự sau:
 - Nếu có Cung Phúc Đức: phân tích nền tảng tinh thần/phúc khí có hỗ trợ sự nghiệp bền vững hay không.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Quan Lộc.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 5 mục:
 - Định hướng nghề nghiệp
 - Phong cách làm việc
@@ -620,7 +655,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Nô Bộc phản ánh bạn bè, đồng nghiệp, cấp dưới, cộng sự, người hỗ trợ và mạng lưới xã hội.
 - Không luận Cung Nô Bộc như một kết luận tuyệt đối về việc có người phản bội, hãm hại hoặc chắc chắn nâng đỡ.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Nô Bộc.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -631,13 +673,13 @@ Hãy luận theo đúng thứ tự sau:
   d. Khả năng được hỗ trợ hoặc phải tự lực
   e. Điểm dễ vướng trong quan hệ xã hội
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường làm quan hệ xã hội biểu hiện thuận hơn, dễ có người hỗ trợ hoặc cộng sự có năng lực.
 - Hãm thường làm quan hệ dễ phức tạp, khó tin người, khó nhờ cậy hoặc dễ bất đồng.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Dễ gặp bạn bè/cộng sự tốt
@@ -647,7 +689,7 @@ Hãy luận theo đúng thứ tự sau:
   e. Dễ được cấp dưới, đồng nghiệp hoặc đối tác giúp đỡ
   f. Có khả năng hóa giải mâu thuẫn trong quan hệ
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Dễ gặp quan hệ phức tạp
@@ -658,14 +700,14 @@ Hãy luận theo đúng thứ tự sau:
   f. Cần rõ ràng về lợi ích, trách nhiệm và ranh giới
 - Không dùng ngôn ngữ gây sợ hãi như “bị phản bội”, “bị hãm hại”, “không có ai giúp”, “bạn bè toàn người xấu”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng duyên với bạn bè, mạng lưới, sự hỗ trợ, lợi ích từ quan hệ hoặc hợp tác.
 - Hóa Quyền: quan hệ xã hội có tính quyền lực, dễ làm trưởng nhóm, quản lý người khác, hoặc gặp cộng sự mạnh cá tính.
 - Hóa Khoa: tăng uy tín trong tập thể, khả năng được tin tưởng, hóa giải mâu thuẫn và xây dựng quan hệ văn minh.
 - Hóa Kỵ: dễ có hiểu lầm, thị phi, cảm giác khó tin người, vướng mắc lợi ích hoặc rối ren trong quan hệ bạn bè/cộng sự.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Nô Bộc.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: phân tích tính cách đương số ảnh hưởng thế nào đến quan hệ bạn bè, đồng nghiệp và cộng sự.
 - Nếu có Cung Quan Lộc: phân tích mạng lưới có hỗ trợ sự nghiệp hay gây áp lực trong công việc.
 - Nếu có Cung Tài Bạch: phân tích hợp tác, quan hệ xã hội có liên quan đến tiền bạc/lợi ích hay không.
@@ -673,7 +715,7 @@ Hãy luận theo đúng thứ tự sau:
 - Nếu có Cung Phúc Đức: phân tích nền tảng phúc khí/quý nhân có giúp quan hệ xã hội bền hơn hay không.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Nô Bộc.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 5 mục:
 - Kiểu quan hệ xã hội thường gặp
 - Khả năng được hỗ trợ hoặc hợp tác
@@ -744,7 +786,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Thiên Di phản ánh môi trường bên ngoài, cách đương số ra xã hội, đi xa, di chuyển, giao tiếp bên ngoài và khả năng thích nghi với ngoại cảnh.
 - Không luận Cung Thiên Di như kết luận tuyệt đối về xuất ngoại, tai nạn, thành công hay thất bại khi đi xa.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Thiên Di.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -755,13 +804,13 @@ Hãy luận theo đúng thứ tự sau:
   d. Khả năng đi xa, thay đổi môi trường hoặc mở rộng quan hệ
   e. Điểm dễ vướng khi ra ngoài xã hội
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường làm khả năng thích nghi, giao tiếp xã hội hoặc cơ hội bên ngoài biểu hiện thuận hơn.
 - Hãm thường làm môi trường bên ngoài dễ phức tạp, áp lực, khó ổn định hoặc cần nhiều thời gian thích nghi.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Dễ gặp quý nhân khi ra ngoài
@@ -771,7 +820,7 @@ Hãy luận theo đúng thứ tự sau:
   e. Có duyên đi xa, mở rộng quan hệ hoặc làm việc với bên ngoài
   f. Có khả năng hóa giải khó khăn khi thay đổi môi trường
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Dễ gặp áp lực khi ra ngoài xã hội
@@ -782,14 +831,14 @@ Hãy luận theo đúng thứ tự sau:
   f. Cần giữ ranh giới và quản lý rủi ro khi mở rộng quan hệ
 - Không dùng ngôn ngữ gây sợ hãi như “ra ngoài gặp nạn”, “đi xa là xấu”, “xuất ngoại thất bại”, “bị người ngoài hại”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng cơ hội bên ngoài, duyên giao tiếp, quý nhân, sự thuận lợi khi đi xa hoặc mở rộng quan hệ.
 - Hóa Quyền: tăng vị thế xã hội, khả năng tạo ảnh hưởng bên ngoài, dễ nắm vai trò chủ động khi ra ngoài.
 - Hóa Khoa: tăng uy tín, danh tiếng, khả năng được tin tưởng và hóa giải khó khăn trong môi trường bên ngoài.
 - Hóa Kỵ: dễ có hiểu lầm, thị phi, áp lực, cảm giác lạc lõng hoặc vướng mắc khi ra ngoài/đi xa.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Thiên Di.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: so sánh con người bên trong với hình ảnh khi ra ngoài; xem đương số ra ngoài có dễ phát huy bản thân hay không.
 - Nếu có Cung Quan Lộc: phân tích môi trường bên ngoài có hỗ trợ sự nghiệp, cơ hội nghề nghiệp hoặc danh tiếng hay không.
 - Nếu có Cung Nô Bộc: phân tích mạng lưới xã hội, bạn bè, đồng nghiệp, đối tác bên ngoài.
@@ -797,7 +846,7 @@ Hãy luận theo đúng thứ tự sau:
 - Nếu có Cung Phúc Đức: phân tích khi ra ngoài có được phúc khí/quý nhân che chở hay cần tự lực nhiều hơn.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Thiên Di.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 5 mục:
 - Hình ảnh khi ra ngoài xã hội
 - Cơ hội từ môi trường bên ngoài
@@ -869,7 +918,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Tật Ách phản ánh xu hướng sức khỏe, điểm yếu thể chất, áp lực tinh thần, tai ách/rủi ro và khả năng vượt qua nghịch cảnh.
 - Không luận Cung Tật Ách như một chẩn đoán y khoa hoặc kết luận chắc chắn về bệnh tật, tai nạn, sinh tử.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Tật Ách.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -880,13 +936,13 @@ Hãy luận theo đúng thứ tự sau:
   d. Khả năng chịu đựng và phục hồi
   e. Cách đương số phản ứng trước nghịch cảnh
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường cho thấy khả năng kiểm soát, hóa giải hoặc phục hồi tốt hơn.
 - Hãm thường cho thấy điểm yếu dễ biểu hiện rõ hơn, áp lực khó xử lý hơn hoặc cần chăm sóc kỹ hơn.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Khả năng hóa giải rủi ro
@@ -895,7 +951,7 @@ Hãy luận theo đúng thứ tự sau:
   d. Biết tìm cách chữa lành/chăm sóc bản thân
   e. Dễ vượt qua giai đoạn bất lợi nếu chủ động điều chỉnh lối sống
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Dễ căng thẳng, lo nghĩ hoặc áp lực kéo dài
@@ -906,14 +962,14 @@ Hãy luận theo đúng thứ tự sau:
   f. Nên kiểm tra sức khỏe khi có dấu hiệu bất thường
 - Không dùng ngôn ngữ gây sợ hãi như “chắc chắn bệnh nặng”, “đại nạn”, “tai nạn”, “đoản thọ”, “khó qua khỏi”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng khả năng phục hồi, duyên gặp hỗ trợ, dễ có điều kiện chăm sóc sức khỏe hoặc giảm nhẹ áp lực.
 - Hóa Quyền: tăng sức chịu đựng, ý chí vượt khó, nhưng cũng có thể làm đương số dễ gồng mình hoặc chịu áp lực lớn.
 - Hóa Khoa: tăng khả năng hóa giải, gặp đúng phương pháp, biết học hỏi để chăm sóc bản thân, dễ giảm rủi ro nếu sống điều độ.
 - Hóa Kỵ: dễ có vướng mắc, lo nghĩ, áp lực tinh thần, bệnh dễ kéo dài do chủ quan hoặc khó gọi tên vấn đề; cần theo dõi và xử lý sớm.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Tật Ách.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: phân tích thể chất, tính cách và thói quen cá nhân ảnh hưởng sức khỏe như thế nào.
 - Nếu có Cung Phúc Đức: phân tích đời sống tinh thần, phúc khí và khả năng an ổn nội tâm có hỗ trợ việc hóa giải áp lực hay không.
 - Nếu có Cung Thiên Di: phân tích rủi ro hoặc áp lực khi ra ngoài, đi xa, thay đổi môi trường.
@@ -921,7 +977,7 @@ Hãy luận theo đúng thứ tự sau:
 - Nếu có Cung Quan Lộc: phân tích công việc có tạo áp lực, quá tải hoặc ảnh hưởng sức khỏe hay không.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Tật Ách.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 5 mục:
 - Xu hướng sức khỏe/thể chất tổng quát
 - Áp lực tinh thần hoặc điểm dễ nhạy cảm
@@ -1012,7 +1068,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Tài Bạch phản ánh cách kiếm tiền, quản lý tiền, tích lũy, dòng tiền, cơ hội và rủi ro tài chính.
 - Không luận Cung Tài Bạch như một kết luận tuyệt đối về giàu nghèo, phá sản hoặc thành công tài chính.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Tài Bạch.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -1023,13 +1086,13 @@ Hãy luận theo đúng thứ tự sau:
   d. Cơ hội tài chính phù hợp
   e. Điểm dễ vướng về tiền bạc
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường làm năng lực kiếm tiền, quản lý tài chính hoặc tích lũy biểu hiện thuận hơn.
 - Hãm thường làm tài chính dễ vòng vèo, khó ổn định, hao tán, hoặc cần kỷ luật tài chính nhiều hơn.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Cơ hội kiếm tiền
@@ -1039,7 +1102,7 @@ Hãy luận theo đúng thứ tự sau:
   e. Khả năng hóa giải khó khăn tài chính
   f. Duyên với tài sản, kinh doanh, nghề nghiệp tạo thu nhập
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Dễ hao tiền hoặc khó giữ tiền
@@ -1050,14 +1113,14 @@ Hãy luận theo đúng thứ tự sau:
   f. Cần xây dựng kỷ luật quản lý tiền
 - Không dùng ngôn ngữ gây sợ hãi như “phá sản”, “mất hết tiền”, “nghèo cả đời”, “không có số giàu”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng cơ hội tài chính, khả năng thu hút tài nguyên, duyên kiếm tiền, dòng tiền hoặc lợi ích vật chất.
 - Hóa Quyền: tăng năng lực kiểm soát tiền bạc, tham vọng tài chính, khả năng chủ động tạo thu nhập hoặc quản lý nguồn lực.
 - Hóa Khoa: tăng khả năng kiếm tiền bằng tri thức, uy tín, chuyên môn, danh tiếng; dễ hóa giải vấn đề tài chính bằng kế hoạch rõ ràng.
 - Hóa Kỵ: dễ có vướng mắc tiền bạc, lo nghĩ tài chính, hao tán, trì hoãn, nợ tình/nợ tiền hoặc bài học về quản lý nguồn lực.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Tài Bạch.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: phân tích tính cách và năng lực cá nhân ảnh hưởng cách kiếm tiền/giữ tiền như thế nào.
 - Nếu có Cung Quan Lộc: phân tích nghề nghiệp có chuyển hóa tốt thành thu nhập hay không.
 - Nếu có Cung Điền Trạch: phân tích khả năng tích lũy thành tài sản cố định, nhà cửa, bất động sản.
@@ -1065,7 +1128,7 @@ Hãy luận theo đúng thứ tự sau:
 - Nếu có Cung Phúc Đức: phân tích nền tảng phúc khí, sự ổn định tinh thần và quý nhân có hỗ trợ tài chính bền vững hay không.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Tài Bạch.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 5 mục:
 - Cách kiếm tiền
 - Khả năng quản lý và tích lũy
@@ -1138,7 +1201,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Tử Tức phản ánh duyên với con cái, quan hệ cha mẹ - con cái, cách nuôi dạy, kỳ vọng vào con và khả năng tiếp nối/thành quả về sau.
 - Không luận Cung Tử Tức như một kết luận tuyệt đối về số con, giới tính con, sinh nở, hiếm muộn hoặc số phận của con cái.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Tử Tức.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -1149,13 +1219,13 @@ Hãy luận theo đúng thứ tự sau:
   d. Khả năng hòa hợp giữa cha mẹ và con cái
   e. Điểm dễ vướng trong chuyện con cái/gia đình
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường làm duyên con cái, sự hòa hợp hoặc khả năng nâng đỡ con biểu hiện thuận hơn.
 - Hãm thường làm quan hệ dễ có khoảng cách, chậm ổn định, nhiều lo nghĩ hoặc cần học cách thấu hiểu hơn.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Duyên con cái thuận hơn
@@ -1165,7 +1235,7 @@ Hãy luận theo đúng thứ tự sau:
   e. Dễ hóa giải mâu thuẫn với con
   f. Đương số có khả năng nuôi dạy, bảo vệ hoặc định hướng con tốt
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Dễ lo nghĩ nhiều về con cái
@@ -1176,14 +1246,14 @@ Hãy luận theo đúng thứ tự sau:
   f. Cần chú ý cách giao tiếp, lắng nghe và tôn trọng cá tính của con
 - Không dùng ngôn ngữ gây sợ hãi như “khó có con”, “khắc con”, “con cái bất hiếu”, “con cái gặp nạn”, “không có hậu duệ”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng duyên tình cảm với con, sự chăm sóc, niềm vui gia đình, hoặc con cái/thế hệ sau mang lại cảm giác đủ đầy.
 - Hóa Quyền: tăng tính trách nhiệm, kỳ vọng, định hướng hoặc kiểm soát trong quan hệ với con; cần tránh áp đặt quá mức.
 - Hóa Khoa: tăng khả năng giáo dục, hóa giải, con cái hoặc thế hệ sau có duyên học hành/danh dự; quan hệ dễ cải thiện bằng lý trí và sự thấu hiểu.
 - Hóa Kỵ: dễ có vướng mắc, lo nghĩ, hiểu lầm, kỳ vọng không nói ra, hoặc bài học sâu trong quan hệ cha mẹ - con cái.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Tử Tức.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: phân tích tính cách đương số ảnh hưởng cách làm cha/mẹ hoặc cách tương tác với con như thế nào.
 - Nếu có Cung Phu Thê: phân tích quan hệ vợ chồng có ảnh hưởng đến việc nuôi dạy con và không khí gia đình hay không.
 - Nếu có Cung Phúc Đức: phân tích phúc khí gia tộc, truyền thống và nền tảng tinh thần có hỗ trợ con cái/thế hệ sau hay không.
@@ -1191,7 +1261,7 @@ Hãy luận theo đúng thứ tự sau:
 - Nếu có Cung Tật Ách: chỉ phân tích ở mức áp lực tinh thần/chăm sóc, không chẩn đoán sức khỏe sinh sản hoặc bệnh tật.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Tử Tức.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 5 mục:
 - Duyên với con cái/thế hệ sau
 - Quan hệ cha mẹ - con cái
@@ -1264,7 +1334,14 @@ Hãy luận theo đúng thứ tự sau:
 - Nhắc ngắn gọn rằng Cung Phu Thê phản ánh duyên tình cảm, hôn nhân, kiểu quan hệ thân mật, hình ảnh người phối ngẫu và cách hai bên tương tác.
 - Không luận Cung Phu Thê như một kết luận tuyệt đối về ly hôn, ngoại tình, hạnh phúc hay bất hạnh.
 
-3. Luận chính tinh
+3. Đối chiếu cách cục đã match
+- Gọi get_cach_cuc_for_palace(position) trước khi luận chi tiết từng sao.
+- Theo nguyên tắc "tiên minh cách cục, thứ khán chúng tinh": cách cục là khung luận chính, ưu tiên cao hơn luận sao rời.
+- Với mỗi cách cục match, dùng read_section (qua catalog) để hiểu nghĩa cách cục đó. Lấy đó làm khung diễn giải.
+- Các bước phía dưới chỉ tô đậm / điều chỉnh cường độ trong khung cách cục.
+- Nếu không có cách cục match → mới dựa hoàn toàn vào luận sao rời theo các bước dưới.
+
+4. Luận chính tinh
 - Xác định chính tinh tại Cung Phu Thê.
 - Nếu có nhiều chính tinh, phân tích sự phối hợp giữa chúng.
 - Nếu vô chính diệu, nói rõ cần xem sao xung chiếu và tam phương tứ chính để bổ sung.
@@ -1275,13 +1352,13 @@ Hãy luận theo đúng thứ tự sau:
   d. Nhu cầu tình cảm trong quan hệ
   e. Điểm dễ vướng trong tình yêu/hôn nhân
 
-4. Điều chỉnh theo trạng thái sao
+5. Điều chỉnh theo trạng thái sao
 - Nếu có miếu/vượng/đắc/hãm, dùng để điều chỉnh cường độ luận.
 - Miếu/vượng/đắc thường làm quan hệ dễ biểu hiện thuận hơn, có khả năng ổn định hoặc hỗ trợ nhau tốt hơn.
 - Hãm thường làm quan hệ dễ có hiểu lầm, chậm ổn định, khác biệt tính cách hoặc cần nhiều học hỏi hơn.
 - Không biến trạng thái sao thành kết luận chắc chắn.
 
-5. Luận phụ tinh và cát tinh
+6. Luận phụ tinh và cát tinh
 - Gom các sao hỗ trợ thành cụm ý nghĩa.
 - Nêu rõ chúng hỗ trợ ở mặt nào:
   a. Duyên gặp người phù hợp
@@ -1291,7 +1368,7 @@ Hãy luận theo đúng thứ tự sau:
   e. Khả năng hóa giải mâu thuẫn
   f. Quan hệ dễ phát triển tốt nếu hai bên biết giao tiếp
 
-6. Luận sát tinh và yếu tố gây áp lực
+7. Luận sát tinh và yếu tố gây áp lực
 - Gom các sao thử thách thành cụm.
 - Diễn giải dưới dạng khuynh hướng:
   a. Dễ có khác biệt tính cách hoặc quan điểm sống
@@ -1302,14 +1379,14 @@ Hãy luận theo đúng thứ tự sau:
   f. Cần tránh phán xét, áp đặt hoặc im lặng kéo dài
 - Không dùng ngôn ngữ gây sợ hãi như “chắc chắn ly hôn”, “bị phản bội”, “khắc vợ/chồng”, “hôn nhân bất hạnh”.
 
-7. Luận Tứ Hóa
+8. Luận Tứ Hóa
 - Hóa Lộc: tăng duyên tình cảm, sức hút, sự chăm sóc, cảm giác đủ đầy hoặc lợi ích tinh thần/vật chất từ quan hệ.
 - Hóa Quyền: tăng tính chủ động, trách nhiệm, kỳ vọng hoặc xu hướng kiểm soát trong quan hệ; cần tránh áp đặt.
 - Hóa Khoa: tăng khả năng thấu hiểu, giữ danh dự, hóa giải mâu thuẫn, phát triển quan hệ bằng lý trí và sự tôn trọng.
 - Hóa Kỵ: dễ có khúc mắc, hiểu lầm, ghen tuông, cảm giác thiếu an toàn, nợ tình cảm hoặc bài học sâu trong quan hệ thân mật.
 - Luôn giải thích Tứ Hóa đang làm biến đổi sắc thái nào của Cung Phu Thê.
 
-8. Liên hệ các cung liên quan
+9. Liên hệ các cung liên quan
 - Nếu có Cung Mệnh: phân tích tính cách đương số ảnh hưởng cách yêu, cách cam kết và cách xử lý mâu thuẫn như thế nào.
 - Nếu có Cung Phúc Đức: phân tích nền tảng tinh thần, gia tộc và phúc khí có hỗ trợ hôn nhân bền vững hay không.
 - Nếu có Cung Tử Tức: phân tích quan hệ đôi lứa có ảnh hưởng đến con cái/gia đình tương lai ra sao, nhưng không kết luận sinh con.
@@ -1318,7 +1395,7 @@ Hãy luận theo đúng thứ tự sau:
 - Nếu có Cung Thiên Di: phân tích yếu tố xa cách, môi trường bên ngoài, đi xa hoặc quan hệ xã hội ảnh hưởng đến tình cảm.
 - Nếu thiếu dữ liệu các cung liên quan, nói rõ phần luận chỉ mới dựa trên bản cung Phu Thê.
 
-9. Tổng hợp
+10. Tổng hợp
 Kết luận bằng 5 mục:
 - Mẫu quan hệ hoặc người phối ngẫu dễ thu hút
 - Cách yêu và cách bước vào cam kết

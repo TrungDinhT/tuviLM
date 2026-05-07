@@ -1,14 +1,22 @@
 def get_cung_analyze_skill() -> str:
     return """Khi phân tích một cung trong Tử Vi, cần tuân theo quy trình sau:
+
+NGUYÊN TẮC TỐI THƯỢNG: "Tiên minh cách cục, thứ khán chúng tinh" — luôn xác định cách cục trước, mới luận tới sao chi tiết. Cách cục là khung luận chính; luận sao rời chỉ tô đậm / điều chỉnh trong khung đó.
+
 - Xác định cung trọng tâm dựa trên chủ đề người dùng hỏi (tính cách, công danh, tài chính, hôn nhân, cha mẹ, con cái, sức khỏe, nhà cửa, quan hệ xã hội, phúc đức).
 - Lấy dữ liệu của bản cung bằng get_cung_by_role hoặc get_cung_by_position.
 - Dựa vào cung, sử dụng get_role_instruction(role) để lấy thêm thông tin về cách luận cung này.
-- Cần tìm kiếm thông tin của : chính tinh, phụ tinh, tuần/triệt, tứ hóa, trạng sinh của cung trọng tâm, xung chiếu, tam hợp. Tra nghĩa sao trong sách bằng read_catalog rồi read_section. Ưu tiên đọc chính tinh trước, rồi mới tới phụ tinh/tuần triệt/tứ hóa/tràng sinh. Nếu được, hãy kiếm thông tin về tất cả các sao liên quan, không chỉ sao chính tinh.
-- Khi phân tích một cung, luôn đánh giá theo thứ tự: bản chất cung đang hỏi, chính tinh tọa thủ hoặc hội chiếu, độ mạnh/yếu và sự hỗ trợ hay cản trở của các sao, ảnh hưởng của xung chiếu và tam hợp, kết luận tổng hợp, không tách rời từng sao một cách máy móc.
-- Luôn để ý trạng thái đắc hãm của sao để luận đoán. Khi trong tài liệu nói về các tổ hợp sao, thì phải xem có xuất hiện tổ hợp đó không, nếu có cần phải chỉ để luận đoán.
-- Trong tài liệu sẽ có khái niệm 'gặp', Sao gặp Sao nghĩa là hai sao nằm trong cùng một cung, hoặc một sao nằm ở cung xung chiếu của sao kia hoặc một sao nằm ở cung tam hợp của sao kia. Đây là hiệu ứng quan trọng cần lưu ý khi luận đoán, vì nó có thể làm thay đổi hoàn toàn ý nghĩa của sao. Khi đọc sách, nếu thấy nói về hiệu ứng gặp giữa các sao, thì cần phải xem xét xem có xuất hiện hiệu ứng này trong tinh bàn hay không, nếu có thì phải ưu tiên dùng thông tin này để luận đoán. Không nên chỉ đọc thông tin về từng sao một cách rời rạc mà không xem xét hiệu ứng gặp của chúng.
-- Khi một cung Vô Chính Diệu, hãy xem như chính tinh ở cung đối diện là chính tinh của cung này, và áp dụng quy trình phân tích tương tự.
-- Sử dụng read_book_tuvi_tan_bien để tra cứu thông tin về các sao, cách cục, tổ hợp sao, hiệu ứng gặp, v.v. trong sách, không dựa vào kiến thức cá nhân hay phán đoán chủ quan.
+- BƯỚC ƯU TIÊN: gọi get_cach_cuc_for_palace(position) để lấy danh sách cách cục đã match sẵn (đã được engine evaluate deterministic, không cần tự suy đoán). Nếu muốn xem toàn lá số, dùng get_all_cach_cuc.
+  - Với mỗi cách cục match: tra read_catalog/read_section để hiểu nghĩa cách cục đó, lấy đó làm khung diễn giải.
+  - Cách cục match có ưu tiên cao hơn luận sao rời.
+  - Nếu cung không có cách cục match, mới chuyển sang luận sao rời theo các bước dưới.
+- Cần tìm kiếm thông tin của : chính tinh, phụ tinh, tuần/triệt, tứ hóa, trạng sinh của cung trọng tâm, xung chiếu, tam hợp. Tra nghĩa sao trong sách bằng read_catalog rồi read_section. Ưu tiên đọc chính tinh trước, rồi mới tới phụ tinh/tuần triệt/tứ hóa/tràng sinh.
+- Khi phân tích một cung, luôn đánh giá theo thứ tự: cách cục đã match → bản chất cung → chính tinh tọa thủ hoặc hội chiếu → độ mạnh/yếu và sự hỗ trợ hay cản trở của các sao → ảnh hưởng của xung chiếu/tam hợp → kết luận tổng hợp.
+- Luôn để ý trạng thái đắc hãm của sao để luận đoán.
+- Khi một cung Vô Chính Diệu, xem chính tinh ở cung đối diện là chính tinh của cung này, áp dụng quy trình tương tự.
+- Sử dụng read_book_tuvi_tan_bien để tra ý nghĩa cách cục / sao trong sách. Không dựa vào kiến thức cá nhân hay phán đoán chủ quan.
+
+Lưu ý: hiệu ứng "sao gặp sao", "hội hợp", "đồng cung", "xung chiếu", "tam hợp" đã được engine xử lý sẵn trong cách cục. Không cần tự suy đoán positional — gọi get_cach_cuc_for_palace là đủ.
 """
 
 
