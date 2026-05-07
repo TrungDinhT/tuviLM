@@ -1,4 +1,4 @@
-import type { BirthInput, BuildSaoLuuInput, ChatMessage, ChatToolCall, CungData, LasoData } from "../types";
+import type { AnalysisResult, BirthInput, BuildSaoLuuInput, ChatMessage, ChatToolCall, CungData, LasoData } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -195,7 +195,7 @@ export async function buildSaoLuu(input: BuildSaoLuuInput): Promise<{
   };
 }
 
-export async function getAnalysis(input: BirthInput, position: string): Promise<string> {
+export async function getAnalysis(input: BirthInput, position: string): Promise<AnalysisResult> {
   const response = await fetch(`${API_BASE_URL}/api/v1/laso/analyze`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -218,9 +218,24 @@ export async function getAnalysis(input: BirthInput, position: string): Promise<
     position: string;
     role: string | null;
     analysis: string;
+    tool_calls?: Array<{
+      id?: string | null;
+      name?: string;
+      tool_name?: string;
+      arguments?: unknown;
+      args?: unknown;
+      result?: unknown;
+    }>;
   };
 
-  return payload.analysis;
+  const toolCalls: ChatToolCall[] = (payload.tool_calls ?? []).map((call, index) => ({
+    id: call.id ?? null,
+    name: call.name ?? call.tool_name ?? `tool_${index + 1}`,
+    arguments: call.arguments ?? call.args ?? {},
+    result: call.result
+  }));
+
+  return { content: payload.analysis, toolCalls };
 }
 
 export async function streamChatReply(

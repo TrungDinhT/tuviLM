@@ -275,7 +275,7 @@ def build_sao_luu(payload: BuildSaoLuuRequest, request: Request) -> BuildSaoLuuR
 
 
 @app.post("/api/v1/laso/analyze", response_model=AnalyzeCungResponse)
-def analyze_cung(payload: AnalyzeCungRequest, request: Request) -> AnalyzeCungResponse:
+async def analyze_cung(payload: AnalyzeCungRequest, request: Request) -> AnalyzeCungResponse:
     api_state = get_api_state(request)
 
     try:
@@ -291,18 +291,26 @@ def analyze_cung(payload: AnalyzeCungRequest, request: Request) -> AnalyzeCungRe
         )
 
     cung = tinh_ban.map_cung[position]
+    role_label = cung.role or "?"
+
+    query = (
+        f"Hãy luận chi tiết cung {role_label} tại vị trí {position} trong lá số hiện tại. "
+        "Tuân thủ quy trình get_cung_analyze_skill: gọi get_cach_cuc_for_palace trước để lấy "
+        "cách cục đã match, tra ý nghĩa qua read_section khi cần, sau đó luận chính tinh / phụ tinh / "
+        "tứ hóa / xung chiếu / tam hợp. Trả lời theo cấu trúc trong get_role_instruction."
+    )
 
     try:
-        from src.agent.cung_analyzer import CungAnalyzer
-        analyzer = CungAnalyzer(model=payload.model)
-        analysis = analyzer.analyze_cung(position, cung)
+        agent = api_state.agent_deps.require_agent()
+        result = await agent.run(query, deps=api_state.agent_deps)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Cung analysis failed: {exc}") from exc
 
     return AnalyzeCungResponse(
         position=position,
         role=cung.role,
-        analysis=analysis,
+        analysis=str(getattr(result, "output", "")),
+        tool_calls=_extract_tool_calls(result),
     )
 
 

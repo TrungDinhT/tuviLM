@@ -4,7 +4,7 @@ import LasoBoard from "./components/LasoBoard";
 import AnalysisPanel from "./components/AnalysisPanel";
 import ChatPanel from "./components/ChatPanel";
 import { buildLaso, buildSaoLuu, getAnalysis, streamChatReply } from "./api/mockApi";
-import type { BirthInput, ChatMessage, LasoData } from "./types";
+import type { AnalysisResult, BirthInput, ChatMessage, ChatToolCall, LasoData } from "./types";
 
 const INITIAL_INPUT: BirthInput = {
   date: 4,
@@ -23,7 +23,7 @@ export default function App() {
   const [viewYear, setViewYear] = useState<number>(new Date().getFullYear());
   const [laso, setLaso] = useState<LasoData | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
-  const [analysisByPosition, setAnalysisByPosition] = useState<Record<string, string>>({});
+  const [analysisByPosition, setAnalysisByPosition] = useState<Record<string, AnalysisResult>>({});
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const [building, setBuilding] = useState(false);
@@ -41,8 +41,12 @@ export default function App() {
   ]);
 
   const canChat = useMemo(() => laso !== null, [laso]);
-  const selectedAnalysis = selectedPosition ? (analysisByPosition[selectedPosition] ?? "") : "";
-  const hasSelectedAnalysis = selectedPosition ? Boolean(analysisByPosition[selectedPosition]) : false;
+  const selectedAnalysisResult: AnalysisResult | undefined = selectedPosition
+    ? analysisByPosition[selectedPosition]
+    : undefined;
+  const selectedAnalysis = selectedAnalysisResult?.content ?? "";
+  const selectedToolCalls: ChatToolCall[] = selectedAnalysisResult?.toolCalls ?? [];
+  const hasSelectedAnalysis = Boolean(selectedAnalysisResult);
 
   const handleBuild = async () => {
     setBuilding(true);
@@ -99,8 +103,8 @@ export default function App() {
     setAnalyzing(true);
     setAnalysisError(null);
     try {
-      const analysisText = await getAnalysis(input, selectedPosition);
-      setAnalysisByPosition((prev) => ({ ...prev, [selectedPosition]: analysisText }));
+      const analysis = await getAnalysis(input, selectedPosition);
+      setAnalysisByPosition((prev) => ({ ...prev, [selectedPosition]: analysis }));
     } catch (error) {
       setAnalysisError(error instanceof Error ? error.message : "Phân tích thất bại.");
     } finally {
@@ -186,6 +190,7 @@ export default function App() {
         <AnalysisPanel
           position={selectedPosition}
           content={selectedAnalysis}
+          toolCalls={selectedToolCalls}
           loading={analyzing}
           hasAnalysis={hasSelectedAnalysis}
           error={analysisError}

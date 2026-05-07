@@ -60,21 +60,22 @@ class AnalyzeCungRequest(TuviTimePayload):
     model: str = "gpt-4.1-mini"
 
 
-class AnalyzeCungResponse(BaseModel):
-    position: str
-    role: str | None = None
-    analysis: str
-
-
-class ChatRequest(BaseModel):
-    message: str
-
-
 class ChatToolCall(BaseModel):
     id: str | None = None
     name: str
     arguments: Any
     result: Any | None = None
+
+
+class AnalyzeCungResponse(BaseModel):
+    position: str
+    role: str | None = None
+    analysis: str
+    tool_calls: list[ChatToolCall] = Field(default_factory=list)
+
+
+class ChatRequest(BaseModel):
+    message: str
 
 
 class ChatResponse(BaseModel):

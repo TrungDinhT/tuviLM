@@ -51,6 +51,11 @@ export type ChatToolCall = {
   result?: unknown;
 };
 
+export type AnalysisResult = {
+  content: string;
+  toolCalls: ChatToolCall[];
+};
+
 export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
