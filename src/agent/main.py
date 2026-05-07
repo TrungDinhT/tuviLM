@@ -4,6 +4,8 @@ from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
 from .tool import (
+    get_all_cach_cuc,
+    get_cach_cuc_for_palace,
     get_cung_by_position,
     get_cung_by_role,
     get_role_instruction,
@@ -75,7 +77,9 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             read_section,
             get_cung_analyze_skill,
             read_book_tuvi_tan_bien,
-            get_role_instruction
+            get_role_instruction,
+            get_all_cach_cuc,
+            get_cach_cuc_for_palace,
         ]
     )
 

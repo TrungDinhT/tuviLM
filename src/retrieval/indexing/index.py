@@ -1,5 +1,5 @@
 import numpy as np
-import json, os, faiss, pdfplumber
+import json, os, pdfplumber
 from tqdm import tqdm
 from whoosh import index
 from whoosh.fields import Schema, TEXT, ID

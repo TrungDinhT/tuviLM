@@ -159,6 +159,9 @@ class Builder:
 
         self.tinhBan.gender = birthTime.gender
 
+        self.tinhBan.year_can = birthTime.thien_can
+        self.tinhBan.year_chi = birthTime.dia_chi
+
         self.tinhBan.am_duong = "Duong" if (LIST_THIEN_CAN.index(birthTime.thien_can) % 2 == 0) else "Am"
 
         self.tinhBan.direction = 1 if (

@@ -21,6 +21,7 @@ from src.agent.prompt.skill_analyze_cung import (
     CUNG_THIEN_DI_INSTRUCTION,
     CUNG_TU_TUC_INSTRUCTION,
 )
+from src.tuvi.cach_cuc import CachCucMatch, check_cach_cuc
 from src.tuvi.cung import Cung
 from src.tuvi.element.types import LIST_DIA_CHI, ROLE_TYPE, TYPE_DIA_CHI
 from src.tuvi.tinh_ban import TinhBan
@@ -128,6 +129,69 @@ def get_xung_chieu(
     info = f"Cung xung chiếu của {position} là {xung_chieu_position}."
     info += get_cung_by_position(ctx, xung_chieu_position)
     return info
+
+
+def _format_cach_cuc(matches: list[CachCucMatch]) -> str:
+    lines: list[str] = []
+    for i, m in enumerate(matches, start=1):
+        lines.append(f"{i}. {m.name} (trang {m.page})\n   Ý nghĩa: {m.meaning}")
+    return "\n".join(lines)
+
+
+def get_all_cach_cuc(ctx: RunContext[TuviAgentDeps]) -> str:
+    """
+    Liệt kê toàn bộ cách cục match trên lá số, gom theo cung.
+
+    Dùng cho cái nhìn tổng quát ("liệt kê các cách cục của lá số"). Nếu chỉ
+    muốn xem cách cục cho một cung cụ thể, dùng `get_cach_cuc_for_palace`.
+    """
+    tinh_ban = ctx.deps.require_tinh_ban()
+    result = check_cach_cuc(
+        tinh_ban,
+        year_can=tinh_ban.year_can or "",
+        gender=tinh_ban.gender,
+    )
+    sections: list[str] = []
+    seen: set[str] = set()
+    total = 0
+    for dia_chi in LIST_DIA_CHI:
+        matches = result.get(dia_chi, [])
+        if not matches:
+            continue
+        cung = tinh_ban.map_cung[dia_chi]
+        sections.append(
+            f"## Cung {cung.role or '?'} ({dia_chi})\n" + _format_cach_cuc(matches)
+        )
+        for m in matches:
+            seen.add(m.id)
+            total += 1
+    if not sections:
+        return "Lá số không có cách cục nào khớp."
+    header = f"Tổng cộng {total} cách cục match ({len(seen)} loại) trên toàn lá số:"
+    _logger.info("get_all_cach_cuc: %d match (%d loại)", total, len(seen))
+    return header + "\n\n" + "\n\n".join(sections)
+
+
+def get_cach_cuc_for_palace(
+    ctx: RunContext[TuviAgentDeps],
+    position: TYPE_DIA_CHI,
+) -> str:
+    """Lấy danh sách cách cục match tại một cung cụ thể (theo địa chi)."""
+    tinh_ban = ctx.deps.require_tinh_ban()
+    result = check_cach_cuc(
+        tinh_ban,
+        year_can=tinh_ban.year_can or "",
+        gender=tinh_ban.gender,
+    )
+    matches = result.get(position, [])
+    cung = tinh_ban.map_cung[position]
+    if not matches:
+        return f"Cung {cung.role or '?'} ({position}) không có cách cục nào khớp."
+    _logger.info("get_cach_cuc_for_palace %s: %d match", position, len(matches))
+    return (
+        f"Cách cục tại cung {cung.role or '?'} ({position}):\n"
+        + _format_cach_cuc(matches)
+    )
 
 
 _ROLE_INSTRUCTION_MAP: dict[ROLE_TYPE, str] = {

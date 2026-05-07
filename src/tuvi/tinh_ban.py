@@ -2,7 +2,7 @@ from typing import Literal
 import pydantic
 
 from src.tuvi.cung import Cung
-from src.tuvi.element.types import AM_DUONG, LIST_DIA_CHI, TYPE_DIA_CHI, TYPE_GENDER
+from src.tuvi.element.types import AM_DUONG, LIST_DIA_CHI, TYPE_DIA_CHI, TYPE_GENDER, TYPE_THIEN_CAN
 from src.tuvi.element.cuc import Cuc
 
 class TinhBan(pydantic.BaseModel):
@@ -18,6 +18,12 @@ class TinhBan(pydantic.BaseModel):
     am_duong : AM_DUONG | None = None
 
     cung_than : TYPE_DIA_CHI | None = None
+
+    year_can : TYPE_THIEN_CAN | None = None
+    "Thiên Can của năm sinh, dùng để tra cứu cách cục"
+
+    year_chi : TYPE_DIA_CHI | None = None
+    "Địa Chi của năm sinh"
 
     @classmethod
     def init_empty_plate(cls):
