@@ -7,6 +7,9 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
