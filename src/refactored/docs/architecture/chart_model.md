@@ -12,7 +12,7 @@ The model separates placement from catalog data:
 - `LaSo` is the aggregate root that holds both and joins them only when needed.
 
 The core remains query-oriented. View models such as `LaSoView` and `CungView`
-will be thin layers built later.
+are built in the `view` package and documented in `view_model.md`.
 
 ## LaSo
 
@@ -109,4 +109,3 @@ Cache flow:
    per-kind limit is exceeded.
 
 Individual `PlacementLayer` instances remain immutable.
-

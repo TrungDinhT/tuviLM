@@ -3,16 +3,6 @@
 This note tracks design topics that are still intentionally unfinished. Domain
 rules remain grounded in `../domain_context.md`.
 
-## View Models
-
-`LaSoView` and `CungView` are not designed yet.
-
-Open questions:
-
-- how UI-facing Cung groups should be derived from `Cung`
-- how catalog data should be joined into display rows
-- which compatibility shape is needed for old `src/tuvi` callers
-
 ## Tu Hoa Phai Query API
 
 `TuHoaPhaiContext` and layer assembly exist, but `LaSo` does not yet expose a
@@ -28,13 +18,14 @@ Open questions:
 
 ## Catalog-Enriched Queries
 
-The core model intentionally stores placement ids only. Higher-level queries
-that return catalog-enriched components are still pending.
+The core model intentionally stores placement ids only. `LaSoView` now provides
+a catalog-enriched exchange snapshot for one studied year, but general
+catalog-enriched query helpers are still pending.
 
 Open questions:
 
 - whether enrichment belongs directly on `LaSo` or in a separate view/query
-  service
+  service beyond the implemented snapshot builder
 - which query results should stay lightweight ids versus full component data
 
 ## Related-Position Queries
@@ -47,4 +38,3 @@ Open questions:
 
 - return positions only, `Cung` results, or catalog-enriched results
 - whether the API should accept selected layer ids
-

@@ -1,0 +1,829 @@
+{
+    "input": {
+        "day": 9,
+        "month": 3,
+        "year": 1999,
+        "hour": 18,
+        "gender": "F"
+    },
+    "map_cung": {
+        "Tý": {
+            "element": null,
+            "sign": "Duong",
+            "role": "Tật Ách",
+            "chinhTinh": [],
+            "phuTinh": [
+                {
+                    "name": "Thiên Sứ",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Phi Liêm",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Khôi",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": true
+                },
+                {
+                    "name": "Phúc Đức",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Đức",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Hồng Loan",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": true
+                },
+                {
+                    "name": "Đào Hoa",
+                    "description": null,
+                    "elemental": "Mộc",
+                    "have_luu": false
+                },
+                {
+                    "name": "Đẩu Quân",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Mộc Dục"
+            },
+            "tuhoa": [],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": false,
+            "dia_chi": "Tý",
+            "thien_can": "",
+            "age_daivan": 73,
+            "saoLuu": []
+        },
+        "Sửu": {
+            "element": null,
+            "sign": "Am",
+            "role": "Tài Bạch",
+            "chinhTinh": [],
+            "phuTinh": [
+                {
+                    "name": "Tam Thai",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Bát Toạ",
+                    "description": null,
+                    "elemental": "Mộc",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Diêu",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Y",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Văn Xương",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": true
+                },
+                {
+                    "name": "Văn Khúc",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": true
+                },
+                {
+                    "name": "Hỷ Thần",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Điếu Khách",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Linh Tinh",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Quả Tú",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Quan Đới"
+            },
+            "tuhoa": [
+                {
+                    "name": "Hóa Kỵ"
+                }
+            ],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": false,
+            "dia_chi": "Sửu",
+            "thien_can": "",
+            "age_daivan": 83,
+            "saoLuu": []
+        },
+        "Dần": {
+            "element": null,
+            "sign": "Duong",
+            "role": "Tử Tức",
+            "chinhTinh": [],
+            "phuTinh": [
+                {
+                    "name": "Thiên Thọ",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Địa Không",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Bệnh Phù",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Quốc Ấn",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Phúc",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Trực Phù",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Lâm Quan"
+            },
+            "tuhoa": [],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": false,
+            "dia_chi": "Dần",
+            "thien_can": "",
+            "age_daivan": 93,
+            "saoLuu": []
+        },
+        "Mão": {
+            "element": null,
+            "sign": "Am",
+            "role": "Phu Thê",
+            "chinhTinh": [
+                {
+                    "name": "Liêm Trinh",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Phá Quân",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                }
+            ],
+            "phuTinh": [
+                {
+                    "name": "Thai Phụ",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                },
+                {
+                    "name": "Đại Hao",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thái Tuế",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Khốc",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": true
+                }
+            ],
+            "trang_sinh": {
+                "name": "Đế  Vương"
+            },
+            "tuhoa": [],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": false,
+            "dia_chi": "Mão",
+            "thien_can": "",
+            "age_daivan": 103,
+            "saoLuu": []
+        },
+        "Thìn": {
+            "element": null,
+            "sign": "Duong",
+            "role": "Huynh Đệ",
+            "chinhTinh": [],
+            "phuTinh": [
+                {
+                    "name": "Tả Phù",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Phục Binh",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiếu Dương",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Không",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên La",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Suy"
+            },
+            "tuhoa": [],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": false,
+            "dia_chi": "Thìn",
+            "thien_can": "",
+            "age_daivan": 113,
+            "saoLuu": []
+        },
+        "Tị": {
+            "element": null,
+            "sign": "Am",
+            "role": "Mệnh",
+            "chinhTinh": [
+                {
+                    "name": "Thiên Phủ",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                }
+            ],
+            "phuTinh": [
+                {
+                    "name": "Thiên Quý",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Đà La",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                },
+                {
+                    "name": "Quan Phủ",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Tang Môn",
+                    "description": null,
+                    "elemental": "Mộc",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Mã",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": true
+                },
+                {
+                    "name": "Phá Toái",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Cô Thần",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Bệnh"
+            },
+            "tuhoa": [],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": false,
+            "dia_chi": "Tị",
+            "thien_can": "",
+            "age_daivan": 3,
+            "saoLuu": []
+        },
+        "Ngọ": {
+            "element": null,
+            "sign": "Duong",
+            "role": "Phụ Mẫu",
+            "chinhTinh": [
+                {
+                    "name": "Thiên Đồng",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thái Âm",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                }
+            ],
+            "phuTinh": [
+                {
+                    "name": "Lộc Tồn",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": true
+                },
+                {
+                    "name": "Bác Sĩ",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Lưu Hà",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiếu Âm",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Hỏa Tinh",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Hỉ",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Tử"
+            },
+            "tuhoa": [],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": false,
+            "dia_chi": "Ngọ",
+            "thien_can": "",
+            "age_daivan": 13,
+            "saoLuu": []
+        },
+        "Mùi": {
+            "element": null,
+            "sign": "Am",
+            "role": "Phúc Đức",
+            "chinhTinh": [
+                {
+                    "name": "Vũ Khúc",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                },
+                {
+                    "name": "Tham Lang",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                }
+            ],
+            "phuTinh": [
+                {
+                    "name": "Địa Giải",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Kình Dương",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                },
+                {
+                    "name": "Lực Sĩ",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Quan Phù",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Long Trì",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Giải Thần",
+                    "description": null,
+                    "elemental": "Mộc",
+                    "have_luu": false
+                },
+                {
+                    "name": "Phượng Các",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Hỏa Cái",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Mộ"
+            },
+            "tuhoa": [
+                {
+                    "name": "Hóa Lộc"
+                },
+                {
+                    "name": "Hóa Quyền"
+                }
+            ],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": false,
+            "dia_chi": "Mùi",
+            "thien_can": "",
+            "age_daivan": 23,
+            "saoLuu": []
+        },
+        "Thân": {
+            "element": null,
+            "sign": "Duong",
+            "role": "Điền Trạch",
+            "chinhTinh": [
+                {
+                    "name": "Thái Dương",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Cự Môn",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                }
+            ],
+            "phuTinh": [
+                {
+                    "name": "Thiên Tài",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Giải",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Địa Kiếp",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thanh Long",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Trù",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Việt",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": true
+                },
+                {
+                    "name": "Tử Phù",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                },
+                {
+                    "name": "Nguyệt Đức",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Kiếp Sát",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Tuyệt"
+            },
+            "tuhoa": [],
+            "is_tuan": true,
+            "is_triet": true,
+            "is_cung_than": false,
+            "dia_chi": "Thân",
+            "thien_can": "",
+            "age_daivan": 33,
+            "saoLuu": []
+        },
+        "Dậu": {
+            "element": null,
+            "sign": "Am",
+            "role": "Quan Lộc",
+            "chinhTinh": [
+                {
+                    "name": "Thiên Tướng",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                }
+            ],
+            "phuTinh": [
+                {
+                    "name": "Thiên Hình",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Ân Quang",
+                    "description": null,
+                    "elemental": "Mộc",
+                    "have_luu": false
+                },
+                {
+                    "name": "Tiểu Hao",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "LN Văn Tinh",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Quan",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Tuế Phá",
+                    "description": null,
+                    "elemental": "Hỏa",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Hư",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": true
+                }
+            ],
+            "trang_sinh": {
+                "name": "Thai"
+            },
+            "tuhoa": [],
+            "is_tuan": true,
+            "is_triet": true,
+            "is_cung_than": false,
+            "dia_chi": "Dậu",
+            "thien_can": "",
+            "age_daivan": 43,
+            "saoLuu": []
+        },
+        "Tuất": {
+            "element": null,
+            "sign": "Duong",
+            "role": "Nô Bộc",
+            "chinhTinh": [
+                {
+                    "name": "Thiên Cơ",
+                    "description": null,
+                    "elemental": "Mộc",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thiên Lương",
+                    "description": null,
+                    "elemental": "Mộc",
+                    "have_luu": false
+                }
+            ],
+            "phuTinh": [
+                {
+                    "name": "Thiên Thuơng",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Hữu Bật",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Tướng Quân",
+                    "description": null,
+                    "elemental": "Mộc",
+                    "have_luu": false
+                },
+                {
+                    "name": "Long Đức",
+                    "description": null,
+                    "elemental": "Thủy",
+                    "have_luu": false
+                },
+                {
+                    "name": "Địa Võng",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Dưỡng"
+            },
+            "tuhoa": [
+                {
+                    "name": "Hóa Khoa"
+                }
+            ],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": false,
+            "dia_chi": "Tuất",
+            "thien_can": "",
+            "age_daivan": 53,
+            "saoLuu": []
+        },
+        "Hợi": {
+            "element": null,
+            "sign": "Am",
+            "role": "Thiên Di",
+            "chinhTinh": [
+                {
+                    "name": "Tử Vi",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Thất Sát",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                }
+            ],
+            "phuTinh": [
+                {
+                    "name": "Phong Cáo",
+                    "description": null,
+                    "elemental": "Thổ",
+                    "have_luu": false
+                },
+                {
+                    "name": "Tấu Thư",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                },
+                {
+                    "name": "Đường Phù",
+                    "description": null,
+                    "elemental": "Mộc",
+                    "have_luu": false
+                },
+                {
+                    "name": "Bạch Hổ",
+                    "description": null,
+                    "elemental": "Kim",
+                    "have_luu": false
+                }
+            ],
+            "trang_sinh": {
+                "name": "Tràng Sinh"
+            },
+            "tuhoa": [],
+            "is_tuan": false,
+            "is_triet": false,
+            "is_cung_than": true,
+            "dia_chi": "Hợi",
+            "thien_can": "",
+            "age_daivan": 63,
+            "saoLuu": []
+        }
+    },
+    "cuc": {
+        "name": "Mộc Tam cục",
+        "number": 3,
+        "elemental": "Mộc"
+    },
+    "direction": 1,
+    "gender": "F",
+    "am_duong": "Am",
+    "cung_than": "Hợi"
+}

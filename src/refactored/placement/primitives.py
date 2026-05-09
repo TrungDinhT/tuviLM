@@ -392,7 +392,7 @@ def tuvi_position_fn(context: PlacementContext) -> DiaChi:
         div = date // cuc_number + 1
         borrow = cuc_number - mod
 
-    offset = (div - 1 + borrow) if div % 2 == 0 else (div - 1 - borrow)
+    offset = (div - 1 + borrow) if borrow % 2 == 0 else (div - 1 - borrow)
     return DiaChi.DAN + offset
 
 
