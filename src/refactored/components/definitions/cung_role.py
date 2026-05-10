@@ -4,7 +4,7 @@ from enum import StrEnum
 
 from pydantic import model_validator
 
-from src.refactored.component.elementary import ComponentBase
+from src.refactored.components.definitions.elementary import ComponentBase
 
 
 class Role(StrEnum):

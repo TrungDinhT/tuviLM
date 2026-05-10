@@ -9,8 +9,8 @@ from typing import Any
 
 import pytest
 
-from src.refactored.component.elementary import DiaChi
-from src.refactored.context.prior import Gender, LaSoPrior
+from src.refactored.model.elementary import DiaChi
+from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.la_so import LaSo
 from src.refactored.view.builder import build_laso_view
 

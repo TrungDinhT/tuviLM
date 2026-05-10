@@ -1,10 +1,10 @@
 import pytest
 from pydantic import ValidationError
 
-from src.refactored.component.elementary import DiaChi
-from src.refactored.context.prior import Gender, LaSoPrior
+from src.refactored.model.elementary import DiaChi
+from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.la_so import LaSo
-from src.refactored.placement.layer import LayerKind
+from src.refactored.model.layer import LayerKind
 from src.refactored.view.builder import build_laso_view
 from src.refactored.view.streamlit_adapter import (
     laso_view_to_streamlit_payload,

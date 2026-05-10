@@ -2,7 +2,7 @@ import inspect
 from dataclasses import dataclass, field
 from typing import Callable, Protocol
 
-from src.refactored.component.elementary import DiaChi
+from src.refactored.model.elementary import DiaChi
 from src.refactored.context.protocol import PlacementContext
 
 ComponentId = str

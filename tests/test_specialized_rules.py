@@ -1,6 +1,6 @@
 import pytest
 
-from src.refactored.component.elementary import DiaChi
+from src.refactored.model.elementary import DiaChi
 from src.refactored.placement.compiler import (
     PlacementRuleCompiler,
     SpecializedPlacementRules,
@@ -31,7 +31,7 @@ def test_compiler_validation_moves_to_rules_constructor():
     from src.refactored.context.natal import NatalContext
     import datetime as dt
 
-    from src.refactored.context.prior import Gender, LaSoPrior
+    from src.refactored.model.prior import Gender, LaSoPrior
 
     ctx = NatalContext.from_prior(
         LaSoPrior.from_solar_day(dt.datetime(1996, 12, 19, 6, 30), Gender.MALE)

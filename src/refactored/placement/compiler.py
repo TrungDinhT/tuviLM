@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Iterable, Mapping, Set
 
-from src.refactored.component.elementary import DiaChi
+from src.refactored.model.elementary import DiaChi
 from src.refactored.context.protocol import PlacementContext
 from src.refactored.placement.primitives import Rule
 from src.refactored.placement.registry import (

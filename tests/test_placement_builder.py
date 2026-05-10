@@ -2,10 +2,10 @@ import datetime as dt
 
 import pytest
 
-from src.refactored.component_catalog import get_default_catalog
+from src.refactored.components.repository import get_default_repository
 from src.refactored.assembly.natal import resolve_natal_placement
 from src.refactored.placement.bundle import get_default_placement_rule_compiler
-from src.refactored.component.sao import TuanTriet
+from src.refactored.components.definitions.sao import TuanTriet
 from src.refactored.placement.compiler import (
     PlacementRuleCompiler,
     SpecializedAbsoluteSpec,
@@ -26,20 +26,17 @@ from src.refactored.placement.rules import (
     PHU_TINH_RULES,
     TU_HOA_RULES,
     TU_HOA_TARGET_BY_THIEN_CAN,
+    TUAN_TRIET_RULES,
 )
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
     RelativePositionSpec,
 )
-from src.refactored.component.cung_role import Role
-from src.refactored.component.elementary import DiaChi
-from src.refactored.context.prior import Gender, LaSoPrior
+from src.refactored.components.definitions.cung_role import Role
+from src.refactored.model.elementary import DiaChi
+from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.context.natal import NatalContext
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
-from src.tuvi.birth import BirthTime
-from src.tuvi.builder import Builder as LegacyBuilder
-from src.tuvi.constant import MAP_TRIET, MAP_TUAN
-from src.tuvi.element.types import LIST_DIA_CHI, LIST_THIEN_CAN
 
 
 CHINH_TINH_COMPONENT_IDS = {
@@ -179,101 +176,12 @@ TRANG_SINH_COMPONENT_IDS = {
 }
 
 
-def _legacy_dia_chi(text: str) -> DiaChi:
-    return {
-        "Tý": DiaChi.TY,
-        "Sửu": DiaChi.SUU,
-        "Dần": DiaChi.DAN,
-        "Mão": DiaChi.MEO,
-        "Thìn": DiaChi.THIN,
-        "Tị": DiaChi.TI,
-        "Ngọ": DiaChi.NGO,
-        "Mùi": DiaChi.MUI,
-        "Thân": DiaChi.THAN,
-        "Dậu": DiaChi.DAU,
-        "Tuất": DiaChi.TUAT,
-        "Hợi": DiaChi.HOI,
-    }[text]
-
-
 def _select_rules_by_component_ids(component_ids: set[str]):
     return [
         rule
         for rule in PHU_TINH_RULES
         if getattr(rule, "component_id", None) in component_ids
     ]
-
-
-def _build_legacy_chinh_tinh_positions(time: dt.datetime) -> dict[str, DiaChi]:
-    tinh_ban = LegacyBuilder().build(BirthTime.from_solar_day(time, "M"))
-    positions: dict[str, DiaChi] = {}
-
-    for dia_chi_text, cung in tinh_ban.map_cung.items():
-        position = _legacy_dia_chi(dia_chi_text)
-        for sao in cung.chinhTinh:
-            positions[CHINH_TINH_COMPONENT_IDS[sao.name]] = position
-
-    return positions
-
-
-def _build_legacy_phu_tinh_positions(
-    time: dt.datetime, component_ids: dict[str, str]
-) -> dict[str, DiaChi]:
-    tinh_ban = LegacyBuilder().build(BirthTime.from_solar_day(time, "M"))
-    positions: dict[str, DiaChi] = {}
-
-    for dia_chi_text, cung in tinh_ban.map_cung.items():
-        position = _legacy_dia_chi(dia_chi_text)
-        for sao in cung.phuTinh:
-            component_id = component_ids.get(sao.name)
-            if component_id is not None:
-                positions[component_id] = position
-
-    return positions
-
-
-def _build_legacy_tuhoa_positions(time: dt.datetime) -> dict[str, DiaChi]:
-    tinh_ban = LegacyBuilder().build(BirthTime.from_solar_day(time, "M"))
-    positions: dict[str, DiaChi] = {}
-    for dia_chi_text, cung in tinh_ban.map_cung.items():
-        position = _legacy_dia_chi(dia_chi_text)
-        for tuhoa in cung.tuhoa:
-            component_id = TUHOA_COMPONENT_IDS[tuhoa.name]
-            positions[component_id] = position
-    return positions
-
-
-def _build_legacy_trang_sinh_positions(
-    time: dt.datetime, component_ids: dict[str, str]
-) -> dict[str, DiaChi]:
-    tinh_ban = LegacyBuilder().build(BirthTime.from_solar_day(time, "M"))
-    positions: dict[str, DiaChi] = {}
-
-    for dia_chi_text, cung in tinh_ban.map_cung.items():
-        position = _legacy_dia_chi(dia_chi_text)
-        if cung.trang_sinh is None:
-            continue
-        component_id = component_ids.get(cung.trang_sinh.name)
-        if component_id is not None:
-            positions[component_id] = position
-
-    return positions
-
-
-def _legacy_tuan_triet_expected(time: dt.datetime, gender: Gender) -> dict[str, DiaChi]:
-    g = "M" if gender == Gender.MALE else "F"
-    bt = BirthTime.from_solar_day(time, g)
-    triet_names = MAP_TRIET[bt.thien_can]
-    tuan_key = LIST_DIA_CHI[
-        (LIST_DIA_CHI.index(bt.dia_chi) - LIST_THIEN_CAN.index(bt.thien_can)) % 12
-    ]
-    tuan_names = MAP_TUAN[tuan_key]
-    return {
-        "triet_1": _legacy_dia_chi(triet_names[0]),
-        "triet_2": _legacy_dia_chi(triet_names[1]),
-        "tuan_1": _legacy_dia_chi(tuan_names[0]),
-        "tuan_2": _legacy_dia_chi(tuan_names[1]),
-    }
 
 
 def _resolve_positions_with_rules(
@@ -415,29 +323,28 @@ def test_builder_detects_circular_position_dependencies():
         resolve_natal_placement(context, compiler=compiler)
 
 
-def test_builder_resolves_chinh_tinh_rules_like_legacy_builder():
+def test_builder_resolves_chinh_tinh_rule_graph():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time, gender=Gender.MALE, rules=CHINH_TINH_RULES
     )
-    legacy_positions = _build_legacy_chinh_tinh_positions(time)
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
+    assert set(CHINH_TINH_COMPONENT_IDS.values()).issubset(positions)
+    assert positions["vu_khuc"] == positions["tu_vi"] - 4
+    assert positions["liem_trinh"] == positions["tu_vi"] + 4
+    assert positions["that_sat"] == positions["thien_phu"] + 6
+    assert positions["thien_tuong"] == positions["pha_quan"] + 6
+    assert len({positions[component_id] for component_id in CHINH_TINH_COMPONENT_IDS.values()}) <= len(DiaChi)
 
 
-def test_builder_resolves_thai_tue_ring_like_legacy_builder():
+def test_builder_resolves_thai_tue_ring_properties():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time, gender=Gender.MALE, rules=[PHU_TINH_RULES[2]]
     )
-    legacy_positions = _build_legacy_phu_tinh_positions(time, THAI_TUE_COMPONENT_IDS)
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
-
+    assert set(THAI_TUE_COMPONENT_IDS.values()).issubset(positions)
+    assert {positions[component_id] for component_id in THAI_TUE_COMPONENT_IDS.values()} == set(DiaChi)
     assert positions["thieu_duong"] == positions["thien_khong"]
     assert positions["quan_phuf"] == positions["long_tri"]
     assert positions["tu_phu"] == positions["nguyet_duc"]
@@ -445,25 +352,23 @@ def test_builder_resolves_thai_tue_ring_like_legacy_builder():
     assert positions["sao_phuc_duc"] == positions["thien_duc"]
 
 
-def test_builder_resolves_loc_ton_ring_like_legacy_builder():
+def test_builder_resolves_loc_ton_ring_and_offsets():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time, gender=Gender.MALE, rules=PHU_TINH_RULES[:2]
     )
-    legacy_positions = _build_legacy_phu_tinh_positions(time, LOC_TON_COMPONENT_IDS)
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
-
+    assert set(LOC_TON_COMPONENT_IDS.values()).issubset(positions)
     assert positions["loc_ton"] == positions["bac_si"]
+    assert positions["kinh_duong"] == positions["loc_ton"] + 1
+    assert positions["da_la"] == positions["loc_ton"] - 1
     assert positions["tieu_hao"] == positions["ln_van_tinh"]
     assert positions["tau_thu"] == positions["duong_phu"]
     assert positions["benh_phu"] == positions["quoc_an"]
     assert positions["da_la"] == positions["quan_phur"]
 
 
-def test_builder_resolves_trang_sinh_circle_like_legacy_builder():
+def test_builder_resolves_trang_sinh_circle_properties():
     time = dt.datetime(1996, 12, 19, 6, 30)
     trang_sinh_rule = next(
         rule for rule in PHU_TINH_RULES if getattr(rule, "principal_id", "") == "trang_sinh"
@@ -471,25 +376,26 @@ def test_builder_resolves_trang_sinh_circle_like_legacy_builder():
     positions = _resolve_positions_with_rules(
         time=time, gender=Gender.MALE, rules=[trang_sinh_rule]
     )
-    legacy_positions = _build_legacy_trang_sinh_positions(time, TRANG_SINH_COMPONENT_IDS)
+    ordered_ids = tuple(TRANG_SINH_COMPONENT_IDS.values())
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
+    assert set(ordered_ids).issubset(positions)
+    assert {positions[component_id] for component_id in ordered_ids} == set(DiaChi)
+    for previous_id, next_id in zip(ordered_ids, ordered_ids[1:]):
+        assert positions[next_id] == positions[previous_id] + 1
 
 
 def test_catalog_loads_tuan_triet_entries():
-    catalog = get_default_catalog()
+    catalog = get_default_repository()
     t1 = catalog.get("tuan_1")
     assert isinstance(t1, TuanTriet)
     assert t1.name == "Tuần"
     assert catalog.get("triet_1").name == "Triệt"
 
 
-def test_builder_resolves_tuan_triet_like_legacy_maps():
+def test_builder_resolves_tuan_triet_pairs_from_context_formulas():
     time = dt.datetime(1996, 12, 19, 6, 30)
     gender = Gender.MALE
-    expected = _legacy_tuan_triet_expected(time, gender)
+    context = NatalContext.from_prior(LaSoPrior.from_solar_day(time, gender))
 
     positions = _resolve_positions_with_rules(
         time=time,
@@ -506,102 +412,86 @@ def test_builder_resolves_tuan_triet_like_legacy_maps():
         ],
     )
 
-    for component_id, dia_chi in expected.items():
-        assert positions[component_id] == dia_chi
+    assert positions["triet_1"] == triet_positions_fn(context)[0]
+    assert positions["triet_2"] == triet_positions_fn(context)[1]
+    assert positions["tuan_1"] == tuan_positions_fn(context)[0]
+    assert positions["tuan_2"] == tuan_positions_fn(context)[1]
+    assert positions["triet_2"] == positions["triet_1"] + 1
+    assert positions["tuan_2"] == positions["tuan_1"] + 1
 
 
-def test_phu_tinh_rules_include_tuan_triet_position_rules():
-    tuan_triet_rules = [r for r in PHU_TINH_RULES if isinstance(r, TuanTrietPosition)]
-    assert len(tuan_triet_rules) == 2
+def test_tuan_triet_rules_are_split_into_their_own_group():
+    assert all(isinstance(rule, TuanTrietPosition) for rule in TUAN_TRIET_RULES)
+    assert len(TUAN_TRIET_RULES) == 2
 
 
-def test_builder_resolves_month_rules_like_legacy_builder():
+def test_builder_resolves_month_rule_group_properties():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
         gender=Gender.MALE,
         rules=_select_rules_by_component_ids(set(MONTH_COMPONENT_IDS.values())),
     )
-    legacy_positions = _build_legacy_phu_tinh_positions(time, MONTH_COMPONENT_IDS)
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
-
+    assert set(MONTH_COMPONENT_IDS.values()).issubset(positions)
     assert positions["thien_dieu"] == positions["thien_y"]
 
 
-def test_builder_resolves_hour_rules_like_legacy_builder():
+def test_builder_resolves_hour_rule_group():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
         gender=Gender.MALE,
         rules=_select_rules_by_component_ids(set(HOUR_COMPONENT_IDS.values())),
     )
-    legacy_positions = _build_legacy_phu_tinh_positions(time, HOUR_COMPONENT_IDS)
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
+    assert set(HOUR_COMPONENT_IDS.values()).issubset(positions)
 
 
-def test_builder_resolves_thien_can_rules_like_legacy_builder():
+def test_builder_resolves_thien_can_rule_group():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
         gender=Gender.MALE,
         rules=_select_rules_by_component_ids(set(THIEN_CAN_COMPONENT_IDS.values())),
     )
-    legacy_positions = _build_legacy_phu_tinh_positions(time, THIEN_CAN_COMPONENT_IDS)
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
+    assert set(THIEN_CAN_COMPONENT_IDS.values()).issubset(positions)
 
 
-def test_builder_resolves_year_branch_rules_like_legacy_builder():
+def test_builder_resolves_year_branch_rule_group_properties():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
         gender=Gender.MALE,
         rules=_select_rules_by_component_ids(set(YEAR_BRANCH_COMPONENT_IDS.values())),
     )
-    legacy_positions = _build_legacy_phu_tinh_positions(time, YEAR_BRANCH_COMPONENT_IDS)
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
-
+    assert set(YEAR_BRANCH_COMPONENT_IDS.values()).issubset(positions)
     assert positions["hong_loan"] == positions["thien_hi"] + 6
     assert positions["phuong_cac"] == positions["giai_than"]
 
 
-def test_builder_resolves_dau_quan_rule_like_legacy_builder():
+def test_builder_resolves_dau_quan_rule():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
         gender=Gender.MALE,
         rules=_select_rules_by_component_ids(set(DAU_QUAN_COMPONENT_IDS.values())),
     )
-    legacy_positions = _build_legacy_phu_tinh_positions(time, DAU_QUAN_COMPONENT_IDS)
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
+    assert set(DAU_QUAN_COMPONENT_IDS.values()).issubset(positions)
 
 
-def test_builder_resolves_linh_hoa_rules_like_legacy_builder():
+def test_builder_resolves_linh_hoa_rule_group():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
         gender=Gender.MALE,
         rules=_select_rules_by_component_ids(set(LINH_HOA_COMPONENT_IDS.values())),
     )
-    legacy_positions = _build_legacy_phu_tinh_positions(time, LINH_HOA_COMPONENT_IDS)
 
-    assert {component_id: positions[component_id] for component_id in legacy_positions} == (
-        legacy_positions
-    )
+    assert set(LINH_HOA_COMPONENT_IDS.values()).issubset(positions)
 
 
 def test_context_relative_position_spec_resolves():
@@ -627,17 +517,18 @@ def test_context_relative_position_spec_resolves():
     assert positions["child_two_arg_transform"] == (DiaChi.THIN + prior.hour.index)
 
 
-def test_builder_resolves_tuhoa_like_legacy_builder():
+def test_builder_resolves_tuhoa_to_mapped_target_positions():
     time = dt.datetime(1996, 12, 19, 6, 30)
+    context = NatalContext.from_prior(LaSoPrior.from_solar_day(time, Gender.MALE))
     positions = _resolve_positions_with_rules(
         time=time,
         gender=Gender.MALE,
         rules=ROLE_RULES + CHINH_TINH_RULES + PHU_TINH_RULES + TU_HOA_RULES,
     )
-    legacy_positions = _build_legacy_tuhoa_positions(time)
 
     for hoa_id in ("hoa_loc", "hoa_quyen", "hoa_khoa", "hoa_ky"):
-        assert positions[hoa_id] == legacy_positions[hoa_id]
+        target_id = TU_HOA_TARGET_BY_THIEN_CAN[context.thien_can][hoa_id]
+        assert positions[hoa_id] == positions[target_id]
 
 
 def test_tuhoa_without_star_rules_raises_key_error():

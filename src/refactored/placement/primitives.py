@@ -10,7 +10,7 @@ This module is organized in four layers:
 from enum import Enum
 from typing import Callable, Mapping, Protocol
 
-from src.refactored.component.elementary import (
+from src.refactored.model.elementary import (
     CircleDirection,
     DiaChi,
     IndexedEnumMixin,

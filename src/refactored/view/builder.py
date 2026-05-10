@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from src.refactored.context.period import PeriodKind
-from src.refactored.cung import Cung
+from src.refactored.model.cung import Cung
 from src.refactored.la_so import LaSo
-from src.refactored.placement.layer import NATAL_LAYER_ID
-from src.refactored.component.elementary import DiaChi
+from src.refactored.model.layer import NATAL_LAYER_ID
+from src.refactored.model.elementary import DiaChi
 from src.refactored.view.models import (
     CungView,
     DaiHanFocusView,

@@ -3,21 +3,25 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping
 
-from src.refactored.component.cung_role import Role
-from src.refactored.component.elementary import DiaChi
+from src.refactored.components.definitions.cung_role import Role
+from src.refactored.model.elementary import DiaChi
 from src.refactored.context.natal import NatalContext
-from src.refactored.context.period_focus import build_period_focus_maps
-from src.refactored.cung import CungId, derive_cung_thien_can
+from src.refactored.model.period_focus import (
+    PeriodFocusMaps,
+    build_dai_han_focus_map,
+    build_tieu_han_focus_map,
+)
+from src.refactored.model.cung import CungId, derive_cung_thien_can
 from src.refactored.placement.bundle import get_default_placement_rule_compiler
 from src.refactored.placement.compiler import PlacementRuleCompiler
 from src.refactored.placement.engine import PlacementEngine
-from src.refactored.placement.layer import (
+from src.refactored.model.layer import (
     NATAL_LAYER_ID,
     STRUCTURAL_COMPONENT_IDS,
     PlacementLayer,
 )
 from src.refactored.placement.registry import ComponentId
-from src.refactored.tinh_ban import TinhBan
+from src.refactored.model.tinh_ban import TinhBan
 
 
 _ROLE_BY_ID = {role.value: role for role in Role}
@@ -96,7 +100,17 @@ def build_natal_tinh_ban(
     resolved_positions = resolve_natal_positions(context, compiler)
     cung_ids = build_cung_ids(context, resolved_positions)
     natal_layer = build_natal_layer(resolved_positions)
-    period_focus_maps = build_period_focus_maps(context)
+    period_focus_maps = PeriodFocusMaps(
+        tieu_han=build_tieu_han_focus_map(
+            natal_year_dia_chi=context.dia_chi,
+            van_direction=context.van_direction,
+        ),
+        dai_han=build_dai_han_focus_map(
+            cuc_number=context.cuc.number,
+            menh_position=context.menh_position,
+            van_direction=context.van_direction,
+        ),
+    )
     return TinhBan(
         cung_ids=cung_ids,
         natal_layer=natal_layer,

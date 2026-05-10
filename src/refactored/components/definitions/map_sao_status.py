@@ -1,5 +1,5 @@
-from src.refactored.component.elementary import DiaChi
-from src.refactored.component.sao import Status
+from src.refactored.model.elementary import DiaChi
+from src.refactored.components.definitions.sao import Status
 
 
 # Source : https://hocvienlyso.org/14-chinh-tinh.html

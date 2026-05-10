@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from src.refactored.component.cuc import Cuc, LIST_CUC
-from src.refactored.component.elementary import CircleDirection, DiaChi, LuongNghi, ThienCan
-from src.refactored.context.prior import Gender, LaSoPrior
-from src.refactored.placement.layer import LayerId, NatalLayerId
+from src.refactored.components.definitions.cuc import Cuc, LIST_CUC
+from src.refactored.model.elementary import CircleDirection, DiaChi, LuongNghi, ThienCan
+from src.refactored.model.prior import Gender, LaSoPrior
 
 
 def _get_menh_position(prior: LaSoPrior) -> DiaChi:
@@ -90,7 +89,3 @@ class NatalContext:
 
     def age(self, year: int) -> int:
         return year - self.prior.year + 1 # tuổi mụ
-
-    @property
-    def layer_id(self) -> LayerId:
-        return NatalLayerId()

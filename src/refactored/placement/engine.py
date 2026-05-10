@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.refactored.component.elementary import DiaChi
+from src.refactored.model.elementary import DiaChi
 from src.refactored.placement.compiler import (
     SpecializedAbsoluteSpec,
     SpecializedPlacementRules,

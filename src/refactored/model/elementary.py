@@ -1,8 +1,6 @@
 from enum import Enum, IntEnum, StrEnum
 from typing import Self
 
-from pydantic import BaseModel, model_validator
-
 
 class IndexedEnumMixin:
     @property
@@ -40,6 +38,7 @@ class ThienCan(CyclicEnumMixin, StrEnum):
     TAN = "tan"
     NHAM = "nham"
     QUY = "quy"
+
 
 class DiaChi(CyclicEnumMixin, StrEnum):
     TY = "ty"
@@ -119,41 +118,3 @@ class NguHanh(IndexedEnumMixin, StrEnum):
 
     def tuong_khac(self, other: "NguHanh") -> bool:
         return self.khac_xuat(other) or self.khac_nhap(other)
-
-
-class ComponentBase(BaseModel):
-    model_config = {"frozen": True}
-
-    id: str
-    name: str
-
-    def __hash__(self) -> int:
-        return hash(self.id)
-
-
-class ThienCanEntity(ComponentBase):
-    model_config = {"frozen": True}
-
-    ngu_hanh: NguHanh
-    value: ThienCan
-
-    @model_validator(mode="before")
-    @classmethod
-    def _normalize_identity(cls, data: object):
-        if not isinstance(data, dict):
-            return data
-        return {**data, "value": ThienCan(data["id"])}
-
-
-class DiaChiEntity(ComponentBase):
-    model_config = {"frozen": True}
-
-    ngu_hanh: NguHanh
-    value: DiaChi
-
-    @model_validator(mode="before")
-    @classmethod
-    def _normalize_identity(cls, data: object):
-        if not isinstance(data, dict):
-            return data
-        return {**data, "value": DiaChi(data["id"])}

@@ -1,6 +1,6 @@
 import pytest
 
-from src.refactored.component.elementary import CircleDirection, DiaChi
+from src.refactored.model.elementary import CircleDirection, DiaChi
 from src.refactored.placement.transforms import (
     get_luc_hai,
     get_nhi_hop,

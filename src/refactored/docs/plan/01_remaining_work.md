@@ -12,8 +12,8 @@ Open questions:
 
 - whether callers ask by source `DiaChi`, source `CungId`, or a higher-level
   query
-- whether `TU_HOA_PHAI` overlays should share the same `overlay_layers` storage
-  without participating in the period LRU cache
+- whether `TU_HOA_PHAI` overlays need their own store/cache policy or should be
+  materialized only on demand
 - whether one layer or many related layers should be returned for a query
 
 ## Catalog-Enriched Queries

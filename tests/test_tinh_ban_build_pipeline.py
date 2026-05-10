@@ -2,13 +2,15 @@ from dataclasses import dataclass
 
 from src.refactored.assembly.natal import build_natal_tinh_ban
 from src.refactored.assembly.tu_hoa_phai import build_tu_hoa_phai_layer
-from src.refactored.component.cung_role import Role
-from src.refactored.component.elementary import DiaChi
+from src.refactored.components.definitions.cung_role import Role
+from src.refactored.model.elementary import DiaChi
 from src.refactored.context.natal import NatalContext
-from src.refactored.context.prior import Gender, LaSoPrior
+from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.context.tu_hoa_phai import TuHoaPhaiContext
 from src.refactored.la_so import LaSo
-from src.refactored.placement.layer import NatalLayerId, PlacementLayer, TieuHanLayerId
+import pytest
+
+from src.refactored.model.layer import PlacementLayer, TieuHanLayerId, TuHoaPhaiLayerId
 
 
 def _prior() -> LaSoPrior:
@@ -43,19 +45,21 @@ def test_build_natal_tinh_ban_does_not_eagerly_build_tu_hoa_phai_layers():
 
     tinh_ban = build_natal_tinh_ban(ctx)
 
-    assert tinh_ban.overlay_layers == {}
+    assert tinh_ban.period_layers.layers == {}
 
 
 def test_build_tu_hoa_phai_layer_uses_scope_and_natal_seed():
     ctx = NatalContext.from_prior(_prior())
     tinh_ban = build_natal_tinh_ban(ctx)
     cung_id = tinh_ban.cung_ids[DiaChi.TY]
+    tu_hoa_phai_context = TuHoaPhaiContext(
+        source_dia_chi=cung_id.dia_chi,
+        thien_can=cung_id.thien_can,
+    )
 
     layer = build_tu_hoa_phai_layer(
-        context=TuHoaPhaiContext(
-            source_dia_chi=cung_id.dia_chi,
-            thien_can=cung_id.thien_can,
-        ),
+        layer_id=TuHoaPhaiLayerId(source_dia_chi=cung_id.dia_chi),
+        context=tu_hoa_phai_context,
         natal_layer=tinh_ban.natal_layer,
     )
 
@@ -65,14 +69,12 @@ def test_build_tu_hoa_phai_layer_uses_scope_and_natal_seed():
 def test_laso_from_prior_wraps_tinh_ban_and_catalog():
     la_so = LaSo.from_prior(_prior())
 
-    assert la_so.natal_context.layer_id == NatalLayerId()
     assert la_so.component("tu_vi").name == "Tử Vi"
     assert la_so.position_of("tu_vi") is not None
 
 
 @dataclass(frozen=True)
 class _FakePeriodContext:
-    layer_id: TieuHanLayerId
     focus_position: DiaChi
 
 
@@ -82,29 +84,63 @@ def test_tinh_ban_period_layer_cache_is_lru_by_layer_kind():
 
     # Force the cache to only keep 2 layers per kind,
     # so we can test eviction logic without building too many layers
-    tinh_ban._period_layer_cache.max_layers_per_kind = 2
+    tinh_ban.period_layers.cache.max_layers_per_kind = 2
 
     build_count = 0
 
-    def _build_layer(period_context: _FakePeriodContext) -> PlacementLayer:
-        nonlocal build_count
-        build_count += 1
-        return PlacementLayer.from_component_positions(
-            id=period_context.layer_id,
-            positions={"thai_tue": period_context.focus_position},
-            focus_position=period_context.focus_position,
-        )
+    def _build_layer(layer_id: TieuHanLayerId, context: _FakePeriodContext):
+        def _build() -> PlacementLayer:
+            nonlocal build_count
+            build_count += 1
+            return PlacementLayer.from_component_positions(
+                id=layer_id,
+                positions={"thai_tue": context.focus_position},
+                focus_position=context.focus_position,
+            )
+        return _build
 
-    first = _FakePeriodContext(TieuHanLayerId(2026), DiaChi.TY)
-    second = _FakePeriodContext(TieuHanLayerId(2027), DiaChi.SUU)
-    third = _FakePeriodContext(TieuHanLayerId(2028), DiaChi.DAN)
+    first_layer_id = TieuHanLayerId(2026)
+    second_layer_id = TieuHanLayerId(2027)
+    third_layer_id = TieuHanLayerId(2028)
 
-    tinh_ban.period_layer(first, _build_layer)
-    tinh_ban.period_layer(second, _build_layer)
-    tinh_ban.period_layer(first, _build_layer)
-    tinh_ban.period_layer(third, _build_layer)
+    first = _FakePeriodContext(DiaChi.TY)
+    second = _FakePeriodContext(DiaChi.SUU)
+    third = _FakePeriodContext(DiaChi.DAN)
+
+    tinh_ban.period_layer(first_layer_id, _build_layer(first_layer_id, first))
+    tinh_ban.period_layer(second_layer_id, _build_layer(second_layer_id, second))
+    tinh_ban.period_layer(first_layer_id, _build_layer(first_layer_id, first))
+    tinh_ban.period_layer(third_layer_id, _build_layer(third_layer_id, third))
 
     assert build_count == 3
-    assert first.layer_id in tinh_ban.overlay_layers
-    assert second.layer_id not in tinh_ban.overlay_layers
-    assert third.layer_id in tinh_ban.overlay_layers
+    assert first_layer_id in tinh_ban.period_layers.layers
+    assert second_layer_id not in tinh_ban.period_layers.layers
+    assert third_layer_id in tinh_ban.period_layers.layers
+
+
+def test_tinh_ban_period_layer_rejects_non_period_layer_id():
+    ctx = NatalContext.from_prior(_prior())
+    tinh_ban = build_natal_tinh_ban(ctx)
+
+    with pytest.raises(ValueError, match="Expected period layer id"):
+        tinh_ban.period_layer(
+            TuHoaPhaiLayerId(source_dia_chi=DiaChi.TY),  # type: ignore[arg-type]
+            lambda: PlacementLayer.from_component_positions(
+                id=TuHoaPhaiLayerId(source_dia_chi=DiaChi.TY),
+                positions={},
+            ),
+        )
+
+
+def test_tinh_ban_period_layer_rejects_mismatched_built_layer_id():
+    ctx = NatalContext.from_prior(_prior())
+    tinh_ban = build_natal_tinh_ban(ctx)
+
+    with pytest.raises(ValueError, match="does not match requested"):
+        tinh_ban.period_layer(
+            TieuHanLayerId(2026),
+            lambda: PlacementLayer.from_component_positions(
+                id=TieuHanLayerId(2027),
+                positions={},
+            ),
+        )

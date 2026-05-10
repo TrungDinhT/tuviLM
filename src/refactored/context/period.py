@@ -5,21 +5,15 @@ from enum import StrEnum
 from functools import cached_property
 from typing import Mapping
 
-from src.refactored.component.elementary import DiaChi, ThienCan
+from src.refactored.model.elementary import DiaChi, ThienCan
 from src.refactored.context.natal import NatalContext
-from src.refactored.context.period_focus import (
+from src.refactored.model.period_focus import (
     PeriodFocusMaps,
     TenYearRange,
     luu_nien_dai_han_focus_position,
 )
-from src.refactored.context.prior import LunarYear
-from src.refactored.cung import CungId
-from src.refactored.placement.layer import (
-    DaiHanLayerId,
-    LayerId,
-    LuuNienDaiHanLayerId,
-    TieuHanLayerId,
-)
+from src.refactored.model.prior import LunarYear
+from src.refactored.model.cung import CungId
 
 
 class PeriodKind(StrEnum):
@@ -83,10 +77,6 @@ class TieuHanContext:
             focus_position=focus_maps.tieu_han[lunar_year.dia_chi],
         )
 
-    @property
-    def layer_id(self) -> LayerId:
-        return TieuHanLayerId(year=self.year)
-
     @cached_property
     def lunar_year(self) -> LunarYear:
         return LunarYear.from_year(self.year)
@@ -125,13 +115,6 @@ class DaiHanContext:
         )
 
     @property
-    def layer_id(self) -> LayerId:
-        return DaiHanLayerId(
-            start_age=self.age_range.start_age,
-            end_age=self.age_range.end_age,
-        )
-
-    @property
     def menh_position(self) -> DiaChi:
         return self.focus_position
 
@@ -159,10 +142,6 @@ class LuuNienDaiHanContext:
                 van_direction=natal_context.van_direction,
             ),
         )
-
-    @property
-    def layer_id(self) -> LayerId:
-        return LuuNienDaiHanLayerId(year=self.year)
 
     @cached_property
     def lunar_year(self) -> LunarYear:

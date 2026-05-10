@@ -5,14 +5,15 @@ from pathlib import Path
 
 from pydantic import TypeAdapter
 
-from src.refactored.component import Component
-from src.refactored.component.cuc import LIST_CUC
-from src.refactored.component.cung_role import CungRole
-from src.refactored.component.elementary import DiaChi, DiaChiEntity, ThienCan, ThienCanEntity
-from src.refactored.component.sao import ChinhPhuTinh, TuanTriet, TuHoa, VongTrangSinh
+from src.refactored.components.definitions import Component
+from src.refactored.components.definitions.cuc import LIST_CUC
+from src.refactored.components.definitions.cung_role import CungRole
+from src.refactored.components.definitions.elementary import DiaChiEntity, ThienCanEntity
+from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet, TuHoa, VongTrangSinh
+from src.refactored.model.elementary import DiaChi, ThienCan
 
 
-class ComponentCatalog:
+class ComponentRepository:
     _cung_adapter = TypeAdapter(list[CungRole])
     _dia_chi_adapter = TypeAdapter(list[DiaChiEntity])
     _sao_adapter = TypeAdapter(list[ChinhPhuTinh | VongTrangSinh])
@@ -22,7 +23,7 @@ class ComponentCatalog:
 
     def __init__(self, catalog_dir: Path | None = None) -> None:
         self._catalog_dir = (
-            catalog_dir or Path(__file__).resolve().parent / "catalog"
+            catalog_dir or Path(__file__).resolve().parent / "data"
         )
         self._components = self._load_components()
 
@@ -96,5 +97,5 @@ class ComponentCatalog:
 
 
 @cache
-def get_default_catalog() -> ComponentCatalog:
-    return ComponentCatalog()
+def get_default_repository() -> ComponentRepository:
+    return ComponentRepository()

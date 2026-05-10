@@ -2,16 +2,18 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict
 
-from src.refactored.component import Component
-from src.refactored.component.cung_role import CungRole
-from src.refactored.component.elementary import (
-    DiaChi,
+from src.refactored.components.definitions import Component
+from src.refactored.components.definitions.cung_role import CungRole
+from src.refactored.components.definitions.elementary import (
     DiaChiEntity,
-    ThienCan,
     ThienCanEntity,
 )
-from src.refactored.context.prior import Gender
-from src.refactored.placement.layer import LayerKind
+from src.refactored.model.elementary import (
+    DiaChi,
+    ThienCan,
+)
+from src.refactored.model.prior import Gender
+from src.refactored.model.layer import LayerKind
 
 
 class LayeredComponentView(BaseModel):

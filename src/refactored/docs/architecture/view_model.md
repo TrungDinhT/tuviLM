@@ -10,7 +10,7 @@ external services. They sit outside the placement core:
 
 - `LaSo`, `TinhBan`, and `Cung` stay query-oriented and lightweight.
 - `LaSoView` and `CungView` are frozen, serializable DTOs.
-- View construction enriches placement ids with complete catalog components.
+- View construction enriches placement ids with complete component definitions.
 
 The view layer lives in `src/refactored/view/`.
 
@@ -31,7 +31,7 @@ API is still tracked in `../plan/01_remaining_work.md`.
 
 `view/models.py` defines frozen Pydantic models:
 
-- `LayeredComponentView`: `layer_kind` plus a catalog `Component`
+- `LayeredComponentView`: `layer_kind` plus a component-definition `Component`
 - `CungView`: structural Cung metadata plus layered component views
 - `TieuHanFocusView`: year `DiaChi` to focus position
 - `DaiHanFocusView`: age range to focus position
@@ -50,7 +50,7 @@ objects.
 
 1. Builds the three period layers through `LaSo.period_layer(...)`.
 2. Queries each `Cung` with natal plus period layer ids.
-3. Enriches Cung structure and components through `ComponentCatalog`.
+3. Enriches Cung structure and components through `ComponentRepository`.
 4. Adds static Tiểu Hạn and Đại Hạn focus maps.
 
 Each `LayeredComponentView` keeps only `LayerKind`, not the full `LayerId`,

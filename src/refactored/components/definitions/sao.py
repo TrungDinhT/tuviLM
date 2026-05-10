@@ -3,7 +3,8 @@ from typing import Optional, TypeAlias
 
 from pydantic import Field
 
-from src.refactored.component.elementary import ComponentBase, NguHanh
+from src.refactored.components.definitions.elementary import ComponentBase
+from src.refactored.model.elementary import NguHanh
 
 
 class Status(StrEnum):

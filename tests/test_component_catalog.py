@@ -1,11 +1,11 @@
-from src.refactored.component_catalog import get_default_catalog
-from src.refactored.component.cung_role import CungRole, Role
-from src.refactored.component.elementary import DiaChi, NguHanh, ThienCan
-from src.refactored.component.sao import ChinhPhuTinh, TuHoa
+from src.refactored.components.repository import get_default_repository
+from src.refactored.components.definitions.cung_role import CungRole, Role
+from src.refactored.model.elementary import DiaChi, NguHanh, ThienCan
+from src.refactored.components.definitions.sao import ChinhPhuTinh, TuHoa
 
 
 def test_default_catalog_loads_cung_and_sao_components():
-    catalog = get_default_catalog()
+    catalog = get_default_repository()
 
     menh = catalog.get("menh")
     thien_tai = catalog.get("thien_tai")
@@ -104,7 +104,7 @@ def test_default_catalog_loads_cung_and_sao_components():
 
 
 def test_default_catalog_get_many_preserves_requested_order():
-    catalog = get_default_catalog()
+    catalog = get_default_repository()
 
     components = catalog.get_many(["thien_tho", "menh"])
 
@@ -112,7 +112,7 @@ def test_default_catalog_get_many_preserves_requested_order():
 
 
 def test_default_catalog_loads_structural_entities():
-    catalog = get_default_catalog()
+    catalog = get_default_repository()
 
     ty = catalog.get_dia_chi(DiaChi.TY)
     giap = catalog.get_thien_can(ThienCan.GIAP)

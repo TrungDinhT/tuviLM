@@ -6,14 +6,17 @@ import types
 import typing
 from typing import TypeAliasType, get_args, get_origin
 
-from src.refactored.component_catalog import get_default_catalog
-from src.refactored.component import Component, Sao
-from src.refactored.component import __all__ as component_all
-from src.refactored.component.cuc import Cuc
-from src.refactored.component.cung_role import CungRole
-from src.refactored.component.elementary import DiaChiEntity, ThienCanEntity
-from src.refactored.component.sao import ChinhPhuTinh, TuanTriet, TuHoa, VongTrangSinh
-from src.refactored.cung import Cung
+from src.refactored.components.definitions.elementary import (
+    DiaChiEntity,
+    ThienCanEntity,
+)
+from src.refactored.components.repository import get_default_repository
+from src.refactored.components.definitions import Component, Sao
+from src.refactored.components.definitions import __all__ as component_all
+from src.refactored.components.definitions.cuc import Cuc
+from src.refactored.components.definitions.cung_role import CungRole
+from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet, TuHoa, VongTrangSinh
+from src.refactored.model.cung import Cung
 from src.refactored.placement import registry as placement_registry
 
 
@@ -74,10 +77,9 @@ def test_component_id_unchanged_in_placement_registry() -> None:
 
 
 def test_catalog_get_covers_component_union_examples() -> None:
-    catalog = get_default_catalog()
+    catalog = get_default_repository()
     assert isinstance(catalog.get("menh"), CungRole)
     assert isinstance(catalog.get("tu_vi"), ChinhPhuTinh)
     assert isinstance(catalog.get("ty"), DiaChiEntity)
     assert isinstance(catalog.get("giap"), ThienCanEntity)
     assert isinstance(catalog.get("hoa_luc_cuc"), Cuc)
-

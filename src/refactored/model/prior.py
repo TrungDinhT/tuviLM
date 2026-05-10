@@ -5,7 +5,7 @@ from functools import cached_property
 import pydantic
 
 from src.external_lib.day_from_js import get_lunar_date
-from src.refactored.component.elementary import DiaChi, ThienCan
+from src.refactored.model.elementary import DiaChi, ThienCan
 
 
 class LunarYear(pydantic.BaseModel):

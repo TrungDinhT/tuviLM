@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Mapping, TypeAlias
 
-from src.refactored.component.cung_role import Role
-from src.refactored.component.elementary import DiaChi
+from src.refactored.components.definitions.cung_role import Role
+from src.refactored.model.elementary import DiaChi
 from src.refactored.placement.registry import ComponentId
 
 
@@ -69,7 +69,17 @@ LayerId: TypeAlias = (
     | TuHoaPhaiLayerId
 )
 
+PeriodLayerId: TypeAlias = TieuHanLayerId | DaiHanLayerId | LuuNienDaiHanLayerId
+
 NATAL_LAYER_ID = NatalLayerId()
+
+PERIOD_LAYER_KINDS: frozenset[LayerKind] = frozenset(
+    (
+        LayerKind.TIEU_HAN,
+        LayerKind.DAI_HAN,
+        LayerKind.LUU_NIEN_DAI_HAN,
+    )
+)
 
 
 @dataclass(frozen=True)

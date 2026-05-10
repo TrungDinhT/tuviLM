@@ -4,8 +4,8 @@ import datetime as dt
 
 import streamlit as st
 
-from src.refactored.context.prior import Gender, LaSoPrior
 from src.refactored.la_so import LaSo
+from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.view.builder import build_laso_view
 from src.refactored.view.streamlit_adapter import render_laso_view_html
 

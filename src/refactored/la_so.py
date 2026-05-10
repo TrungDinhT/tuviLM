@@ -4,38 +4,41 @@ from dataclasses import dataclass, field
 from typing import Iterable
 
 from src.refactored.assembly.natal import build_natal_tinh_ban
-from src.refactored.assembly.period import build_period_layer
-from src.refactored.component import Component
-from src.refactored.component.elementary import DiaChi
-from src.refactored.component_catalog import ComponentCatalog, get_default_catalog
+from src.refactored.assembly.period import build_period_layer, build_period_layer_id
+from src.refactored.components.definitions import Component
+from src.refactored.components.repository import (
+    ComponentRepository,
+    get_default_repository,
+)
 from src.refactored.context.natal import NatalContext
 from src.refactored.context.period import PeriodKind, build_period_context
-from src.refactored.context.period_focus import DaiHanFocusMap
-from src.refactored.context.prior import LaSoPrior
-from src.refactored.cung import Cung
-from src.refactored.placement.layer import LayerId, NATAL_LAYER_ID, PlacementLayer
+from src.refactored.model.cung import Cung
+from src.refactored.model.elementary import DiaChi
+from src.refactored.model.layer import LayerId, NATAL_LAYER_ID, PlacementLayer
+from src.refactored.model.period_focus import DaiHanFocusMap
+from src.refactored.model.prior import LaSoPrior
+from src.refactored.model.tinh_ban import TinhBan
 from src.refactored.placement.registry import ComponentId
-from src.refactored.tinh_ban import TinhBan
 
 
 @dataclass
 class LaSo:
     prior: LaSoPrior
     natal_context: NatalContext
-    catalog: ComponentCatalog
+    catalog: ComponentRepository
     tinh_ban: TinhBan
 
     @classmethod
     def from_prior(
         cls,
         prior: LaSoPrior,
-        catalog: ComponentCatalog | None = None,
+        catalog: ComponentRepository | None = None,
     ) -> "LaSo":
         natal_context = NatalContext.from_prior(prior)
         return cls(
             prior=prior,
             natal_context=natal_context,
-            catalog=catalog or get_default_catalog(),
+            catalog=catalog or get_default_repository(),
             tinh_ban=build_natal_tinh_ban(natal_context),
         )
 
@@ -70,10 +73,12 @@ class LaSo:
             focus_maps=self.tinh_ban.period_focus_maps,
             cung_ids=self.tinh_ban.cung_ids,
         )
+        layer_id = build_period_layer_id(kind, context)
         return self.tinh_ban.period_layer(
-            context=context,
-            build_fn=lambda ctx: build_period_layer(
-                context=ctx,
+            layer_id=layer_id,
+            build_fn=lambda: build_period_layer(
+                kind=kind,
+                context=context,
                 tinh_ban=self.tinh_ban,
             ),
         )

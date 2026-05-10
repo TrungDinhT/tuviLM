@@ -8,9 +8,8 @@ from __future__ import annotations
 
 import datetime as dt
 
-from src.refactored.component.cuc import NguHanh
-from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCan
-from src.refactored.context.prior import Gender, LaSoPrior
+from src.refactored.model.elementary import CircleDirection, DiaChi, NguHanh, ThienCan
+from src.refactored.model.prior import Gender, LaSoPrior
 
 # Canonical happy-path birth (Nam, same instant as placement regression tests).
 _SOLAR_A = dt.datetime(1990, 5, 15, 10, 30)

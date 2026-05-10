@@ -1,11 +1,13 @@
 import pytest
 
-from src.refactored.component.elementary import (
-    DiaChi,
+from src.refactored.components.definitions.elementary import (
     DiaChiEntity,
+    ThienCanEntity,
+)
+from src.refactored.model.elementary import (
+    DiaChi,
     NguHanh,
     ThienCan,
-    ThienCanEntity,
 )
 
 

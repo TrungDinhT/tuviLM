@@ -1,12 +1,12 @@
 import pytest
 
-from src.refactored.component.elementary import (
+from src.refactored.model.elementary import (
     CircleDirection,
     DiaChi,
     NguHanh,
     ThienCan,
 )
-from src.refactored.context.prior import Gender, LaSoPrior, LunarYear
+from src.refactored.model.prior import Gender, LaSoPrior, LunarYear
 from src.refactored.context.natal import NatalContext
 
 

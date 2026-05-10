@@ -1,4 +1,4 @@
-from src.refactored.component.elementary import CircleDirection, DiaChi
+from src.refactored.model.elementary import CircleDirection, DiaChi
 
 
 def get_xung_chieu(position: DiaChi) -> DiaChi:

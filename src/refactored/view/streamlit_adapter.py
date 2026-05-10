@@ -5,8 +5,8 @@ from typing import Mapping
 
 from pydantic import BaseModel, ConfigDict
 
-from src.refactored.component.elementary import DiaChi
-from src.refactored.placement.layer import LayerKind
+from src.refactored.model.elementary import DiaChi
+from src.refactored.model.layer import LayerKind
 from src.refactored.view.models import CungView, LaSoView
 
 

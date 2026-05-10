@@ -1,10 +1,10 @@
 
 import pytest
 
-from src.refactored.component.elementary import CircleDirection, DiaChi, ThienCan
-from src.refactored.context.prior import Gender, LaSoPrior
+from src.refactored.model.elementary import CircleDirection, DiaChi, ThienCan
+from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.context.natal import NatalContext
-from src.refactored.cung import NGU_HO_DON_THIEN_CAN, derive_cung_thien_can
+from src.refactored.model.cung import NGU_HO_DON_THIEN_CAN, derive_cung_thien_can
 from src.refactored.placement.primitives import (
     move_by_attr,
     move_by_birth_month,

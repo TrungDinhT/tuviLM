@@ -6,7 +6,7 @@ sets of component ids that placement layers can choose to materialize.
 
 from typing import Literal, get_args
 
-from src.refactored.component.cung_role import Role
+from src.refactored.components.definitions.cung_role import Role
 from src.refactored.placement.registry import ComponentId
 
 

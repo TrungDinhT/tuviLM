@@ -2,36 +2,70 @@ from __future__ import annotations
 
 from typing import Mapping
 
-from src.refactored.context.protocol import PeriodContext
-from src.refactored.component.cung_role import Role
-from src.refactored.component.elementary import DiaChi
+from src.refactored.context.period import (
+    DaiHanContext,
+    LuuNienDaiHanContext,
+    PeriodKind,
+    TieuHanContext,
+)
+from src.refactored.components.definitions.cung_role import Role
+from src.refactored.model.elementary import DiaChi
 from src.refactored.placement.bundle import get_default_placement_rule_compiler
 from src.refactored.placement.compiler import PlacementRuleCompiler
 from src.refactored.placement.engine import PlacementEngine
-from src.refactored.placement.layer import LayerKind, PlacementLayer
-from src.refactored.placement.layer_scopes import (
+from src.refactored.model.layer import (
+    DaiHanLayerId,
+    LuuNienDaiHanLayerId,
+    PeriodLayerId,
+    PlacementLayer,
+    TieuHanLayerId,
+)
+from src.refactored.placement.scopes import (
     DAI_HAN_SCOPE,
     LUU_NIEN_DAI_HAN_SCOPE,
     TIEU_HAN_SCOPE,
 )
 from src.refactored.placement.registry import ComponentId
-from src.refactored.tinh_ban import TinhBan
+from src.refactored.model.tinh_ban import TinhBan
 
 
-PERIOD_SCOPE_BY_KIND: dict[LayerKind, frozenset[ComponentId]] = {
-    LayerKind.TIEU_HAN: TIEU_HAN_SCOPE,
-    LayerKind.DAI_HAN: DAI_HAN_SCOPE,
-    LayerKind.LUU_NIEN_DAI_HAN: LUU_NIEN_DAI_HAN_SCOPE,
+PERIOD_SCOPE_BY_KIND: dict[PeriodKind, frozenset[ComponentId]] = {
+    PeriodKind.TIEU_HAN: TIEU_HAN_SCOPE,
+    PeriodKind.DAI_HAN: DAI_HAN_SCOPE,
+    PeriodKind.LUU_NIEN_DAI_HAN: LUU_NIEN_DAI_HAN_SCOPE,
 }
+
+
+PeriodLayerContext = TieuHanContext | DaiHanContext | LuuNienDaiHanContext
+
+
+def build_period_layer_id(
+    kind: PeriodKind,
+    context: PeriodLayerContext,
+) -> PeriodLayerId:
+    if kind is PeriodKind.TIEU_HAN and isinstance(context, TieuHanContext):
+        return TieuHanLayerId(year=context.year)
+    if kind is PeriodKind.DAI_HAN and isinstance(context, DaiHanContext):
+        return DaiHanLayerId(
+            start_age=context.age_range.start_age,
+            end_age=context.age_range.end_age,
+        )
+    if (
+        kind is PeriodKind.LUU_NIEN_DAI_HAN
+        and isinstance(context, LuuNienDaiHanContext)
+    ):
+        return LuuNienDaiHanLayerId(year=context.year)
+    raise TypeError(f"Period kind {kind!r} does not match context {context!r}.")
 
 
 def build_period_layer(
     *,
-    context: PeriodContext,
+    kind: PeriodKind,
+    context: PeriodLayerContext,
     tinh_ban: TinhBan,
     compiler: PlacementRuleCompiler | None = None,
 ) -> PlacementLayer:
-    scope = PERIOD_SCOPE_BY_KIND[context.layer_id.kind]
+    scope = PERIOD_SCOPE_BY_KIND[kind]
     active_compiler = compiler or get_default_placement_rule_compiler()
     specialized_rules = active_compiler.compile(
         context,
@@ -43,7 +77,7 @@ def build_period_layer(
     )
     resolved_positions = PlacementEngine(specialized_rules).resolve_all()
     return PlacementLayer.from_component_positions(
-        id=context.layer_id,
+        id=build_period_layer_id(kind, context),
         positions={
             component_id: resolved_positions[component_id]
             for component_id in scope

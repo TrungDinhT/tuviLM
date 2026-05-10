@@ -1,7 +1,7 @@
 """Regression checks for shared ``tests/fixtures/laso_priors`` data."""
 
 from src.refactored.assembly.natal import resolve_natal_placement
-from src.refactored.component.cung_role import Role
+from src.refactored.components.definitions.cung_role import Role
 from src.refactored.context.natal import NatalContext
 from tests.fixtures.laso_priors import (
     EXPECTED_A,

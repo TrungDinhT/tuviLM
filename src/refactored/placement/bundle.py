@@ -8,6 +8,7 @@ from src.refactored.placement.rules import (
     PHU_TINH_RULES,
     ROLE_RULES,
     TU_HOA_RULES,
+    TUAN_TRIET_RULES,
 )
 
 
@@ -17,5 +18,6 @@ def get_default_placement_rule_compiler() -> PlacementRuleCompiler:
     compiler.register_rules(ROLE_RULES)
     compiler.register_rules(CHINH_TINH_RULES)
     compiler.register_rules(PHU_TINH_RULES)
+    compiler.register_rules(TUAN_TRIET_RULES)
     compiler.register_rules(TU_HOA_RULES)
     return compiler

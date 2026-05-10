@@ -1,6 +1,6 @@
 from src.refactored.assembly.natal import build_natal_tinh_ban
-from src.refactored.assembly.period import build_period_layer
-from src.refactored.component.elementary import CircleDirection, DiaChi
+from src.refactored.assembly.period import build_period_layer, build_period_layer_id
+from src.refactored.model.elementary import CircleDirection, DiaChi
 from src.refactored.context.natal import NatalContext
 from src.refactored.context.period import (
     DaiHanContext,
@@ -9,15 +9,15 @@ from src.refactored.context.period import (
     TieuHanContext,
     build_period_context,
 )
-from src.refactored.context.period_focus import (
+from src.refactored.model.period_focus import (
     TenYearRange,
     build_dai_han_focus_map,
     build_tieu_han_focus_map,
     luu_nien_dai_han_focus_position,
 )
-from src.refactored.context.prior import Gender, LaSoPrior
+from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.la_so import LaSo
-from src.refactored.placement.layer import (
+from src.refactored.model.layer import (
     DaiHanLayerId,
     LuuNienDaiHanLayerId,
     TieuHanLayerId,
@@ -49,7 +49,7 @@ def test_tieu_han_focus_map_places_year_branches_from_static_anchor():
 def test_dai_han_focus_map_places_ten_year_ranges_from_menh():
     ctx = NatalContext.from_prior(_prior())
     focus_map = build_dai_han_focus_map(
-        cuc=ctx.cuc,
+        cuc_number=ctx.cuc.number,
         menh_position=ctx.menh_position,
         van_direction=ctx.van_direction,
     )
@@ -72,7 +72,7 @@ def test_build_natal_tinh_ban_stores_queryable_period_focus_maps():
     assert la_so.dai_han_focus_map() == tinh_ban.period_focus_maps.dai_han
 
 
-def test_period_contexts_derive_layer_ids_and_focus_positions():
+def test_period_assembly_derives_layer_ids_from_contexts():
     ctx = NatalContext.from_prior(_prior())
     tinh_ban = build_natal_tinh_ban(ctx)
 
@@ -93,17 +93,22 @@ def test_period_contexts_derive_layer_ids_and_focus_positions():
         dai_han_context=dai_han,
     )
 
-    assert tieu_han.layer_id == TieuHanLayerId(year=2034)
+    assert build_period_layer_id(PeriodKind.TIEU_HAN, tieu_han) == TieuHanLayerId(
+        year=2034
+    )
     assert tieu_han.focus_position == tinh_ban.period_focus_maps.tieu_han[DiaChi.DAN]
 
-    assert dai_han.layer_id == DaiHanLayerId(
+    assert build_period_layer_id(PeriodKind.DAI_HAN, dai_han) == DaiHanLayerId(
         start_age=ctx.cuc.number,
         end_age=ctx.cuc.number + 9,
     )
     assert dai_han.age_range.start_age == ctx.cuc.number
     assert dai_han.thien_can == tinh_ban.cung_ids[dai_han.focus_position].thien_can
 
-    assert luu_nien.layer_id == LuuNienDaiHanLayerId(year=2002)
+    assert build_period_layer_id(
+        PeriodKind.LUU_NIEN_DAI_HAN,
+        luu_nien,
+    ) == LuuNienDaiHanLayerId(year=2002)
     assert luu_nien.focus_position == get_xung_chieu(dai_han.focus_position)
 
 
@@ -147,6 +152,7 @@ def test_build_period_layer_materializes_scope_and_focus_position():
     )
 
     layer = build_period_layer(
+        kind=PeriodKind.TIEU_HAN,
         context=tieu_han,
         tinh_ban=tinh_ban,
     )
@@ -183,5 +189,5 @@ def test_build_period_context_factory_and_laso_period_layer_api():
     layer = la_so.period_layer(PeriodKind.DAI_HAN, year=2002)
 
     assert isinstance(context, DaiHanContext)
-    assert layer.id == context.layer_id
+    assert layer.id == build_period_layer_id(PeriodKind.DAI_HAN, context)
     assert layer.focus_position == context.focus_position

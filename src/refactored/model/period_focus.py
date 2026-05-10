@@ -1,14 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Mapping, TypeAlias
+from typing import Mapping, TypeAlias
 
-from src.refactored.component.elementary import CircleDirection, DiaChi
-from src.refactored.placement.transforms import get_xung_chieu
-
-if TYPE_CHECKING:
-    from src.refactored.component.cuc import Cuc
-    from src.refactored.context.natal import NatalContext
+from src.refactored.model.elementary import CircleDirection, DiaChi
 
 
 @dataclass(frozen=True, order=True)
@@ -59,20 +54,6 @@ class PeriodFocusMaps:
     dai_han: DaiHanFocusMap
 
 
-def build_period_focus_maps(natal_context: NatalContext) -> PeriodFocusMaps:
-    return PeriodFocusMaps(
-        tieu_han=build_tieu_han_focus_map(
-            natal_year_dia_chi=natal_context.dia_chi,
-            van_direction=natal_context.van_direction,
-        ),
-        dai_han=build_dai_han_focus_map(
-            cuc=natal_context.cuc,
-            menh_position=natal_context.menh_position,
-            van_direction=natal_context.van_direction,
-        ),
-    )
-
-
 def build_tieu_han_focus_map(
     *,
     natal_year_dia_chi: DiaChi,
@@ -87,17 +68,17 @@ def build_tieu_han_focus_map(
 
 def build_dai_han_focus_map(
     *,
-    cuc: Cuc,
+    cuc_number: int,
     menh_position: DiaChi,
     van_direction: CircleDirection,
 ) -> DaiHanFocusMap:
     by_range = {
-        TenYearRange(start_age=cuc.number + offset * 10): (
+        TenYearRange(start_age=cuc_number + offset * 10): (
             menh_position + van_direction * offset
         )
         for offset, _dia_chi in enumerate(DiaChi)
     }
-    return DaiHanFocusMap(first_start_age=cuc.number, by_range=by_range)
+    return DaiHanFocusMap(first_start_age=cuc_number, by_range=by_range)
 
 
 def tieu_han_anchor_position(natal_year_dia_chi: DiaChi) -> DiaChi:
@@ -128,7 +109,7 @@ def luu_nien_dai_han_focus_position(
     if delta == 0:
         return dai_han_focus_position
 
-    xung_chieu_position = get_xung_chieu(dai_han_focus_position)
+    xung_chieu_position = dai_han_focus_position + 6
     if delta == 1:
         return xung_chieu_position
 
