@@ -1,0 +1,13 @@
+{
+    "cung": [
+        "ti", "suu", "dan", "mao", "thin", "ty", "ngo", "mui", "than", "dau", "tuat", "hoi"
+    ],
+    "nhi_hop": [
+        ["ti", "suu"], 
+        ["hoi", "dan"],
+        ["tuat", "mao"],
+        ["dau", "thin"],
+        ["than", "ty"],
+        ["mui", "ngo"]
+    ]
+}

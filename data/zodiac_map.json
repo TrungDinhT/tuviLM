@@ -1,0 +1,1127 @@
+{
+    "Tat Ach": {
+        "sao": {
+            "chinh_tinh": [
+                "Thien Luong",
+                "Thien Co"
+            ],
+            "phu_tinh": [
+                "Long Tri",
+                "Hoa Cai",
+                "Hoa Quyen",
+                "Da La",
+                "Quan Phu",
+                "Quan Phu?",
+                "Thien La",
+                "Thien Su"
+            ],
+            "vong_trang_sinh": "Quan Doi"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Phu Mau",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Duong Phu",
+                        "Giai Than",
+                        "Phuong cac",
+                        "Tau thu",
+                        "Qua Tu",
+                        "Dieu Khach",
+                        "Dia Vong"
+                    ],
+                    "vong_trang_sing": "Mo"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Huynh De",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Van Tinh",
+                        "Dia Khong",
+                        "Bach Ho",
+                        "Tieu Hao"
+                    ],
+                    "vong_trang_sinh": "Benh"
+                }
+            },
+            {
+                "cung": "Dien Trach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thai Am",
+                        "Thien Dong"
+                    ],
+                    "phu_tinh": [
+                        "Huu Bat",
+                        "Thien Phuc",
+                        "Thien Tru",
+                        "Hy Than",
+                        "Hoa Loc",
+                        "Thai Tue"
+                    ],
+                    "vong_trang_sing": "Thai"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Menh",
+                "sao": {
+                    "chinh_tinh": [
+                        "Pha Quan",
+                        "Liem Trinh"
+                    ],
+                    "phu_tinh": [
+                        "Thai Phu",
+                        "Thien Viet",
+                        "Dao Hoa",
+                        "Thien Hi",
+                        "Thien Duc",
+                        "Phuc Duc",
+                        "Thien Tai",
+                        "Tuong Quan",
+                        "Hoa Ky"
+                    ],
+                    "vong_trang_sinh": "Tu"
+                }
+            }
+        ]
+    },
+    "Tai Bach": {
+        "sao": {
+            "chinh_tinh": [
+                "Tu Vi",
+                "That Sat"
+            ],
+            "phu_tinh": [
+                "Phong Cao",
+                "Dia Giai",
+                "Loc Ton",
+                "Thien Quan",
+                "Nguyet Duc",
+                "Bac Sy",
+                "Hoa Tinh",
+                "Kiep Sat",
+                "Tu Phu",
+                "Dau Quan"
+            ],
+            "vong_trang_sinh": "Lam Quan"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Phuc Duc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Phu"
+                    ],
+                    "phu_tinh": [
+                        "Thien Y",
+                        "Thien Khoi",
+                        "Thien Quy",
+                        "Tam Thai",
+                        "Thien Dieu",
+                        "Truc Phu",
+                        "Phi Liem",
+                        "Bach Ho"
+                    ],
+                    "vong_trang_sing": "Tuyet"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Menh",
+                "sao": {
+                    "chinh_tinh": [
+                        "Pha Quan",
+                        "Liem Trinh"
+                    ],
+                    "phu_tinh": [
+                        "Thai Phu",
+                        "Thien Viet",
+                        "Dao Hoa",
+                        "Thien Hi",
+                        "Thien Duc",
+                        "Phuc Duc",
+                        "Thien Tai",
+                        "Tuong Quan",
+                        "Hoa Ky"
+                    ],
+                    "vong_trang_sinh": "Tu"
+                }
+            },
+            {
+                "cung": "Quan Loc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Tham Lang",
+                        "Vu Khuc"
+                    ],
+                    "phu_tinh": [
+                        "Quoc An",
+                        "Thieu Duong",
+                        "Thien Khong",
+                        "Benh Phu"
+                    ],
+                    "vong_trang_sing": "Duong"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Huynh De",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Van Tinh",
+                        "Dia Khong",
+                        "Bach Ho",
+                        "Tieu Hao"
+                    ],
+                    "vong_trang_sinh": "Benh"
+                }
+            }
+        ]
+    },
+    "Tu Tuc": {
+        "sao": {
+            "chinh_tinh": [],
+            "phu_tinh": [
+                "Thien Giai",
+                "Luc Sy",
+                "Kinh Duong",
+                "Thien Khoc",
+                "Thien Hu",
+                "Tue Pha"
+            ],
+            "vong_trang_sinh": "De Vuong"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Dien Trach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thai Am",
+                        "Thien Dong"
+                    ],
+                    "phu_tinh": [
+                        "Huu Bat",
+                        "Thien Phuc",
+                        "Thien Tru",
+                        "Hy Than",
+                        "Hoa Loc",
+                        "Thai Tue"
+                    ],
+                    "vong_trang_sing": "Thai"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Phu Mau",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Duong Phu",
+                        "Giai Than",
+                        "Phuong cac",
+                        "Tau thu",
+                        "Qua Tu",
+                        "Dieu Khach",
+                        "Dia Vong"
+                    ],
+                    "vong_trang_sing": "Mo"
+                }
+            },
+            {
+                "cung": "No Boc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Cu Mon",
+                        "Thai Duong"
+                    ],
+                    "phu_tinh": [
+                        "Ta Phu",
+                        "Thien Ma",
+                        "Dia Kiep",
+                        "Co Than",
+                        "Tang Mon",
+                        "Dai Hao",
+                        "Thien Thuong"
+                    ],
+                    "vong_trang_sing": "Trang Sinh"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Phu The",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Van Khuc",
+                        "Van Xuong",
+                        "Long Duc",
+                        "Thanh Long",
+                        "Hoa Khoa",
+                        "Linh Tinh",
+                        "Thien Hinh",
+                        "Luu Ha"
+                    ],
+                    "vong_trang_sinh": "Suy"
+                }
+            }
+        ]
+    },
+    "Phu The": {
+        "sao": {
+            "chinh_tinh": [],
+            "phu_tinh": [
+                "Van Khuc",
+                "Van Xuong",
+                "Long Duc",
+                "Thanh Long",
+                "Hoa Khoa",
+                "Linh Tinh",
+                "Thien Hinh",
+                "Luu Ha"
+            ],
+            "vong_trang_sinh": "Suy"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Quan Loc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Tham Lang",
+                        "Vu Khuc"
+                    ],
+                    "phu_tinh": [
+                        "Quoc An",
+                        "Thieu Duong",
+                        "Thien Khong",
+                        "Benh Phu"
+                    ],
+                    "vong_trang_sing": "Duong"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Phuc Duc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Phu"
+                    ],
+                    "phu_tinh": [
+                        "Thien Y",
+                        "Thien Khoi",
+                        "Thien Quy",
+                        "Tam Thai",
+                        "Thien Dieu",
+                        "Truc Phu",
+                        "Phi Liem",
+                        "Bach Ho"
+                    ],
+                    "vong_trang_sing": "Tuyet"
+                }
+            },
+            {
+                "cung": "Thien Di",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Tuong"
+                    ],
+                    "phu_tinh": [
+                        "Hong Loan",
+                        "Thieu Am",
+                        "An Quang",
+                        "Bat Toa",
+                        "Thien Tho",
+                        "Phuc Binh"
+                    ],
+                    "vong_trang_sing": "Moc Duc"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Tu Tuc",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Thien Giai",
+                        "Luc Sy",
+                        "Kinh Duong",
+                        "Thien Khoc",
+                        "Thien Hu",
+                        "Tue Pha"
+                    ],
+                    "vong_trang_sinh": "De Vuong"
+                }
+            }
+        ]
+    },
+    "Huynh De": {
+        "sao": {
+            "chinh_tinh": [],
+            "phu_tinh": [
+                "Van Tinh",
+                "Dia Khong",
+                "Bach Ho",
+                "Tieu Hao"
+            ],
+            "vong_trang_sinh": "Benh"
+        },
+        "xung_chieu": [
+            {
+                "cung": "No Boc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Cu Mon",
+                        "Thai Duong"
+                    ],
+                    "phu_tinh": [
+                        "Ta Phu",
+                        "Thien Ma",
+                        "Dia Kiep",
+                        "Co Than",
+                        "Tang Mon",
+                        "Dai Hao",
+                        "Thien Thuong"
+                    ],
+                    "vong_trang_sing": "Trang Sinh"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Dien Trach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thai Am",
+                        "Thien Dong"
+                    ],
+                    "phu_tinh": [
+                        "Huu Bat",
+                        "Thien Phuc",
+                        "Thien Tru",
+                        "Hy Than",
+                        "Hoa Loc",
+                        "Thai Tue"
+                    ],
+                    "vong_trang_sing": "Thai"
+                }
+            },
+            {
+                "cung": "Tat Ach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Luong",
+                        "Thien Co"
+                    ],
+                    "phu_tinh": [
+                        "Long Tri",
+                        "Hoa Cai",
+                        "Hoa Quyen",
+                        "Da La",
+                        "Quan Phu",
+                        "Quan Phu?",
+                        "Thien La",
+                        "Thien Su"
+                    ],
+                    "vong_trang_sinh": "Quan Doi"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Tai Bach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Tu Vi",
+                        "That Sat"
+                    ],
+                    "phu_tinh": [
+                        "Phong Cao",
+                        "Dia Giai",
+                        "Loc Ton",
+                        "Thien Quan",
+                        "Nguyet Duc",
+                        "Bac Sy",
+                        "Hoa Tinh",
+                        "Kiep Sat",
+                        "Tu Phu",
+                        "Dau Quan"
+                    ],
+                    "vong_trang_sinh": "Lam Quan"
+                }
+            }
+        ]
+    },
+    "Menh": {
+        "sao": {
+            "chinh_tinh": [
+                "Pha Quan",
+                "Liem Trinh"
+            ],
+            "phu_tinh": [
+                "Thai Phu",
+                "Thien Viet",
+                "Dao Hoa",
+                "Thien Hi",
+                "Thien Duc",
+                "Phuc Duc",
+                "Thien Tai",
+                "Tuong Quan",
+                "Hoa Ky"
+            ],
+            "vong_trang_sinh": "Tu"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Thien Di",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Tuong"
+                    ],
+                    "phu_tinh": [
+                        "Hong Loan",
+                        "Thieu Am",
+                        "An Quang",
+                        "Bat Toa",
+                        "Thien Tho",
+                        "Phuc Binh"
+                    ],
+                    "vong_trang_sing": "Moc Duc"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Quan Loc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Tham Lang",
+                        "Vu Khuc"
+                    ],
+                    "phu_tinh": [
+                        "Quoc An",
+                        "Thieu Duong",
+                        "Thien Khong",
+                        "Benh Phu"
+                    ],
+                    "vong_trang_sing": "Duong"
+                }
+            },
+            {
+                "cung": "Tai Bach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Tu Vi",
+                        "That Sat"
+                    ],
+                    "phu_tinh": [
+                        "Phong Cao",
+                        "Dia Giai",
+                        "Loc Ton",
+                        "Thien Quan",
+                        "Nguyet Duc",
+                        "Bac Sy",
+                        "Hoa Tinh",
+                        "Kiep Sat",
+                        "Tu Phu",
+                        "Dau Quan"
+                    ],
+                    "vong_trang_sinh": "Lam Quan"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Tat Ach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Luong",
+                        "Thien Co"
+                    ],
+                    "phu_tinh": [
+                        "Long Tri",
+                        "Hoa Cai",
+                        "Hoa Quyen",
+                        "Da La",
+                        "Quan Phu",
+                        "Quan Phu?",
+                        "Thien La",
+                        "Thien Su"
+                    ],
+                    "vong_trang_sinh": "Quan Doi"
+                }
+            }
+        ]
+    },
+    "Phu Mau": {
+        "sao": {
+            "chinh_tinh": [],
+            "phu_tinh": [
+                "Duong Phu",
+                "Giai Than",
+                "Phuong cac",
+                "Tau thu",
+                "Qua Tu",
+                "Dieu Khach",
+                "Dia Vong"
+            ],
+            "vong_trang_sing": "Mo"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Tat Ach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Luong",
+                        "Thien Co"
+                    ],
+                    "phu_tinh": [
+                        "Long Tri",
+                        "Hoa Cai",
+                        "Hoa Quyen",
+                        "Da La",
+                        "Quan Phu",
+                        "Quan Phu?",
+                        "Thien La",
+                        "Thien Su"
+                    ],
+                    "vong_trang_sinh": "Quan Doi"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "No Boc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Cu Mon",
+                        "Thai Duong"
+                    ],
+                    "phu_tinh": [
+                        "Ta Phu",
+                        "Thien Ma",
+                        "Dia Kiep",
+                        "Co Than",
+                        "Tang Mon",
+                        "Dai Hao",
+                        "Thien Thuong"
+                    ],
+                    "vong_trang_sing": "Trang Sinh"
+                }
+            },
+            {
+                "cung": "Tu Tuc",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Thien Giai",
+                        "Luc Sy",
+                        "Kinh Duong",
+                        "Thien Khoc",
+                        "Thien Hu",
+                        "Tue Pha"
+                    ],
+                    "vong_trang_sinh": "De Vuong"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Thien Di",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Tuong"
+                    ],
+                    "phu_tinh": [
+                        "Hong Loan",
+                        "Thieu Am",
+                        "An Quang",
+                        "Bat Toa",
+                        "Thien Tho",
+                        "Phuc Binh"
+                    ],
+                    "vong_trang_sing": "Moc Duc"
+                }
+            }
+        ]
+    },
+    "Phuc Duc": {
+        "sao": {
+            "chinh_tinh": [
+                "Thien Phu"
+            ],
+            "phu_tinh": [
+                "Thien Y",
+                "Thien Khoi",
+                "Thien Quy",
+                "Tam Thai",
+                "Thien Dieu",
+                "Truc Phu",
+                "Phi Liem",
+                "Bach Ho"
+            ],
+            "vong_trang_sing": "Tuyet"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Tai Bach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Tu Vi",
+                        "That Sat"
+                    ],
+                    "phu_tinh": [
+                        "Phong Cao",
+                        "Dia Giai",
+                        "Loc Ton",
+                        "Thien Quan",
+                        "Nguyet Duc",
+                        "Bac Sy",
+                        "Hoa Tinh",
+                        "Kiep Sat",
+                        "Tu Phu",
+                        "Dau Quan"
+                    ],
+                    "vong_trang_sinh": "Lam Quan"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Thien Di",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Tuong"
+                    ],
+                    "phu_tinh": [
+                        "Hong Loan",
+                        "Thieu Am",
+                        "An Quang",
+                        "Bat Toa",
+                        "Thien Tho",
+                        "Phuc Binh"
+                    ],
+                    "vong_trang_sing": "Moc Duc"
+                }
+            },
+            {
+                "cung": "Phu The",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Van Khuc",
+                        "Van Xuong",
+                        "Long Duc",
+                        "Thanh Long",
+                        "Hoa Khoa",
+                        "Linh Tinh",
+                        "Thien Hinh",
+                        "Luu Ha"
+                    ],
+                    "vong_trang_sinh": "Suy"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "No Boc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Cu Mon",
+                        "Thai Duong"
+                    ],
+                    "phu_tinh": [
+                        "Ta Phu",
+                        "Thien Ma",
+                        "Dia Kiep",
+                        "Co Than",
+                        "Tang Mon",
+                        "Dai Hao",
+                        "Thien Thuong"
+                    ],
+                    "vong_trang_sing": "Trang Sinh"
+                }
+            }
+        ]
+    },
+    "Dien Trach": {
+        "sao": {
+            "chinh_tinh": [
+                "Thai Am",
+                "Thien Dong"
+            ],
+            "phu_tinh": [
+                "Huu Bat",
+                "Thien Phuc",
+                "Thien Tru",
+                "Hy Than",
+                "Hoa Loc",
+                "Thai Tue"
+            ],
+            "vong_trang_sing": "Thai"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Tu Tuc",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Thien Giai",
+                        "Luc Sy",
+                        "Kinh Duong",
+                        "Thien Khoc",
+                        "Thien Hu",
+                        "Tue Pha"
+                    ],
+                    "vong_trang_sinh": "De Vuong"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Tat Ach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Luong",
+                        "Thien Co"
+                    ],
+                    "phu_tinh": [
+                        "Long Tri",
+                        "Hoa Cai",
+                        "Hoa Quyen",
+                        "Da La",
+                        "Quan Phu",
+                        "Quan Phu?",
+                        "Thien La",
+                        "Thien Su"
+                    ],
+                    "vong_trang_sinh": "Quan Doi"
+                }
+            },
+            {
+                "cung": "Huynh De",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Van Tinh",
+                        "Dia Khong",
+                        "Bach Ho",
+                        "Tieu Hao"
+                    ],
+                    "vong_trang_sinh": "Benh"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Quan Loc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Tham Lang",
+                        "Vu Khuc"
+                    ],
+                    "phu_tinh": [
+                        "Quoc An",
+                        "Thieu Duong",
+                        "Thien Khong",
+                        "Benh Phu"
+                    ],
+                    "vong_trang_sing": "Duong"
+                }
+            }
+        ]
+    },
+    "Quan Loc": {
+        "sao": {
+            "chinh_tinh": [
+                "Tham Lang",
+                "Vu Khuc"
+            ],
+            "phu_tinh": [
+                "Quoc An",
+                "Thieu Duong",
+                "Thien Khong",
+                "Benh Phu"
+            ],
+            "vong_trang_sing": "Duong"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Phu The",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Van Khuc",
+                        "Van Xuong",
+                        "Long Duc",
+                        "Thanh Long",
+                        "Hoa Khoa",
+                        "Linh Tinh",
+                        "Thien Hinh",
+                        "Luu Ha"
+                    ],
+                    "vong_trang_sinh": "Suy"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Tai Bach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Tu Vi",
+                        "That Sat"
+                    ],
+                    "phu_tinh": [
+                        "Phong Cao",
+                        "Dia Giai",
+                        "Loc Ton",
+                        "Thien Quan",
+                        "Nguyet Duc",
+                        "Bac Sy",
+                        "Hoa Tinh",
+                        "Kiep Sat",
+                        "Tu Phu",
+                        "Dau Quan"
+                    ],
+                    "vong_trang_sinh": "Lam Quan"
+                }
+            },
+            {
+                "cung": "Menh",
+                "sao": {
+                    "chinh_tinh": [
+                        "Pha Quan",
+                        "Liem Trinh"
+                    ],
+                    "phu_tinh": [
+                        "Thai Phu",
+                        "Thien Viet",
+                        "Dao Hoa",
+                        "Thien Hi",
+                        "Thien Duc",
+                        "Phuc Duc",
+                        "Thien Tai",
+                        "Tuong Quan",
+                        "Hoa Ky"
+                    ],
+                    "vong_trang_sinh": "Tu"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Dien Trach",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thai Am",
+                        "Thien Dong"
+                    ],
+                    "phu_tinh": [
+                        "Huu Bat",
+                        "Thien Phuc",
+                        "Thien Tru",
+                        "Hy Than",
+                        "Hoa Loc",
+                        "Thai Tue"
+                    ],
+                    "vong_trang_sing": "Thai"
+                }
+            }
+        ]
+    },
+    "No Boc": {
+        "sao": {
+            "chinh_tinh": [
+                "Cu Mon",
+                "Thai Duong"
+            ],
+            "phu_tinh": [
+                "Ta Phu",
+                "Thien Ma",
+                "Dia Kiep",
+                "Co Than",
+                "Tang Mon",
+                "Dai Hao",
+                "Thien Thuong"
+            ],
+            "vong_trang_sing": "Trang Sinh"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Huynh De",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Van Tinh",
+                        "Dia Khong",
+                        "Bach Ho",
+                        "Tieu Hao"
+                    ],
+                    "vong_trang_sinh": "Benh"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Tu Tuc",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Thien Giai",
+                        "Luc Sy",
+                        "Kinh Duong",
+                        "Thien Khoc",
+                        "Thien Hu",
+                        "Tue Pha"
+                    ],
+                    "vong_trang_sinh": "De Vuong"
+                }
+            },
+            {
+                "cung": "Phu Mau",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Duong Phu",
+                        "Giai Than",
+                        "Phuong cac",
+                        "Tau thu",
+                        "Qua Tu",
+                        "Dieu Khach",
+                        "Dia Vong"
+                    ],
+                    "vong_trang_sing": "Mo"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Phuc Duc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Phu"
+                    ],
+                    "phu_tinh": [
+                        "Thien Y",
+                        "Thien Khoi",
+                        "Thien Quy",
+                        "Tam Thai",
+                        "Thien Dieu",
+                        "Truc Phu",
+                        "Phi Liem",
+                        "Bach Ho"
+                    ],
+                    "vong_trang_sing": "Tuyet"
+                }
+            }
+        ]
+    },
+    "Thien Di": {
+        "sao": {
+            "chinh_tinh": [
+                "Thien Tuong"
+            ],
+            "phu_tinh": [
+                "Hong Loan",
+                "Thieu Am",
+                "An Quang",
+                "Bat Toa",
+                "Thien Tho",
+                "Phuc Binh"
+            ],
+            "vong_trang_sing": "Moc Duc"
+        },
+        "xung_chieu": [
+            {
+                "cung": "Menh",
+                "sao": {
+                    "chinh_tinh": [
+                        "Pha Quan",
+                        "Liem Trinh"
+                    ],
+                    "phu_tinh": [
+                        "Thai Phu",
+                        "Thien Viet",
+                        "Dao Hoa",
+                        "Thien Hi",
+                        "Thien Duc",
+                        "Phuc Duc",
+                        "Thien Tai",
+                        "Tuong Quan",
+                        "Hoa Ky"
+                    ],
+                    "vong_trang_sinh": "Tu"
+                }
+            }
+        ],
+        "tam_hop": [
+            {
+                "cung": "Phu The",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Van Khuc",
+                        "Van Xuong",
+                        "Long Duc",
+                        "Thanh Long",
+                        "Hoa Khoa",
+                        "Linh Tinh",
+                        "Thien Hinh",
+                        "Luu Ha"
+                    ],
+                    "vong_trang_sinh": "Suy"
+                }
+            },
+            {
+                "cung": "Phuc Duc",
+                "sao": {
+                    "chinh_tinh": [
+                        "Thien Phu"
+                    ],
+                    "phu_tinh": [
+                        "Thien Y",
+                        "Thien Khoi",
+                        "Thien Quy",
+                        "Tam Thai",
+                        "Thien Dieu",
+                        "Truc Phu",
+                        "Phi Liem",
+                        "Bach Ho"
+                    ],
+                    "vong_trang_sing": "Tuyet"
+                }
+            }
+        ],
+        "nhi_hop": [
+            {
+                "cung": "Phu Mau",
+                "sao": {
+                    "chinh_tinh": [],
+                    "phu_tinh": [
+                        "Duong Phu",
+                        "Giai Than",
+                        "Phuong cac",
+                        "Tau thu",
+                        "Qua Tu",
+                        "Dieu Khach",
+                        "Dia Vong"
+                    ],
+                    "vong_trang_sing": "Mo"
+                }
+            }
+        ]
+    }
+}
