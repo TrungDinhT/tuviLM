@@ -10,7 +10,7 @@ from src.refactored.placement.engine import PlacementEngine
 from src.refactored.placement.registry import AbsolutePositionSpec, RelativePositionSpec
 
 
-def test_specialized_rules_rejects_dangling_reference():
+def test_compiled_rules_reject_dangling_reference():
     with pytest.raises(KeyError, match=r"child -> missing"):
         SpecializedPlacementRules(
             specs={

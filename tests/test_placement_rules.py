@@ -2,10 +2,8 @@ import datetime as dt
 
 import pytest
 
-from src.refactored.components.repository import get_default_repository
 from src.refactored.assembly.natal import resolve_natal_placement
 from src.refactored.placement.bundle import get_default_placement_rule_compiler
-from src.refactored.components.definitions.sao import TuanTriet
 from src.refactored.placement.compiler import (
     PlacementRuleCompiler,
     SpecializedAbsoluteSpec,
@@ -13,20 +11,23 @@ from src.refactored.placement.compiler import (
     SpecializedRelativeSpec,
 )
 from src.refactored.placement.engine import PlacementEngine
-from src.refactored.placement.primitives import (
-    Circle,
-    SamePosition,
-    TuanTrietPosition,
+from src.refactored.placement.rules.registration import (
+    build_tu_hoa_target_mapping,
+)
+from src.refactored.placement.rules.loader import (
+    DeclarationRule,
+    load_rule_group,
+    load_tu_hoa_target_mapping,
+)
+from src.refactored.placement.rules.declarations.models import (
+    CircleDeclaration,
+    FixedAnchorDeclaration,
+    SamePositionMemberDeclaration,
+    TuHoaDeclaration,
+)
+from src.refactored.placement.rules.positions.absolute import (
     triet_positions_fn,
     tuan_positions_fn,
-)
-from src.refactored.placement.rules import (
-    CHINH_TINH_RULES,
-    ROLE_RULES,
-    PHU_TINH_RULES,
-    TU_HOA_RULES,
-    TU_HOA_TARGET_BY_THIEN_CAN,
-    TUAN_TRIET_RULES,
 )
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
@@ -37,6 +38,13 @@ from src.refactored.model.elementary import DiaChi
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.context.natal import NatalContext
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
+
+ROLE_RULES = list(load_rule_group("cung_roles"))
+CHINH_TINH_RULES = list(load_rule_group("chinh_tinh"))
+PHU_TINH_RULES = list(load_rule_group("phu_tinh"))
+TU_HOA_RULES = list(load_rule_group("tu_hoa"))
+TU_HOA_TARGET_BY_THIEN_CAN = load_tu_hoa_target_mapping()
+TUAN_TRIET_RULES = list(load_rule_group("tuan_triet"))
 
 
 CHINH_TINH_COMPONENT_IDS = {
@@ -215,7 +223,7 @@ def _resolve_positions_with_specs(
     return merged
 
 
-def test_builder_resolves_chained_specs_in_any_order():
+def test_compiler_resolves_chained_specs_in_any_order():
     component_a = "A"
     component_b = "B"
     component_c = "C"
@@ -235,15 +243,22 @@ def test_builder_resolves_chained_specs_in_any_order():
     assert positions[component_c] == DiaChi.THIN
 
 
-def test_vong_supports_same_position_groups():
+def test_circle_declaration_supports_same_position_groups():
     rules = [
-        Circle(
-            principal_id="anchor",
-            principal_position_fn=lambda _context: DiaChi.DAN,
-            others=[
-                SamePosition("slot_one_a", "slot_one_b"),
-                "slot_two",
-            ],
+        DeclarationRule(
+            CircleDeclaration(
+                kind="circle",
+                principal_id="anchor",
+                anchor=FixedAnchorDeclaration(kind="dia_chi", value="dan"),
+                others=[
+                    SamePositionMemberDeclaration(
+                        kind="same_position",
+                        component_id="slot_one_a",
+                        reference_id="slot_one_b",
+                    ),
+                    "slot_two",
+                ],
+            )
         )
     ]
 
@@ -259,16 +274,23 @@ def test_vong_supports_same_position_groups():
     assert positions["slot_two"] == DiaChi.THIN
 
 
-def test_vong_can_follow_van_direction():
+def test_circle_declaration_can_follow_van_direction():
     rules = [
-        Circle(
-            principal_id="anchor",
-            principal_position_fn=lambda _context: DiaChi.DAN,
-            direction=Circle.Direction.VAN,
-            others=[
-                "slot_one",
-                SamePosition("slot_two_a", "slot_two_b"),
-            ],
+        DeclarationRule(
+            CircleDeclaration(
+                kind="circle",
+                principal_id="anchor",
+                anchor=FixedAnchorDeclaration(kind="dia_chi", value="dan"),
+                direction="van",
+                others=[
+                    "slot_one",
+                    SamePositionMemberDeclaration(
+                        kind="same_position",
+                        component_id="slot_two_a",
+                        reference_id="slot_two_b",
+                    ),
+                ],
+            )
         )
     ]
 
@@ -284,7 +306,7 @@ def test_vong_can_follow_van_direction():
     assert positions["slot_two_b"] == DiaChi.TY
 
 
-def test_builder_supports_prior_aware_relative_specs():
+def test_compiler_supports_prior_aware_relative_specs():
     component_a = "A"
     component_b = "B"
 
@@ -303,7 +325,7 @@ def test_builder_supports_prior_aware_relative_specs():
     assert positions[component_b] == DiaChi.MEO
 
 
-def test_builder_detects_circular_position_dependencies():
+def test_engine_detects_circular_position_dependencies():
     component_a = "A"
     component_b = "B"
 
@@ -323,7 +345,7 @@ def test_builder_detects_circular_position_dependencies():
         resolve_natal_placement(context, compiler=compiler)
 
 
-def test_builder_resolves_chinh_tinh_rule_graph():
+def test_rule_group_resolves_chinh_tinh_graph():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time, gender=Gender.MALE, rules=CHINH_TINH_RULES
@@ -337,7 +359,7 @@ def test_builder_resolves_chinh_tinh_rule_graph():
     assert len({positions[component_id] for component_id in CHINH_TINH_COMPONENT_IDS.values()}) <= len(DiaChi)
 
 
-def test_builder_resolves_thai_tue_ring_properties():
+def test_rule_group_resolves_thai_tue_ring_properties():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time, gender=Gender.MALE, rules=[PHU_TINH_RULES[2]]
@@ -352,7 +374,7 @@ def test_builder_resolves_thai_tue_ring_properties():
     assert positions["sao_phuc_duc"] == positions["thien_duc"]
 
 
-def test_builder_resolves_loc_ton_ring_and_offsets():
+def test_rule_group_resolves_loc_ton_ring_and_offsets():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time, gender=Gender.MALE, rules=PHU_TINH_RULES[:2]
@@ -368,7 +390,7 @@ def test_builder_resolves_loc_ton_ring_and_offsets():
     assert positions["da_la"] == positions["quan_phur"]
 
 
-def test_builder_resolves_trang_sinh_circle_properties():
+def test_rule_group_resolves_trang_sinh_circle_properties():
     time = dt.datetime(1996, 12, 19, 6, 30)
     trang_sinh_rule = next(
         rule for rule in PHU_TINH_RULES if getattr(rule, "principal_id", "") == "trang_sinh"
@@ -384,15 +406,7 @@ def test_builder_resolves_trang_sinh_circle_properties():
         assert positions[next_id] == positions[previous_id] + 1
 
 
-def test_catalog_loads_tuan_triet_entries():
-    catalog = get_default_repository()
-    t1 = catalog.get("tuan_1")
-    assert isinstance(t1, TuanTriet)
-    assert t1.name == "Tuần"
-    assert catalog.get("triet_1").name == "Triệt"
-
-
-def test_builder_resolves_tuan_triet_pairs_from_context_formulas():
+def test_rule_group_resolves_tuan_triet_pairs_from_context_formulas():
     time = dt.datetime(1996, 12, 19, 6, 30)
     gender = Gender.MALE
     context = NatalContext.from_prior(LaSoPrior.from_solar_day(time, gender))
@@ -400,16 +414,7 @@ def test_builder_resolves_tuan_triet_pairs_from_context_formulas():
     positions = _resolve_positions_with_rules(
         time=time,
         gender=gender,
-        rules=[
-            TuanTrietPosition(
-                pair_ids=("triet_1", "triet_2"),
-                pair_position_fn=triet_positions_fn,
-            ),
-            TuanTrietPosition(
-                pair_ids=("tuan_1", "tuan_2"),
-                pair_position_fn=tuan_positions_fn,
-            ),
-        ],
+        rules=TUAN_TRIET_RULES,
     )
 
     assert positions["triet_1"] == triet_positions_fn(context)[0]
@@ -421,11 +426,10 @@ def test_builder_resolves_tuan_triet_pairs_from_context_formulas():
 
 
 def test_tuan_triet_rules_are_split_into_their_own_group():
-    assert all(isinstance(rule, TuanTrietPosition) for rule in TUAN_TRIET_RULES)
     assert len(TUAN_TRIET_RULES) == 2
 
 
-def test_builder_resolves_month_rule_group_properties():
+def test_rule_group_resolves_month_rule_properties():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
@@ -437,7 +441,7 @@ def test_builder_resolves_month_rule_group_properties():
     assert positions["thien_dieu"] == positions["thien_y"]
 
 
-def test_builder_resolves_hour_rule_group():
+def test_rule_group_resolves_hour_rules():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
@@ -448,7 +452,7 @@ def test_builder_resolves_hour_rule_group():
     assert set(HOUR_COMPONENT_IDS.values()).issubset(positions)
 
 
-def test_builder_resolves_thien_can_rule_group():
+def test_rule_group_resolves_thien_can_rules():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
@@ -459,7 +463,7 @@ def test_builder_resolves_thien_can_rule_group():
     assert set(THIEN_CAN_COMPONENT_IDS.values()).issubset(positions)
 
 
-def test_builder_resolves_year_branch_rule_group_properties():
+def test_rule_group_resolves_year_branch_rule_properties():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
@@ -472,7 +476,7 @@ def test_builder_resolves_year_branch_rule_group_properties():
     assert positions["phuong_cac"] == positions["giai_than"]
 
 
-def test_builder_resolves_dau_quan_rule():
+def test_rule_group_resolves_dau_quan_rule():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
@@ -483,7 +487,7 @@ def test_builder_resolves_dau_quan_rule():
     assert set(DAU_QUAN_COMPONENT_IDS.values()).issubset(positions)
 
 
-def test_builder_resolves_linh_hoa_rule_group():
+def test_rule_group_resolves_linh_hoa_rules():
     time = dt.datetime(1996, 12, 19, 6, 30)
     positions = _resolve_positions_with_rules(
         time=time,
@@ -517,7 +521,7 @@ def test_context_relative_position_spec_resolves():
     assert positions["child_two_arg_transform"] == (DiaChi.THIN + prior.hour.index)
 
 
-def test_builder_resolves_tuhoa_to_mapped_target_positions():
+def test_rule_group_resolves_tuhoa_to_mapped_target_positions():
     time = dt.datetime(1996, 12, 19, 6, 30)
     context = NatalContext.from_prior(LaSoPrior.from_solar_day(time, Gender.MALE))
     positions = _resolve_positions_with_rules(
@@ -529,6 +533,19 @@ def test_builder_resolves_tuhoa_to_mapped_target_positions():
     for hoa_id in ("hoa_loc", "hoa_quyen", "hoa_khoa", "hoa_ky"):
         target_id = TU_HOA_TARGET_BY_THIEN_CAN[context.thien_can][hoa_id]
         assert positions[hoa_id] == positions[target_id]
+
+
+def test_tuhoa_target_mapping_requires_exactly_one_declaration():
+    declaration = TuHoaDeclaration(kind="tu_hoa", mapping={})
+
+    with pytest.raises(
+        ValueError, match="Expected exactly one Tứ Hóa declaration, found 0."
+    ):
+        build_tu_hoa_target_mapping([])
+    with pytest.raises(
+        ValueError, match="Expected exactly one Tứ Hóa declaration, found 2."
+    ):
+        build_tu_hoa_target_mapping([declaration, declaration])
 
 
 def test_tuhoa_without_star_rules_raises_key_error():

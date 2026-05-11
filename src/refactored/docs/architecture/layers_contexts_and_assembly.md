@@ -33,7 +33,7 @@ Generic structural protocols live in `context/protocol.py`:
 
 - `PlacementContext`
 
-They are intentionally broad. Placement primitives use whichever attributes a
+They are intentionally broad. Placement formulas use whichever attributes a
 concrete context provides.
 
 Concrete contexts live outside the protocol module:
@@ -119,17 +119,9 @@ absolute anchor.
 This allows period and `TU_HOA_PHAI` contexts to provide only the attributes
 needed by their scoped rules.
 
-Placement rules are static and grouped by component/domain concern under
-`placement/rules/`:
-
-- Cung roles
-- chính tinh
-- phụ tinh
-- tuần / triệt
-- tứ hóa
-
-Contexts and scopes select which static rules participate in a given layer;
-rules are not split by natal/period/Tu Hoa Phai context.
+Placement rules are documented in `placement_rules.md`. Contexts and scopes
+select which static rules participate in a given layer; rules are not split by
+natal/period/Tu Hoa Phai context.
 
 ## Period Layer Assembly
 

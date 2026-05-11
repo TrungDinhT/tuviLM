@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Iterable, Mapping, Set
+from typing import Callable, Iterable, Mapping, Protocol, Set
 
 from src.refactored.model.elementary import DiaChi
 from src.refactored.context.protocol import PlacementContext
-from src.refactored.placement.primitives import Rule
 from src.refactored.placement.registry import (
     AbsolutePositionSpec,
     ComponentId,
@@ -17,6 +16,10 @@ from src.refactored.placement.registry import (
 PlacementSpecMap = dict[ComponentId, PositionSpec]
 SpecializedAbsoluteResolver = Callable[[], DiaChi]
 SpecializedRelativeTransform = Callable[[DiaChi], DiaChi]
+
+
+class Rule(Protocol):
+    def register_components(self, registry: PlacementRegistry) -> None: ...
 
 
 @dataclass(frozen=True)

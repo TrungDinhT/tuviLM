@@ -1,7 +1,7 @@
 from src.refactored.components.repository import get_default_repository
 from src.refactored.components.definitions.cung_role import CungRole, Role
 from src.refactored.model.elementary import DiaChi, NguHanh, ThienCan
-from src.refactored.components.definitions.sao import ChinhPhuTinh, TuHoa
+from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet, TuHoa
 
 
 def test_default_catalog_loads_cung_and_sao_components():
@@ -126,3 +126,13 @@ def test_default_catalog_loads_structural_entities():
     assert giap.name == "Giáp"
     assert giap.value == ThienCan.GIAP
     assert giap.ngu_hanh == NguHanh.MOC
+
+
+def test_default_catalog_loads_tuan_triet_entries():
+    catalog = get_default_repository()
+
+    tuan = catalog.get("tuan_1")
+
+    assert isinstance(tuan, TuanTriet)
+    assert tuan.name == "Tuần"
+    assert catalog.get("triet_1").name == "Triệt"

@@ -1,0 +1,25 @@
+rules:
+  - kind: circle
+    principal_id: menh
+    anchor:
+      kind: formula
+      name: menh_position
+    others:
+      - phu_mau
+      - phuc_duc
+      - dien_trach
+      - quan_loc
+      - no_boc
+      - thien_di
+      - tat_ach
+      - tai_bach
+      - tu_tuc
+      - phu_the
+      - huynh_de
+
+  - component_id: cung_than
+    kind: relative
+    reference_id: menh
+    transform: move_by_birth_hour
+    direction: cw
+    step_multiplier: 2
