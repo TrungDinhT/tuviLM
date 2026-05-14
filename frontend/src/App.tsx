@@ -69,7 +69,7 @@ export default function App() {
     setBuildingSaoLuu(true);
     try {
       const result = await buildSaoLuu({
-        tinhBan: laso.tinhBan,
+        tinhBan: laso.laso,
         observationTime: {
           date: input.date,
           month: input.month,
@@ -83,7 +83,7 @@ export default function App() {
         if (!prev) return prev;
         return {
           ...prev,
-          tinhBan: result.tinhBan,
+          laso: result.tinhBan,
           cungByPosition: result.cungByPosition
         };
       });
@@ -134,9 +134,9 @@ export default function App() {
           prev.map((m) =>
             m.id === assistantMsg.id
               ? {
-                  ...m,
-                  content: m.content + chunk
-                }
+                ...m,
+                content: m.content + chunk
+              }
               : m
           )
         );
@@ -146,9 +146,9 @@ export default function App() {
         prev.map((m) =>
           m.id === assistantMsg.id
             ? {
-                ...m,
-                toolCalls
-              }
+              ...m,
+              toolCalls
+            }
             : m
         )
       );

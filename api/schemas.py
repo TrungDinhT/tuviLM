@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
-from src.tuvi.tinh_ban import TinhBan
+from src.refactored.view.models import LaSoView
 
 
 class TuviTimePayload(BaseModel):
@@ -19,7 +19,7 @@ class BuildLasoRequest(TuviTimePayload):
 
 
 class BuildSaoLuuRequest(BaseModel):
-    tinhBan: TinhBan
+    laSo: LaSoView
     observation_time: TuviTimePayload
 
 
@@ -29,6 +29,7 @@ class StarPayload(BaseModel):
     element: str
 
 
+# TODO : Need to adapt with new view
 class CungPayload(BaseModel):
     position: str
     role: str | None = None
@@ -46,12 +47,12 @@ class CungPayload(BaseModel):
 class BuildLasoResponse(BaseModel):
     id: str
     summary: str
-    tinhBan: TinhBan
+    laso: LaSoView
     cung_by_position: dict[str, CungPayload]
 
 
 class BuildSaoLuuResponse(BaseModel):
-    tinhBan: TinhBan
+    laso: LaSoView
     cung_by_position: dict[str, CungPayload]
 
 

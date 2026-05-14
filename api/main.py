@@ -6,11 +6,13 @@ import logging
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 
+from api._parse import to_cung_payload_map
 from api.schemas import (
     AnalyzeCungRequest,
     AnalyzeCungResponse,
@@ -26,9 +28,13 @@ from api.schemas import (
 )
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
-from src.tuvi.birth import TuviTime
-from src.tuvi.builder import Builder
-from src.tuvi.tinh_ban import TinhBan
+from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
+from src.refactored.components.definitions.sao import ChinhPhuTinh
+from src.refactored.la_so import LaSo
+from src.refactored.model.prior import Gender, LaSoPrior
+from src.refactored.view.builder import build_laso_view
+from src.refactored.view.models import LaSoView
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,14 +48,14 @@ class ApiState:
     agent_deps: TuviAgentDeps
 
     @property
-    def has_tinh_ban(self) -> bool:
-        return self.agent_deps.tinh_ban is not None
+    def has_la_so(self) -> bool:
+        return self.agent_deps.la_so is not None
 
-    def set_tinh_ban(self, tinh_ban: TinhBan) -> None:
-        self.agent_deps.tinh_ban = tinh_ban
+    def set_la_so(self, la_so: LaSo) -> None:
+        self.agent_deps.la_so = la_so
 
-    def require_tinh_ban(self) -> TinhBan:
-        return self.agent_deps.require_tinh_ban()
+    def require_la_so(self) -> LaSo:
+        return self.agent_deps.require_la_so()
 
 
 @asynccontextmanager
@@ -155,39 +161,6 @@ def health(request: Request) -> dict[str, str | bool]:
     }
 
 
-def _to_cung_payload_map(tinh_ban: TinhBan) -> dict[str, CungPayload]:
-    cung_by_position: dict[str, CungPayload] = {}
-    for position, cung in tinh_ban.map_cung.items():
-        cung_by_position[position] = CungPayload(
-            position=position,
-            role=cung.role,
-            chinh_tinh=[star.star_name_with_status(position) for star in cung.chinhTinh],
-            phu_tinh=[
-                StarPayload(
-                    name=star.name,
-                    display=star.star_name_with_status(position),
-                    element=star.elemental,
-                )
-                for star in cung.phuTinh
-            ],
-            tuhoa=[tuhoa.name for tuhoa in cung.tuhoa],
-            trang_sinh=cung.trang_sinh.name if cung.trang_sinh else None,
-            is_tuan=cung.is_tuan,
-            is_triet=cung.is_triet,
-            is_cung_than=cung.is_cung_than,
-            age_daivan=cung.age_daivan,
-            saoLuu=[
-                StarPayload(
-                    name=star.name,
-                    display=star.star_name_with_status(position),
-                    element=star.elemental,
-                )
-                for star in cung.saoLuu
-            ],
-        )
-    return cung_by_position
-
-
 @app.post("/api/v1/laso/build", response_model=BuildLasoResponse)
 def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse:
     try:
@@ -200,25 +173,27 @@ def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    birth_time = TuviTime.from_solar_day(solar_dt, payload.gender)
-    tinh_ban = Builder().build(birth_time)
-    get_api_state(request).set_tinh_ban(tinh_ban)
-
-    cung_by_position = _to_cung_payload_map(tinh_ban)
-
-    summary = (
-        f"Cục: {tinh_ban.cuc.name if tinh_ban.cuc else 'N/A'} | "
-        f"Âm Dương: {tinh_ban.am_duong} | "
-        f"Giới tính: {payload.gender} | "
-        f"Sinh dương lịch: {payload.date:02d}/{payload.month:02d}/{payload.year} {payload.hour:02d}:00"
+    prior = LaSoPrior.from_solar_day(
+        solar_dt, Gender.MALE if payload.gender == "M" else Gender.FEMALE
     )
+
+    # TODO : This is inefficient as we are building the LaSo and LaSoView again in the agent deps.
+    # We should refactor to build it only once and reuse.
+    la_so = LaSo.from_prior(prior)
+    la_so_view = build_laso_view(la_so, study_year=datetime.now().year)
+    get_api_state(request).set_la_so(la_so)
+
+    cung_by_position = to_cung_payload_map(la_so_view)
+
+    # TODO : How to use view to extract general summary about the LaSo?
+    summary = f"Sinh dương lịch: {payload.date:02d}/{payload.month:02d}/{payload.year} {payload.hour:02d}:00"
 
     response_id = f"{payload.year:04d}{payload.month:02d}{payload.date:02d}{payload.hour:02d}{payload.gender}"
 
     return BuildLasoResponse(
         id=response_id,
         summary=summary,
-        tinhBan=tinh_ban,
+        laso=la_so_view,
         cung_by_position=cung_by_position,
     )
 
@@ -235,55 +210,19 @@ def build_sao_luu(payload: BuildSaoLuuRequest, request: Request) -> BuildSaoLuuR
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    observed_time = TuviTime.from_solar_day(observed_solar_dt, payload.observation_time.gender)
-
-    builder = Builder()
-    builder.tinhBan = payload.tinhBan
-    tinh_ban = builder.build_current_year(observed_time)
-    get_api_state(request).set_tinh_ban(tinh_ban)
+    la_so = get_api_state(request).require_la_so()
+    la_so_view = build_laso_view(la_so, study_year=observed_solar_dt.year)
 
     return BuildSaoLuuResponse(
-        tinhBan=tinh_ban,
-        cung_by_position=_to_cung_payload_map(tinh_ban),
-    )
-
-
-@app.post("/api/v1/laso/analyze", response_model=AnalyzeCungResponse)
-def analyze_cung(payload: AnalyzeCungRequest, request: Request) -> AnalyzeCungResponse:
-    api_state = get_api_state(request)
-
-    try:
-        tinh_ban = api_state.require_tinh_ban()
-    except ValueError as exc:
-        raise HTTPException(status_code=409, detail=str(exc)) from exc
-
-    position = payload.position.strip()
-    if position not in tinh_ban.map_cung:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid position '{payload.position}'. Must be one of: {', '.join(tinh_ban.map_cung.keys())}",
-        )
-
-    cung = tinh_ban.map_cung[position]
-
-    try:
-        from src.agent.cung_analyzer import CungAnalyzer
-        analyzer = CungAnalyzer(model=payload.model)
-        analysis = analyzer.analyze_cung(position, cung)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Cung analysis failed: {exc}") from exc
-
-    return AnalyzeCungResponse(
-        position=position,
-        role=cung.role,
-        analysis=analysis,
+        laso=la_so_view,
+        cung_by_position=to_cung_payload_map(la_so_view),
     )
 
 
 @app.post("/api/v1/chat", response_model=ChatResponse)
 async def chat_dummy(payload: ChatRequest, request: Request) -> ChatResponse:
     api_state = get_api_state(request)
-    if not api_state.has_tinh_ban:
+    if not api_state.has_la_so:
         return ChatResponse(
             answer="TinhBan chưa được tạo trong state.",
         )
