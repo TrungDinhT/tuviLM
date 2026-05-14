@@ -13,7 +13,7 @@ FastAPI backend for TuviLM UI.
 From repo root:
 
 ```bash
-poetry install
+uv sync
 ```
 
 or if you use pip directly:
@@ -26,7 +26,7 @@ pip install fastapi uvicorn pydantic
 From repo root:
 
 ```bash
-poetry run uvicorn api.main:app --reload --port 8000
+uv run uvicorn api.main:app --reload --port 8000
 ```
 
 ## Health check
