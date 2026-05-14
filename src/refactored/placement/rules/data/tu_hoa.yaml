@@ -1,0 +1,53 @@
+rules:
+  - kind: tu_hoa
+    mapping:
+      giap:
+        hoa_loc: liem_trinh
+        hoa_quyen: pha_quan
+        hoa_khoa: vu_khuc
+        hoa_ky: thai_duong
+      at:
+        hoa_loc: thien_co
+        hoa_quyen: thien_luong
+        hoa_khoa: tu_vi
+        hoa_ky: thai_am
+      binh:
+        hoa_loc: thien_dong
+        hoa_quyen: thien_co
+        hoa_khoa: van_xuong
+        hoa_ky: liem_trinh
+      dinh:
+        hoa_loc: thai_am
+        hoa_quyen: thien_dong
+        hoa_khoa: thien_co
+        hoa_ky: cu_mon
+      mau:
+        hoa_loc: tham_lang
+        hoa_quyen: thai_am
+        hoa_khoa: huu_bat
+        hoa_ky: thien_co
+      ky:
+        hoa_loc: vu_khuc
+        hoa_quyen: tham_lang
+        hoa_khoa: thien_luong
+        hoa_ky: van_khuc
+      canh:
+        hoa_loc: thai_duong
+        hoa_quyen: vu_khuc
+        hoa_khoa: thien_dong
+        hoa_ky: thai_am
+      tan:
+        hoa_loc: cu_mon
+        hoa_quyen: thai_duong
+        hoa_khoa: van_khuc
+        hoa_ky: van_xuong
+      nham:
+        hoa_loc: thien_luong
+        hoa_quyen: tu_vi
+        hoa_khoa: thien_phu
+        hoa_ky: vu_khuc
+      quy:
+        hoa_loc: pha_quan
+        hoa_quyen: cu_mon
+        hoa_khoa: thai_am
+        hoa_ky: tham_lang

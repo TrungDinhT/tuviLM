@@ -1,0 +1,101 @@
+from __future__ import annotations
+
+from functools import cache
+from pathlib import Path
+
+from pydantic import TypeAdapter
+
+from src.refactored.components.definitions import Component
+from src.refactored.components.definitions.cuc import LIST_CUC
+from src.refactored.components.definitions.cung_role import CungRole
+from src.refactored.components.definitions.elementary import DiaChiEntity, ThienCanEntity
+from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet, TuHoa, VongTrangSinh
+from src.refactored.model.elementary import DiaChi, ThienCan
+
+
+class ComponentRepository:
+    _cung_adapter = TypeAdapter(list[CungRole])
+    _dia_chi_adapter = TypeAdapter(list[DiaChiEntity])
+    _sao_adapter = TypeAdapter(list[ChinhPhuTinh | VongTrangSinh])
+    _thien_can_adapter = TypeAdapter(list[ThienCanEntity])
+    _tuhoa_adapter = TypeAdapter(list[TuHoa])
+    _tuan_triet_adapter = TypeAdapter(list[TuanTriet])
+
+    def __init__(self, catalog_dir: Path | None = None) -> None:
+        self._catalog_dir = (
+            catalog_dir or Path(__file__).resolve().parent / "data"
+        )
+        self._components = self._load_components()
+
+    def __contains__(self, component_id: str) -> bool:
+        return component_id in self._components
+
+    def get(self, component_id: str) -> Component:
+        try:
+            return self._components[component_id]
+        except KeyError as exc:
+            raise KeyError(
+                f"Component id `{component_id}` is not defined in the catalog."
+            ) from exc
+
+    def get_many(self, component_ids: list[str]) -> list[Component]:
+        return [self.get(component_id) for component_id in component_ids]
+
+    def get_dia_chi(self, dia_chi: DiaChi) -> DiaChiEntity:
+        return self.get(dia_chi.value)
+
+    def get_thien_can(self, thien_can: ThienCan) -> ThienCanEntity:
+        return self.get(thien_can.value)
+
+    def _load_components(self) -> dict[str, Component]:
+        components: dict[str, Component] = {}
+        for component in self._load_dia_chi_entities():
+            self._register(components, component)
+        for component in self._load_thien_can_entities():
+            self._register(components, component)
+        for component in LIST_CUC:
+            self._register(components, component)
+        for component in self._load_cungs():
+            self._register(components, component)
+        for component in self._load_saos():
+            self._register(components, component)
+        for component in self._load_tuhoas():
+            self._register(components, component)
+        for component in self._load_tuan_triet():
+            self._register(components, component)
+
+        return components
+
+    def _load_cungs(self) -> list[CungRole]:
+        raw_json = (self._catalog_dir / "cung_role.json").read_text(encoding="utf-8")
+        return self._cung_adapter.validate_json(raw_json)
+
+    def _load_dia_chi_entities(self) -> list[DiaChiEntity]:
+        raw_json = (self._catalog_dir / "dia_chi.json").read_text(encoding="utf-8")
+        return self._dia_chi_adapter.validate_json(raw_json)
+
+    def _load_saos(self) -> list[ChinhPhuTinh | VongTrangSinh]:
+        raw_json = (self._catalog_dir / "sao.json").read_text(encoding="utf-8")
+        return self._sao_adapter.validate_json(raw_json)
+
+    def _load_tuhoas(self) -> list[TuHoa]:
+        raw_json = (self._catalog_dir / "tuhoa.json").read_text(encoding="utf-8")
+        return self._tuhoa_adapter.validate_json(raw_json)
+
+    def _load_thien_can_entities(self) -> list[ThienCanEntity]:
+        raw_json = (self._catalog_dir / "thien_can.json").read_text(encoding="utf-8")
+        return self._thien_can_adapter.validate_json(raw_json)
+
+    def _load_tuan_triet(self) -> list[TuanTriet]:
+        raw_json = (self._catalog_dir / "tuan_triet.json").read_text(encoding="utf-8")
+        return self._tuan_triet_adapter.validate_json(raw_json)
+
+    def _register(self, components: dict[str, Component], component: Component) -> None:
+        if component.id in components:
+            raise ValueError(f"Duplicate component id in catalog: {component.id}")
+        components[component.id] = component
+
+
+@cache
+def get_default_repository() -> ComponentRepository:
+    return ComponentRepository()

@@ -1,0 +1,8 @@
+rules:
+  - kind: tuan_triet_pair
+    pair_ids: [triet_1, triet_2]
+    formula: triet_positions
+
+  - kind: tuan_triet_pair
+    pair_ids: [tuan_1, tuan_2]
+    formula: tuan_positions

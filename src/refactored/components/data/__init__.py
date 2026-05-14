@@ -1,0 +1,1 @@
+"""Canonical component data files."""

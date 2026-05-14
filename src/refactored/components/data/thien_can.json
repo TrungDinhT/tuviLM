@@ -1,0 +1,12 @@
+[
+  { "id": "giap", "name": "Giáp", "ngu_hanh": "Mộc" },
+  { "id": "at", "name": "Ất", "ngu_hanh": "Mộc" },
+  { "id": "binh", "name": "Bính", "ngu_hanh": "Hỏa" },
+  { "id": "dinh", "name": "Đinh", "ngu_hanh": "Hỏa" },
+  { "id": "mau", "name": "Mậu", "ngu_hanh": "Thổ" },
+  { "id": "ky", "name": "Kỷ", "ngu_hanh": "Thổ" },
+  { "id": "canh", "name": "Canh", "ngu_hanh": "Kim" },
+  { "id": "tan", "name": "Tân", "ngu_hanh": "Kim" },
+  { "id": "nham", "name": "Nhâm", "ngu_hanh": "Thủy" },
+  { "id": "quy", "name": "Quý", "ngu_hanh": "Thủy" }
+]

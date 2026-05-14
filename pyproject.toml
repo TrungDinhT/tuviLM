@@ -1,14 +1,29 @@
-[tool.poetry]
+[project]
 name = "tuvilm"
 version = "0.1.0"
 description = ""
-authors = ["lephuock <phuockhanhnk94@gmail.com>"]
 readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "lephuock", email = "phuockhanhnk94@gmail.com" },
+    { name = "TrungDinhT", email = "dinhthanhtrung1996@gmail.com" },
+]
+dependencies = [
+    "pydantic>=2.9.2,<3",
+    "pyyaml>=6.0.0,<7",
+    "streamlit>=1.40.0,<2",
+    "lunarcalendar>=0.0.9,<0.1",
+    "whoosh>=2.7.4,<3",
+    "pdfplumber>=0.11.7,<0.12",
+    "tqdm>=4.67.1,<5",
+    "pytest>=8.3.5,<9",
+    "pydantic-ai>=1.96.0",
+    "fastapi>=0.136.1",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+## TODO: proper packaging
+#[tool.uv]
+#package = false
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

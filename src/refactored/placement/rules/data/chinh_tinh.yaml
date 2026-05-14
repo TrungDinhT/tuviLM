@@ -1,0 +1,74 @@
+rules:
+  - component_id: tu_vi
+    kind: absolute_formula
+    formula: tuvi_position
+
+  - component_id: vu_khuc
+    kind: relative
+    reference_id: tu_vi
+    transform: tam_hop
+    direction: ccw
+
+  - component_id: liem_trinh
+    kind: relative
+    reference_id: tu_vi
+    transform: tam_hop
+    direction: cw
+
+  - component_id: that_sat
+    kind: relative
+    reference_id: thien_phu
+    transform: xung_chieu
+
+  - component_id: pha_quan
+    kind: relative
+    reference_id: that_sat
+    transform: tam_hop
+    direction: cw
+
+  - component_id: tham_lang
+    kind: relative
+    reference_id: that_sat
+    transform: tam_hop
+    direction: ccw
+
+  - component_id: thien_co
+    kind: relative
+    reference_id: pha_quan
+    transform: nhi_hop
+
+  - component_id: thai_am
+    kind: relative
+    reference_id: vu_khuc
+    transform: nhi_hop
+
+  - component_id: thien_dong
+    kind: relative
+    reference_id: tham_lang
+    transform: nhi_hop
+
+  - component_id: thien_luong
+    kind: relative
+    reference_id: liem_trinh
+    transform: nhi_hop
+
+  - component_id: cu_mon
+    kind: relative
+    reference_id: tu_vi
+    transform: luc_hai
+
+  - component_id: thai_duong
+    kind: relative
+    reference_id: thien_phu
+    transform: nhi_hop
+
+  - component_id: thien_phu
+    kind: relative
+    reference_id: tu_vi
+    transform: mirror_across
+    axis: [dan, than]
+
+  - component_id: thien_tuong
+    kind: relative
+    reference_id: pha_quan
+    transform: xung_chieu

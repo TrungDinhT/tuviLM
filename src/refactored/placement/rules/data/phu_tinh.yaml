@@ -1,0 +1,470 @@
+rules:
+  - kind: circle
+    principal_id: bac_si
+    anchor:
+      kind: formula
+      name: loc_ton_position
+    direction: van
+    others:
+      - luc_si
+      - thanh_long
+      - tieu_hao
+      - tuong_quan
+      - tau_thu
+      - phi_liem
+      - hy_than
+      - benh_phu
+      - dai_hao
+      - phuc_binh
+      - quan_phur
+
+  - kind: offset_group
+    anchor_id: loc_ton
+    anchor:
+      kind: formula
+      name: loc_ton_position
+    offsets:
+      kinh_duong: 1
+      da_la: -1
+      ln_van_tinh: 3
+      duong_phu: 5
+      quoc_an: 8
+
+  - kind: circle
+    principal_id: thai_tue
+    anchor:
+      kind: formula
+      name: thai_tue_position
+    others:
+      - kind: same_position
+        component_id: thieu_duong
+        reference_id: thien_khong
+      - tang_mon
+      - thieu_am
+      - kind: same_position
+        component_id: quan_phuf
+        reference_id: long_tri
+      - kind: same_position
+        component_id: tu_phu
+        reference_id: nguyet_duc
+      - kind: same_position
+        component_id: tue_pha
+        reference_id: thien_hu
+      - long_duc
+      - bach_ho
+      - kind: same_position
+        component_id: sao_phuc_duc
+        reference_id: thien_duc
+      - dieu_khach
+      - truc_phu
+
+  - kind: circle
+    principal_id: trang_sinh
+    anchor:
+      kind: formula
+      name: trang_sinh_position
+    direction: van
+    others:
+      - moc_duc
+      - quan_doi
+      - lam_quan
+      - de_vuong
+      - suy
+      - benh
+      - tu
+      - mo
+      - tuyet
+      - thai
+      - duong
+
+  - component_id: thien_khoi
+    kind: absolute_by_thien_can
+    mapping:
+      giap: suu
+      at: ty
+      binh: hoi
+      dinh: hoi
+      mau: suu
+      ky: ty
+      canh: ngo
+      tan: ngo
+      nham: meo
+      quy: meo
+
+  - component_id: thien_viet
+    kind: absolute_by_thien_can
+    mapping:
+      giap: mui
+      at: than
+      binh: dau
+      dinh: dau
+      mau: mui
+      ky: than
+      canh: dan
+      tan: dan
+      nham: ti
+      quy: ti
+
+  - component_id: luu_ha
+    kind: absolute_by_thien_can
+    mapping:
+      giap: dau
+      at: tuat
+      binh: mui
+      dinh: thin
+      mau: ti
+      ky: ngo
+      canh: than
+      tan: thin
+      nham: hoi
+      quy: dan
+
+  - component_id: thien_tru
+    kind: absolute_by_thien_can
+    mapping:
+      giap: ti
+      at: ngo
+      binh: ty
+      dinh: ti
+      mau: ngo
+      ky: than
+      canh: dan
+      tan: ngo
+      nham: dau
+      quy: tuat
+
+  - component_id: thien_quan
+    kind: absolute_by_thien_can
+    mapping:
+      giap: mui
+      at: mui
+      binh: thin
+      dinh: dan
+      mau: meo
+      ky: dau
+      canh: hoi
+      tan: dau
+      nham: tuat
+      quy: ngo
+
+  - component_id: thien_phuc
+    kind: absolute_by_thien_can
+    mapping:
+      giap: dau
+      at: dau
+      binh: than
+      dinh: hoi
+      mau: meo
+      ky: dan
+      canh: ngo
+      tan: ti
+      nham: ngo
+      quy: ti
+
+  - component_id: co_than
+    kind: absolute_by_dia_chi_groups
+    groups:
+      - dia_chi: [dan, meo, thin]
+        position: ti
+      - dia_chi: [ti, ngo, mui]
+        position: than
+      - dia_chi: [than, dau, tuat]
+        position: hoi
+      - dia_chi: [hoi, ty, suu]
+        position: mui
+
+  - component_id: qua_tu
+    kind: absolute_by_dia_chi_groups
+    groups:
+      - dia_chi: [dan, meo, thin]
+        position: suu
+      - dia_chi: [ti, ngo, mui]
+        position: thin
+      - dia_chi: [than, dau, tuat]
+        position: dan
+      - dia_chi: [hoi, ty, suu]
+        position: tuat
+
+  - component_id: thien_hi
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: dau
+    transform: move_by_dia_chi
+    direction: ccw
+
+  - component_id: hong_loan
+    kind: relative
+    reference_id: thien_hi
+    transform: xung_chieu
+
+  - component_id: giai_than
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: tuat
+    transform: move_by_dia_chi
+    direction: ccw
+
+  - component_id: phuong_cac
+    kind: same_position
+    reference_id: giai_than
+
+  - component_id: thien_khoc
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: ngo
+    transform: move_by_dia_chi
+    direction: ccw
+
+  - component_id: thien_ma
+    kind: absolute_by_dia_chi_groups
+    groups:
+      - dia_chi: [than, ty, thin]
+        position: dan
+      - dia_chi: [ti, dau, suu]
+        position: hoi
+      - dia_chi: [dan, ngo, tuat]
+        position: than
+      - dia_chi: [hoi, meo, mui]
+        position: ti
+
+  - component_id: hoa_cai
+    kind: absolute_by_dia_chi_groups
+    groups:
+      - dia_chi: [than, ty, thin]
+        position: thin
+      - dia_chi: [ti, dau, suu]
+        position: suu
+      - dia_chi: [dan, ngo, tuat]
+        position: tuat
+      - dia_chi: [hoi, meo, mui]
+        position: mui
+
+  - component_id: dao_hoa
+    kind: absolute_by_dia_chi_groups
+    groups:
+      - dia_chi: [than, ty, thin]
+        position: dau
+      - dia_chi: [ti, dau, suu]
+        position: ngo
+      - dia_chi: [dan, ngo, tuat]
+        position: meo
+      - dia_chi: [hoi, meo, mui]
+        position: ty
+
+  - component_id: kiep_sat
+    kind: absolute_by_dia_chi_groups
+    groups:
+      - dia_chi: [than, ty, thin]
+        position: ti
+      - dia_chi: [ti, dau, suu]
+        position: dan
+      - dia_chi: [dan, ngo, tuat]
+        position: hoi
+      - dia_chi: [hoi, meo, mui]
+        position: than
+
+  - component_id: pha_toai
+    kind: absolute_by_dia_chi_groups
+    groups:
+      - dia_chi: [ty, ngo, meo, dau]
+        position: ti
+      - dia_chi: [thin, tuat, suu, mui]
+        position: suu
+      - dia_chi: [dan, than, ti, hoi]
+        position: dau
+
+  - component_id: ta_phu
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: thin
+    transform: move_by_birth_month
+    direction: cw
+
+  - component_id: huu_bat
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: tuat
+    transform: move_by_birth_month
+    direction: ccw
+
+  - component_id: thien_giai
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: than
+    transform: move_by_birth_month
+    direction: cw
+
+  - component_id: dia_giai
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: mui
+    transform: move_by_birth_month
+    direction: cw
+
+  - component_id: thien_hinh
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: dau
+    transform: move_by_birth_month
+    direction: cw
+
+  - component_id: thien_dieu
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: suu
+    transform: move_by_birth_month
+    direction: cw
+
+  - component_id: thien_y
+    kind: same_position
+    reference_id: thien_dieu
+
+  - component_id: tam_thai
+    kind: relative
+    reference_id: ta_phu
+    transform: move_by_birth_date
+    direction: cw
+    date_offset: -1
+
+  - component_id: bat_toa
+    kind: relative
+    reference_id: huu_bat
+    transform: move_by_birth_date
+    direction: ccw
+    date_offset: -1
+
+  - component_id: an_quang
+    kind: relative
+    reference_id: van_xuong
+    transform: move_by_birth_date
+    direction: cw
+    date_offset: -2
+
+  - component_id: thien_quy
+    kind: relative
+    reference_id: van_khuc
+    transform: move_by_birth_date
+    direction: ccw
+    date_offset: -2
+
+  - component_id: dia_khong
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: hoi
+    transform: move_by_birth_hour
+    direction: ccw
+
+  - component_id: dia_kiep
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: hoi
+    transform: move_by_birth_hour
+    direction: cw
+
+  - component_id: van_xuong
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: tuat
+    transform: move_by_birth_hour
+    direction: ccw
+
+  - component_id: van_khuc
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: thin
+    transform: move_by_birth_hour
+    direction: cw
+
+  - component_id: thai_phu
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: ngo
+    transform: move_by_birth_hour
+    direction: cw
+
+  - component_id: phong_cao
+    kind: from_anchor
+    anchor:
+      kind: dia_chi
+      value: dan
+    transform: move_by_birth_hour
+    direction: cw
+
+  - component_id: dau_quan
+    kind: absolute_formula
+    formula: dau_quan_position
+
+  - component_id: hoa_tinh
+    kind: from_anchor
+    anchor:
+      kind: dia_chi_groups
+      groups:
+        - dia_chi: [than, ty, thin]
+          position: dan
+        - dia_chi: [ti, dau, suu]
+          position: meo
+        - dia_chi: [dan, ngo, tuat]
+          position: suu
+        - dia_chi: [hoi, meo, mui]
+          position: dau
+    transform: move_by_van_direction
+    step: birth_hour_index
+
+  - component_id: linh_tinh
+    kind: from_anchor
+    anchor:
+      kind: dia_chi_groups
+      groups:
+        - dia_chi: [than, ty, thin]
+          position: tuat
+        - dia_chi: [ti, dau, suu]
+          position: tuat
+        - dia_chi: [dan, ngo, tuat]
+          position: meo
+        - dia_chi: [hoi, meo, mui]
+          position: tuat
+    transform: move_by_van_direction
+    step: birth_hour_index
+    step_multiplier: -1
+
+  - component_id: thien_tai
+    kind: relative
+    reference_id: menh
+    transform: move_by_dia_chi
+    direction: cw
+
+  - component_id: thien_tho
+    kind: relative
+    reference_id: cung_than
+    transform: move_by_dia_chi
+    direction: cw
+
+  - component_id: thien_su
+    kind: same_position
+    reference_id: tat_ach
+
+  - component_id: thien_thuong
+    kind: same_position
+    reference_id: no_boc
+
+  - component_id: thien_la
+    kind: definitive
+    position: thin
+
+  - component_id: dia_vong
+    kind: definitive
+    position: tuat
