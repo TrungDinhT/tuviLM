@@ -6,6 +6,7 @@ from pydantic_ai import ModelRetry, RunContext
 from src.agent.book_index import (
     SectionContent,
 )
+from src.agent.constant import MAP_STR_TO_DIACHI
 from src.agent.deps import TuviAgentDeps
 from src.agent.prompt.skill_analyze_cung import (
     CUNG_DIEN_TRACH_INSTRUCTION,
@@ -21,36 +22,27 @@ from src.agent.prompt.skill_analyze_cung import (
     CUNG_THIEN_DI_INSTRUCTION,
     CUNG_TU_TUC_INSTRUCTION,
 )
-from src.tuvi.cung import Cung
-from src.tuvi.element.types import LIST_DIA_CHI, ROLE_TYPE, TYPE_DIA_CHI
-from src.tuvi.tinh_ban import TinhBan
+from src.refactored.la_so import LaSo
 
 
 _logger = logging.getLogger(__name__)
 
-def get_tinh_ban(ctx: RunContext[TuviAgentDeps]) -> TinhBan:
-    """Lấy toàn bộ cấu trúc TinhBan hiện có trong deps."""
-    return ctx.deps.require_tinh_ban()
+
+def get_laso(ctx: RunContext[TuviAgentDeps]) -> LaSo:
+    """Lấy toàn bộ cấu trúc LaSo hiện có trong deps."""
+    return ctx.deps.require_la_so()
 
 
-def get_cung_by_position(
-    ctx: RunContext[TuviAgentDeps],
-    position: TYPE_DIA_CHI
-) -> Cung:
+def get_cung_by_position(ctx: RunContext[TuviAgentDeps], position: str) -> str:
     """Lấy cung theo vị trí địa chi, ví dụ: Tý, Sửu, Dần."""
     _logger.info(f"Lấy cung theo vị trí: {position}")
     return ctx.deps.get_cung_by_position(position)
 
 
-def get_cung_by_role(
-    ctx: RunContext[TuviAgentDeps],
-    role: ROLE_TYPE
-) -> Cung:
+def get_cung_by_role(ctx: RunContext[TuviAgentDeps], role: str) -> str:
     """Lấy cung theo vai trò, ví dụ: Mệnh, Phụ Mẫu, Quan Lộc."""
     _logger.info(f"Lấy cung theo vai trò: {role}")
     return ctx.deps.get_cung_by_role(role)
-
-
 
 
 def read_catalog(
@@ -80,7 +72,6 @@ def read_catalog(
         raise ModelRetry(str(exc)) from exc
 
 
-
 def read_section(
     ctx: RunContext[TuviAgentDeps],
     section_id: str,
@@ -94,20 +85,20 @@ def read_section(
         f"Đọc mục sách: section_id={section_id}",
     )
     try:
-        return ctx.deps.require_book().read_section(section_id,)
+        return ctx.deps.require_book().read_section(
+            section_id,
+        )
     except ValueError as exc:
         raise ModelRetry(f"Failed to read section {section_id}") from exc
 
 
+def get_tam_hop(ctx: RunContext[TuviAgentDeps], position: str) -> str:
+    """Lấy cung tam hợp của một cung cụ thể.
 
-def get_tam_hop(
-    ctx: RunContext[TuviAgentDeps],
-    position: TYPE_DIA_CHI
-) -> str:
-    """Lấy cung tam hợp của một cung cụ thể."""
-    index = LIST_DIA_CHI.index(position)
-    tam_hop_index = ((index + 4) % 12, (index + 8) % 12)
-    tam_hop_position = (LIST_DIA_CHI[tam_hop_index[0]], LIST_DIA_CHI[tam_hop_index[1]])
+    position phải là một trong các giá trị sau: Tý, Sửu, Dần, Mão, Thìn, Tỵ, Ngọ, Mùi, Thân, Dậu, Tuất, Hợi.
+    """
+    dia_chi = MAP_STR_TO_DIACHI.get(position)
+    tam_hop_position = dia_chi + 4, dia_chi + 8
     info = ""
     info += f"Cung tam hợp của {position} là {tam_hop_position[0]}."
     info += get_cung_by_position(ctx, tam_hop_position[0])
@@ -116,21 +107,16 @@ def get_tam_hop(
     return info
 
 
-
-def get_xung_chieu(
-    ctx: RunContext[TuviAgentDeps],
-    position: TYPE_DIA_CHI
-) -> str:
+def get_xung_chieu(ctx: RunContext[TuviAgentDeps], position: str) -> str:
     """Lấy cung xung chiếu của một cung cụ thể."""
-    index = LIST_DIA_CHI.index(position)
-    xung_chieu_index = (index + 6) % 12
-    xung_chieu_position = LIST_DIA_CHI[xung_chieu_index]
+    dia_chi = MAP_STR_TO_DIACHI.get(position)
+    xung_chieu_position = dia_chi + 6
     info = f"Cung xung chiếu của {position} là {xung_chieu_position}."
     info += get_cung_by_position(ctx, xung_chieu_position)
     return info
 
 
-_ROLE_INSTRUCTION_MAP: dict[ROLE_TYPE, str] = {
+_ROLE_INSTRUCTION_MAP: dict[str, str] = {
     "Mệnh": CUNG_MENH_INSTRUCTION,
     "Quan Lộc": CUNG_QUAN_LOC_INSTRUCTION,
     "Tài Bạch": CUNG_TAI_BACH_INSTRUCTION,
@@ -146,7 +132,11 @@ _ROLE_INSTRUCTION_MAP: dict[ROLE_TYPE, str] = {
 }
 
 
-def get_role_instruction(role: ROLE_TYPE) -> str:
+def get_role_instruction(role: str) -> str:
+    """Lấy hướng dẫn phân tích cho một cung dựa trên vai trò của nó.
+
+    role phải là một trong các giá trị sau: Mệnh, Phụ Mẫu, Phúc Đức, Điền Trạch, Quan Lộc, Nô Bộc, Thiên Di, Tật Ách, Tài Bạch, Tử Tức, Phu Thê, Huynh Đệ.
+    """
     if role not in _ROLE_INSTRUCTION_MAP:
         assert_never(role)
     return _ROLE_INSTRUCTION_MAP[role]
