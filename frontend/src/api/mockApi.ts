@@ -76,6 +76,9 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
   const payload = await response.json() as {
     id: string;
     summary: string;
+    ban_menh_name: string;
+    cuc_name: string;
+    menh_cuc_relation_label: string;
     cung_by_position: Record<string, {
       position: string;
       role: string | null;
@@ -118,6 +121,9 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
   return {
     id: payload.id,
     summary: payload.summary,
+    banMenhName: payload.ban_menh_name,
+    cucName: payload.cuc_name,
+    menhCucRelationLabel: payload.menh_cuc_relation_label,
     cungByPosition: mapped
   };
 }

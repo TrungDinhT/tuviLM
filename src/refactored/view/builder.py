@@ -31,6 +31,9 @@ def build_laso_view(la_so: LaSo, study_year: int) -> LaSoView:
         dia_chi_natal_year=la_so.prior.dia_chi,
         thien_can_natal_year=la_so.prior.thien_can,
         study_year=study_year,
+        ban_menh_name=la_so.ban_menh.name,
+        cuc_name=la_so.natal_context.cuc.name,
+        menh_cuc_relation_label=la_so.menh_cuc_relation().label,
         tieu_han_focus_map=build_tieu_han_focus_view(la_so),
         dai_han_focus_map=build_dai_han_focus_view(la_so),
         cungs=tuple(

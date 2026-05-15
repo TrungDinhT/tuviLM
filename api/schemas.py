@@ -45,6 +45,9 @@ class CungPayload(BaseModel):
 class BuildLasoResponse(BaseModel):
     id: str
     summary: str
+    ban_menh_name: str
+    cuc_name: str
+    menh_cuc_relation_label: str
     cung_by_position: dict[str, CungPayload]
 
 

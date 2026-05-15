@@ -5,6 +5,7 @@ from src.refactored.model.elementary import DiaChi
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.la_so import LaSo
 from src.refactored.model.layer import LayerKind
+from src.refactored.model.menh_cuc_relation import MenhCucRelationType
 from src.refactored.view.builder import build_laso_view
 from src.refactored.view.streamlit_adapter import (
     laso_view_to_streamlit_payload,
@@ -30,6 +31,9 @@ def test_build_laso_view_materializes_catalog_enriched_period_snapshot():
     assert view.hour == DiaChi.MEO
     assert view.year == 1996
     assert view.study_year == 2034
+    assert view.ban_menh_name == "Giản Hạ Thủy"
+    assert view.cuc_name == la_so.natal_context.cuc.name
+    assert view.menh_cuc_relation_label == la_so.menh_cuc_relation().label
     assert view.dia_chi_natal_year == la_so.prior.dia_chi
     assert view.thien_can_natal_year == la_so.prior.thien_can
     assert len(view.cungs) == 12
@@ -95,3 +99,18 @@ def test_streamlit_adapter_creates_render_payload_without_old_tinh_ban_shape():
     assert "Tiểu hạn" in html
     assert "Đại hạn" in html
     assert "component-layer-title" in html
+
+
+def test_laso_menh_cuc_relation_computed_correctly():
+    from src.refactored.model.elementary import NguHanh
+
+    la_so = LaSo.from_prior(_prior())
+    relation = la_so.menh_cuc_relation()
+
+    assert relation.label == "Mệnh khắc cục"
+    assert relation.relation_type == MenhCucRelationType.KHAC_XUAT
+    assert relation.ngu_hanh_menh == NguHanh.THUY
+    assert relation.ngu_hanh_cuc == NguHanh.HOA
+    assert relation.direction == "mệnh -> cục"
+    assert "Thủy" in relation.description
+    assert "Hỏa" in relation.description

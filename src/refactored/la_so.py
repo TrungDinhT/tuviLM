@@ -16,6 +16,7 @@ from src.refactored.context.period import PeriodKind, build_period_context
 from src.refactored.model.cung import Cung
 from src.refactored.model.elementary import DiaChi
 from src.refactored.model.layer import LayerId, NATAL_LAYER_ID, PlacementLayer
+from src.refactored.model.menh_cuc_relation import MenhCucRelation
 from src.refactored.model.period_focus import DaiHanFocusMap
 from src.refactored.model.prior import LaSoPrior
 from src.refactored.model.tinh_ban import TinhBan
@@ -62,6 +63,12 @@ class LaSo:
 
     def component(self, component_id: ComponentId) -> Component:
         return self.catalog.get(component_id)
+
+    def menh_cuc_relation(self) -> MenhCucRelation:
+        return MenhCucRelation.compute(
+            self.ban_menh.ngu_hanh,
+            self.natal_context.cuc.ngu_hanh,
+        )
 
     def tieu_han_focus_map(self) -> dict[DiaChi, DiaChi]:
         return self.tinh_ban.tieu_han_focus_map()

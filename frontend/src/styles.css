@@ -86,6 +86,22 @@ body {
   color: var(--muted);
 }
 
+.laso-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand);
+  background: linear-gradient(135deg, #fff7e9, #f6e8cd);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+
 .input-panel {
   padding-bottom: 12px;
 }
@@ -295,6 +311,21 @@ textarea {
   margin-top: 4px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.center-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-line {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand);
+  letter-spacing: 0.02em;
 }
 
 .chat-panel {
