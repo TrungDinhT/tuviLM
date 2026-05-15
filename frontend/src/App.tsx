@@ -60,7 +60,6 @@ export default function App() {
     setBuildingSaoLuu(true);
     try {
       const result = await buildSaoLuu({
-        laso: laso.laso,
         observationTime: {
           date: input.date,
           month: input.month,
@@ -74,7 +73,6 @@ export default function App() {
         if (!prev) return prev;
         return {
           ...prev,
-          laso: result.laso,
           cungByPosition: result.cungByPosition
         };
       });

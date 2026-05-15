@@ -114,7 +114,7 @@ frontend/
 File: `src/api/mockApi.ts`
 
 - `buildLaso(input)` -> calls real backend `POST /api/v1/laso/build`
-- `buildSaoLuu({ tinhBan, observationTime })` -> calls backend `POST /api/v1/laso/build_sao_luu`
+- `buildSaoLuu({ observationTime })` -> calls backend `POST /api/v1/laso/build_sao_luu`
 - `streamChatReply(messages, selectedPosition, onChunk)` -> chunked chat text
 
 This mirrors the future backend flow, so migration is straightforward.

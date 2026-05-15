@@ -35,12 +35,10 @@ export type CungData = {
 export type LasoData = {
   id: string;
   summary: string;
-  laso: unknown;
   cungByPosition: Record<string, CungData>;
 };
 
 export type BuildSaoLuuInput = {
-  laso: unknown;
   observationTime: TuviTimeInput;
 };
 
