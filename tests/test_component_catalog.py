@@ -1,4 +1,5 @@
 from src.refactored.components.repository import get_default_repository
+from src.refactored.components.definitions.ban_menh import BanMenh
 from src.refactored.components.definitions.cung_role import CungRole, Role
 from src.refactored.model.elementary import DiaChi, NguHanh, ThienCan
 from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet, TuHoa
@@ -136,3 +137,35 @@ def test_default_catalog_loads_tuan_triet_entries():
     assert isinstance(tuan, TuanTriet)
     assert tuan.name == "Tuần"
     assert catalog.get("triet_1").name == "Triệt"
+
+
+def test_default_catalog_loads_ban_menh_entries():
+    catalog = get_default_repository()
+
+    bach_lap_kim = catalog.get("bach_lap_kim")
+
+    assert isinstance(bach_lap_kim, BanMenh)
+    assert bach_lap_kim.id == "bach_lap_kim"
+    assert bach_lap_kim.name == "Bạch Lạp Kim"
+    assert bach_lap_kim.ngu_hanh == NguHanh.KIM
+    assert bach_lap_kim.description == "Vàng trong nến trắng: Tinh khiết, thanh cao, nhưng dễ tan chảy trước nghịch cảnh"
+
+    sa_trung_kim = catalog.get("sa_trung_kim")
+    assert isinstance(sa_trung_kim, BanMenh)
+    assert sa_trung_kim.ngu_hanh == NguHanh.KIM
+
+    tung_bach_moc = catalog.get("tung_bach_moc")
+    assert isinstance(tung_bach_moc, BanMenh)
+    assert tung_bach_moc.ngu_hanh == NguHanh.MOC
+
+    truong_luu_thuy = catalog.get("truong_luu_thuy")
+    assert isinstance(truong_luu_thuy, BanMenh)
+    assert truong_luu_thuy.ngu_hanh == NguHanh.THUY
+
+    son_ha_hoa = catalog.get("son_ha_hoa")
+    assert isinstance(son_ha_hoa, BanMenh)
+    assert son_ha_hoa.ngu_hanh == NguHanh.HOA
+
+    bich_thuong_tho = catalog.get("bich_thuong_tho")
+    assert isinstance(bich_thuong_tho, BanMenh)
+    assert bich_thuong_tho.ngu_hanh == NguHanh.THO
