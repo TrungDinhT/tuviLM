@@ -1,0 +1,62 @@
+// Mirrors backend openapi schema at localhost:8000/openapi.json
+export interface StarPayload {
+  name: string;
+  display: string;
+  element: string;
+}
+
+export interface CungPayload {
+  position: string;
+  role: string | null;
+  chinh_tinh: string[];
+  phu_tinh: StarPayload[];
+  tuhoa: string[];
+  trang_sinh: string | null;
+  is_tuan: boolean;
+  is_triet: boolean;
+  is_cung_than: boolean;
+  age_daivan: number | null;
+  saoLuu: StarPayload[];
+}
+
+export interface BuildLasoResponse {
+  id: string;
+  summary: string;
+  cung_by_position: Record<string, CungPayload>;
+}
+
+export interface BuildLasoRequest {
+  date: number;
+  month: number;
+  year: number;
+  hour: number;
+  gender: "M" | "F";
+}
+
+export type Calendar = "duong" | "am";
+
+export interface UserProfile {
+  name: string;
+  gender: "M" | "F";
+  calendar: Calendar;
+  date: number;
+  month: number;
+  year: number;
+  hour: number;
+}
+
+export interface SessionStash {
+  laso: BuildLasoResponse;
+  profile: UserProfile;
+  fetchedAt: string; // ISO
+}
+
+export type Sender = "ai" | "me";
+
+export interface ChatMessage {
+  id: string;
+  sender: Sender;
+  body: string; // may contain inline markers: [[ref:Quan Lộc]], [[sao:Kình Dương]]
+}
+
+export type OverlayKind = "daiVan" | "lichSu" | null;

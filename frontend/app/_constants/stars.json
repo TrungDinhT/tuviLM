@@ -1,0 +1,874 @@
+{
+  "version": "1.0.0",
+  "source": "Tử Vi Đẩu Số Tân Biên",
+  "stars": {
+    "tu_vi": {
+      "name": "Tử Vi",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "thien_co": {
+      "name": "Thiên Cơ",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "thai_duong": {
+      "name": "Thái Dương",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "vu_khuc": {
+      "name": "Vũ Khúc",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "thien_dong": {
+      "name": "Thiên Đồng",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "liem_trinh": {
+      "name": "Liêm Trinh",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "thien_phu": {
+      "name": "Thiên Phủ",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "thai_am": {
+      "name": "Thái Âm",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "tham_lang": {
+      "name": "Tham Lang",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "cu_mon": {
+      "name": "Cự Môn",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "thien_tuong": {
+      "name": "Thiên Tướng",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "thien_luong": {
+      "name": "Thiên Lương",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "that_sat": {
+      "name": "Thất Sát",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "pha_quan": {
+      "name": "Phá Quân",
+      "categories": [
+        "chinh_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "ta_phu": {
+      "name": "Tả Phù",
+      "categories": [
+        "luc_cat"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "huu_bat": {
+      "name": "Hữu Bật",
+      "categories": [
+        "luc_cat"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "van_xuong": {
+      "name": "Văn Xương",
+      "categories": [
+        "luc_cat"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "van_khuc": {
+      "name": "Văn Khúc",
+      "categories": [
+        "luc_cat"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "thien_khoi": {
+      "name": "Thiên Khôi",
+      "categories": [
+        "luc_cat"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "thien_viet": {
+      "name": "Thiên Việt",
+      "categories": [
+        "luc_cat"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "hoa_tinh": {
+      "name": "Hỏa Tinh",
+      "categories": [
+        "luc_sat",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "linh_tinh": {
+      "name": "Linh Tinh",
+      "categories": [
+        "luc_sat",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "khinh_duong": {
+      "name": "Kình Dương",
+      "categories": [
+        "luc_sat",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "da_la": {
+      "name": "Đà La",
+      "categories": [
+        "luc_sat",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "dia_kiep": {
+      "name": "Địa Kiếp",
+      "categories": [
+        "luc_sat",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "dia_khong": {
+      "name": "Địa Không",
+      "categories": [
+        "luc_sat",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "bac_si": {
+      "name": "Bác Sĩ",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "luc_sy": {
+      "name": "Lực Sỹ",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "thanh_long": {
+      "name": "Thanh Long",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "tieu_hao": {
+      "name": "Tiểu Hao",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "tuong_quan": {
+      "name": "Tướng Quân",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "tau_thu": {
+      "name": "Tấu Thư",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "phi_liem": {
+      "name": "Phi Liêm",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "hy_than": {
+      "name": "Hỷ Thần",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "benh_phu": {
+      "name": "Bệnh Phù",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "dai_hao": {
+      "name": "Đại Hao",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "phuc_binh": {
+      "name": "Phục Binh",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "quan_phur": {
+      "name": "Quan Phủ",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "loc_ton": {
+      "name": "Lộc Tồn",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "thai_tue": {
+      "name": "Thái Tuế",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "thieu_duong": {
+      "name": "Thiếu Dương",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "tang_mon": {
+      "name": "Tang Môn",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "thieu_am": {
+      "name": "Thiếu Âm",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "quan_phuf": {
+      "name": "Quan Phù",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "tu_phu": {
+      "name": "Tử Phù",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "tue_pha": {
+      "name": "Tuế Phá",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "long_duc": {
+      "name": "Long Đức",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "bach_ho": {
+      "name": "Bạch Hổ",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "phuc_duc": {
+      "name": "Phúc Đức",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "dieu_khach": {
+      "name": "Điếu Khách",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "truc_phu": {
+      "name": "Trực Phù",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "trang_sinh": {
+      "name": "Tràng Sinh",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "moc_duc": {
+      "name": "Mộc Dục",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "quan_doai": {
+      "name": "Quan Đới",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "lam_quan": {
+      "name": "Lâm Quan",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "de_vuong": {
+      "name": "Đế Vượng",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "suy": {
+      "name": "Suy",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "benh": {
+      "name": "Bệnh",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "tu": {
+      "name": "Tử",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "mo": {
+      "name": "Mộ",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "tuyet": {
+      "name": "Tuyệt",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "thai": {
+      "name": "Thai",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "duong": {
+      "name": "Dưỡng",
+      "categories": [
+        "phu_tinh",
+        "trang_sinh"
+      ],
+      "ngu_hanh": null
+    },
+    "hoa_loc": {
+      "name": "Hóa Lộc",
+      "categories": [
+        "tu_hoa",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "hoa_quyen": {
+      "name": "Hóa Quyền",
+      "categories": [
+        "tu_hoa",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "hoa_khoa": {
+      "name": "Hóa Khoa",
+      "categories": [
+        "tu_hoa",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "hoa_ky": {
+      "name": "Hóa Kỵ",
+      "categories": [
+        "tu_hoa",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "long_tri": {
+      "name": "Long Trì",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "phuong_cac": {
+      "name": "Phượng Các",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "thien_khoc": {
+      "name": "Thiên Khốc",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "thien_hu": {
+      "name": "Thiên Hư",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "tam_thai": {
+      "name": "Tam Thai",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "bat_toa": {
+      "name": "Bát Tọa",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "an_quang": {
+      "name": "Ân Quang",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "thien_quy": {
+      "name": "Thiên Quý",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "thien_duc": {
+      "name": "Thiên Đức",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "nguyet_duc": {
+      "name": "Nguyệt Đức",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "thien_hinh": {
+      "name": "Thiên Hình",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "thien_rieu": {
+      "name": "Thiên Riêu",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "thien_y": {
+      "name": "Thiên Y",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "hong_loan": {
+      "name": "Hồng Loan",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "thien_hy": {
+      "name": "Thiên Hỷ",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "quoc_an": {
+      "name": "Quốc Ấn",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "duong_phu": {
+      "name": "Đường Phù",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "thien_giai": {
+      "name": "Thiên Giải",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "dia_giai": {
+      "name": "Địa Giải",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "giai_than": {
+      "name": "Giải Thần",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "thai_phu": {
+      "name": "Thai Phụ",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "phong_cao": {
+      "name": "Phong Cáo",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "thien_tai": {
+      "name": "Thiên Tài",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "thien_tho": {
+      "name": "Thiên Thọ",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "thien_thuong": {
+      "name": "Thiên Thương",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "thien_su": {
+      "name": "Thiên Sứ",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "thien_la": {
+      "name": "Thiên La",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "dia_vong": {
+      "name": "Địa Võng",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "thien_quan": {
+      "name": "Thiên Quan",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "thien_phuc": {
+      "name": "Thiên Phúc",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "co_than": {
+      "name": "Cô Thần",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "qua_tu": {
+      "name": "Quả Tú",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "dao_hoa": {
+      "name": "Đào Hoa",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "moc"
+    },
+    "thien_ma": {
+      "name": "Thiên Mã",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "kiep_sat": {
+      "name": "Kiếp Sát",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "pha_toai": {
+      "name": "Phá Toái",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "hoa_cai": {
+      "name": "Hoa Cái",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "luu_ha": {
+      "name": "Lưu Hà",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "thuy"
+    },
+    "thien_tru": {
+      "name": "Thiên Trù",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "luu_nien_van_tinh": {
+      "name": "LN Văn Tinh",
+      "categories": [
+        "phu_tinh",
+        "cat_tinh"
+      ],
+      "ngu_hanh": "kim"
+    },
+    "dau_quan": {
+      "name": "Đẩu Quân",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "thien_khong": {
+      "name": "Thiên Không",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "hoa"
+    },
+    "tuan_trung": {
+      "name": "Tuần Trung",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "tho"
+    },
+    "triet_lo": {
+      "name": "Triệt Lộ",
+      "categories": [
+        "phu_tinh",
+        "hung_tinh"
+      ],
+      "ngu_hanh": "tho"
+    }
+  }
+}
