@@ -6,6 +6,7 @@ from typing import Iterable
 from src.refactored.assembly.natal import build_natal_tinh_ban
 from src.refactored.assembly.period import build_period_layer, build_period_layer_id
 from src.refactored.components.definitions import Component
+from src.refactored.components.definitions.ban_menh import BanMenh, compute_ban_menh_id
 from src.refactored.components.repository import (
     ComponentRepository,
     get_default_repository,
@@ -27,6 +28,7 @@ class LaSo:
     natal_context: NatalContext
     catalog: ComponentRepository
     tinh_ban: TinhBan
+    ban_menh: BanMenh
 
     @classmethod
     def from_prior(
@@ -35,11 +37,13 @@ class LaSo:
         catalog: ComponentRepository | None = None,
     ) -> "LaSo":
         natal_context = NatalContext.from_prior(prior)
+        components_repository = catalog or get_default_repository()
         return cls(
             prior=prior,
             natal_context=natal_context,
-            catalog=catalog or get_default_repository(),
+            catalog=components_repository,
             tinh_ban=build_natal_tinh_ban(natal_context),
+            ban_menh=components_repository.get(compute_ban_menh_id(prior.year)),
         )
 
     def cung_at(

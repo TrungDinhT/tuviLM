@@ -7,7 +7,9 @@ from src.refactored.model.elementary import DiaChi
 from src.refactored.context.natal import NatalContext
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.context.tu_hoa_phai import TuHoaPhaiContext
+from src.refactored.components.definitions.ban_menh import BanMenh, compute_ban_menh_id
 from src.refactored.la_so import LaSo
+from src.refactored.model.elementary import NguHanh
 import pytest
 
 from src.refactored.model.layer import PlacementLayer, TieuHanLayerId, TuHoaPhaiLayerId
@@ -71,6 +73,29 @@ def test_laso_from_prior_wraps_tinh_ban_and_catalog():
 
     assert la_so.component("tu_vi").name == "Tử Vi"
     assert la_so.position_of("tu_vi") is not None
+
+
+def test_laso_from_prior_computes_ban_menh_from_year():
+    la_so = LaSo.from_prior(_prior())
+
+    assert isinstance(la_so.ban_menh, BanMenh)
+    assert la_so.ban_menh.id == "gian_ha_thuy"
+    assert la_so.ban_menh.ngu_hanh == NguHanh.THUY
+
+
+def test_compute_ban_menh_id_cycle():
+    assert compute_ban_menh_id(1900) == "bich_thuong_tho"
+    assert compute_ban_menh_id(1948) == "tich_lich_hoa"
+    assert compute_ban_menh_id(1949) == "tich_lich_hoa"
+    assert compute_ban_menh_id(1950) == "tung_bach_moc"
+    assert compute_ban_menh_id(2008) == "tich_lich_hoa"
+    assert compute_ban_menh_id(2009) == "tich_lich_hoa"
+    assert compute_ban_menh_id(1930) == "lo_bang_tho"
+    assert compute_ban_menh_id(2050) == "lo_bang_tho"
+    assert compute_ban_menh_id(1996) == "gian_ha_thuy"
+    assert compute_ban_menh_id(1997) == "gian_ha_thuy"
+    assert compute_ban_menh_id(2000) == "bach_lap_kim"
+    assert compute_ban_menh_id(2001) == "bach_lap_kim"
 
 
 @dataclass(frozen=True)
