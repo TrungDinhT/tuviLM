@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-paper:        #f4ede0;
+  --color-paper-2:      #ece3d0;
+  --color-paper-3:      #e2d6bd;
+  --color-ink:          #1a1611;
+  --color-ink-2:        #4a4239;
+  --color-ink-3:        #7a705f;
+  --color-ink-4:        #aea291;
+  --color-crimson:      #8b2a1f;
+  --color-crimson-soft: #b54b3a;
+  --color-gold:         #a8854a;
+  --color-jade:         #4a6b58;
+  --font-serif: var(--font-cormorant), "EB Garamond", serif;
+  --font-sans:  var(--font-be-vietnam), "Inter", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .paper-tex {
+    background:
+      radial-gradient(ellipse at 12% 8%, rgba(168,133,74,.04), transparent 50%),
+      radial-gradient(ellipse at 88% 92%, rgba(139,42,31,.03), transparent 50%),
+      var(--color-paper);
+  }
+  .ref {
+    color: var(--color-crimson);
+    font-weight: 600;
+    border-bottom: 1px dotted var(--color-crimson);
+    cursor: pointer;
+    padding: 0 1px;
+  }
+  .ref-sao {
+    color: var(--color-ink);
+    font-weight: 600;
+    border-bottom: 1px dotted var(--color-ink-3);
+    cursor: pointer;
+    padding: 0 1px;
+  }
+  .eyebrow {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-crimson);
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  @keyframes hf-pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+  .dot-pulse {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--color-jade);
+    display: inline-block;
+    animation: hf-pulse 1.6s ease-in-out infinite;
+  }
 }
