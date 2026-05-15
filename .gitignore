@@ -162,3 +162,7 @@ cython_debug/
 ./data
 ./frontend/node_modules/*
 ./frontend/dist
+
+.serena/
+.claude/
+docs/superpowers
