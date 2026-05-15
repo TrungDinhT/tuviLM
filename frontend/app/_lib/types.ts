@@ -43,6 +43,7 @@ export interface UserProfile {
   month: number;
   year: number;
   hour: number;
+  minute: number;
 }
 
 export interface SessionStash {
