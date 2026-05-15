@@ -49,17 +49,15 @@ curl -X POST http://localhost:8000/api/v1/laso/build \
   }'
 ```
 
-## Build sao lưu from existing tinh ban
+## Build sao lưu from server state
 
 `/api/v1/laso/build_sao_luu` takes:
-- `tinhBan`: an already-built `TinhBan` object
 - `observation_time`: same shape as build time (`date/month/year/hour/gender`)
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/laso/build_sao_luu \
   -H "Content-Type: application/json" \
   -d '{
-    "tinhBan": { "...": "existing tinh ban JSON" },
     "observation_time": {
       "date": 8,
       "month": 3,
