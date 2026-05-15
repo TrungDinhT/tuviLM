@@ -3,7 +3,6 @@
 Frontend app for:
 - birth input
 - lá số rendering
-- cung analysis panel
 - chatbot panel (streaming-style responses)
 
 Current version uses a local dummy API (`src/api/mockApi.ts`).
@@ -15,7 +14,7 @@ You can later swap it to your real backend without changing UI layout/components
 - TypeScript
 - Vite
 - CSS (custom, no UI framework)
-- `react-markdown` for analysis display
+- `react-markdown` for chat markdown display
 
 ## 2. Prerequisites
 
@@ -92,7 +91,6 @@ frontend/
     components/
       BirthForm.tsx
       LasoBoard.tsx
-      AnalysisPanel.tsx
       ChatPanel.tsx
 ```
 
@@ -105,10 +103,7 @@ frontend/
 ### Lá số panel
 - Renders 12 cung in a board
 - Each cung content is HTML from dummy data (compatible with backend `__repr__` style)
-- Click a cung to load analysis
-
-### Phân tích panel
-- Shows markdown analysis for selected cung
+- Click a cung to select it
 
 ### Chat panel
 - Ask questions about current chart/selected cung
@@ -120,7 +115,6 @@ File: `src/api/mockApi.ts`
 
 - `buildLaso(input)` -> calls real backend `POST /api/v1/laso/build`
 - `buildSaoLuu({ tinhBan, observationTime })` -> calls backend `POST /api/v1/laso/build_sao_luu`
-- `getAnalysis(position)` -> returns markdown string
 - `streamChatReply(messages, selectedPosition, onChunk)` -> chunked chat text
 
 This mirrors the future backend flow, so migration is straightforward.
@@ -134,7 +128,6 @@ Recommended migration steps:
 3. Preserve function signatures:
    - `buildLaso`
    - `buildSaoLuu`
-   - `getAnalysis`
    - `streamChatReply`
 4. If backend supports SSE/WebSocket, map stream events to `onChunk`.
 

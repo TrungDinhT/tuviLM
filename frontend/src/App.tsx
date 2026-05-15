@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
 import BirthForm from "./components/BirthForm";
 import LasoBoard from "./components/LasoBoard";
-import AnalysisPanel from "./components/AnalysisPanel";
 import ChatPanel from "./components/ChatPanel";
-import { buildLaso, buildSaoLuu, getAnalysis, streamChatReply } from "./api/mockApi";
+import { buildLaso, buildSaoLuu, streamChatReply } from "./api/mockApi";
 import type { BirthInput, ChatMessage, LasoData } from "./types";
 
 const INITIAL_INPUT: BirthInput = {
@@ -23,12 +22,9 @@ export default function App() {
   const [viewYear, setViewYear] = useState<number>(new Date().getFullYear());
   const [laso, setLaso] = useState<LasoData | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
-  const [analysisByPosition, setAnalysisByPosition] = useState<Record<string, string>>({});
-  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const [building, setBuilding] = useState(false);
   const [buildingSaoLuu, setBuildingSaoLuu] = useState(false);
-  const [analyzing, setAnalyzing] = useState(false);
   const [chatBusy, setChatBusy] = useState(false);
 
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -41,16 +37,12 @@ export default function App() {
   ]);
 
   const canChat = useMemo(() => laso !== null, [laso]);
-  const selectedAnalysis = selectedPosition ? (analysisByPosition[selectedPosition] ?? "") : "";
-  const hasSelectedAnalysis = selectedPosition ? Boolean(analysisByPosition[selectedPosition]) : false;
 
   const handleBuild = async () => {
     setBuilding(true);
     try {
       const result = await buildLaso(input);
       setLaso(result);
-      setAnalysisByPosition({});
-      setAnalysisError(null);
       const nextPosition = "Tị";
       setSelectedPosition(nextPosition);
     } finally {
@@ -60,7 +52,6 @@ export default function App() {
 
   const handleSelectPosition = (position: string) => {
     setSelectedPosition(position);
-    setAnalysisError(null);
   };
 
   const handleBuildSaoLuu = async () => {
@@ -69,7 +60,7 @@ export default function App() {
     setBuildingSaoLuu(true);
     try {
       const result = await buildSaoLuu({
-        tinhBan: laso.laso,
+        laso: laso.laso,
         observationTime: {
           date: input.date,
           month: input.month,
@@ -83,28 +74,12 @@ export default function App() {
         if (!prev) return prev;
         return {
           ...prev,
-          laso: result.tinhBan,
+          laso: result.laso,
           cungByPosition: result.cungByPosition
         };
       });
     } finally {
       setBuildingSaoLuu(false);
-    }
-  };
-
-  const handleAnalyzeSelected = async () => {
-    if (!selectedPosition) return;
-    if (analysisByPosition[selectedPosition]) return;
-
-    setAnalyzing(true);
-    setAnalysisError(null);
-    try {
-      const analysisText = await getAnalysis(input, selectedPosition);
-      setAnalysisByPosition((prev) => ({ ...prev, [selectedPosition]: analysisText }));
-    } catch (error) {
-      setAnalysisError(error instanceof Error ? error.message : "Phân tích thất bại.");
-    } finally {
-      setAnalyzing(false);
     }
   };
 
@@ -161,7 +136,7 @@ export default function App() {
     <main className="app-root">
       <header className="app-header">
         <h1>TuviLM UI</h1>
-        <p>Input + Lá số + Phân tích + Chat</p>
+        <p>Input + Lá số + Chat</p>
       </header>
 
       <section className="top-layout">
@@ -181,15 +156,6 @@ export default function App() {
           laso={laso}
           selectedPosition={selectedPosition}
           onSelectPosition={handleSelectPosition}
-        />
-
-        <AnalysisPanel
-          position={selectedPosition}
-          content={selectedAnalysis}
-          loading={analyzing}
-          hasAnalysis={hasSelectedAnalysis}
-          error={analysisError}
-          onAnalyze={() => void handleAnalyzeSelected()}
         />
       </section>
 

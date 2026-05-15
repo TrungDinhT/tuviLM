@@ -196,34 +196,6 @@ export async function buildSaoLuu(input: BuildSaoLuuInput): Promise<{
   };
 }
 
-export async function getAnalysis(input: BirthInput, position: string): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/laso/analyze`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      date: input.date,
-      month: input.month,
-      year: input.year,
-      hour: input.hour,
-      gender: input.gender,
-      position
-    })
-  });
-
-  if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`Analyze cung failed (${response.status}): ${detail}`);
-  }
-
-  const payload = await response.json() as {
-    position: string;
-    role: string | null;
-    analysis: string;
-  };
-
-  return payload.analysis;
-}
-
 export async function streamChatReply(
   messages: ChatMessage[],
   onChunk: (chunk: string) => void
