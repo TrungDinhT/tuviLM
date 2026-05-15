@@ -1,15 +1,11 @@
 from __future__ import annotations
 
-from typing import Mapping
-
 from src.refactored.context.period import (
     DaiHanContext,
     LuuNienDaiHanContext,
     PeriodKind,
     TieuHanContext,
 )
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.model.elementary import DiaChi
 from src.refactored.placement.bundle import get_default_placement_rule_compiler
 from src.refactored.placement.compiler import PlacementRuleCompiler
 from src.refactored.placement.engine import PlacementEngine
