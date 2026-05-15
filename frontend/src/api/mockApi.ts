@@ -76,7 +76,6 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
   const payload = await response.json() as {
     id: string;
     summary: string;
-    laso: unknown;
     cung_by_position: Record<string, {
       position: string;
       role: string | null;
@@ -119,21 +118,18 @@ export async function buildLaso(input: BirthInput): Promise<LasoData> {
   return {
     id: payload.id,
     summary: payload.summary,
-    laso: payload.laso,
     cungByPosition: mapped
   };
 }
 
 // TODO : This route is failed by unknown reason,
 export async function buildSaoLuu(input: BuildSaoLuuInput): Promise<{
-  laso: unknown;
   cungByPosition: Record<string, CungData>;
 }> {
   const response = await fetch(`${API_BASE_URL}/api/v1/laso/build_sao_luu`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      laso: input.laso,
       observation_time: {
         date: input.observationTime.date,
         month: input.observationTime.month,
@@ -150,7 +146,6 @@ export async function buildSaoLuu(input: BuildSaoLuuInput): Promise<{
   }
 
   const payload = await response.json() as {
-    laso: unknown;
     cung_by_position: Record<string, {
       position: string;
       role: string | null;
@@ -191,37 +186,8 @@ export async function buildSaoLuu(input: BuildSaoLuuInput): Promise<{
   }
 
   return {
-    laso: payload.laso,
     cungByPosition: mapped
   };
-}
-
-export async function getAnalysis(input: BirthInput, position: string): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/laso/analyze`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      date: input.date,
-      month: input.month,
-      year: input.year,
-      hour: input.hour,
-      gender: input.gender,
-      position
-    })
-  });
-
-  if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`Analyze cung failed (${response.status}): ${detail}`);
-  }
-
-  const payload = await response.json() as {
-    position: string;
-    role: string | null;
-    analysis: string;
-  };
-
-  return payload.analysis;
 }
 
 export async function streamChatReply(

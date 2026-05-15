@@ -14,26 +14,19 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api._parse import to_cung_payload_map
 from api.schemas import (
-    AnalyzeCungRequest,
-    AnalyzeCungResponse,
     BuildLasoRequest,
     BuildLasoResponse,
     BuildSaoLuuRequest,
     BuildSaoLuuResponse,
-    CungPayload,
     ChatRequest,
     ChatResponse,
     ChatToolCall,
-    StarPayload,
 )
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
-from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
-from src.refactored.components.definitions.sao import ChinhPhuTinh
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.view.builder import build_laso_view
-from src.refactored.view.models import LaSoView
 
 
 logging.basicConfig(
@@ -193,7 +186,6 @@ def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse
     return BuildLasoResponse(
         id=response_id,
         summary=summary,
-        laso=la_so_view,
         cung_by_position=cung_by_position,
     )
 
@@ -214,7 +206,6 @@ def build_sao_luu(payload: BuildSaoLuuRequest, request: Request) -> BuildSaoLuuR
     la_so_view = build_laso_view(la_so, study_year=observed_solar_dt.year)
 
     return BuildSaoLuuResponse(
-        laso=la_so_view,
         cung_by_position=to_cung_payload_map(la_so_view),
     )
 

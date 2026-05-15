@@ -52,7 +52,7 @@ body {
 
 .top-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr minmax(250px, 340px);
+  grid-template-columns: minmax(220px, 280px) 1fr;
   gap: 12px;
   align-items: start;
 }
@@ -295,25 +295,6 @@ textarea {
   margin-top: 4px;
   color: var(--muted);
   font-size: 12px;
-}
-
-.analysis-panel {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  min-height: 520px;
-  max-height: 1500px;
-}
-
-.analysis-body {
-  padding: 12px;
-  overflow: auto;
-  line-height: 1.45;
-}
-
-.analysis-body h1,
-.analysis-body h2,
-.analysis-body h3 {
-  margin: 0 0 8px 0;
 }
 
 .chat-panel {

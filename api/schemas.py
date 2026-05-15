@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
-from src.refactored.view.models import LaSoView
 
 
 class TuviTimePayload(BaseModel):
@@ -19,7 +18,6 @@ class BuildLasoRequest(TuviTimePayload):
 
 
 class BuildSaoLuuRequest(BaseModel):
-    laSo: LaSoView
     observation_time: TuviTimePayload
 
 
@@ -47,24 +45,11 @@ class CungPayload(BaseModel):
 class BuildLasoResponse(BaseModel):
     id: str
     summary: str
-    laso: LaSoView
     cung_by_position: dict[str, CungPayload]
 
 
 class BuildSaoLuuResponse(BaseModel):
-    laso: LaSoView
     cung_by_position: dict[str, CungPayload]
-
-
-class AnalyzeCungRequest(TuviTimePayload):
-    position: str
-    model: str = "gpt-4.1-mini"
-
-
-class AnalyzeCungResponse(BaseModel):
-    position: str
-    role: str | None = None
-    analysis: str
 
 
 class ChatRequest(BaseModel):
