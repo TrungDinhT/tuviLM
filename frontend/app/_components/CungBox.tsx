@@ -70,39 +70,39 @@ export function CungBox({ cung, highlighted, tieuVan, onClick }: CungBoxProps) {
         )}
       </div>
 
-      {/* Phụ tinh: always visible, 2-col cát/hung, smaller font on mobile */}
-      <div className="mt-0.5 text-[5px] sm:text-[6.5px] md:text-[7.5px] lg:text-[9.5px]">
-        <div className="grid grid-cols-2 gap-x-1 md:gap-x-2 tracking-[0.2px]">
-          <div className="flex flex-col gap-px">
-            {fixedCat.map((s) => <span key={`fc-${s.name}`} style={{ color: colorForElement(s.element) }}>{s.name}</span>)}
-            {luuCat.map((s) => <span key={`lc-${s.name}`} style={{ color: colorForElement(s.element) }}>L.{s.name}</span>)}
-          </div>
-          <div className="flex flex-col gap-px items-end text-right">
-            {fixedHung.map((s) => <span key={`fh-${s.name}`} style={{ color: colorForElement(s.element) }}>{s.name}</span>)}
-            {luuHung.map((s) => <span key={`lh-${s.name}`} style={{ color: colorForElement(s.element) }}>L.{s.name}</span>)}
-          </div>
-        </div>
-
-        {/* Tứ Hóa: split Kỵ right, others left */}
-        {cung.tuhoa.length > 0 && (() => {
-          const tuhoaLeft = cung.tuhoa.filter((h) => !h.includes("Kỵ"));
-          const tuhoaRight = cung.tuhoa.filter((h) => h.includes("Kỵ"));
-          return (
-            <div className="grid grid-cols-2 gap-x-1 md:gap-x-2 mt-0.5">
+      {/* Phụ tinh + Tứ Hóa: single 2-col grid so tứ hóa flows directly after lưu in each column */}
+      {(() => {
+        const tuhoaLeft = cung.tuhoa.filter((h) => !h.includes("Kỵ"));
+        const tuhoaRight = cung.tuhoa.filter((h) => h.includes("Kỵ"));
+        return (
+          <div className="mt-0.5 text-[5px] sm:text-[6.5px] md:text-[7.5px] lg:text-[9.5px]">
+            <div className="grid grid-cols-2 gap-x-1 md:gap-x-2 tracking-[0.2px]">
               <div className="flex flex-col gap-px">
+                {fixedCat.map((s) => (
+                  <span key={`fc-${s.name}`} style={{ color: colorForElement(s.element) }}>{s.name}</span>
+                ))}
                 {tuhoaLeft.map((h) => (
                   <span key={`th-l-${h}`} className="font-semibold" style={{ color: colorForStarName(h) }}>{h}</span>
                 ))}
+                {luuCat.map((s) => (
+                  <span key={`lc-${s.name}`} style={{ color: colorForElement(s.element) }}>L.{s.name}</span>
+                ))}
               </div>
               <div className="flex flex-col gap-px items-end text-right">
+                {fixedHung.map((s) => (
+                  <span key={`fh-${s.name}`} style={{ color: colorForElement(s.element) }}>{s.name}</span>
+                ))}
                 {tuhoaRight.map((h) => (
                   <span key={`th-r-${h}`} className="font-semibold" style={{ color: colorForStarName(h) }}>{h}</span>
                 ))}
+                {luuHung.map((s) => (
+                  <span key={`lh-${s.name}`} style={{ color: colorForElement(s.element) }}>L.{s.name}</span>
+                ))}
               </div>
             </div>
-          );
-        })()}
-      </div>
+          </div>
+        );
+      })()}
 
       {/* Footer: age_daivan */}
       <div

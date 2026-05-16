@@ -22,7 +22,7 @@ export function DaiVanModal({ onClose }: DaiVanModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="daivan-title"
-        className="absolute top-12 md:top-24 left-1/2 w-[1180px] max-w-[calc(100vw-48px)] max-h-[calc(100vh-72px)] overflow-y-auto bg-[rgba(255,252,245,0.99)] border-[1.5px] border-[var(--color-ink)] anim-scale-up"
+        className="absolute inset-y-6 md:inset-y-12 left-1/2 w-[1180px] max-w-[calc(100vw-48px)] overflow-y-auto bg-[rgba(255,252,245,0.99)] border-[1.5px] border-[var(--color-ink)] anim-scale-up"
         style={{ boxShadow: "0 24px 80px rgba(26,22,17,0.25)" }}
       >
         {/* Header */}
