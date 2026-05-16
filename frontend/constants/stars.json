@@ -606,8 +606,8 @@
       ],
       "ngu_hanh": "hoa"
     },
-    "thien_rieu": {
-      "name": "Thiên Riêu",
+    "thien_dieu": {
+      "name": "Thiên Diêu",
       "categories": [
         "phu_tinh",
         "hung_tinh"
@@ -711,7 +711,7 @@
       "ngu_hanh": "tho"
     },
     "thien_thuong": {
-      "name": "Thiên Thương",
+      "name": "Thiên Thuơng",
       "categories": [
         "phu_tinh",
         "hung_tinh"
