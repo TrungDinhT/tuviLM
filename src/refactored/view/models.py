@@ -59,6 +59,9 @@ class LaSoView(BaseModel):
     dia_chi_natal_year: DiaChi
     thien_can_natal_year: ThienCan
     study_year: int
+    ban_menh_name: str
+    cuc_name: str
+    menh_cuc_relation_label: str
     tieu_han_focus_map: tuple[TieuHanFocusView, ...]
     dai_han_focus_map: tuple[DaiHanFocusView, ...]
     cungs: tuple[CungView, ...]

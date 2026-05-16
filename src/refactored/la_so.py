@@ -6,6 +6,7 @@ from typing import Iterable
 from src.refactored.assembly.natal import build_natal_tinh_ban
 from src.refactored.assembly.period import build_period_layer, build_period_layer_id
 from src.refactored.components.definitions import Component
+from src.refactored.components.definitions.ban_menh import BanMenh, compute_ban_menh_id
 from src.refactored.components.repository import (
     ComponentRepository,
     get_default_repository,
@@ -15,6 +16,7 @@ from src.refactored.context.period import PeriodKind, build_period_context
 from src.refactored.model.cung import Cung
 from src.refactored.model.elementary import DiaChi
 from src.refactored.model.layer import LayerId, NATAL_LAYER_ID, PlacementLayer
+from src.refactored.model.menh_cuc_relation import MenhCucRelation
 from src.refactored.model.period_focus import DaiHanFocusMap
 from src.refactored.model.prior import LaSoPrior
 from src.refactored.model.tinh_ban import TinhBan
@@ -27,6 +29,7 @@ class LaSo:
     natal_context: NatalContext
     catalog: ComponentRepository
     tinh_ban: TinhBan
+    ban_menh: BanMenh
 
     @classmethod
     def from_prior(
@@ -35,11 +38,13 @@ class LaSo:
         catalog: ComponentRepository | None = None,
     ) -> "LaSo":
         natal_context = NatalContext.from_prior(prior)
+        components_repository = catalog or get_default_repository()
         return cls(
             prior=prior,
             natal_context=natal_context,
-            catalog=catalog or get_default_repository(),
+            catalog=components_repository,
             tinh_ban=build_natal_tinh_ban(natal_context),
+            ban_menh=components_repository.get(compute_ban_menh_id(prior.year)),
         )
 
     def cung_at(
@@ -58,6 +63,12 @@ class LaSo:
 
     def component(self, component_id: ComponentId) -> Component:
         return self.catalog.get(component_id)
+
+    def menh_cuc_relation(self) -> MenhCucRelation:
+        return MenhCucRelation.compute(
+            self.ban_menh.ngu_hanh,
+            self.natal_context.cuc.ngu_hanh,
+        )
 
     def tieu_han_focus_map(self) -> dict[DiaChi, DiaChi]:
         return self.tinh_ban.tieu_han_focus_map()

@@ -35,6 +35,9 @@ export type CungData = {
 export type LasoData = {
   id: string;
   summary: string;
+  banMenhName: string;
+  cucName: string;
+  menhCucRelationLabel: string;
   cungByPosition: Record<string, CungData>;
 };
 

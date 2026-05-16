@@ -6,6 +6,7 @@ from pathlib import Path
 from pydantic import TypeAdapter
 
 from src.refactored.components.definitions import Component
+from src.refactored.components.definitions.ban_menh import BanMenh
 from src.refactored.components.definitions.cuc import LIST_CUC
 from src.refactored.components.definitions.cung_role import CungRole
 from src.refactored.components.definitions.elementary import DiaChiEntity, ThienCanEntity
@@ -20,6 +21,7 @@ class ComponentRepository:
     _thien_can_adapter = TypeAdapter(list[ThienCanEntity])
     _tuhoa_adapter = TypeAdapter(list[TuHoa])
     _tuan_triet_adapter = TypeAdapter(list[TuanTriet])
+    _ban_menh_adapter = TypeAdapter(list[BanMenh])
 
     def __init__(self, catalog_dir: Path | None = None) -> None:
         self._catalog_dir = (
@@ -63,6 +65,8 @@ class ComponentRepository:
             self._register(components, component)
         for component in self._load_tuan_triet():
             self._register(components, component)
+        for component in self._load_ban_menh():
+            self._register(components, component)
 
         return components
 
@@ -89,6 +93,10 @@ class ComponentRepository:
     def _load_tuan_triet(self) -> list[TuanTriet]:
         raw_json = (self._catalog_dir / "tuan_triet.json").read_text(encoding="utf-8")
         return self._tuan_triet_adapter.validate_json(raw_json)
+
+    def _load_ban_menh(self) -> list[BanMenh]:
+        raw_json = (self._catalog_dir / "ban_menh.json").read_text(encoding="utf-8")
+        return self._ban_menh_adapter.validate_json(raw_json)
 
     def _register(self, components: dict[str, Component], component: Component) -> None:
         if component.id in components:

@@ -67,8 +67,18 @@ export default function LasoBoard({ laso, selectedPosition, onSelectPosition }: 
                   className="center-cell"
                   style={{ gridRow: "2 / span 2", gridColumn: "2 / span 2" }}
                 >
-                  <p>TUVI LM</p>
-                  <p className="center-sub">interactive board</p>
+                  {laso ? (
+                    <div className="center-info">
+                      <p className="center-line">Bản mệnh: {laso.banMenhName}</p>
+                      <p className="center-line">Cục: {laso.cucName}</p>
+                      <p className="center-line">{laso.menhCucRelationLabel}</p>
+                    </div>
+                  ) : (
+                    <>
+                      <p>TUVI LM</p>
+                      <p className="center-sub">interactive board</p>
+                    </>
+                  )}
                 </div>
               );
             }

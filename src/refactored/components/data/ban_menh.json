@@ -1,0 +1,182 @@
+[
+    {
+        "id": "sa_trung_kim",
+        "name": "Sa Trung Kim",
+        "ngu_hanh": "Kim",
+        "description": "Vàng trong cát: Phẩm chất quý giá nhưng ẩn giấu, cần được khai thác"
+    },
+    {
+        "id": "kim_bach_kim",
+        "name": "Kim Bạch Kim",
+        "ngu_hanh": "Kim",
+        "description": "Vàng pha kim khí trắng: Vàng trắng, tinh khiết và sáng sủi"
+    },
+    {
+        "id": "hai_trung_kim",
+        "name": "Hải Trung Kim",
+        "ngu_hanh": "Kim",
+        "description": "Vàng dưới biển: Vàng quý giá nằm sâu, nội lực mạnh nhưng ít bộc lộ"
+    },
+    {
+        "id": "kiem_phong_kim",
+        "name": "Kiếm Phong Kim",
+        "ngu_hanh": "Kim",
+        "description": "Vàng ở mũi kiếm: Sắc bén, mạnh mẽ, có khả năng quyết đoán và gây ảnh hưởng"
+    },
+    {
+        "id": "bach_lap_kim",
+        "name": "Bạch Lạp Kim",
+        "ngu_hanh": "Kim",
+        "description": "Vàng trong nến trắng: Tinh khiết, thanh cao, nhưng dễ tan chảy trước nghịch cảnh"
+    },
+    {
+        "id": "thoa_xuyen_kim",
+        "name": "Thoa Xuyến Kim",
+        "ngu_hanh": "Kim",
+        "description": "Vàng làm đồ trang sức: Sang trọng, quý phái, thích hợp với việc trang trí và thể hiện"
+    },
+    {
+        "id": "tung_bach_moc",
+        "name": "Tùng Bách Mộc",
+        "ngu_hanh": "Mộc",
+        "description": "Cây tùng bách: Kiên cường, bền bỉ, sống lâu và dẻo dai trước gió bão"
+    },
+    {
+        "id": "binh_dia_moc",
+        "name": "Bình Địa Mộc",
+        "ngu_hanh": "Mộc",
+        "description": "Cây ở đồng bằng: Phát triển ổn định, dễ thích nghi với môi trường rộng lớn"
+    },
+    {
+        "id": "tang_do_moc",
+        "name": "Tang Đố Mộc",
+        "ngu_hanh": "Mộc",
+        "description": "Gỗ cây dâu: Hữu ích, thường gắn liền với nghề tằm tang, sự chăm chỉ"
+    },
+    {
+        "id": "thach_luu_moc",
+        "name": "Thạch Lựu Mộc",
+        "ngu_hanh": "Mộc",
+        "description": "Gỗ cây thạch lựu: Rực rỡ, sinh sôi mạnh mẽ, thường mang lại kết quả tốt đẹp"
+    },
+    {
+        "id": "dai_lam_moc",
+        "name": "Đại Lâm Mộc",
+        "ngu_hanh": "Mộc",
+        "description": "Cây trong rừng lớn: Quy mô lớn, sức mạnh tập thể, uy nghi và vững chãi"
+    },
+    {
+        "id": "duong_lieu_moc",
+        "name": "Dương Liễu Mộc",
+        "ngu_hanh": "Mộc",
+        "description": "Gỗ cây liễu: Mềm mại, uyển chuyển, dễ thích nghi nhưng đôi khi thiếu sự cứng rắn"
+    },
+    {
+        "id": "truong_luu_thuy",
+        "name": "Trường Lưu Thủy",
+        "ngu_hanh": "Thủy",
+        "description": "Dòng nước lớn: Mãnh liệt, chảy xiết, có sức ảnh hưởng rộng và không ngừng nghỉ"
+    },
+    {
+        "id": "thien_ha_thuy",
+        "name": "Thiên Hà Thủy",
+        "ngu_hanh": "Thủy",
+        "description": "Nước trên trời: Như mưa, tuyết, sương, mang lại sự mát mẻ và phúc đức"
+    },
+    {
+        "id": "dai_khe_thuy",
+        "name": "Đại Khê Thủy",
+        "ngu_hanh": "Thủy",
+        "description": "Nước dưới khe lớn: Chảy mạnh qua núi non, kiên trì và không ngừng tiến lên"
+    },
+    {
+        "id": "dai_hai_thuy",
+        "name": "Đại Hải Thủy",
+        "ngu_hanh": "Thủy",
+        "description": "Nước đại dương: Rộng lớn, bao dung, sâu thẳm và chứa đựng nhiều tiềm năng"
+    },
+    {
+        "id": "gian_ha_thuy",
+        "name": "Giản Hạ Thủy",
+        "ngu_hanh": "Thủy",
+        "description": "Nước dưới khe: Nhẹ nhàng, trong trẻo, tinh khiết và dễ chịu"
+    },
+    {
+        "id": "tuyen_trung_thuy",
+        "name": "Tuyền Trung Thủy",
+        "ngu_hanh": "Thủy",
+        "description": "Nước giữa dòng suối: Trong lành, mát mẻ, thường mang lại sự thanh thản"
+    },
+    {
+        "id": "son_ha_hoa",
+        "name": "Sơn Hạ Hỏa",
+        "ngu_hanh": "Hỏa",
+        "description": "Lửa dưới chân núi: Sức mạnh tiềm ẩn, ấm áp, thường âm ỉ nhưng mạnh mẽ khi bùng phát"
+    },
+    {
+        "id": "phu_dang_hoa",
+        "name": "Phú Đăng Hỏa",
+        "ngu_hanh": "Hỏa",
+        "description": "Lửa ngọn đèn: Ánh sáng nhỏ bé nhưng bền bỉ, mang lại sự soi đường và ấm cúng"
+    },
+    {
+        "id": "thien_thuong_hoa",
+        "name": "Thiên Thượng Hỏa",
+        "ngu_hanh": "Hỏa",
+        "description": "Lửa trên trời: Như mặt trời, ánh sáng mặt trời, rực rỡ, vĩ đại và ban phát năng lượng"
+    },
+    {
+        "id": "lo_trung_hoa",
+        "name": "Lộ Trung Hỏa",
+        "ngu_hanh": "Hỏa",
+        "description": "Lửa trong lò: Lửa nhân tạo, có kiểm soát, phục vụ cho sự nấu nướng và công nghiệp"
+    },
+    {
+        "id": "son_dau_hoa",
+        "name": "Sơn Đầu Hỏa",
+        "ngu_hanh": "Hỏa",
+        "description": "Lửa trên núi: Dữ dội, bùng nổ nhanh, mạnh mẽ nhưng đôi khi thiếu bền vững"
+    },
+    {
+        "id": "tich_lich_hoa",
+        "name": "Tích Lịch Hỏa",
+        "ngu_hanh": "Hỏa",
+        "description": "Lửa sấm sét: Cực kỳ mạnh mẽ, bất ngờ, nhanh chóng và có sức tàn phá hoặc tạo ra biến cố lớn"
+    },
+    {
+        "id": "bich_thuong_tho",
+        "name": "Bích Thượng Thổ",
+        "ngu_hanh": "Thổ",
+        "description": "Đất trên vách: Đất trên tường nhà, bền vững, bảo vệ và che chắn"
+    },
+    {
+        "id": "dai_dich_tho",
+        "name": "Đại Dịch Thổ",
+        "ngu_hanh": "Thổ",
+        "description": "Đất thuộc 1 khu lớn: Đất rộng lớn, bao la, mang lại sự ổn định và nguồn lực dồi dào"
+    },
+    {
+        "id": "sa_trung_tho",
+        "name": "Sa Trung Thổ",
+        "ngu_hanh": "Thổ",
+        "description": "Đất lẫn trong cát: Đất pha tạp, cần được sàng lọc để trở nên hữu ích, linh hoạt"
+    },
+    {
+        "id": "lo_bang_tho",
+        "name": "Lộ Bàng Thổ",
+        "ngu_hanh": "Thổ",
+        "description": "Đất giữa đường: Đất ven đường, gần gũi, phục vụ cho sự đi lại và kết nối"
+    },
+    {
+        "id": "oc_thuong_tho",
+        "name": "Ốc Thượng Thổ",
+        "ngu_hanh": "Thổ",
+        "description": "Đất trên nóc nhà: Đất trên mái nhà, bảo vệ, che chở và mang lại sự an toàn"
+    },
+    {
+        "id": "thanh_dau_tho",
+        "name": "Thành Đầu Thổ",
+        "ngu_hanh": "Thổ",
+        "description": "Đất trên mặt thành: Đất trên tường thành, mang tính phòng thủ, vững chãi và uy nghiêm"
+    }
+]
