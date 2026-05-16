@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { ChatMessage as Msg, CungPayload, SessionStash, OverlayKind } from "../_lib/types";
 import { loadStash } from "../_lib/session-store";
-import { seedOpeningMessage, pickCannedReply, SUGGESTED_CHIPS } from "../_data/mock-chat";
+import { seedOpeningMessage, SUGGESTED_CHIPS } from "../_data/mock-chat";
+import { useSendChat } from "@/services/api/v1/chat/send";
 import { getSaoDetail } from "../_data/mock-stars";
 import { Chart } from "./Chart";
 import { Chip } from "./Buttons";
@@ -33,12 +34,11 @@ export function MobileChartView() {
   const [selectedSao, setSelectedSao] = useState<string | null>(null);
   const [openOverlay, setOpenOverlay] = useState<OverlayKind>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
-  const [pending, setPending] = useState(false);
-  const [replySeed, setReplySeed] = useState(0);
   const [chatOpen, setChatOpen] = useState(false);
   const chartSize = useResponsiveSize();
   const isMobile = useIsMobile();
-  const timerRef = useRef<number | null>(null);
+  const sendChat = useSendChat();
+  const pending = sendChat.isPending;
 
   useEffect(() => {
     const s = loadStash();
@@ -51,13 +51,6 @@ export function MobileChartView() {
     setHydrated(true);
     setMessages(seedOpeningMessage(s.laso));
   }, [router]);
-
-  useEffect(
-    () => () => {
-      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-    },
-    [],
-  );
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -86,17 +79,29 @@ export function MobileChartView() {
   const onSend = useCallback(
     (body: string) => {
       setMessages((prev) => [...prev, { id: `me-${Date.now()}`, sender: "me", body }]);
-      const seed = replySeed;
-      setReplySeed((s) => s + 1);
-      setPending(true);
-      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(() => {
-        timerRef.current = null;
-        setMessages((prev) => [...prev, pickCannedReply(seed)]);
-        setPending(false);
-      }, 600);
+      sendChat.mutate(
+        { message: body },
+        {
+          onSuccess: (data) => {
+            setMessages((prev) => [
+              ...prev,
+              { id: `ai-${Date.now()}`, sender: "ai", body: data.answer },
+            ]);
+          },
+          onError: (err) => {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `ai-${Date.now()}`,
+                sender: "ai",
+                body: `Thầy đang bận, con thử lại sau nhé. (${err instanceof Error ? err.message : "lỗi"})`,
+              },
+            ]);
+          },
+        },
+      );
     },
-    [replySeed],
+    [sendChat],
   );
 
   const onRefClick = useCallback((kind: "ref" | "sao", value: string) => {

@@ -166,3 +166,4 @@ cython_debug/
 .serena/
 .claude/
 docs/superpowers
+.playwright-mcp/

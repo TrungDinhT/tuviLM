@@ -61,3 +61,18 @@ export interface ChatMessage {
 }
 
 export type OverlayKind = "daiVan" | "lichSu" | null;
+
+export interface ChatToolCall {
+  id: string | null;
+  name: string;
+  arguments: unknown;
+}
+
+export interface ChatRequest {
+  message: string;
+}
+
+export interface ChatResponse {
+  answer: string;
+  tool_calls: ChatToolCall[];
+}

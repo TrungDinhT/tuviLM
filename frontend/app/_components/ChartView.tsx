@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import type {
   ChatMessage as Msg,
@@ -9,7 +9,8 @@ import type {
   SessionStash,
 } from "../_lib/types";
 import { loadStash } from "../_lib/session-store";
-import { seedOpeningMessage, pickCannedReply } from "../_data/mock-chat";
+import { seedOpeningMessage } from "../_data/mock-chat";
+import { useSendChat } from "@/services/api/v1/chat/send";
 import { TopBar } from "./TopBar";
 import { TopBarMenu } from "./TopBarMenu";
 import { LeftRail } from "./LeftRail";
@@ -43,16 +44,7 @@ export function ChartView() {
   const [selectedSao, setSelectedSao] = useState<string | null>(null);
   const [openOverlay, setOpenOverlay] = useState<OverlayKind>(null);
   const [extraMessages, setExtraMessages] = useState<Msg[]>([]);
-  const [pending, setPending] = useState(false);
-  const [replySeed, setReplySeed] = useState(0);
-  const timerRef = useRef<number | null>(null);
-
-  useEffect(
-    () => () => {
-      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-    },
-    [],
-  );
+  const sendChat = useSendChat();
 
   const openingMessages = useMemo<Msg[]>(
     () => (stash ? seedOpeningMessage(stash.laso) : []),
@@ -102,17 +94,29 @@ export function ChartView() {
         ...prev,
         { id: `me-${Date.now()}`, sender: "me", body },
       ]);
-      const seed = replySeed;
-      setReplySeed((s) => s + 1);
-      setPending(true);
-      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(() => {
-        timerRef.current = null;
-        setExtraMessages((prev) => [...prev, pickCannedReply(seed)]);
-        setPending(false);
-      }, 600);
+      sendChat.mutate(
+        { message: body },
+        {
+          onSuccess: (data) => {
+            setExtraMessages((prev) => [
+              ...prev,
+              { id: `ai-${Date.now()}`, sender: "ai", body: data.answer },
+            ]);
+          },
+          onError: (err) => {
+            setExtraMessages((prev) => [
+              ...prev,
+              {
+                id: `ai-${Date.now()}`,
+                sender: "ai",
+                body: `Thầy đang bận, con thử lại sau nhé. (${err instanceof Error ? err.message : "lỗi"})`,
+              },
+            ]);
+          },
+        },
+      );
     },
-    [replySeed],
+    [sendChat],
   );
 
   const onChipClick = useCallback(
@@ -163,7 +167,7 @@ export function ChartView() {
             onSend={onSend}
             onRefClick={onRefClick}
             onChipClick={onChipClick}
-            pending={pending}
+            pending={sendChat.isPending}
           />
         </div>
         <RightRail
