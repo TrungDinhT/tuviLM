@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { BuildLasoResponse, Calendar, UserProfile } from "../_lib/types";
+import type { Calendar, UserProfile } from "../_lib/types";
 import { saveStash } from "../_lib/session-store";
 import { EntryFormSchema } from "../_lib/schemas";
+import { useBuildLaso } from "@/services/api/v1/laso/build";
 import { Btn } from "./Buttons";
 import { Eyebrow } from "./Eyebrow";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-const API = `${API_BASE}/api/v1/laso/build`;
-
 export function EntryForm() {
   const router = useRouter();
+  const buildLaso = useBuildLaso();
   const [name, setName] = useState("");
   const [gender, setGender] = useState<"M" | "F">("M");
   const [calendar, setCalendar] = useState<Calendar>("am");
@@ -21,8 +20,6 @@ export function EntryForm() {
   const [year, setYear] = useState(1999);
   const [hour, setHour] = useState(12);
   const [minute, setMinute] = useState(30);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   async function onSubmit(e: React.FormEvent) {
@@ -38,32 +35,18 @@ export function EntryForm() {
       return;
     }
     setFieldErrors({});
-    setLoading(true);
-    setError(null);
+
+    const { minute: _m, ...apiPayload } = parsed.data;
+    void _m;
+
     try {
-      const { minute: _m, ...apiPayload } = parsed.data;
-      void _m;
-      const res = await fetch(API, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(apiPayload),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const laso = await res.json();
-      if (
-        !laso ||
-        typeof laso.id !== "string" ||
-        !laso.cung_by_position
-      ) {
-        throw new Error("Phản hồi lá số không hợp lệ");
-      }
+      const laso = await buildLaso.mutateAsync(apiPayload);
       const profile: UserProfile = { name, gender, calendar, date, month, year, hour, minute };
-      saveStash({ laso: laso as BuildLasoResponse, profile, fetchedAt: new Date().toISOString() });
+      saveStash({ laso, profile, fetchedAt: new Date().toISOString() });
       router.push("/chart");
-    } catch {
-      setError("Không lập được lá số. Thử lại?");
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Không lập được lá số. Thử lại?";
+      setFieldErrors({ _form: msg });
     }
   }
 
@@ -123,10 +106,9 @@ export function EntryForm() {
         </Group>
 
         {fieldErrors._form && <div className="text-[13px] text-[var(--color-crimson)]">{fieldErrors._form}</div>}
-        {error && <div className="text-[13px] text-[var(--color-crimson)]">{error}</div>}
 
-        <Btn type="submit" variant="crimson" disabled={loading} className="justify-center py-3.5 text-[15px] tracking-[0.4px] mt-2">
-          {loading ? "Đang an lá số…" : "✦ An lá số · trò chuyện với thầy"}
+        <Btn type="submit" variant="crimson" disabled={buildLaso.isPending} className="justify-center py-3.5 text-[15px] tracking-[0.4px] mt-2">
+          {buildLaso.isPending ? "Đang an lá số…" : "✦ An lá số · trò chuyện với thầy"}
         </Btn>
         <div className="text-center text-[11px] text-[var(--color-ink-3)] -mt-1">
           Tiếp tục → bạn đồng ý <button type="button" className="text-[var(--color-crimson)] underline-offset-2 hover:underline cursor-pointer">điều khoản</button> & <button type="button" className="text-[var(--color-crimson)] underline-offset-2 hover:underline cursor-pointer">quyền riêng tư</button>

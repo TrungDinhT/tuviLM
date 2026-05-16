@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./_components/Providers";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["vietnamese", "latin"],
@@ -25,7 +26,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" className={`${cormorant.variable} ${beVietnam.variable}`}>
-      <body className="paper-tex">{children}</body>
+      <body className="paper-tex">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

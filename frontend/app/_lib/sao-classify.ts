@@ -1,4 +1,4 @@
-import starsData from "../_constants/stars.json";
+import starsData from "@/constants/stars.json";
 
 type StarEntry = { name: string; categories: string[]; ngu_hanh: string | null };
 
