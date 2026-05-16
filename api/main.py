@@ -150,7 +150,7 @@ def health(request: Request) -> dict[str, str | bool]:
     api_state = get_api_state(request)
     return {
         "status": "ok",
-        "tinh_ban_created": api_state.has_tinh_ban,
+        "la_so_created": api_state.has_la_so,
     }
 
 
