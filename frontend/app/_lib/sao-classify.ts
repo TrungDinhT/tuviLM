@@ -23,3 +23,8 @@ export function classifyPhuTinh(name: string): PhuTinhKind {
 export function stripParen(s: string): string {
   return s.replace(/\s*\([^)]*\)\s*$/, "");
 }
+
+// Strip leading "Hóa " (or "Hoá ") prefix from tứ hóa labels: "Hóa Lộc" → "Lộc"
+export function stripHoa(s: string): string {
+  return s.replace(/^\s*Ho[áa]\s+/, "");
+}

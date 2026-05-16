@@ -33,8 +33,8 @@ export function ChartViewBoot() {
   }
 
   return (
-    <div className="paper-tex min-h-screen flex items-center justify-center text-[var(--color-ink-3)] font-serif italic text-[18px] flex-col gap-3">
-      <div>Lá số đã sẵn sàng — {stash.profile.name}</div>
+    <div className="paper-tex min-h-screen flex items-center justify-center text-[var(--color-ink-3)] font-serif italic text-[28px] flex-col gap-3">
+      <div>Lá số đã sẵn sàng — {stash.profile.name || "Lần sau nhớ ghi tên vào nhé!"}</div>
       <div className="text-[13px] text-[var(--color-ink-4)] not-italic">
         ID: {stash.laso.id} · {Object.keys(stash.laso.cung_by_position).length} cung
       </div>
