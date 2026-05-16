@@ -25,7 +25,7 @@ export function LeftRail({
   size = 690,
 }: LeftRailProps) {
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-[18px] items-center xl:items-start">
       <Chart
         laso={laso}
         profile={profile}

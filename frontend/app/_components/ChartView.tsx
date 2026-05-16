@@ -17,6 +17,7 @@ import { ChatPanel } from "./ChatPanel";
 import { RightRail } from "./RightRail";
 import { DaiVanModal } from "./DaiVanModal";
 import { LichSuDrawer } from "./LichSuDrawer";
+import { useResponsiveSize } from "./useResponsiveSize";
 
 // 2026 = Bính Ngọ → tiểu vận badge sits on cung at địa chi "Ngọ"
 const TIEU_VAN_POSITION = "Ngọ";
@@ -25,6 +26,7 @@ export function ChartView() {
   const router = useRouter();
   const [stash, setStash] = useState<SessionStash | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const chartSize = useResponsiveSize();
 
   useEffect(() => {
     const s = loadStash();
@@ -151,22 +153,25 @@ export function ChartView() {
         }
       />
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[720px_1fr_320px] gap-6 lg:gap-8 px-4 sm:px-6 lg:px-9 py-5 lg:py-7 min-h-0">
+      <div className="flex-1 grid grid-cols-1 xl:grid-cols-[720px_1fr_320px] gap-6 xl:gap-8 px-4 sm:px-6 xl:px-9 py-5 xl:py-7 min-h-0">
         <LeftRail
           laso={laso}
           profile={profile}
+          size={chartSize}
           highlightedRole={selectedRole}
           tieuVanPosition={TIEU_VAN_POSITION}
           onCungClick={onCungClick}
           onOpenDaiVan={() => setOpenOverlay("daiVan")}
         />
-        <ChatPanel
-          messages={messages}
-          onSend={onSend}
-          onRefClick={onRefClick}
-          onChipClick={onChipClick}
-          pending={pending}
-        />
+        <div className="min-h-[60vh] xl:min-h-0 min-w-0">
+          <ChatPanel
+            messages={messages}
+            onSend={onSend}
+            onRefClick={onRefClick}
+            onChipClick={onChipClick}
+            pending={pending}
+          />
+        </div>
         <RightRail
           selectedCung={selectedCung}
           selectedSao={selectedSao}
