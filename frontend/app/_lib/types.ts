@@ -54,10 +54,19 @@ export interface SessionStash {
 
 export type Sender = "ai" | "me";
 
+export interface ChatToolEntry {
+  id: string;
+  name: string;
+  arguments: unknown;
+  result?: unknown;
+}
+
 export interface ChatMessage {
   id: string;
   sender: Sender;
   body: string; // may contain inline markers: [[ref:Quan Lộc]], [[sao:Kình Dương]]
+  toolCalls?: ChatToolEntry[];
+  streaming?: boolean;
 }
 
 export type OverlayKind = "daiVan" | "lichSu" | null;

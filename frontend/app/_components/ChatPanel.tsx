@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import type { ChatMessage as Msg } from "../_lib/types";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { Chip } from "./Buttons";
 import { SUGGESTED_CHIPS } from "../_data/mock-chat";
+import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 
 interface ChatPanelProps {
   messages: Msg[];
@@ -16,41 +16,52 @@ interface ChatPanelProps {
 }
 
 export function ChatPanel({ messages, onSend, onRefClick, onChipClick, pending = false }: ChatPanelProps) {
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    sentinelRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages.length, pending]);
-
   return (
     <div className="flex flex-col gap-4 h-full min-h-0">
-      <div
-        className="flex-1 flex flex-col gap-[18px] p-5 overflow-auto min-h-0 border border-[rgba(26,22,17,0.14)]"
-        style={{ background: "rgba(255,252,245,0.55)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 0 rgba(26,22,17,0.06)" }}
+      <StickToBottom
+        className="flex-1 min-h-0 relative"
+        resize="smooth"
+        initial="instant"
       >
-        <div className="flex items-center gap-3 text-[11px] tracking-[2px] text-[var(--color-ink-4)] uppercase">
-          <span className="flex-1 h-px bg-[var(--color-ink-4)]" />
-          <span>BẮT ĐẦU CUỘC NÓI CHUYỆN</span>
-          <span className="flex-1 h-px bg-[var(--color-ink-4)]" />
-        </div>
-        {messages.map((m) => (
-          <ChatMessage key={m.id} msg={m} onRefClick={onRefClick} />
-        ))}
-        {pending && (
-          <div className="self-start font-serif italic text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] xl:text-[14px] text-[var(--color-ink-2)]">
-            Thầy đang suy…
+        <StickToBottom.Content
+          className="flex flex-col gap-[18px] py-5 pr-3 pl-1"
+          scrollClassName="chat-scroll"
+        >
+          <div className="flex items-center gap-3 text-[11px] tracking-[2px] text-[var(--color-ink-4)] uppercase">
+            <span className="flex-1 h-px bg-[var(--color-ink-4)]" />
+            <span>BẮT ĐẦU CUỘC NÓI CHUYỆN</span>
+            <span className="flex-1 h-px bg-[var(--color-ink-4)]" />
           </div>
-        )}
-        {messages.length <= 1 && (
-          <div className="flex flex-wrap gap-2">
-            {SUGGESTED_CHIPS.map((c) => (
-              <Chip key={`sug-${c}`} onClick={() => onChipClick(c)}>{c}</Chip>
-            ))}
-          </div>
-        )}
-        <div ref={sentinelRef} />
-      </div>
+          {messages.map((m) => (
+            <ChatMessage key={m.id} msg={m} onRefClick={onRefClick} />
+          ))}
+          {messages.length <= 1 && (
+            <div className="flex flex-wrap gap-2">
+              {SUGGESTED_CHIPS.map((c) => (
+                <Chip key={`sug-${c}`} onClick={() => onChipClick(c)}>{c}</Chip>
+              ))}
+            </div>
+          )}
+        </StickToBottom.Content>
+        <ScrollToBottomButton />
+      </StickToBottom>
       <ChatInput onSend={onSend} disabled={pending} />
     </div>
+  );
+}
+
+function ScrollToBottomButton() {
+  const { isAtBottom, scrollToBottom } = useStickToBottomContext();
+  if (isAtBottom) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => scrollToBottom()}
+      className="absolute left-1/2 -translate-x-1/2 bottom-3 z-10 w-9 h-9 rounded-full grid place-items-center text-[18px] text-[var(--color-paper)] border-0 cursor-pointer"
+      style={{ background: "var(--color-crimson)", boxShadow: "0 4px 12px rgba(139,42,31,0.4)" }}
+      aria-label="Cuộn xuống dưới"
+    >
+      ↓
+    </button>
   );
 }

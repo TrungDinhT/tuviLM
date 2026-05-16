@@ -1,9 +1,6 @@
 import type { ChatMessage, BuildLasoResponse } from "../_lib/types";
 
-export function seedOpeningMessage(laso: BuildLasoResponse): ChatMessage[] {
-  const menh = Object.values(laso.cung_by_position).find(c => c.role === "Mệnh");
-  const menhStar = menh?.chinh_tinh[0]?.replace(/\s*\(.*\)\s*$/, "") ?? "vô chính diệu";
-  const menhPos = menh?.position ?? "";
+export function seedOpeningMessage(_laso: BuildLasoResponse): ChatMessage[] {
   return [
     {
       id: "ai-open",

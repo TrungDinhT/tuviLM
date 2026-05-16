@@ -11,6 +11,16 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+from pydantic_ai import (
+    AgentRunResultEvent,
+    FunctionToolCallEvent,
+    FunctionToolResultEvent,
+    PartDeltaEvent,
+    PartStartEvent,
+    TextPart,
+    TextPartDelta,
+)
 
 from api._parse import to_cung_payload_map
 from api.schemas import (
@@ -224,3 +234,63 @@ async def chat_dummy(payload: ChatRequest, request: Request) -> ChatResponse:
         answer=result.output,
         tool_calls=_extract_tool_calls(result),
     )
+
+
+def _sse(event: dict[str, Any]) -> str:
+    return f"data: {json.dumps(event, ensure_ascii=False, default=str)}\n\n"
+
+
+@app.post("/api/v1/chat/stream")
+async def chat_stream(payload: ChatRequest, request: Request) -> StreamingResponse:
+    api_state = get_api_state(request)
+
+    async def gen():
+        if not api_state.has_la_so:
+            yield _sse({"type": "error", "message": "Chưa lập lá số."})
+            yield _sse({"type": "done"})
+            return
+
+        agent = api_state.agent_deps.require_agent()
+        try:
+            async with agent.run_stream_events(
+                payload.message, deps=api_state.agent_deps
+            ) as stream:
+                async for event in stream:
+                    msg = _serialize_event(event)
+                    if msg is not None:
+                        yield _sse(msg)
+        except Exception as exc:
+            yield _sse({"type": "error", "message": str(exc)})
+        yield _sse({"type": "done"})
+
+    return StreamingResponse(
+        gen(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+def _serialize_event(event: Any) -> dict[str, Any] | None:
+    match event:
+        case PartStartEvent(part=TextPart(content=content)):
+            return {"type": "text", "delta": content}
+        case PartDeltaEvent(delta=TextPartDelta(content_delta=delta)):
+            return {"type": "text", "delta": delta}
+        case FunctionToolCallEvent(part=part):
+            return {
+                "type": "tool_call",
+                "id": part.tool_call_id,
+                "name": part.tool_name,
+                "arguments": _json_safe(_get_tool_args(part)),
+            }
+        case FunctionToolResultEvent(part=part):
+            return {
+                "type": "tool_result",
+                "id": event.tool_call_id,
+                "name": getattr(part, "tool_name", None),
+                "content": _json_safe(getattr(part, "content", None)),
+            }
+        case AgentRunResultEvent(result=result):
+            return {"type": "result", "output": getattr(result, "output", None)}
+        case _:
+            return None

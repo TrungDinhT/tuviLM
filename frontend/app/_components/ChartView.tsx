@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type {
   ChatMessage as Msg,
+  ChatToolEntry,
   CungPayload,
   OverlayKind,
   SessionStash,
 } from "../_lib/types";
 import { loadStash } from "../_lib/session-store";
 import { seedOpeningMessage } from "../_data/mock-chat";
-import { useSendChat } from "@/services/api/v1/chat/send";
+import { useStreamChat } from "@/services/api/v1/chat/send";
 import { TopBar } from "./TopBar";
 import { TopBarMenu } from "./TopBarMenu";
 import { LeftRail } from "./LeftRail";
@@ -44,7 +45,15 @@ export function ChartView() {
   const [selectedSao, setSelectedSao] = useState<string | null>(null);
   const [openOverlay, setOpenOverlay] = useState<OverlayKind>(null);
   const [extraMessages, setExtraMessages] = useState<Msg[]>([]);
-  const sendChat = useSendChat();
+  const chat = useStreamChat();
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(
+    () => () => {
+      abortRef.current?.abort();
+    },
+    [],
+  );
 
   const openingMessages = useMemo<Msg[]>(
     () => (stash ? seedOpeningMessage(stash.laso) : []),
@@ -90,33 +99,87 @@ export function ChartView() {
 
   const onSend = useCallback(
     (body: string) => {
+      const aiId = `ai-${Date.now()}`;
       setExtraMessages((prev) => [
         ...prev,
         { id: `me-${Date.now()}`, sender: "me", body },
+        { id: aiId, sender: "ai", body: "", toolCalls: [], streaming: true },
       ]);
-      sendChat.mutate(
-        { message: body },
+
+      abortRef.current?.abort();
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
+
+      const updateAi = (mut: (msg: Msg) => Msg) => {
+        setExtraMessages((prev) =>
+          prev.map((m) => (m.id === aiId ? mut(m) : m)),
+        );
+      };
+
+      chat.mutate(
         {
-          onSuccess: (data) => {
-            setExtraMessages((prev) => [
-              ...prev,
-              { id: `ai-${Date.now()}`, sender: "ai", body: data.answer },
-            ]);
+          message: body,
+          signal: ctrl.signal,
+          onEvent: (event) => {
+            switch (event.type) {
+              case "text":
+                updateAi((m) => ({ ...m, body: m.body + event.delta }));
+                break;
+              case "tool_call": {
+                const entry: ChatToolEntry = {
+                  id: event.id,
+                  name: event.name,
+                  arguments: event.arguments,
+                };
+                updateAi((m) => {
+                  const existing = m.toolCalls ?? [];
+                  const idx = existing.findIndex((t) => t.id === entry.id);
+                  const next = idx >= 0
+                    ? existing.map((t, i) => (i === idx ? { ...t, ...entry } : t))
+                    : [...existing, entry];
+                  return { ...m, toolCalls: next };
+                });
+                break;
+              }
+              case "tool_result":
+                updateAi((m) => ({
+                  ...m,
+                  toolCalls: (m.toolCalls ?? []).map((t) =>
+                    t.id === event.id ? { ...t, result: event.content } : t,
+                  ),
+                }));
+                break;
+              case "error":
+                updateAi((m) => ({
+                  ...m,
+                  body: m.body + `\n\n_Thầy đang bận: ${event.message}_`,
+                }));
+                break;
+              case "done":
+                updateAi((m) => ({ ...m, streaming: false }));
+                break;
+              default:
+                break;
+            }
+          },
+        },
+        {
+          onSettled: () => {
+            updateAi((m) => ({ ...m, streaming: false }));
           },
           onError: (err) => {
-            setExtraMessages((prev) => [
-              ...prev,
-              {
-                id: `ai-${Date.now()}`,
-                sender: "ai",
-                body: `Thầy đang bận, con thử lại sau nhé. (${err instanceof Error ? err.message : "lỗi"})`,
-              },
-            ]);
+            if (ctrl.signal.aborted) return;
+            updateAi((m) => ({
+              ...m,
+              body:
+                m.body +
+                `\n\n_Lỗi kết nối: ${err instanceof Error ? err.message : "không rõ"}_`,
+            }));
           },
         },
       );
     },
-    [sendChat],
+    [chat],
   );
 
   const onChipClick = useCallback(
@@ -140,7 +203,7 @@ export function ChartView() {
     : null;
 
   return (
-    <div className="paper-tex min-h-screen flex flex-col">
+    <div className="paper-tex h-dvh flex flex-col overflow-hidden">
       <TopBar
         breadcrumb={
           <>
@@ -161,13 +224,13 @@ export function ChartView() {
           onCungClick={onCungClick}
           onOpenDaiVan={() => setOpenOverlay("daiVan")}
         />
-        <div className="min-h-[60vh] xl:min-h-0 min-w-0">
+        <div className="min-h-[60vh] xl:min-h-0 min-w-0 h-full">
           <ChatPanel
             messages={messages}
             onSend={onSend}
             onRefClick={onRefClick}
             onChipClick={onChipClick}
-            pending={sendChat.isPending}
+            pending={chat.isPending}
           />
         </div>
         <RightRail

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import type { ChatMessage as Msg, CungPayload, SessionStash, OverlayKind } from "../_lib/types";
+import type { ChatMessage as Msg, ChatToolEntry, CungPayload, SessionStash, OverlayKind } from "../_lib/types";
 import { loadStash } from "../_lib/session-store";
 import { seedOpeningMessage, SUGGESTED_CHIPS } from "../_data/mock-chat";
-import { useSendChat } from "@/services/api/v1/chat/send";
+import { useStreamChat } from "@/services/api/v1/chat/send";
+import { StickToBottom } from "use-stick-to-bottom";
 import { getSaoDetail } from "../_data/mock-stars";
 import { Chart } from "./Chart";
 import { Chip } from "./Buttons";
@@ -35,10 +36,18 @@ export function MobileChartView() {
   const [openOverlay, setOpenOverlay] = useState<OverlayKind>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
+  const chat = useStreamChat();
+  const pending = chat.isPending;
   const chartSize = useResponsiveSize();
   const isMobile = useIsMobile();
-  const sendChat = useSendChat();
-  const pending = sendChat.isPending;
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(
+    () => () => {
+      abortRef.current?.abort();
+    },
+    [],
+  );
 
   useEffect(() => {
     const s = loadStash();
@@ -78,30 +87,85 @@ export function MobileChartView() {
 
   const onSend = useCallback(
     (body: string) => {
-      setMessages((prev) => [...prev, { id: `me-${Date.now()}`, sender: "me", body }]);
-      sendChat.mutate(
-        { message: body },
+      const aiId = `ai-${Date.now()}`;
+      setMessages((prev) => [
+        ...prev,
+        { id: `me-${Date.now()}`, sender: "me", body },
+        { id: aiId, sender: "ai", body: "", toolCalls: [], streaming: true },
+      ]);
+
+      abortRef.current?.abort();
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
+
+      const updateAi = (mut: (msg: Msg) => Msg) => {
+        setMessages((prev) => prev.map((m) => (m.id === aiId ? mut(m) : m)));
+      };
+
+      chat.mutate(
         {
-          onSuccess: (data) => {
-            setMessages((prev) => [
-              ...prev,
-              { id: `ai-${Date.now()}`, sender: "ai", body: data.answer },
-            ]);
+          message: body,
+          signal: ctrl.signal,
+          onEvent: (event) => {
+            switch (event.type) {
+              case "text":
+                updateAi((m) => ({ ...m, body: m.body + event.delta }));
+                break;
+              case "tool_call": {
+                const entry: ChatToolEntry = {
+                  id: event.id,
+                  name: event.name,
+                  arguments: event.arguments,
+                };
+                updateAi((m) => {
+                  const existing = m.toolCalls ?? [];
+                  const idx = existing.findIndex((t) => t.id === entry.id);
+                  const next = idx >= 0
+                    ? existing.map((t, i) => (i === idx ? { ...t, ...entry } : t))
+                    : [...existing, entry];
+                  return { ...m, toolCalls: next };
+                });
+                break;
+              }
+              case "tool_result":
+                updateAi((m) => ({
+                  ...m,
+                  toolCalls: (m.toolCalls ?? []).map((t) =>
+                    t.id === event.id ? { ...t, result: event.content } : t,
+                  ),
+                }));
+                break;
+              case "error":
+                updateAi((m) => ({
+                  ...m,
+                  body: m.body + `\n\n_Thầy đang bận: ${event.message}_`,
+                }));
+                break;
+              case "done":
+                updateAi((m) => ({ ...m, streaming: false }));
+                break;
+              default:
+                break;
+            }
+          },
+        },
+        {
+          onSettled: () => {
+            updateAi((m) => ({ ...m, streaming: false }));
           },
           onError: (err) => {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: `ai-${Date.now()}`,
-                sender: "ai",
-                body: `Thầy đang bận, con thử lại sau nhé. (${err instanceof Error ? err.message : "lỗi"})`,
-              },
-            ]);
+            if (ctrl.signal.aborted) return;
+            updateAi((m) => ({
+              ...m,
+              body:
+                m.body +
+                `\n\n_Lỗi kết nối: ${err instanceof Error ? err.message : "không rõ"}_`,
+            }));
           },
         },
       );
     },
-    [sendChat],
+    [chat],
   );
 
   const onRefClick = useCallback((kind: "ref" | "sao", value: string) => {
@@ -231,25 +295,26 @@ export function MobileChartView() {
                 ✕
               </button>
             </div>
-            <div className="flex-1 px-4 py-3 flex flex-col gap-2.5 overflow-auto min-h-0">
-              {messages.map((m) => (
-                <ChatMessage key={m.id} msg={m} onRefClick={onRefClick} />
-              ))}
-              {pending && (
-                <div className="self-start font-serif italic text-[13px] text-[var(--color-ink-3)]">
-                  Thầy đang suy…
-                </div>
-              )}
-              {messages.length <= 1 && (
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  {SUGGESTED_CHIPS.map((c) => (
-                    <Chip key={`sug-${c}`} className="text-[10px] px-2 py-1" onClick={() => onSend(c)}>
-                      {c}
-                    </Chip>
-                  ))}
-                </div>
-              )}
-            </div>
+            <StickToBottom
+              className="flex-1 min-h-0 relative"
+              resize="smooth"
+              initial="instant"
+            >
+              <StickToBottom.Content className="px-4 py-3 flex flex-col gap-2.5">
+                {messages.map((m) => (
+                  <ChatMessage key={m.id} msg={m} onRefClick={onRefClick} />
+                ))}
+                {messages.length <= 1 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {SUGGESTED_CHIPS.map((c) => (
+                      <Chip key={`sug-${c}`} className="text-[10px] px-2 py-1" onClick={() => onSend(c)}>
+                        {c}
+                      </Chip>
+                    ))}
+                  </div>
+                )}
+              </StickToBottom.Content>
+            </StickToBottom>
             <div
               className="px-3 py-2 border-t border-[rgba(26,22,17,0.14)]"
               style={{ background: "var(--color-paper)" }}
