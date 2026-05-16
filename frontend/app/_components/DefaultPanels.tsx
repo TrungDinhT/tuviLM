@@ -18,7 +18,7 @@ export function DefaultPanels() {
         <button type="button" className="text-[12px] text-[var(--color-crimson)] mt-1 cursor-pointer text-left underline-offset-2 hover:underline self-start">↳ Hỏi thầy về cách này</button>
       </div>
       <div className="mt-auto text-[11px] text-[var(--color-ink-3)] leading-[1.5]">
-        Diễn giải bởi mô hình tham khảo từ Tử Vi Đẩu Số (Trần Đoàn) — chỉ mang tính tham khảo, không thay thế thầy có nghề.
+        Diễn giải bởi AI — chỉ mang tính tham khảo, không thay thế thầy có nghề.
       </div>
     </div>
   );

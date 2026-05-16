@@ -138,9 +138,8 @@ export function ChartView() {
       <TopBar
         breadcrumb={
           <>
-            <span>{profile.name}, {profile.year}</span>
-            <span className="text-[var(--color-ink-4)]">·</span>
-            <span>vừa lập</span>
+            <span>{profile.name || "Giấu tên"}, {profile.year}</span>
+            <span className="text-[var(--color-ink-4)]"></span>
           </>
         }
         rightActions={
@@ -152,7 +151,7 @@ export function ChartView() {
         }
       />
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[480px_1fr_320px] gap-6 lg:gap-8 px-4 sm:px-6 lg:px-9 py-5 lg:py-7 min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[720px_1fr_320px] gap-6 lg:gap-8 px-4 sm:px-6 lg:px-9 py-5 lg:py-7 min-h-0">
         <LeftRail
           laso={laso}
           profile={profile}

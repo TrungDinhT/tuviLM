@@ -1,5 +1,14 @@
 import type { CungPayload } from "../_lib/types";
-import { classifyPhuTinh, stripHoa, stripParen } from "../_lib/sao-classify";
+import { classifyPhuTinh } from "../_lib/sao-classify";
+import { deriveStars } from "../_lib/cung-derive";
+import { colorForStarName, colorForElement } from "../_lib/ngu-hanh";
+
+function abbrevStatus(s: string): string {
+  return s.replace(/\(([^)]+)\)/, (_, content) => {
+    const trimmed = content.trim();
+    return trimmed.length > 0 ? `(${trimmed[0]})` : "";
+  });
+}
 
 interface CungBoxProps {
   cung: CungPayload;
@@ -15,8 +24,11 @@ export function CungBox({ cung, highlighted, tieuVan, cellSize, onClick }: CungB
   const maxCat = veryTight ? 1 : 2;
   const maxHung = veryTight ? 1 : 2;
 
-  const cat = cung.phu_tinh.filter((s) => classifyPhuTinh(s.name) === "cat").slice(0, maxCat);
-  const hung = cung.phu_tinh.filter((s) => classifyPhuTinh(s.name) === "hung").slice(0, maxHung);
+  const { fixed, luu } = deriveStars(cung);
+  const fixedCat = fixed.filter((s) => classifyPhuTinh(s.name) === "cat").slice(0, maxCat);
+  const fixedHung = fixed.filter((s) => classifyPhuTinh(s.name) === "hung").slice(0, maxHung);
+  const luuCat = luu.filter((s) => classifyPhuTinh(s.name) === "cat").slice(0, maxCat);
+  const luuHung = luu.filter((s) => classifyPhuTinh(s.name) === "hung").slice(0, maxHung);
 
   const padding = veryTight ? "px-1.5 pt-1 pb-3" : tight ? "px-1.5 pt-1.5 pb-4" : "px-2.5 pt-2.5 pb-[18px]";
   const ringClass = highlighted
@@ -35,44 +47,62 @@ export function CungBox({ cung, highlighted, tieuVan, cellSize, onClick }: CungB
       className={`relative h-full box-border border border-[rgba(26,22,17,0.14)] flex flex-col gap-px text-[11px] text-[var(--color-ink-2)] cursor-pointer transition-[background,outline] duration-200 hover:bg-[rgba(255,252,245,0.85)] overflow-hidden ${padding} ${ringClass}`}
       style={{ background: bg, boxShadow: ringShadow, zIndex: highlighted ? 2 : "auto" }}
     >
-      {tieuVan && !veryTight && (
-        <div
-          className="absolute -top-1.5 -right-1.5 z-[3] text-[9px] font-semibold tracking-[0.5px] px-1.5 py-px rounded-lg text-white"
-          style={{ background: "var(--color-gold)", boxShadow: "0 2px 6px rgba(168,133,74,0.4)" }}
-        >
-          2026
-        </div>
-      )}
-      <div className="flex justify-between items-baseline gap-1 mb-px">
-        <div className={`font-serif font-semibold tracking-[0.4px] text-[var(--color-ink)] leading-[1.05] pr-1 flex-1 min-w-0 ${veryTight ? "text-[10.5px]" : tight ? "text-[11.5px]" : "text-[13px]"}`}>
-          {cung.role === "Mệnh" && <span className="text-[var(--color-crimson)] text-[12px] mr-1">✦</span>}
+      {/* Top row: địa chi left, role centered */}
+      <div className="relative w-full">
+        <span className={`absolute left-0 top-0 font-serif italic text-[var(--color-ink-3)] tracking-[0.4px] leading-[1] ${veryTight ? "text-[9px]" : tight ? "text-[10px]" : "text-[11px]"}`}>
+          {cung.position}
+        </span>
+        <div className={`text-center font-serif font-semibold tracking-[0.4px] text-[var(--color-ink)] leading-[1.05] whitespace-nowrap ${veryTight ? "text-[10px]" : tight ? "text-[12px]" : "text-[14px]"}`}>
+          {cung.role === "Mệnh" && <span className="text-[var(--color-crimson)] mr-1">✦</span>}
           {cung.is_cung_than && cung.role !== "Mệnh" && (
-            <span className="text-[var(--color-gold)] text-[10px] mr-1">✦</span>
+            <span className="text-[var(--color-gold)] mr-1">✦</span>
           )}
           {cung.role ?? ""}
         </div>
-        <div className={`font-serif italic text-[var(--color-ink-3)] tracking-[0.4px] flex-none ${veryTight ? "text-[9px]" : tight ? "text-[10px]" : "text-[11px]"}`}>
-          {cung.position}
-        </div>
       </div>
 
-      {cung.chinh_tinh.length > 0 ? (
-        <div className={`font-serif font-semibold leading-[1.15] tracking-[0.2px] text-[var(--color-crimson)] ${veryTight ? "text-[10px]" : tight ? "text-[11px]" : "text-[12.5px]"}`}>
-          {veryTight ? stripParen(cung.chinh_tinh[0]) : cung.chinh_tinh.join(" · ")}
-        </div>
-      ) : (
-        <div className={`font-serif italic text-[var(--color-ink-4)] ${veryTight ? "text-[9.5px]" : tight ? "text-[10px]" : "text-[11.5px]"}`}>
-          vô chính diệu
-        </div>
-      )}
+      <div
+        className={`text-center font-serif font-semibold tracking-[0.2px] flex flex-col gap-px leading-[1.15] mt-0.5 ${veryTight ? "text-[11.5px]" : tight ? "text-[13px]" : "text-[15px]"}`}
+        style={{ minHeight: "calc(2 * 1.15em)" }}
+      >
+        {cung.chinh_tinh.length > 0 && (
+          cung.chinh_tinh.map((s) => (
+            <div key={`ct-${s}`} style={{ color: colorForStarName(s) }}>{abbrevStatus(s)}</div>
+          ))
+        )}
+      </div>
 
       {!veryTight && (
-        <div className={`flex flex-wrap tracking-[0.2px] mt-0.5 ${tight ? "text-[9.5px] gap-x-1.5 gap-y-0.5" : "text-[10.5px] gap-x-2 gap-y-0.5"}`}>
-          {cat.map((s) => <span key={`cat-${s.name}`} className="text-[var(--color-jade)]">{s.name}</span>)}
-          {hung.map((s) => <span key={`hung-${s.name}`} className="text-[var(--color-ink-2)]">{s.name}</span>)}
-          {cung.tuhoa.map((h) => (
-            <span key={`tuhoa-${h}`} className="text-[var(--color-gold)] font-semibold">Hoá {stripHoa(h)}</span>
-          ))}
+        <div className={`mt-0.5 ${tight ? "text-[9.5px]" : "text-[10.5px]"}`}>
+          <div className="grid grid-cols-2 gap-x-2 tracking-[0.2px]">
+            <div className="flex flex-col gap-px">
+              {fixedCat.map((s) => <span key={`fc-${s.name}`} style={{ color: colorForElement(s.element) }}>{s.name}</span>)}
+              {luuCat.map((s) => <span key={`lc-${s.name}`} style={{ color: colorForElement(s.element) }}>L.{s.name}</span>)}
+            </div>
+            <div className="flex flex-col gap-px items-end text-right">
+              {fixedHung.map((s) => <span key={`fh-${s.name}`} style={{ color: colorForElement(s.element) }}>{s.name}</span>)}
+              {luuHung.map((s) => <span key={`lh-${s.name}`} style={{ color: colorForElement(s.element) }}>L.{s.name}</span>)}
+            </div>
+          </div>
+
+          {cung.tuhoa.length > 0 && (() => {
+            const tuhoaLeft = cung.tuhoa.filter((h) => !h.includes("Kỵ"));
+            const tuhoaRight = cung.tuhoa.filter((h) => h.includes("Kỵ"));
+            return (
+              <div className="grid grid-cols-2 gap-x-2 mt-0.5">
+                <div className="flex flex-col gap-px">
+                  {tuhoaLeft.map((h) => (
+                    <span key={`th-l-${h}`} className="font-semibold" style={{ color: colorForStarName(h) }}>{h}</span>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-px items-end text-right">
+                  {tuhoaRight.map((h) => (
+                    <span key={`th-r-${h}`} className="font-semibold" style={{ color: colorForStarName(h) }}>{h}</span>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -85,7 +115,6 @@ export function CungBox({ cung, highlighted, tieuVan, cellSize, onClick }: CungB
         }}
       >
         <span>{cung.age_daivan != null ? `${cung.age_daivan}` : "—"}</span>
-        {cung.role === "Mệnh" && !veryTight && <span>· chủ</span>}
       </div>
     </div>
   );

@@ -24,7 +24,10 @@ export function ChatPanel({ messages, onSend, onRefClick, onChipClick, pending =
 
   return (
     <div className="flex flex-col gap-4 h-full min-h-0">
-      <div className="flex-1 flex flex-col gap-[18px] pt-4 overflow-auto min-h-0">
+      <div
+        className="flex-1 flex flex-col gap-[18px] p-5 overflow-auto min-h-0 border border-[rgba(26,22,17,0.14)]"
+        style={{ background: "rgba(255,252,245,0.55)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 0 rgba(26,22,17,0.06)" }}
+      >
         <div className="flex items-center gap-3 text-[11px] tracking-[2px] text-[var(--color-ink-4)] uppercase">
           <span className="flex-1 h-px bg-[var(--color-ink-4)]" />
           <span>BẮT ĐẦU CUỘC NÓI CHUYỆN</span>

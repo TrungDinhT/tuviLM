@@ -1,5 +1,7 @@
 import type { CungPayload } from "../_lib/types";
-import { classifyPhuTinh, stripHoa, stripParen } from "../_lib/sao-classify";
+import { classifyPhuTinh, stripParen } from "../_lib/sao-classify";
+import { deriveStars } from "../_lib/cung-derive";
+import { colorForElement, colorForStarName } from "../_lib/ngu-hanh";
 import { Eyebrow } from "./Eyebrow";
 
 interface CungDetailCardProps {
@@ -9,8 +11,9 @@ interface CungDetailCardProps {
 }
 
 export function CungDetailCard({ cung, onSaoClick, onClose }: CungDetailCardProps) {
-  const cat = cung.phu_tinh.filter((s) => classifyPhuTinh(s.name) === "cat");
-  const hung = cung.phu_tinh.filter((s) => classifyPhuTinh(s.name) === "hung");
+  const { fixed, luu } = deriveStars(cung);
+  const cat = fixed.filter((s) => classifyPhuTinh(s.name) === "cat");
+  const hung = fixed.filter((s) => classifyPhuTinh(s.name) === "hung");
 
   return (
     <div
@@ -51,7 +54,8 @@ export function CungDetailCard({ cung, onSaoClick, onClose }: CungDetailCardProp
               <button
                 key={`chinh-${s}`}
                 onClick={() => onSaoClick(stripParen(s))}
-                className="font-serif text-[16px] font-semibold text-[var(--color-crimson)] ref"
+                className="font-serif text-[16px] font-semibold ref"
+                style={{ color: colorForStarName(s) }}
                 type="button"
               >
                 {s}
@@ -73,7 +77,7 @@ export function CungDetailCard({ cung, onSaoClick, onClose }: CungDetailCardProp
                 className="text-[12.5px] font-semibold text-[var(--color-gold)] px-2 py-0.5 border border-[var(--color-gold)] rounded-sm"
                 style={{ background: "rgba(168,133,74,0.10)" }}
               >
-                Hoá {stripHoa(h)}
+                {h}
               </span>
             ))}
           </div>
@@ -83,13 +87,13 @@ export function CungDetailCard({ cung, onSaoClick, onClose }: CungDetailCardProp
       {cat.length > 0 && (
         <div>
           <Eyebrow style={{ fontSize: 10 }}>Cát tinh ({cat.length})</Eyebrow>
-          <div className="flex flex-wrap gap-x-2 gap-y-1 mt-1.5 text-[13px] text-[var(--color-jade)]">
+          <div className="flex flex-wrap gap-x-2 gap-y-1 mt-1.5 text-[13px]">
             {cat.map((s) => (
               <button
                 key={`cat-${s.name}`}
                 onClick={() => onSaoClick(s.name)}
                 className="ref-sao"
-                style={{ color: "var(--color-jade)", borderBottomColor: "var(--color-jade)" }}
+                style={{ color: colorForElement(s.element), borderBottomColor: colorForElement(s.element) }}
                 type="button"
               >
                 {s.display}
@@ -102,15 +106,35 @@ export function CungDetailCard({ cung, onSaoClick, onClose }: CungDetailCardProp
       {hung.length > 0 && (
         <div>
           <Eyebrow style={{ fontSize: 10 }}>Hung tinh ({hung.length})</Eyebrow>
-          <div className="flex flex-wrap gap-x-2 gap-y-1 mt-1.5 text-[13px] text-[var(--color-ink-2)]">
+          <div className="flex flex-wrap gap-x-2 gap-y-1 mt-1.5 text-[13px]">
             {hung.map((s) => (
               <button
                 key={`hung-${s.name}`}
                 onClick={() => onSaoClick(s.name)}
                 className="ref-sao"
+                style={{ color: colorForElement(s.element), borderBottomColor: colorForElement(s.element) }}
                 type="button"
               >
                 {s.display}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {luu.length > 0 && (
+        <div>
+          <Eyebrow style={{ fontSize: 10 }}>Sao lưu năm xem ({luu.length})</Eyebrow>
+          <div className="flex flex-wrap gap-x-2 gap-y-1 mt-1.5 text-[13px]">
+            {luu.map((s) => (
+              <button
+                key={`luu-${s.name}`}
+                onClick={() => onSaoClick(s.name)}
+                className="font-serif italic border-b border-dotted cursor-pointer"
+                style={{ color: colorForElement(s.element), borderBottomColor: colorForElement(s.element) }}
+                type="button"
+              >
+                L.{s.display}
               </button>
             ))}
           </div>

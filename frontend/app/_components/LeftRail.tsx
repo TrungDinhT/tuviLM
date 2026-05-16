@@ -22,7 +22,7 @@ export function LeftRail({
   onCungClick,
   onOpenDaiVan,
   mentions = [],
-  size = 460,
+  size = 690,
 }: LeftRailProps) {
   return (
     <div className="flex flex-col gap-[18px]">

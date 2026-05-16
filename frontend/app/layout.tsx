@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Be_Vietnam_Pro } from "next/font/google";
+import { Lora, Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./_components/Providers";
 
-const cormorant = Cormorant_Garamond({
+const lora = Lora({
   subsets: ["vietnamese", "latin"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  variable: "--font-cormorant",
+  variable: "--font-lora",
   display: "swap",
 });
 
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={`${cormorant.variable} ${beVietnam.variable}`}>
+    <html lang="vi" className={`${lora.variable} ${beVietnam.variable}`}>
       <body className="paper-tex">
         <Providers>{children}</Providers>
       </body>

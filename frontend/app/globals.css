@@ -12,7 +12,12 @@
   --color-crimson-soft: #b54b3a;
   --color-gold: #a8854a;
   --color-jade: #4a6b58;
-  --font-serif: var(--font-cormorant), "EB Garamond", serif;
+  --color-nh-hoa:  #c20000;
+  --color-nh-moc:  #0a7c1f;
+  --color-nh-tho:  #f2a614;
+  --color-nh-kim:  #99938d;
+  --color-nh-thuy: #000000;
+  --font-serif: var(--font-lora), "EB Garamond", serif;
   --font-sans: var(--font-be-vietnam), "Inter", sans-serif;
 }
 
