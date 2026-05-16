@@ -18,7 +18,7 @@ export function ChartCenter({ laso, profile, cellSize }: ChartCenterProps) {
       className={`relative h-full box-border border border-[rgba(26,22,17,0.14)] flex flex-col overflow-hidden ${padding}`}
       style={{ background: "rgba(255,252,245,0.7)", gap: 2 }}
     >
-      <div className={`eyebrow ${veryTight ? "text-[7.5px]" : tight ? "text-[8px]" : "text-[10px]"}`} style={{ letterSpacing: "1.4px" }}>
+      <div className={`eyebrow ${veryTight ? "!text-[10px]" : tight ? "!text-[12px]" : "!text-[15px]"} text-center`} style={{ letterSpacing: "1.4px" }}>
         lá số tử vi
       </div>
       <div className={`font-serif font-medium text-[var(--color-ink)] leading-[1.05] mt-0.5 tracking-[0.3px] ${veryTight ? "text-[13px]" : tight ? "text-[16px]" : "text-[24px]"}`}>
