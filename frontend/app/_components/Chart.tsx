@@ -79,7 +79,6 @@ export function Chart({
               cung={cung}
               highlighted={highlightedRole != null && cung.role === highlightedRole}
               tieuVan={tieuVanPosition === diaChi}
-              cellSize={cellW}
               onClick={() => cung.role && onCungClick?.(cung.role)}
             />
           </div>
@@ -101,7 +100,7 @@ export function Chart({
         return (
           <div
             key={`tt-${pair.anchor}`}
-            className="absolute z-10 px-2 py-0.5 text-[10px] font-semibold tracking-[0.5px] uppercase rounded-sm bg-[var(--color-crimson)] text-[var(--color-paper)] whitespace-nowrap pointer-events-none"
+            className="absolute z-10 px-2 py-0.5 text-[7px] sm:text-[8px] md:text-[10px] font-semibold tracking-[0.5px] uppercase rounded-sm bg-[var(--color-crimson)] text-[var(--color-paper)] whitespace-nowrap pointer-events-none"
             style={{
               left: x,
               top: y,
@@ -120,7 +119,7 @@ export function Chart({
         return (
           <div
             key="tieu-van-badge"
-            className="absolute z-20 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.5px] rounded-lg whitespace-nowrap text-white pointer-events-none"
+            className="absolute z-20 px-1.5 py-0.5 text-[7px] sm:text-[8px] md:text-[10px] font-semibold tracking-[0.5px] rounded-lg whitespace-nowrap text-white pointer-events-none"
             style={{
               left: x,
               top: y,

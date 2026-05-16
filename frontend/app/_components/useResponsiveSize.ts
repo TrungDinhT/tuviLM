@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const PADDING_BUFFER = 32; // outer padding allowance on mobile
+const PADDING_BUFFER = 48; // outer padding allowance on mobile
 
 function pickSize(width: number): number {
   if (width >= 1280) return 690;
-  if (width >= 1024) return 580;
-  if (width >= 768) return 520;
-  // mobile: fit viewport, minimum 320, leave room for padding
-  return Math.max(320, Math.min(420, width - PADDING_BUFFER));
+  if (width >= 1024) return 560;
+  if (width >= 768) return 500;
+  // mobile: fit viewport, minimum 300, leave room for padding
+  return Math.max(300, Math.min(420, width - PADDING_BUFFER));
 }
 
 export function useResponsiveSize(): number {

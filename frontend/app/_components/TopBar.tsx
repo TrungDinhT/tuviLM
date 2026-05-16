@@ -9,7 +9,7 @@ export function TopBar({ breadcrumb, rightActions }: TopBarProps) {
   return (
     <div
       className="flex items-center justify-between px-7 py-4 border-b border-[rgba(26,22,17,0.14)]"
-      style={{ background: "rgba(244,237,224,0.92)", backdropFilter: "blur(6px)" }}
+      style={{ background: "var(--color-paper)" }}
     >
       <div className="flex items-center gap-6">
         <div className="font-serif text-[26px] font-semibold tracking-[1px] text-[var(--color-ink)]">

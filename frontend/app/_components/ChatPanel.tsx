@@ -37,7 +37,7 @@ export function ChatPanel({ messages, onSend, onRefClick, onChipClick, pending =
           <ChatMessage key={m.id} msg={m} onRefClick={onRefClick} />
         ))}
         {pending && (
-          <div className="self-start font-serif italic text-[14px] text-[var(--color-ink-3)]">
+          <div className="self-start font-serif italic text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] xl:text-[14px] text-[var(--color-ink-2)]">
             Thầy đang suy…
           </div>
         )}

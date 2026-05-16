@@ -11,7 +11,7 @@ export function ChatMessage({ msg, onRefClick }: ChatMessageProps) {
   if (msg.sender === "me") {
     return (
       <div
-        className="self-end px-4 py-2.5 max-w-[88%] text-[14px] text-[var(--color-ink)] border border-[rgba(26,22,17,0.14)]"
+        className="self-end px-4 py-2.5 max-w-[88%] text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px] text-[var(--color-ink)] border border-[rgba(26,22,17,0.14)]"
         style={{ background: "var(--color-paper-2)", borderRadius: "14px 14px 4px 14px" }}
       >
         {msg.body}
@@ -20,8 +20,8 @@ export function ChatMessage({ msg, onRefClick }: ChatMessageProps) {
   }
 
   return (
-    <div className="self-start max-w-[88%] font-serif text-[17px] leading-[1.5] text-[var(--color-ink)]">
-      <span className="font-serif italic block mb-1 text-[13px] tracking-[0.5px] uppercase font-medium text-[var(--color-crimson)]">
+    <div className="self-start max-w-[88%] font-serif text-[14px] sm:text-[15px] md:text-[16px] lg:text-[17px] xl:text-[18px] text-[var(--color-ink)] leading-[1.5] text-[var(--color-ink)]">
+      <span className="font-serif italic block mb-1 text-[14px] sm:text-[15px] md:text-[16px] lg:text-[17px] xl:text-[18px] tracking-[0.5px] uppercase font-medium text-[var(--color-crimson)]">
         Thầy Tuệ
       </span>
       {renderBody(msg.body, onRefClick)}

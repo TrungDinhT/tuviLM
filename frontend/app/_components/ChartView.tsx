@@ -11,7 +11,7 @@ import type {
 import { loadStash } from "../_lib/session-store";
 import { seedOpeningMessage, pickCannedReply } from "../_data/mock-chat";
 import { TopBar } from "./TopBar";
-import { Btn } from "./Buttons";
+import { TopBarMenu } from "./TopBarMenu";
 import { LeftRail } from "./LeftRail";
 import { ChatPanel } from "./ChatPanel";
 import { RightRail } from "./RightRail";
@@ -144,13 +144,7 @@ export function ChartView() {
             <span className="text-[var(--color-ink-4)]"></span>
           </>
         }
-        rightActions={
-          <>
-            <Btn variant="ghost" onClick={() => setOpenOverlay("lichSu")}>Lịch sử</Btn>
-            <Btn variant="ghost">↗ chia sẻ</Btn>
-            <Btn>⬇ tải lá số</Btn>
-          </>
-        }
+        rightActions={<TopBarMenu onOpenLichSu={() => setOpenOverlay("lichSu")} />}
       />
 
       <div className="flex-1 grid grid-cols-1 xl:grid-cols-[720px_1fr_320px] gap-6 xl:gap-8 px-4 sm:px-6 xl:px-9 py-5 xl:py-7 min-h-0">

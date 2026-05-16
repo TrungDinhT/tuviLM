@@ -18,7 +18,6 @@ export function ChartCenter({ laso, profile, cellSize }: ChartCenterProps) {
       className={`relative h-full box-border border border-[rgba(26,22,17,0.14)] flex flex-col overflow-hidden ${padding}`}
       style={{ background: "rgba(255,252,245,0.7)", gap: 2 }}
     >
-      <span className="absolute top-2 right-3.5 text-[14px] text-[var(--color-gold)]">✦</span>
       <div className={`eyebrow ${veryTight ? "text-[7.5px]" : tight ? "text-[8px]" : "text-[10px]"}`} style={{ letterSpacing: "1.4px" }}>
         lá số tử vi
       </div>
@@ -28,7 +27,7 @@ export function ChartCenter({ laso, profile, cellSize }: ChartCenterProps) {
       <div className={`text-[var(--color-ink-3)] leading-[1.4] mt-0.5 tracking-[0.2px] ${veryTight ? "text-[9px]" : tight ? "text-[9.5px]" : "text-[11px]"}`}>
         {veryTight
           ? `${sex} ${profile.year}`
-          : <>{sex} · {profile.year}<br/>{String(profile.date).padStart(2, "0")}/{String(profile.month).padStart(2, "0")} {calLabel} · {String(profile.hour).padStart(2, "0")}:{String(profile.minute).padStart(2, "0")}</>
+          : <>{sex} · {profile.year}<br />{String(profile.date).padStart(2, "0")}/{String(profile.month).padStart(2, "0")} {calLabel} · {String(profile.hour).padStart(2, "0")}:{String(profile.minute).padStart(2, "0")}</>
         }
       </div>
       {!veryTight && (
@@ -36,7 +35,7 @@ export function ChartCenter({ laso, profile, cellSize }: ChartCenterProps) {
           <div className="truncate"><span className="text-[var(--color-ink-3)]">Mã:</span> {laso.id}</div>
         </div>
       )}
-      <div className={`flex justify-between mt-auto border-t border-[rgba(26,22,17,0.14)] ${veryTight ? "text-[9px] pt-1" : tight ? "text-[9.5px] pt-1.5" : "text-[11px] pt-2"}`}>
+      <div className={`flex justify-between mt-auto border-t border-[rgba(26,22,17,0.14)] ${veryTight ? "text-[9px] pt-1" : tight ? "text-[7.5px] pt-1.5" : "text-[9.5px] pt-2"}`}>
         <div><span className="text-[var(--color-ink-3)] mr-1.5">Năm</span><span className="text-[var(--color-crimson)] font-semibold">2026 Bính Ngọ</span></div>
         <div className="text-[var(--color-gold)]">{veryTight ? "24–33" : "Đại vận 24–33 ▾"}</div>
       </div>
