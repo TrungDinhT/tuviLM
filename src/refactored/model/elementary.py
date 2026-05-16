@@ -113,6 +113,9 @@ class NguHanh(IndexedEnumMixin, StrEnum):
     def khac_nhap(self, other: "NguHanh") -> bool:
         return other.khac_xuat(self)
 
+    def dong_hanh(self, other: "NguHanh") -> bool:
+        return self.index == other.index
+
     def tuong_sinh(self, other: "NguHanh") -> bool:
         return self.sinh_xuat(other) or self.sinh_nhap(other)
 

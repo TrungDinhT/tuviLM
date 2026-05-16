@@ -196,6 +196,9 @@ def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse
     return BuildLasoResponse(
         id=response_id,
         summary=summary,
+        ban_menh_name=la_so_view.ban_menh_name,
+        cuc_name=la_so_view.cuc_name,
+        menh_cuc_relation_label=la_so_view.menh_cuc_relation_label,
         cung_by_position=cung_by_position,
     )
 
