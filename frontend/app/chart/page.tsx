@@ -1,10 +1,10 @@
 "use client";
 
-import { useIsMobile } from "../_components/useIsMobile";
+import { useIsCompact } from "../_components/useIsCompact";
 import { ChartView } from "../_components/ChartView";
 import { MobileChartView } from "../_components/MobileChartView";
 
 export default function ChartPage() {
-  const isMobile = useIsMobile();
-  return isMobile ? <MobileChartView /> : <ChartView />;
+  const isCompact = useIsCompact();
+  return isCompact ? <MobileChartView /> : <ChartView />;
 }

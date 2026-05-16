@@ -14,6 +14,8 @@ import { CungDetailCard } from "./CungDetailCard";
 import { DaiVanModal } from "./DaiVanModal";
 import { LichSuDrawer } from "./LichSuDrawer";
 import { useResponsiveSize } from "./useResponsiveSize";
+import { useIsMobile } from "./useIsMobile";
+import { DefaultPanels } from "./DefaultPanels";
 
 const TIEU_VAN_POSITION = "Ngọ";
 
@@ -35,6 +37,7 @@ export function MobileChartView() {
   const [replySeed, setReplySeed] = useState(0);
   const [chatOpen, setChatOpen] = useState(false);
   const chartSize = useResponsiveSize();
+  const isMobile = useIsMobile();
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -148,19 +151,42 @@ export function MobileChartView() {
         </div>
       </div>
 
-      {/* Chart strip fills viewport */}
-      <div
-        className="flex-1 border-b border-[rgba(26,22,17,0.14)] px-3 py-2 grid place-items-center overflow-auto"
-        style={{ background: "rgba(255,252,245,0.4)" }}
-      >
-        <Chart
-          laso={stash.laso}
-          profile={stash.profile}
-          size={chartSize}
-          highlightedRole={selectedRole}
-          tieuVanPosition={TIEU_VAN_POSITION}
-          onCungClick={(role) => setSelectedRole((prev) => (prev === role ? null : role))}
-        />
+      {/* Body: chart only on mobile, chart + tips side-by-side on tablet */}
+      <div className="flex-1 overflow-auto min-h-0">
+        {isMobile ? (
+          <div
+            className="border-b border-[rgba(26,22,17,0.14)] px-3 py-2 grid place-items-center"
+            style={{ background: "rgba(255,252,245,0.4)" }}
+          >
+            <Chart
+              laso={stash.laso}
+              profile={stash.profile}
+              size={chartSize}
+              highlightedRole={selectedRole}
+              tieuVanPosition={TIEU_VAN_POSITION}
+              onCungClick={(role) => setSelectedRole((prev) => (prev === role ? null : role))}
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-[1fr_320px] gap-6 px-4 py-4 min-h-full">
+            <div
+              className="grid place-items-center px-3 py-2 border border-[rgba(26,22,17,0.14)]"
+              style={{ background: "rgba(255,252,245,0.4)" }}
+            >
+              <Chart
+                laso={stash.laso}
+                profile={stash.profile}
+                size={chartSize}
+                highlightedRole={selectedRole}
+                tieuVanPosition={TIEU_VAN_POSITION}
+                onCungClick={(role) => setSelectedRole((prev) => (prev === role ? null : role))}
+              />
+            </div>
+            <div className="overflow-auto">
+              <DefaultPanels />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Chat FAB */}
