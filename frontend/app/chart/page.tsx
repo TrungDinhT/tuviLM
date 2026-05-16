@@ -1,5 +1,5 @@
-import { ChartViewBoot } from "../_components/ChartViewBoot";
+import { ChartView } from "../_components/ChartView";
 
 export default function ChartPage() {
-  return <ChartViewBoot />;
+  return <ChartView />;
 }
