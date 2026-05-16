@@ -106,4 +106,29 @@
     display: inline-block;
     animation: hf-pulse 1.6s ease-in-out infinite;
   }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes scale-up-fade {
+    from { opacity: 0; transform: translate(-50%, 0) scale(0.96); }
+    to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  }
+
+  @keyframes slide-in-left {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0); }
+  }
+
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+  }
+
+  .anim-fade-in   { animation: fade-in 180ms ease-out both; }
+  .anim-scale-up  { animation: scale-up-fade 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .anim-slide-left  { animation: slide-in-left 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .anim-slide-right { animation: slide-in-right 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 }

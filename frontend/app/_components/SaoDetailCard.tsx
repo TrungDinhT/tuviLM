@@ -12,7 +12,7 @@ export function SaoDetailCard({ saoName, onClose }: SaoDetailCardProps) {
   return (
     <div className="absolute inset-0 flex items-stretch">
       <div
-        className="absolute inset-0 bg-[rgba(244,237,224,0.7)]"
+        className="absolute inset-0 bg-[rgba(244,237,224,0.7)] anim-fade-in"
         style={{ backdropFilter: "blur(2px)" }}
         onClick={onClose}
       />
@@ -20,7 +20,7 @@ export function SaoDetailCard({ saoName, onClose }: SaoDetailCardProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="sao-detail-title"
-        className="relative w-full bg-[rgba(255,252,245,0.98)] border border-[var(--color-ink-3)] p-5 overflow-auto"
+        className="relative w-full bg-[rgba(255,252,245,0.98)] border border-[var(--color-ink-3)] p-5 overflow-auto anim-slide-right"
         style={{ boxShadow: "0 1px 0 rgba(26,22,17,0.08), 0 12px 32px rgba(26,22,17,0.10)" }}
       >
         <button
