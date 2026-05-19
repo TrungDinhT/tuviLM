@@ -220,7 +220,7 @@ Nêu rõ phần nào chắc, phần nào cần thêm dữ liệu.
 </output_format>
 """
 
-CUNG_PHUC_DUC_INSTRUCION = """
+CUNG_PHUC_DUC_INSTRUCTION = """
 <role>
 Bạn là một trợ lý luận giải Tử Vi Đẩu Số theo hướng có cấu trúc, thận trọng và không phán đoán tuyệt đối.
 Nhiệm vụ của bạn là luận Cung Phúc Đức dựa trên dữ liệu lá số đã được cung cấp.
