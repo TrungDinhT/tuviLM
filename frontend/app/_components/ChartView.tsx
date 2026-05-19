@@ -214,17 +214,19 @@ export function ChartView() {
         rightActions={<TopBarMenu onOpenLichSu={() => setOpenOverlay("lichSu")} />}
       />
 
-      <div className="flex-1 grid grid-cols-1 xl:grid-cols-[720px_1fr_320px] gap-6 xl:gap-8 px-4 sm:px-6 xl:px-9 py-5 xl:py-7 min-h-0">
-        <LeftRail
-          laso={laso}
-          profile={profile}
-          size={chartSize}
-          highlightedRole={selectedRole}
-          tieuVanPosition={TIEU_VAN_POSITION}
-          onCungClick={onCungClick}
-          onOpenDaiVan={() => setOpenOverlay("daiVan")}
-        />
-        <div className="min-h-[60vh] xl:min-h-0 min-w-0 h-full">
+      <div className="flex-1 grid grid-cols-1 xl:grid-cols-[720px_1fr_320px] gap-6 xl:gap-8 px-4 sm:px-6 xl:px-9 py-5 xl:py-7 min-h-0" style={{ gridAutoRows: '1fr' }}>
+        <div className="xl:overflow-auto chat-scroll">
+          <LeftRail
+            laso={laso}
+            profile={profile}
+            size={chartSize}
+            highlightedRole={selectedRole}
+            tieuVanPosition={TIEU_VAN_POSITION}
+            onCungClick={onCungClick}
+            onOpenDaiVan={() => setOpenOverlay("daiVan")}
+          />
+        </div>
+        <div className="min-h-[60vh] xl:min-h-0 min-w-0 h-full xl:overflow-auto chat-scroll">
           <ChatPanel
             messages={messages}
             onSend={onSend}
@@ -233,13 +235,15 @@ export function ChartView() {
             pending={chat.isPending}
           />
         </div>
-        <RightRail
-          selectedCung={selectedCung}
-          selectedSao={selectedSao}
-          onCloseCung={() => setSelectedRole(null)}
-          onCloseSao={() => setSelectedSao(null)}
-          onSaoClick={(name) => setSelectedSao(name)}
-        />
+        <div className="xl:overflow-auto chat-scroll">
+          <RightRail
+            selectedCung={selectedCung}
+            selectedSao={selectedSao}
+            onCloseCung={() => setSelectedRole(null)}
+            onCloseSao={() => setSelectedSao(null)}
+            onSaoClick={(name) => setSelectedSao(name)}
+          />
+        </div>
       </div>
 
       {openOverlay === "daiVan" && <DaiVanModal onClose={() => setOpenOverlay(null)} />}

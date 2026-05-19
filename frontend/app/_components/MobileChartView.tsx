@@ -279,8 +279,8 @@ export function MobileChartView() {
           <div
             role="dialog"
             aria-modal="true"
-            className="absolute bottom-0 left-0 right-0 top-[10vh] flex flex-col bg-[var(--color-paper)] border-t-[1.5px] border-[var(--color-ink)] anim-slide-up"
-            style={{ boxShadow: "0 -8px 24px rgba(26,22,17,0.18)" }}
+            className="absolute bottom-0 left-0 right-0 flex flex-col bg-[var(--color-paper)] border-t-[1.5px] border-[var(--color-ink)] anim-slide-up"
+            style={{ boxShadow: "0 -8px 24px rgba(26,22,17,0.18)", top: "min(10vh, max(0px, calc(100vh - 280px)))" }}
           >
             <div className="flex justify-between items-center px-4 py-3 border-b border-[rgba(26,22,17,0.14)]">
               <div className="font-serif italic text-[var(--color-crimson)] text-[13px] tracking-[0.5px] uppercase font-medium">
