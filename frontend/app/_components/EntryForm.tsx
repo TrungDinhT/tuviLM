@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Calendar, UserProfile } from "../_lib/types";
-import { saveStash } from "../_lib/session-store";
+import { getClientId, saveStash } from "../_lib/session-store";
 import { EntryFormSchema } from "../_lib/schemas";
 import { useBuildLaso } from "@/services/api/v1/laso/build";
 import { Btn } from "./Buttons";
@@ -14,7 +14,7 @@ export function EntryForm() {
   const buildLaso = useBuildLaso();
   const [name, setName] = useState("");
   const [gender, setGender] = useState<"M" | "F">("M");
-  const [calendar, setCalendar] = useState<Calendar>("am");
+  const [calendar, setCalendar] = useState<Calendar>("duong");
   const [date, setDate] = useState(1);
   const [month, setMonth] = useState(1);
   const [year, setYear] = useState(1999);
@@ -36,11 +36,13 @@ export function EntryForm() {
     }
     setFieldErrors({});
 
-    const { minute: _m, ...apiPayload } = parsed.data;
-    void _m;
-
     try {
-      const laso = await buildLaso.mutateAsync(apiPayload);
+      const laso = await buildLaso.mutateAsync({
+        ...parsed.data,
+        client_id: getClientId(),
+        display_name: name,
+        calendar: calendar === "duong" ? "solar" : "lunar",
+      });
       const profile: UserProfile = { name, gender, calendar, date, month, year, hour, minute };
       saveStash({ laso, profile, fetchedAt: new Date().toISOString() });
       router.push("/chart");
@@ -81,7 +83,7 @@ export function EntryForm() {
           <Group label="Lịch">
             <div className="flex gap-1.5">
               <Btn type="button" variant={calendar === "duong" ? "primary" : "default"} className="flex-1 justify-center" onClick={() => setCalendar("duong")}>Dương</Btn>
-              <Btn type="button" variant={calendar === "am" ? "primary" : "default"} className="flex-1 justify-center" onClick={() => setCalendar("am")}>Âm</Btn>
+              <Btn type="button" variant="default" className="flex-1 justify-center" disabled title="Lịch âm sẽ được hỗ trợ sau">Âm</Btn>
             </div>
           </Group>
         </div>

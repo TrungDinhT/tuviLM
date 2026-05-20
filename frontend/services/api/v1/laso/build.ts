@@ -9,10 +9,23 @@ export async function buildLaso(req: BuildLasoRequest): Promise<BuildLasoRespons
     body: JSON.stringify(req),
   });
   if (!res.ok) {
-    throw new Error(`Không lập được lá số (HTTP ${res.status})`);
+    let detail = "";
+    try {
+      const body = await res.json();
+      detail = typeof body?.detail === "string" ? body.detail : "";
+    } catch {
+      detail = "";
+    }
+    throw new Error(detail || `Không lập được lá số (HTTP ${res.status})`);
   }
   const data = await res.json();
-  if (!data || typeof data.id !== "string" || !data.cung_by_position) {
+  if (
+    !data ||
+    typeof data.id !== "string" ||
+    typeof data.session_id !== "string" ||
+    typeof data.active_leaf_id !== "string" ||
+    !data.cung_by_position
+  ) {
     throw new Error("Phản hồi lá số không hợp lệ");
   }
   return data as BuildLasoResponse;

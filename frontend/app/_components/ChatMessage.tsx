@@ -11,7 +11,7 @@ interface ChatMessageProps {
 }
 
 export function ChatMessage({ msg, onRefClick }: ChatMessageProps) {
-  if (msg.sender === "me") {
+  if (msg.sender === "user") {
     return (
       <div
         className="self-end px-4 py-2.5 max-w-[88%] text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px] text-[var(--color-ink)] border border-[rgba(26,22,17,0.14)]"

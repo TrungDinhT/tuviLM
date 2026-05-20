@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type {
   ChatMessage as Msg,
   ChatToolEntry,
   CungPayload,
   OverlayKind,
+  SessionDetailResponse,
   SessionStash,
+  UserProfile,
 } from "../_lib/types";
-import { loadStash } from "../_lib/session-store";
+import { getClientId, loadStash, saveStash } from "../_lib/session-store";
 import { seedOpeningMessage } from "../_data/mock-chat";
 import { useStreamChat } from "@/services/api/v1/chat/send";
+import { getSessionDetail } from "@/services/api/v1/sessions";
 import { TopBar } from "./TopBar";
 import { TopBarMenu } from "./TopBarMenu";
 import { LeftRail } from "./LeftRail";
@@ -21,14 +24,43 @@ import { DaiVanModal } from "./DaiVanModal";
 import { LichSuDrawer } from "./LichSuDrawer";
 import { useResponsiveSize } from "./useResponsiveSize";
 
-// 2026 = Bính Ngọ → tiểu vận badge sits on cung at địa chi "Ngọ"
 const TIEU_VAN_POSITION = "Ngọ";
+
+function stashFromDetail(detail: SessionDetailResponse): SessionStash {
+  const birth = detail.chart_profile.birth_metadata;
+  const profile: UserProfile = {
+    name: detail.chart_profile.display_name,
+    gender: birth.gender,
+    calendar: birth.calendar === "solar" ? "duong" : "am",
+    date: birth.date,
+    month: birth.month,
+    year: birth.year,
+    hour: birth.hour,
+    minute: birth.minute,
+  };
+  return { laso: detail.laso, profile, fetchedAt: new Date().toISOString() };
+}
 
 export function ChartView() {
   const router = useRouter();
   const [stash, setStash] = useState<SessionStash | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const chartSize = useResponsiveSize();
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedSao, setSelectedSao] = useState<string | null>(null);
+  const [openOverlay, setOpenOverlay] = useState<OverlayKind>(null);
+  const [messages, setMessages] = useState<Msg[]>([]);
+  const [activeLeafId, setActiveLeafId] = useState<string | null>(null);
+  const chat = useStreamChat();
+  const abortRef = useRef<AbortController | null>(null);
+
+  const applySessionDetail = useCallback((detail: SessionDetailResponse) => {
+    const nextStash = stashFromDetail(detail);
+    saveStash(nextStash);
+    setStash(nextStash);
+    setMessages(detail.messages);
+    setActiveLeafId(detail.session.active_leaf_id);
+  }, []);
 
   useEffect(() => {
     const s = loadStash();
@@ -38,15 +70,16 @@ export function ChartView() {
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStash(s);
+    setMessages(seedOpeningMessage(s.laso));
+    setActiveLeafId(s.laso.active_leaf_id);
     setHydrated(true);
-  }, [router]);
 
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [selectedSao, setSelectedSao] = useState<string | null>(null);
-  const [openOverlay, setOpenOverlay] = useState<OverlayKind>(null);
-  const [extraMessages, setExtraMessages] = useState<Msg[]>([]);
-  const chat = useStreamChat();
-  const abortRef = useRef<AbortController | null>(null);
+    getSessionDetail(getClientId(), s.laso.session_id)
+      .then(applySessionDetail)
+      .catch(() => {
+        // Keep cached chart usable if the persisted session cannot be loaded.
+      });
+  }, [applySessionDetail, router]);
 
   useEffect(
     () => () => {
@@ -55,16 +88,6 @@ export function ChartView() {
     [],
   );
 
-  const openingMessages = useMemo<Msg[]>(
-    () => (stash ? seedOpeningMessage(stash.laso) : []),
-    [stash],
-  );
-  const messages = useMemo<Msg[]>(
-    () => [...openingMessages, ...extraMessages],
-    [openingMessages, extraMessages],
-  );
-
-  // Esc closes overlay > sao > cung (in priority)
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key !== "Escape") return;
@@ -78,7 +101,6 @@ export function ChartView() {
       }
       if (selectedRole) {
         setSelectedRole(null);
-        return;
       }
     }
     window.addEventListener("keydown", onKey);
@@ -90,20 +112,31 @@ export function ChartView() {
   }, []);
 
   const onRefClick = useCallback((kind: "ref" | "sao", value: string) => {
-    if (kind === "sao") {
-      setSelectedSao(value);
-    } else {
-      setSelectedRole(value);
-    }
+    if (kind === "sao") setSelectedSao(value);
+    else setSelectedRole(value);
   }, []);
 
   const onSend = useCallback(
     (body: string) => {
-      const aiId = `ai-${Date.now()}`;
-      setExtraMessages((prev) => [
+      if (!stash || !activeLeafId) return;
+
+      const userTempId = `me-${Date.now()}`;
+      const aiTempId = `ai-${Date.now()}`;
+      let userMessageId = userTempId;
+      let assistantMessageId = aiTempId;
+
+      setMessages((prev) => [
         ...prev,
-        { id: `me-${Date.now()}`, sender: "me", body },
-        { id: aiId, sender: "ai", body: "", toolCalls: [], streaming: true },
+        { id: userTempId, parent_id: activeLeafId, sender: "user", body, status: "pending" },
+        {
+          id: aiTempId,
+          parent_id: userTempId,
+          sender: "assistant",
+          body: "",
+          toolCalls: [],
+          streaming: true,
+          status: "streaming",
+        },
       ]);
 
       abortRef.current?.abort();
@@ -111,17 +144,35 @@ export function ChartView() {
       abortRef.current = ctrl;
 
       const updateAi = (mut: (msg: Msg) => Msg) => {
-        setExtraMessages((prev) =>
-          prev.map((m) => (m.id === aiId ? mut(m) : m)),
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantMessageId ? mut(m) : m)),
         );
       };
 
       chat.mutate(
         {
-          message: body,
+          clientId: getClientId(),
+          sessionId: stash.laso.session_id,
+          parentId: activeLeafId,
+          content: body,
           signal: ctrl.signal,
           onEvent: (event) => {
             switch (event.type) {
+              case "ids":
+                userMessageId = event.user_message_id;
+                assistantMessageId = event.assistant_message_id;
+                setMessages((prev) =>
+                  prev.map((m) => {
+                    if (m.id === userTempId) {
+                      return { ...m, id: userMessageId, status: "confirmed" };
+                    }
+                    if (m.id === aiTempId) {
+                      return { ...m, id: assistantMessageId, parent_id: userMessageId };
+                    }
+                    return m;
+                  }),
+                );
+                break;
               case "text":
                 updateAi((m) => ({ ...m, body: m.body + event.delta }));
                 break;
@@ -149,16 +200,18 @@ export function ChartView() {
                   ),
                 }));
                 break;
-              case "error":
+              case "failed":
                 updateAi((m) => ({
                   ...m,
                   body: m.body + `\n\n_Thầy đang bận: ${event.message}_`,
+                  streaming: false,
+                  status: "failed",
                 }));
+                setActiveLeafId(userMessageId);
                 break;
               case "done":
-                updateAi((m) => ({ ...m, streaming: false }));
-                break;
-              default:
+                updateAi((m) => ({ ...m, streaming: false, status: "confirmed" }));
+                setActiveLeafId(assistantMessageId);
                 break;
             }
           },
@@ -174,20 +227,17 @@ export function ChartView() {
               body:
                 m.body +
                 `\n\n_Lỗi kết nối: ${err instanceof Error ? err.message : "không rõ"}_`,
+              status: "failed",
             }));
+            setActiveLeafId(userMessageId);
           },
         },
       );
     },
-    [chat],
+    [activeLeafId, chat, stash],
   );
 
-  const onChipClick = useCallback(
-    (chip: string) => {
-      onSend(chip);
-    },
-    [onSend],
-  );
+  const onChipClick = useCallback((chip: string) => onSend(chip), [onSend]);
 
   if (!hydrated || !stash) {
     return (
@@ -243,7 +293,17 @@ export function ChartView() {
       </div>
 
       {openOverlay === "daiVan" && <DaiVanModal onClose={() => setOpenOverlay(null)} />}
-      {openOverlay === "lichSu" && <LichSuDrawer onClose={() => setOpenOverlay(null)} />}
+      {openOverlay === "lichSu" && (
+        <LichSuDrawer
+          currentSessionId={stash.laso.session_id}
+          onClose={() => setOpenOverlay(null)}
+          onSelectSession={(sessionId) => {
+            getSessionDetail(getClientId(), sessionId)
+              .then(applySessionDetail)
+              .then(() => setOpenOverlay(null));
+          }}
+        />
+      )}
     </div>
   );
 }

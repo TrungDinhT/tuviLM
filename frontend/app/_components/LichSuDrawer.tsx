@@ -1,14 +1,28 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Eyebrow } from "./Eyebrow";
 import { Btn, Chip } from "./Buttons";
-import { MOCK_HISTORY } from "../_data/mock-history";
+import type { SessionSummary } from "../_lib/types";
+import { getClientId } from "../_lib/session-store";
+import { listSessions } from "@/services/api/v1/sessions";
 
 interface LichSuDrawerProps {
   onClose: () => void;
+  currentSessionId?: string;
+  onSelectSession?: (sessionId: string) => void;
 }
 
-export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
+export function LichSuDrawer({ onClose, currentSessionId, onSelectSession }: LichSuDrawerProps) {
+  const [sessions, setSessions] = useState<SessionSummary[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    listSessions(getClientId())
+      .then((res) => setSessions(res.sessions))
+      .catch((err) => setError(err instanceof Error ? err.message : "Không tải được lịch sử"));
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-[rgba(244,237,224,0.55)] anim-fade-in" onClick={onClose} />
@@ -28,7 +42,7 @@ export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
                 Sổ tay trò chuyện
               </h2>
               <div className="text-[12px] text-[var(--color-ink-3)] mt-1">
-                {MOCK_HISTORY.reduce((acc, g) => acc + g.items.length, 0)} phiên · {MOCK_HISTORY.reduce((acc, g) => acc + g.items.reduce((s, it) => s + it.count, 0), 0)} câu thầy đã trả lời
+                {sessions.length} phiên · {sessions.reduce((acc, it) => acc + it.message_count, 0)} tin đã lưu
               </div>
             </div>
             <Btn variant="ghost" className="text-[16px]" onClick={onClose} aria-label="Đóng">✕</Btn>
@@ -37,7 +51,7 @@ export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
           <div className="flex items-center gap-3 mt-4">
             <span className="text-[11px] text-[var(--color-ink-3)] uppercase tracking-[1px]">Lá số</span>
             <div className="px-3.5 py-1.5 border border-[rgba(26,22,17,0.32)] bg-[var(--color-paper)] font-serif text-[16px] flex items-center gap-2 cursor-pointer">
-              Vũ Duy Khanh <span className="text-[var(--color-ink-3)] text-[11px]">▾</span>
+              Tất cả lá số <span className="text-[var(--color-ink-3)] text-[11px]">▾</span>
             </div>
             <Btn variant="ghost" className="text-[12px]">＋ thêm lá số</Btn>
           </div>
@@ -62,45 +76,54 @@ export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
 
         {/* Session list */}
         <div className="flex-1 py-2 overflow-auto">
-          {MOCK_HISTORY.map((s) => (
-            <div key={`day-${s.date}`}>
+          {error && (
+            <div className="px-8 py-4 text-[13px] text-[var(--color-crimson)]">{error}</div>
+          )}
+          {!error && sessions.length === 0 && (
+            <div className="px-8 py-4 text-[13px] text-[var(--color-ink-3)] font-serif italic">
+              Chưa có phiên nào.
+            </div>
+          )}
+          {!error && sessions.map((it) => {
+            const date = it.updated_at ? new Date(it.updated_at) : null;
+            const dateLabel = date ? date.toLocaleDateString("vi-VN") : "Không rõ ngày";
+            const timeLabel = date ? date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "";
+            return (
+            <div key={`day-${it.session_id}`}>
               <div className="px-8 pt-3.5 pb-1.5 text-[10px] text-[var(--color-ink-3)] font-semibold tracking-[1.5px] uppercase flex items-baseline gap-3">
-                <span>{s.date}</span>
+                <span>{dateLabel}</span>
                 <span className="flex-1 h-px bg-[var(--color-paper-3)]" />
               </div>
-              {s.items.map((it) => (
                 <button
-                  key={`it-${s.date}-${it.time}-${it.q.slice(0,16)}`}
                   type="button"
                   className="w-full text-left px-8 py-3 cursor-pointer transition-colors"
+                  onClick={() => onSelectSession?.(it.session_id)}
                   style={{
-                    borderLeft: it.current ? "3px solid var(--color-crimson)" : "3px solid transparent",
-                    background: it.current ? "rgba(139,42,31,0.06)" : "transparent",
+                    borderLeft: it.session_id === currentSessionId ? "3px solid var(--color-crimson)" : "3px solid transparent",
+                    background: it.session_id === currentSessionId ? "rgba(139,42,31,0.06)" : "transparent",
                   }}
                 >
                   <div className="flex justify-between items-baseline gap-3">
                     <div className="flex-1">
                       <div className="font-serif text-[17px] leading-[1.3] text-[var(--color-ink)]">
-                        {it.starred && <span className="text-[var(--color-gold)] mr-1.5">★</span>}
-                        {it.q}
+                        {it.last_message_preview || "Cuộc trò chuyện mới"}
                       </div>
                     </div>
-                    <span className="text-[11px] text-[var(--color-ink-3)] font-serif">{it.time}</span>
+                    <span className="text-[11px] text-[var(--color-ink-3)] font-serif">{timeLabel}</span>
                   </div>
                   <div className="flex gap-2 mt-1.5 items-center text-[11.5px] text-[var(--color-ink-3)]">
                     <span
                       className="px-2 py-px border border-[rgba(26,22,17,0.14)] text-[10px] tracking-[0.3px] text-[var(--color-crimson)]"
                       style={{ background: "rgba(255,252,245,0.8)" }}
                     >
-                      {it.cung}
+                      {it.birth_year ?? "?"}
                     </span>
-                    <span className="font-serif italic text-[12px]">{it.mention}</span>
-                    <span className="ml-auto">{it.count} tin</span>
+                    <span className="font-serif italic text-[12px]">{it.display_name || "Giấu tên"}</span>
+                    <span className="ml-auto">{it.message_count} tin</span>
                   </div>
                 </button>
-              ))}
             </div>
-          ))}
+          )})}
         </div>
 
         {/* Footer */}

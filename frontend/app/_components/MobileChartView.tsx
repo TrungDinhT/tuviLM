@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import type { ChatMessage as Msg, ChatToolEntry, CungPayload, SessionStash, OverlayKind } from "../_lib/types";
-import { loadStash } from "../_lib/session-store";
+import type { ChatMessage as Msg, ChatToolEntry, CungPayload, SessionDetailResponse, SessionStash, OverlayKind, UserProfile } from "../_lib/types";
+import { getClientId, loadStash, saveStash } from "../_lib/session-store";
 import { seedOpeningMessage, SUGGESTED_CHIPS } from "../_data/mock-chat";
 import { useStreamChat } from "@/services/api/v1/chat/send";
+import { getSessionDetail } from "@/services/api/v1/sessions";
 import { StickToBottom } from "use-stick-to-bottom";
 import { getSaoDetail } from "../_data/mock-stars";
 import { Chart } from "./Chart";
@@ -27,6 +28,21 @@ function shortName(full: string): string {
   return parts.map((p, i) => (i === parts.length - 1 ? p : `${p[0]}.`)).join("");
 }
 
+function stashFromDetail(detail: SessionDetailResponse): SessionStash {
+  const birth = detail.chart_profile.birth_metadata;
+  const profile: UserProfile = {
+    name: detail.chart_profile.display_name,
+    gender: birth.gender,
+    calendar: birth.calendar === "solar" ? "duong" : "am",
+    date: birth.date,
+    month: birth.month,
+    year: birth.year,
+    hour: birth.hour,
+    minute: birth.minute,
+  };
+  return { laso: detail.laso, profile, fetchedAt: new Date().toISOString() };
+}
+
 export function MobileChartView() {
   const router = useRouter();
   const [stash, setStash] = useState<SessionStash | null>(null);
@@ -35,6 +51,7 @@ export function MobileChartView() {
   const [selectedSao, setSelectedSao] = useState<string | null>(null);
   const [openOverlay, setOpenOverlay] = useState<OverlayKind>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
+  const [activeLeafId, setActiveLeafId] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const chat = useStreamChat();
   const pending = chat.isPending;
@@ -59,6 +76,19 @@ export function MobileChartView() {
     setStash(s);
     setHydrated(true);
     setMessages(seedOpeningMessage(s.laso));
+    setActiveLeafId(s.laso.active_leaf_id);
+
+    getSessionDetail(getClientId(), s.laso.session_id)
+      .then((detail) => {
+        const nextStash = stashFromDetail(detail);
+        saveStash(nextStash);
+        setStash(nextStash);
+        setMessages(detail.messages);
+        setActiveLeafId(detail.session.active_leaf_id);
+      })
+      .catch(() => {
+        // Keep cached chart usable if the persisted session cannot be loaded.
+      });
   }, [router]);
 
   useEffect(() => {
@@ -87,11 +117,15 @@ export function MobileChartView() {
 
   const onSend = useCallback(
     (body: string) => {
-      const aiId = `ai-${Date.now()}`;
+      if (!stash || !activeLeafId) return;
+      const userTempId = `me-${Date.now()}`;
+      const aiTempId = `ai-${Date.now()}`;
+      let userMessageId = userTempId;
+      let assistantMessageId = aiTempId;
       setMessages((prev) => [
         ...prev,
-        { id: `me-${Date.now()}`, sender: "me", body },
-        { id: aiId, sender: "ai", body: "", toolCalls: [], streaming: true },
+        { id: userTempId, parent_id: activeLeafId, sender: "user", body, status: "pending" },
+        { id: aiTempId, parent_id: userTempId, sender: "assistant", body: "", toolCalls: [], streaming: true, status: "streaming" },
       ]);
 
       abortRef.current?.abort();
@@ -99,15 +133,29 @@ export function MobileChartView() {
       abortRef.current = ctrl;
 
       const updateAi = (mut: (msg: Msg) => Msg) => {
-        setMessages((prev) => prev.map((m) => (m.id === aiId ? mut(m) : m)));
+        setMessages((prev) => prev.map((m) => (m.id === assistantMessageId ? mut(m) : m)));
       };
 
       chat.mutate(
         {
-          message: body,
+          clientId: getClientId(),
+          sessionId: stash.laso.session_id,
+          parentId: activeLeafId,
+          content: body,
           signal: ctrl.signal,
           onEvent: (event) => {
             switch (event.type) {
+              case "ids":
+                userMessageId = event.user_message_id;
+                assistantMessageId = event.assistant_message_id;
+                setMessages((prev) =>
+                  prev.map((m) => {
+                    if (m.id === userTempId) return { ...m, id: userMessageId, status: "confirmed" };
+                    if (m.id === aiTempId) return { ...m, id: assistantMessageId, parent_id: userMessageId };
+                    return m;
+                  }),
+                );
+                break;
               case "text":
                 updateAi((m) => ({ ...m, body: m.body + event.delta }));
                 break;
@@ -135,16 +183,18 @@ export function MobileChartView() {
                   ),
                 }));
                 break;
-              case "error":
+              case "failed":
                 updateAi((m) => ({
                   ...m,
                   body: m.body + `\n\n_Thầy đang bận: ${event.message}_`,
+                  streaming: false,
+                  status: "failed",
                 }));
+                setActiveLeafId(userMessageId);
                 break;
               case "done":
-                updateAi((m) => ({ ...m, streaming: false }));
-                break;
-              default:
+                updateAi((m) => ({ ...m, streaming: false, status: "confirmed" }));
+                setActiveLeafId(assistantMessageId);
                 break;
             }
           },
@@ -160,12 +210,14 @@ export function MobileChartView() {
               body:
                 m.body +
                 `\n\n_Lỗi kết nối: ${err instanceof Error ? err.message : "không rõ"}_`,
+              status: "failed",
             }));
+            setActiveLeafId(userMessageId);
           },
         },
       );
     },
-    [chat],
+    [activeLeafId, chat, stash],
   );
 
   const onRefClick = useCallback((kind: "ref" | "sao", value: string) => {
@@ -418,7 +470,22 @@ export function MobileChartView() {
       })()}
 
       {openOverlay === "daiVan" && <DaiVanModal onClose={() => setOpenOverlay(null)} />}
-      {openOverlay === "lichSu" && <LichSuDrawer onClose={() => setOpenOverlay(null)} />}
+      {openOverlay === "lichSu" && (
+        <LichSuDrawer
+          currentSessionId={stash.laso.session_id}
+          onClose={() => setOpenOverlay(null)}
+          onSelectSession={(sessionId) => {
+            getSessionDetail(getClientId(), sessionId).then((detail) => {
+              const nextStash = stashFromDetail(detail);
+              saveStash(nextStash);
+              setStash(nextStash);
+              setMessages(detail.messages);
+              setActiveLeafId(detail.session.active_leaf_id);
+              setOpenOverlay(null);
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

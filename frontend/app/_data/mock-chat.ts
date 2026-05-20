@@ -3,9 +3,10 @@ import type { ChatMessage, BuildLasoResponse } from "../_lib/types";
 export function seedOpeningMessage(_laso: BuildLasoResponse): ChatMessage[] {
   return [
     {
-      id: "ai-open",
-      sender: "ai",
+      id: _laso.active_leaf_id || "ai-open",
+      sender: "assistant",
       body: `Chào con. Thầy vừa xem qua lá số của con — một lá số không tầm thường. Con muốn thầy nói sâu về điều gì trước?`,
+      status: "confirmed",
     },
   ];
 }

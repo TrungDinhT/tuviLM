@@ -1,0 +1,20 @@
+services:
+  mongodb:
+    image: mongo:7 # mongo:8 currently crashes after startup with Linux kernel 6.19 (https://github.com/Sky1-Linux/linux-sky1/issues/15), so we use mongo:7 for now
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet --eval 'try { rs.status().ok } catch (e) { rs.initiate({_id:\"rs0\", members:[{_id:0, host:\"localhost:27017\"}] }).ok }' | grep 1",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  mongodb_data:

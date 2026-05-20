@@ -21,16 +21,26 @@ export interface CungPayload {
 
 export interface BuildLasoResponse {
   id: string;
+  chart_profile_id: string;
+  session_id: string;
+  active_leaf_id: string;
   summary: string;
   cung_by_position: Record<string, CungPayload>;
 }
 
-export interface BuildLasoRequest {
+export interface BirthMetadata {
+  calendar: "solar" | "lunar";
   date: number;
   month: number;
   year: number;
   hour: number;
+  minute: number;
   gender: "M" | "F";
+}
+
+export interface BuildLasoRequest extends BirthMetadata {
+  client_id: string;
+  display_name: string;
 }
 
 export type Calendar = "duong" | "am";
@@ -52,7 +62,7 @@ export interface SessionStash {
   fetchedAt: string; // ISO
 }
 
-export type Sender = "ai" | "me";
+export type Sender = "assistant" | "user";
 
 export interface ChatToolEntry {
   id: string;
@@ -63,10 +73,13 @@ export interface ChatToolEntry {
 
 export interface ChatMessage {
   id: string;
+  parent_id?: string | null;
   sender: Sender;
   body: string; // may contain inline markers: [[ref:Quan Lộc]], [[sao:Kình Dương]]
+  status?: "pending" | "confirmed" | "streaming" | "failed" | "cancelled" | "deleted";
   toolCalls?: ChatToolEntry[];
   streaming?: boolean;
+  created_at?: string | null;
 }
 
 export type OverlayKind = "daiVan" | "lichSu" | null;
@@ -78,10 +91,49 @@ export interface ChatToolCall {
 }
 
 export interface ChatRequest {
-  message: string;
+  client_id: string;
+  session_id: string;
+  parent_id: string;
+  content: string;
 }
 
 export interface ChatResponse {
   answer: string;
   tool_calls: ChatToolCall[];
+}
+
+export interface SessionRef {
+  id: string;
+  chart_profile_id: string;
+  active_leaf_id: string;
+}
+
+export interface ChartProfileDTO {
+  id: string;
+  client_id: string;
+  display_name: string;
+  birth_metadata: BirthMetadata;
+}
+
+export interface SessionDetailResponse {
+  session: SessionRef;
+  chart_profile: ChartProfileDTO;
+  laso: BuildLasoResponse;
+  messages: ChatMessage[];
+  has_more_before: boolean;
+}
+
+export interface SessionSummary {
+  session_id: string;
+  chart_profile_id: string;
+  active_leaf_id: string | null;
+  display_name: string;
+  birth_year: number | null;
+  last_message_preview: string;
+  message_count: number;
+  updated_at: string | null;
+}
+
+export interface SessionListResponse {
+  sessions: SessionSummary[];
 }

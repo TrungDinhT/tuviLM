@@ -2,12 +2,12 @@ import { useMutation } from "@tanstack/react-query";
 import { API_URL } from "@/constants/env";
 
 export type StreamEvent =
+  | { type: "ids"; user_message_id: string; assistant_message_id: string }
   | { type: "text"; delta: string }
   | { type: "tool_call"; id: string; name: string; arguments: unknown }
   | { type: "tool_result"; id: string; name: string | null; content: unknown }
-  | { type: "result"; output: string | null }
-  | { type: "error"; message: string }
-  | { type: "done" };
+  | { type: "failed"; assistant_message_id: string; status: "failed"; message: string }
+  | { type: "done"; status: "confirmed" };
 
 export interface StreamHandlers {
   onEvent: (event: StreamEvent) => void;
@@ -15,23 +15,38 @@ export interface StreamHandlers {
 }
 
 export interface StreamChatVars {
-  message: string;
+  clientId: string;
+  sessionId: string;
+  parentId: string;
+  content: string;
   onEvent: (event: StreamEvent) => void;
   signal?: AbortSignal;
 }
 
 export async function streamChat(
-  message: string,
+  req: { clientId: string; sessionId: string; parentId: string; content: string },
   { onEvent, signal }: StreamHandlers,
 ): Promise<void> {
   const res = await fetch(`${API_URL}/api/v1/chat/stream`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({
+      client_id: req.clientId,
+      session_id: req.sessionId,
+      parent_id: req.parentId,
+      content: req.content,
+    }),
     signal,
   });
   if (!res.ok || !res.body) {
-    throw new Error(`Stream chat failed (HTTP ${res.status})`);
+    let detail = "";
+    try {
+      const body = await res.json();
+      detail = typeof body?.detail === "string" ? body.detail : "";
+    } catch {
+      detail = "";
+    }
+    throw new Error(detail || `Stream chat failed (HTTP ${res.status})`);
   }
 
   const reader = res.body.getReader();
@@ -64,7 +79,7 @@ export async function streamChat(
 
 export function useStreamChat() {
   return useMutation({
-    mutationFn: ({ message, onEvent, signal }: StreamChatVars) =>
-      streamChat(message, { onEvent, signal }),
+    mutationFn: ({ clientId, sessionId, parentId, content, onEvent, signal }: StreamChatVars) =>
+      streamChat({ clientId, sessionId, parentId, content }, { onEvent, signal }),
   });
 }
