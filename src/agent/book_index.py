@@ -135,7 +135,9 @@ class SectionContent(BaseModel):
     title: str
     breadcrumb: str
     content: str
-    children: list[str]
+    children: list[str] = Field(
+        default_factory=list,
+    )
 
 
 class SectionSearchHit(BaseModel):
