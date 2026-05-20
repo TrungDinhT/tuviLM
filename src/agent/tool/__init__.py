@@ -1,12 +1,15 @@
-from src.agent.tool.book import read_catalog, read_section
-from src.agent.tool.chart import (
+from __future__ import annotations
+
+from .book import read_catalog, read_section
+from .chart import (
     get_cung_by_position,
     get_cung_by_role,
     get_laso,
     get_tam_hop,
     get_xung_chieu,
 )
-from src.agent.tool.guidance import get_role_instruction
+from .guidance import get_role_instruction
+from .tu_vi_tan_bien import get_star_description, get_star_role_interaction
 
 __all__ = [
     "get_cung_by_position",
@@ -15,6 +18,8 @@ __all__ = [
     "get_role_instruction",
     "get_tam_hop",
     "get_xung_chieu",
+    "get_star_description",
+    "get_star_role_interaction",
     "read_catalog",
     "read_section",
 ]

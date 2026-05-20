@@ -8,9 +8,9 @@ from .tool import (
     get_cung_by_role,
     get_role_instruction,
     get_tam_hop,
-    read_catalog,
     get_xung_chieu,
-    read_section,
+    get_star_description,
+    get_star_role_interaction
 )
 from .skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
 
@@ -71,8 +71,8 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_cung_by_role,
             get_tam_hop,
             get_xung_chieu,
-            read_catalog,
-            read_section,
+            get_star_description,
+            get_star_role_interaction,
             get_cung_analyze_skill,
             read_book_tuvi_tan_bien,
             get_role_instruction
