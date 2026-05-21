@@ -125,7 +125,7 @@ export function MobileChartView() {
       setMessages((prev) => [
         ...prev,
         { id: userTempId, parent_id: activeLeafId, sender: "user", body, status: "pending" },
-        { id: aiTempId, parent_id: userTempId, sender: "assistant", body: "", toolCalls: [], streaming: true, status: "streaming" },
+        { id: aiTempId, parent_id: userTempId, sender: "assistant", body: "", toolCalls: [], status: "streaming" },
       ]);
 
       abortRef.current?.abort();
@@ -187,13 +187,12 @@ export function MobileChartView() {
                 updateAi((m) => ({
                   ...m,
                   body: m.body + `\n\n_Thầy đang bận: ${event.message}_`,
-                  streaming: false,
                   status: "failed",
                 }));
                 setActiveLeafId(userMessageId);
                 break;
               case "done":
-                updateAi((m) => ({ ...m, streaming: false, status: "confirmed" }));
+                updateAi((m) => ({ ...m, status: "confirmed" }));
                 setActiveLeafId(assistantMessageId);
                 break;
             }
@@ -201,7 +200,9 @@ export function MobileChartView() {
         },
         {
           onSettled: () => {
-            updateAi((m) => ({ ...m, streaming: false }));
+            updateAi((m) =>
+              m.status === "streaming" ? { ...m, status: "cancelled" } : m,
+            );
           },
           onError: (err) => {
             if (ctrl.signal.aborted) return;

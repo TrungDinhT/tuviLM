@@ -134,7 +134,6 @@ export function ChartView() {
           sender: "assistant",
           body: "",
           toolCalls: [],
-          streaming: true,
           status: "streaming",
         },
       ]);
@@ -204,13 +203,12 @@ export function ChartView() {
                 updateAi((m) => ({
                   ...m,
                   body: m.body + `\n\n_Thầy đang bận: ${event.message}_`,
-                  streaming: false,
                   status: "failed",
                 }));
                 setActiveLeafId(userMessageId);
                 break;
               case "done":
-                updateAi((m) => ({ ...m, streaming: false, status: "confirmed" }));
+                updateAi((m) => ({ ...m, status: "confirmed" }));
                 setActiveLeafId(assistantMessageId);
                 break;
             }
@@ -218,7 +216,9 @@ export function ChartView() {
         },
         {
           onSettled: () => {
-            updateAi((m) => ({ ...m, streaming: false }));
+            updateAi((m) =>
+              m.status === "streaming" ? { ...m, status: "cancelled" } : m,
+            );
           },
           onError: (err) => {
             if (ctrl.signal.aborted) return;

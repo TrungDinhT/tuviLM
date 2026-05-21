@@ -160,7 +160,6 @@ def test_message_document_converts_to_domain_message() -> None:
     assert msg.sender == "assistant"
     assert msg.body == "Xin chào"
     assert msg.status == "streaming"
-    assert msg.streaming is True
 
 
 def test_chat_request_requires_client_id() -> None:

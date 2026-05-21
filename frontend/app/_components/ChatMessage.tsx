@@ -23,7 +23,7 @@ export function ChatMessage({ msg, onRefClick }: ChatMessageProps) {
   }
 
   const hasBody = msg.body.trim().length > 0;
-  const showThinking = msg.streaming && !hasBody;
+  const showThinking = msg.status === "streaming" && !hasBody;
 
   return (
     <div className="self-start max-w-[88%] font-serif text-[14px] sm:text-[15px] md:text-[16px] lg:text-[17px] xl:text-[18px] text-[var(--color-ink)] leading-[1.5]">

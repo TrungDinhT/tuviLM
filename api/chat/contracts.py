@@ -32,7 +32,6 @@ class Message:
     sender: str  # "user" | "assistant"
     body: str
     status: str  # "confirmed" | "streaming" | "failed" | "cancelled" | "deleted"
-    streaming: bool = False
     created_at: dt.datetime | None = None
 
 

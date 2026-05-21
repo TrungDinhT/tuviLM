@@ -9,7 +9,6 @@ from api.schemas import (
     ChartProfileDTO,
     GenderCode,
     SessionDetailResponse,
-    SessionListResponse,
     SessionRef,
     SessionSummary,
     BuildLasoResponse,
@@ -47,7 +46,6 @@ def message_to_dto(message: Message) -> ChatMessageDTO:
         sender=message.sender,
         body=message.body,
         status=ChatMessageStatus(message.status),
-        streaming=message.streaming,
         created_at=message.created_at,
     )
 

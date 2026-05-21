@@ -108,7 +108,6 @@ class ChatMessageDTO(BaseModel):
     sender: str
     body: str
     status: ChatMessageStatus = ChatMessageStatus.CONFIRMED
-    streaming: bool = False
     created_at: dt.datetime | None = None
 
 

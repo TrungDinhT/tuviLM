@@ -85,7 +85,6 @@ class MessageDocument(MongoDocument):
             sender=self.role.value,
             body=self.content,
             status=self.status.value,
-            streaming=self.status == MessageStatus.STREAMING,
             created_at=self.created_at,
         )
 

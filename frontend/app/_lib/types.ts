@@ -78,7 +78,6 @@ export interface ChatMessage {
   body: string; // may contain inline markers: [[ref:Quan Lộc]], [[sao:Kình Dương]]
   status?: "pending" | "confirmed" | "streaming" | "failed" | "cancelled" | "deleted";
   toolCalls?: ChatToolEntry[];
-  streaming?: boolean;
   created_at?: string | null;
 }
 
