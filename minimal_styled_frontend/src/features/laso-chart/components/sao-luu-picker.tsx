@@ -1,128 +1,71 @@
 'use client';
 
-import { useState } from 'react';
-import { Loader2, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { DateInput } from '@/components/shared/date-input';
-import { GenderControl } from '@/components/shared/gender-control';
-import { HourSelect } from '@/components/shared/hour-select';
-import { MinuteSelect } from '@/components/shared/minute-select';
+import { Input } from '@/components/ui/input';
 import { useBuildSaoLuu } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
 import { useChartStore } from '@/store/chart-store';
-import type { Gender } from '@/lib/api/schemas';
-
-interface Draft {
-  dateOf: Date | undefined;
-  hourOf: number | undefined;
-  minuteOf: number | undefined;
-  gender: Gender;
-}
 
 export function SaoLuuPicker() {
   const setOverlay = useChartStore((s) => s.setSaoLuuOverlay);
-  const clearOverlay = useChartStore((s) => s.clearSaoLuu);
-  const overlay = useChartStore((s) => s.saoLuuOverlay);
   const lastInput = useChartStore((s) => s.lastInput);
 
-  const [values, setValues] = useState<Draft>(() => ({
-    dateOf: new Date(),
-    hourOf: 8,
-    minuteOf: 0,
-    gender: lastInput?.gender ?? 'M',
-  }));
+  const [year, setYear] = useState<string>(() => new Date().getFullYear().toString());
   const [error, setError] = useState<string | null>(null);
 
   const mutation = useBuildSaoLuu();
+  const { mutate } = mutation;
 
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
-    setError(null);
-    if (!values.dateOf || values.hourOf === undefined) {
-      setError('Vui lòng chọn ngày và giờ quan sát.');
+  useEffect(() => {
+    const parsed = Number(year);
+    if (!Number.isInteger(parsed) || parsed < 1900 || parsed > 2099) {
+      setError(year === '' ? null : 'Vui lòng nhập năm hợp lệ (1900–2099).');
       return;
     }
-    mutation.mutate(
-      {
-        observation_time: {
-          date: values.dateOf.getDate(),
-          month: values.dateOf.getMonth() + 1,
-          year: values.dateOf.getFullYear(),
-          hour: values.hourOf,
-          gender: values.gender,
+    setError(null);
+    const handle = setTimeout(() => {
+      mutate(
+        {
+          observation_time: {
+            date: 1,
+            month: 1,
+            year: parsed,
+            hour: 0,
+            gender: lastInput?.gender ?? 'M',
+          },
         },
-      },
-      {
-        onSuccess: (res) => setOverlay(res),
-        onError: (err) => setError(isApiError(err) ? apiErrorMessage(err) : 'Đã có lỗi xảy ra.'),
-      },
-    );
-  };
+        {
+          onSuccess: (res) => setOverlay(res),
+          onError: (err) =>
+            setError(isApiError(err) ? apiErrorMessage(err) : 'Đã có lỗi xảy ra.'),
+        },
+      );
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [year, lastInput?.gender, mutate, setOverlay]);
 
   return (
     <Card size="sm">
-      <CardHeader>
-        <CardTitle className="text-sm">Sao lưu</CardTitle>
-      </CardHeader>
+      <CardHeader></CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="flex flex-col gap-3" noValidate>
-          <FieldGroup>
-            <div className="grid grid-cols-2 gap-3">
-              <Field>
-                <FieldLabel htmlFor="sl-date">Ngày quan sát</FieldLabel>
-                <DateInput
-                  id="sl-date"
-                  value={values.dateOf}
-                  onChange={(d) => setValues((p) => ({ ...p, dateOf: d }))}
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="sl-hour">Giờ : Phút</FieldLabel>
-                <div className="grid grid-cols-2 gap-2">
-                  <HourSelect
-                    id="sl-hour"
-                    value={values.hourOf}
-                    onChange={(h) => setValues((p) => ({ ...p, hourOf: h }))}
-                  />
-                  <MinuteSelect
-                    id="sl-minute"
-                    value={values.minuteOf}
-                    onChange={(m) => setValues((p) => ({ ...p, minuteOf: m }))}
-                  />
-                </div>
-              </Field>
-            </div>
-            <Field>
-              <FieldLabel htmlFor="sl-gender">Giới tính</FieldLabel>
-              <GenderControl
-                id="sl-gender"
-                value={values.gender}
-                onChange={(g) => setValues((p) => ({ ...p, gender: g }))}
-              />
-            </Field>
-          </FieldGroup>
+        <FieldGroup>
+          <Field className="flex-row">
+            <FieldLabel htmlFor="sl-year">Xem năm</FieldLabel>
+            <Input
+              id="sl-year"
+              type="number"
+              inputMode="numeric"
+              min={1800}
+              max={2200}
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+            />
+          </Field>
+        </FieldGroup>
 
-          {error && <div className="text-xs text-destructive">{error}</div>}
-
-          <div className="flex items-center gap-2">
-            <Button type="submit" size="sm" disabled={mutation.isPending}>
-              {mutation.isPending ? (
-                <>
-                  <Loader2 className="size-3.5 animate-spin" /> Đang tính…
-                </>
-              ) : (
-                'Áp dụng sao lưu'
-              )}
-            </Button>
-            {overlay && (
-              <Button type="button" size="sm" variant="ghost" onClick={clearOverlay}>
-                <X className="size-3.5" /> Xóa sao lưu
-              </Button>
-            )}
-          </div>
-        </form>
+        {error && <div className="mt-3 text-xs text-destructive">{error}</div>}
       </CardContent>
     </Card>
   );
