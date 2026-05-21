@@ -16,7 +16,7 @@ export default function OnboardingPage() {
       {/* Above-the-fold: hero + form, side by side on desktop */}
       <div className="grid grid-cols-1 items-center gap-8 lg:min-h-[calc(100svh-5rem)] lg:grid-cols-2">
         <Hero />
-        <div className="lg:max-w-xl lg:justify-self-end">
+        <div className="lg:w-full lg:max-w-xl lg:justify-self-end">
           <BirthForm />
         </div>
       </div>

@@ -102,7 +102,7 @@ export function BirthForm() {
       </CardHeader>
       <form onSubmit={onSubmit} noValidate>
         <CardContent>
-          <FieldGroup>
+          <FieldGroup className='pb-4'>
             <Field>
               <FieldLabel htmlFor="b-name">Tên gọi</FieldLabel>
               <Input
