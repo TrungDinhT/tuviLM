@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Maximize2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -16,12 +16,14 @@ import { Empty, EmptyContent, EmptyDescription, EmptyMedia, EmptyTitle } from '@
 import { useChartStore } from '@/store/chart-store';
 import { AspectBars } from '@/features/laso-chart/components/aspect-bars';
 import { CompactChart } from '@/features/laso-chart/components/compact-chart';
+import { FullChartDialog } from '@/features/laso-chart/components/full-chart-dialog';
 import { SaoLuuPicker } from '@/features/laso-chart/components/sao-luu-picker';
 import { ChatPanel } from './chat-panel';
 
 export function ChatScreen() {
   const current = useChartStore((s) => s.current);
   const [mobileChartOpen, setMobileChartOpen] = useState(false);
+  const [fullChartOpen, setFullChartOpen] = useState(false);
 
   if (!current) {
     return (
@@ -68,8 +70,17 @@ export function ChatScreen() {
       {/* Desktop chart side panel */}
       <aside className="hidden w-[420px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-border bg-background p-4 lg:flex">
         <Card size="sm">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between gap-2">
             <CardTitle className="text-sm">Lá số</CardTitle>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Xem chi tiết"
+              onClick={() => setFullChartOpen(true)}
+            >
+              <Maximize2 />
+            </Button>
           </CardHeader>
           <CardContent>
             <CompactChart />
@@ -82,15 +93,28 @@ export function ChatScreen() {
       {/* Mobile chart sheet */}
       <Sheet open={mobileChartOpen} onOpenChange={setMobileChartOpen}>
         <SheetContent side="right" className="flex w-full flex-col gap-4 overflow-y-auto p-4">
-          <SheetHeader className="gap-1 p-0">
-            <SheetTitle>Lá số</SheetTitle>
-            <SheetDescription>Chạm vào một cung để xem chi tiết.</SheetDescription>
+          <SheetHeader className="flex flex-row items-start justify-between gap-2 p-0 pr-10">
+            <div className="flex flex-col gap-1">
+              <SheetTitle>Lá số</SheetTitle>
+              <SheetDescription>Chạm vào một cung để xem chi tiết.</SheetDescription>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Xem chi tiết"
+              onClick={() => setFullChartOpen(true)}
+            >
+              <Maximize2 />
+            </Button>
           </SheetHeader>
           <CompactChart />
           <SaoLuuPicker />
           <AspectBars />
         </SheetContent>
       </Sheet>
+
+      <FullChartDialog open={fullChartOpen} onOpenChange={setFullChartOpen} />
     </div>
   );
 }
