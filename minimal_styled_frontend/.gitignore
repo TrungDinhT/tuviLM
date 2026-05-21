@@ -2,6 +2,11 @@
 
 # dependencies
 /node_modules
+
+# Root .gitignore inherits Python conventions (lib/, build/, dist/) that
+# match Next.js source dirs. Re-allow what we need.
+!src/lib/
+!src/lib/**
 /.pnp
 .pnp.*
 .yarn/*
