@@ -9,12 +9,15 @@ import { useChartStore } from '@/store/chart-store';
  * hydration mismatches for client components that read persisted slices.
  */
 export function StoreHydrator({ children }: { children: ReactNode }) {
-  const [hydrated, setHydrated] = useState(() => useChartStore.persist.hasHydrated());
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    if (hydrated) return;
+    if (useChartStore.persist.hasHydrated()) {
+      setHydrated(true);
+      return;
+    }
     return useChartStore.persist.onFinishHydration(() => setHydrated(true));
-  }, [hydrated]);
+  }, []);
 
   if (!hydrated) return null;
   return <>{children}</>;
