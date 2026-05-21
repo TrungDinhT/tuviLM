@@ -35,7 +35,7 @@ export function GenderControl({ value, onChange, id, className }: Props) {
       id={id}
       role="radiogroup"
       className={cn(
-        'inline-flex w-fit items-stretch rounded-md border border-input bg-background p-0.5',
+        'flex w-full items-stretch rounded-md border border-input bg-background p-0.5',
         className,
       )}
     >
@@ -54,7 +54,7 @@ export function GenderControl({ value, onChange, id, className }: Props) {
             onClick={() => onChange(option.value)}
             onKeyDown={(e) => handleKeyDown(e, index)}
             className={cn(
-              'rounded-sm px-4 py-1.5 text-sm font-medium transition-colors',
+              'flex-1 rounded-sm px-4 py-1.5 text-sm font-medium transition-colors',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               active
                 ? 'bg-primary text-primary-foreground'

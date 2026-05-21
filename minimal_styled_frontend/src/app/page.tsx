@@ -1,4 +1,6 @@
-import { BookOpen, Compass, History, Sparkles } from 'lucide-react';
+import { BookOpen, History, Sparkles } from 'lucide-react';
+import { Hero } from './_landing/hero';
+import { HowItWorks } from './_landing/how-it-works';
 import { BirthForm } from '@/features/birth-input/components/birth-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -10,34 +12,30 @@ const FEATURES = [
 
 export default function OnboardingPage() {
   return (
-    <div className="flex w-full flex-col items-center px-4 py-6 lg:px-12 lg:py-12">
-      <div className="flex w-full max-w-2xl flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Compass className="size-4" />
-          </span>
-          <div>
-            <div className="font-heading text-base leading-none font-medium">Tử Vi AI</div>
-            <div className="mt-0.5 text-xs text-muted-foreground">An lá số bằng AI</div>
-          </div>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-6 lg:px-8 lg:py-10">
+      {/* Above-the-fold: hero + form, side by side on desktop */}
+      <div className="grid grid-cols-1 items-center gap-8 lg:min-h-[calc(100svh-5rem)] lg:grid-cols-2">
+        <Hero />
+        <div className="lg:max-w-xl lg:justify-self-end">
+          <BirthForm />
         </div>
+      </div>
 
-        <BirthForm />
+      <HowItWorks />
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          {FEATURES.map((f) => {
-            const Icon = f.icon;
-            return (
-              <Card key={f.title} size="sm">
-                <CardHeader className="flex-row items-center gap-2 [&_svg]:text-muted-foreground">
-                  <Icon className="size-4" />
-                  <CardTitle className="text-sm">{f.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-xs text-muted-foreground">{f.body}</CardContent>
-              </Card>
-            );
-          })}
-        </div>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {FEATURES.map((f) => {
+          const Icon = f.icon;
+          return (
+            <Card key={f.title} size="sm">
+              <CardHeader className="flex-row items-center gap-2 [&_svg]:text-muted-foreground">
+                <Icon className="size-4" />
+                <CardTitle className="text-sm">{f.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">{f.body}</CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

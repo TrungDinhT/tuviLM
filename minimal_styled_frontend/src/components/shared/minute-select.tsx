@@ -11,19 +11,28 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   value: number | undefined;
-  onChange: (hour: number) => void;
+  onChange: (minute: number) => void;
   id?: string;
   className?: string;
   placeholder?: string;
+  /** Step between minute options. Defaults to 5; common alt values are 1 and 15. */
+  step?: 1 | 5 | 15;
 }
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
-
-function formatHour(h: number): string {
-  return h.toString();
+function pad(n: number): string {
+  return n.toString().padStart(2, '0');
 }
 
-export function HourSelect({ value, onChange, id, className, placeholder = '--' }: Props) {
+export function MinuteSelect({
+  value,
+  onChange,
+  id,
+  className,
+  placeholder = '--',
+  step = 5,
+}: Props) {
+  const options = Array.from({ length: Math.ceil(60 / step) }, (_, i) => i * step);
+
   return (
     <Select
       value={value === undefined ? undefined : value.toString()}
@@ -33,9 +42,9 @@ export function HourSelect({ value, onChange, id, className, placeholder = '--' 
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {HOURS.map((h) => (
-          <SelectItem key={h} value={h.toString()}>
-            {formatHour(h)}
+        {options.map((m) => (
+          <SelectItem key={m} value={m.toString()}>
+            {pad(m)}
           </SelectItem>
         ))}
       </SelectContent>

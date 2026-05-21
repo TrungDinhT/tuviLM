@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Geist_Mono, JetBrains_Mono } from 'next/font/google';
-import { AppShell } from '@/components/layouts/app-shell';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { StoreHydrator } from '@/components/providers/store-hydrator';
 import './globals.css';
@@ -25,11 +24,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="vi" className={`${geistMono.variable} ${jetbrainsMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col bg-muted/40">
         <QueryProvider>
-          <StoreHydrator>
-            <AppShell>{children}</AppShell>
-          </StoreHydrator>
+          <StoreHydrator>{children}</StoreHydrator>
         </QueryProvider>
       </body>
     </html>

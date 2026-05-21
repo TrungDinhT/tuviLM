@@ -5,22 +5,21 @@ import { Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DateInput } from '@/components/shared/date-input';
+import { GenderControl } from '@/components/shared/gender-control';
+import { HourSelect } from '@/components/shared/hour-select';
+import { MinuteSelect } from '@/components/shared/minute-select';
 import { useBuildSaoLuu } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
 import { useChartStore } from '@/store/chart-store';
-import {
-  BirthFormSchema,
-  toBirthInput,
-  type BirthFormValues,
-} from '@/features/birth-input/schema';
+import type { Gender } from '@/lib/api/schemas';
 
-const DEFAULT_TIME: BirthFormValues = {
-  dateOf: new Date().toISOString().slice(0, 10),
-  timeOf: '08:00',
-  gender: 'F',
-};
+interface Draft {
+  dateOf: Date | undefined;
+  hourOf: number | undefined;
+  minuteOf: number | undefined;
+  gender: Gender;
+}
 
 export function SaoLuuPicker() {
   const setOverlay = useChartStore((s) => s.setSaoLuuOverlay);
@@ -28,35 +27,31 @@ export function SaoLuuPicker() {
   const overlay = useChartStore((s) => s.saoLuuOverlay);
   const lastInput = useChartStore((s) => s.lastInput);
 
-  const [values, setValues] = useState<BirthFormValues>(() => ({
-    ...DEFAULT_TIME,
-    gender: lastInput?.gender ?? 'F',
+  const [values, setValues] = useState<Draft>(() => ({
+    dateOf: new Date(),
+    hourOf: 8,
+    minuteOf: 0,
+    gender: lastInput?.gender ?? 'M',
   }));
   const [error, setError] = useState<string | null>(null);
 
   const mutation = useBuildSaoLuu();
 
-  const update = <K extends keyof BirthFormValues>(key: K, value: BirthFormValues[K]) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
-  };
-
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setError(null);
-    const parsed = BirthFormSchema.safeParse(values);
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? 'Dữ liệu không hợp lệ.');
+    if (!values.dateOf || values.hourOf === undefined) {
+      setError('Vui lòng chọn ngày và giờ quan sát.');
       return;
     }
-    const input = toBirthInput(parsed.data);
     mutation.mutate(
       {
         observation_time: {
-          date: input.date,
-          month: input.month,
-          year: input.year,
-          hour: input.hour,
-          gender: input.gender,
+          date: values.dateOf.getDate(),
+          month: values.dateOf.getMonth() + 1,
+          year: values.dateOf.getFullYear(),
+          hour: values.hourOf,
+          gender: values.gender,
         },
       },
       {
@@ -77,37 +72,35 @@ export function SaoLuuPicker() {
             <div className="grid grid-cols-2 gap-3">
               <Field>
                 <FieldLabel htmlFor="sl-date">Ngày quan sát</FieldLabel>
-                <Input
+                <DateInput
                   id="sl-date"
-                  type="date"
                   value={values.dateOf}
-                  onChange={(e) => update('dateOf', e.target.value)}
+                  onChange={(d) => setValues((p) => ({ ...p, dateOf: d }))}
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="sl-time">Giờ</FieldLabel>
-                <Input
-                  id="sl-time"
-                  type="time"
-                  value={values.timeOf}
-                  onChange={(e) => update('timeOf', e.target.value)}
-                />
+                <FieldLabel htmlFor="sl-hour">Giờ : Phút</FieldLabel>
+                <div className="grid grid-cols-2 gap-2">
+                  <HourSelect
+                    id="sl-hour"
+                    value={values.hourOf}
+                    onChange={(h) => setValues((p) => ({ ...p, hourOf: h }))}
+                  />
+                  <MinuteSelect
+                    id="sl-minute"
+                    value={values.minuteOf}
+                    onChange={(m) => setValues((p) => ({ ...p, minuteOf: m }))}
+                  />
+                </div>
               </Field>
             </div>
             <Field>
               <FieldLabel htmlFor="sl-gender">Giới tính</FieldLabel>
-              <Select
+              <GenderControl
+                id="sl-gender"
                 value={values.gender}
-                onValueChange={(v) => update('gender', v as 'M' | 'F')}
-              >
-                <SelectTrigger id="sl-gender">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="F">Nữ</SelectItem>
-                  <SelectItem value="M">Nam</SelectItem>
-                </SelectContent>
-              </Select>
+                onChange={(g) => setValues((p) => ({ ...p, gender: g }))}
+              />
             </Field>
           </FieldGroup>
 

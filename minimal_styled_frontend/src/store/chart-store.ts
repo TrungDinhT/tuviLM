@@ -8,7 +8,6 @@ import type {
 
 export type BirthInput = BuildLasoRequest & {
   name?: string;
-  place?: string;
 };
 
 export interface HistoryEntry {

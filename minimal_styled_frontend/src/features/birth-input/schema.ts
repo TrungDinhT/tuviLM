@@ -5,42 +5,48 @@ import type { BirthInput } from '@/store/chart-store';
 export const BirthFormSchema = z
   .object({
     name: z.string().optional(),
-    place: z.string().optional(),
-    dateOf: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Ngày sinh không hợp lệ.'),
-    timeOf: z.string().regex(/^\d{2}:\d{2}$/, 'Giờ sinh không hợp lệ.'),
+    dateOf: z
+      .date({
+        required_error: 'Vui lòng chọn ngày sinh.',
+        invalid_type_error: 'Vui lòng chọn ngày sinh.',
+      })
+      .refine(
+        (d) => d.getFullYear() >= 1900 && d.getFullYear() <= 2099,
+        'Năm sinh phải nằm trong khoảng 1900–2099.',
+      ),
+    hourOf: z
+      .number({
+        required_error: 'Vui lòng chọn giờ sinh.',
+        invalid_type_error: 'Vui lòng chọn giờ sinh.',
+      })
+      .int()
+      .min(0)
+      .max(23),
+    minuteOf: z
+      .number({
+        required_error: 'Vui lòng chọn phút sinh.',
+        invalid_type_error: 'Vui lòng chọn phút sinh.',
+      })
+      .int()
+      .min(0)
+      .max(59),
     gender: GenderSchema,
-  })
-  .superRefine((value, ctx) => {
-    const [y, m, d] = value.dateOf.split('-').map(Number) as [number, number, number];
-    if (y < 1900 || y > 2099) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['dateOf'],
-        message: 'Năm sinh phải nằm trong khoảng 1900–2099.',
-      });
-    }
-    if (m < 1 || m > 12 || d < 1 || d > 31) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['dateOf'],
-        message: 'Ngày sinh không hợp lệ.',
-      });
-    }
   });
 
 export type BirthFormValues = z.infer<typeof BirthFormSchema>;
 
 export function toBirthInput(values: BirthFormValues): BirthInput {
-  const [y, m, d] = values.dateOf.split('-').map(Number) as [number, number, number];
-  const [hh] = values.timeOf.split(':').map(Number) as [number, number];
   return {
-    date: d,
-    month: m,
-    year: y,
-    hour: hh,
+    date: values.dateOf.getDate(),
+    month: values.dateOf.getMonth() + 1,
+    year: values.dateOf.getFullYear(),
+    hour: values.hourOf,
+    // Note: minute is collected for UX precision but not sent — the backend's
+    // BuildLasoRequest only carries hour, and Tử Vi giờ boundaries fall on
+    // odd hours (e.g. 14:59 = Mùi, 15:00 = Thân) so the hour value already
+    // determines the canh giờ correctly.
     gender: values.gender,
     name: values.name?.trim() || undefined,
-    place: values.place?.trim() || undefined,
   };
 }
 
@@ -54,14 +60,14 @@ export function toApiRequest(input: BirthInput): BuildLasoRequest {
   };
 }
 
-export function fromBirthInput(input: BirthInput): BirthFormValues {
-  const dateOf = `${input.year.toString().padStart(4, '0')}-${input.month.toString().padStart(2, '0')}-${input.date.toString().padStart(2, '0')}`;
-  const timeOf = `${input.hour.toString().padStart(2, '0')}:00`;
+export function fromBirthInput(input: BirthInput): Partial<BirthFormValues> {
   return {
     name: input.name,
-    place: input.place,
-    dateOf,
-    timeOf,
+    dateOf: new Date(input.year, input.month - 1, input.date),
+    hourOf: input.hour,
+    // We don't persist the minute (backend doesn't carry it), so the form
+    // defaults to `0` on prefill.
+    minuteOf: 0,
     gender: input.gender,
   };
 }
