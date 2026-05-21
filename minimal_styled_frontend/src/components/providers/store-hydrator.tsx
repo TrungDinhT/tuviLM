@@ -13,6 +13,8 @@ export function StoreHydrator({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (useChartStore.persist.hasHydrated()) {
+      // Set once on mount when hydration already finished before this effect ran.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHydrated(true);
       return;
     }
