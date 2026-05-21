@@ -5,10 +5,14 @@ import {
   BuildLasoResponseSchema,
   BuildSaoLuuRequestSchema,
   BuildSaoLuuResponseSchema,
+  ChatRequestSchema,
+  ChatResponseSchema,
   type BuildLasoRequest,
   type BuildLasoResponse,
   type BuildSaoLuuRequest,
   type BuildSaoLuuResponse,
+  type ChatRequest,
+  type ChatResponse,
 } from './schemas';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000';
@@ -71,6 +75,10 @@ export function buildSaoLuu(req: BuildSaoLuuRequest): Promise<BuildSaoLuuRespons
     BuildSaoLuuResponseSchema,
     req,
   );
+}
+
+export function chat(req: ChatRequest): Promise<ChatResponse> {
+  return call('/api/v1/chat', ChatRequestSchema, ChatResponseSchema, req);
 }
 
 /**

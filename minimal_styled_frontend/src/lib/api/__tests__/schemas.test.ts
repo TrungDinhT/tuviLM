@@ -4,7 +4,10 @@ import {
   BuildLasoResponseSchema,
   BuildSaoLuuRequestSchema,
   BuildSaoLuuResponseSchema,
+  ChatRequestSchema,
+  ChatResponseSchema,
   CungSchema,
+  NO_LASO_SENTINEL,
 } from '../schemas';
 import fixture from '../__fixtures__/build-laso.json';
 
@@ -84,6 +87,47 @@ describe('BuildSaoLuuResponseSchema', () => {
       cung_by_position: fixture.cung_by_position,
     });
     expect(r.success).toBe(true);
+  });
+});
+
+describe('ChatRequestSchema', () => {
+  it('accepts a string message', () => {
+    expect(ChatRequestSchema.safeParse({ message: 'Hello' }).success).toBe(true);
+  });
+
+  it('rejects a missing message', () => {
+    expect(ChatRequestSchema.safeParse({}).success).toBe(false);
+  });
+});
+
+describe('ChatResponseSchema', () => {
+  it('round-trips a minimal response with empty tool_calls', () => {
+    const r = ChatResponseSchema.safeParse({ answer: 'Xin chào.', tool_calls: [] });
+    expect(r.success).toBe(true);
+  });
+
+  it('requires tool_calls (backend always emits the field)', () => {
+    expect(ChatResponseSchema.safeParse({ answer: 'Hi' }).success).toBe(false);
+  });
+
+  it('accepts populated tool_calls with arbitrary arguments', () => {
+    const r = ChatResponseSchema.safeParse({
+      answer: 'See cung Mệnh',
+      tool_calls: [{ id: 'c1', name: 'get_cung_by_position', arguments: { position: 'Tý' } }],
+    });
+    expect(r.success).toBe(true);
+  });
+
+  it('rejects a response missing answer', () => {
+    expect(ChatResponseSchema.safeParse({ tool_calls: [] }).success).toBe(false);
+  });
+});
+
+describe('NO_LASO_SENTINEL', () => {
+  // Pin the exact string. If the backend wording in `api/main.py::chat_dummy`
+  // changes, this test fails — update both sides in lockstep.
+  it('matches the exact backend sentinel string', () => {
+    expect(NO_LASO_SENTINEL).toBe('TinhBan chưa được tạo trong state.');
   });
 });
 

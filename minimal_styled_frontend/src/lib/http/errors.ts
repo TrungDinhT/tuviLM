@@ -3,12 +3,13 @@ import type { ZodIssue } from 'zod';
 export type ApiError =
   | { kind: 'network' }
   | { kind: 'http'; status: number; body: unknown }
-  | { kind: 'parse'; issues: ZodIssue[] };
+  | { kind: 'parse'; issues: ZodIssue[] }
+  | { kind: 'no-la-so'; requiresRebuild: boolean };
 
 export function isApiError(value: unknown): value is ApiError {
   if (!value || typeof value !== 'object') return false;
   const kind = (value as { kind?: unknown }).kind;
-  return kind === 'network' || kind === 'http' || kind === 'parse';
+  return kind === 'network' || kind === 'http' || kind === 'parse' || kind === 'no-la-so';
 }
 
 export function apiErrorMessage(err: ApiError): string {
@@ -21,5 +22,9 @@ export function apiErrorMessage(err: ApiError): string {
       return `Máy chủ trả về lỗi (${err.status}).`;
     case 'parse':
       return 'Phản hồi từ máy chủ không đúng định dạng.';
+    case 'no-la-so':
+      return err.requiresRebuild
+        ? 'Phiên đã hết — vui lòng quay lại trang nhập thông tin để tạo lại lá số.'
+        : 'Không khôi phục được phiên lá số. Vui lòng thử lại.';
   }
 }

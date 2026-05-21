@@ -56,3 +56,28 @@ export const BuildSaoLuuResponseSchema = z.object({
   cung_by_position: z.record(z.string(), CungSchema),
 });
 export type BuildSaoLuuResponse = z.infer<typeof BuildSaoLuuResponseSchema>;
+
+export const ChatRequestSchema = z.object({
+  message: z.string(),
+});
+export type ChatRequest = z.infer<typeof ChatRequestSchema>;
+
+export const ChatToolCallSchema = z.object({
+  id: z.string().nullable().optional(),
+  name: z.string(),
+  arguments: z.unknown(),
+});
+export type ChatToolCall = z.infer<typeof ChatToolCallSchema>;
+
+export const ChatResponseSchema = z.object({
+  answer: z.string(),
+  tool_calls: z.array(ChatToolCallSchema),
+});
+export type ChatResponse = z.infer<typeof ChatResponseSchema>;
+
+/**
+ * Sentinel `answer` returned by `POST /api/v1/chat` when the backend
+ * has no `la_so` in process state (see `api/main.py::chat_dummy`).
+ * Match the backend string exactly; a schema-test asserts they agree.
+ */
+export const NO_LASO_SENTINEL = 'TinhBan chưa được tạo trong state.';
