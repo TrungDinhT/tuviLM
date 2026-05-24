@@ -4,8 +4,9 @@ import datetime as dt
 from dataclasses import asdict
 from typing import Any
 
+from beanie.operators import In
 from bson import ObjectId
-from pymongo import ASCENDING, DESCENDING, ReturnDocument
+from pymongo import ReturnDocument
 from pymongo.asynchronous.database import AsyncDatabase
 
 from api.chat.contracts import (
@@ -61,29 +62,9 @@ class MongoChatStore:
     async def ping(self) -> None:
         await self.db.client.admin.command("ping")
 
-    async def ensure_indexes(self) -> None:
-        await self.db.chart_profiles.create_index(
-            [("client_id", ASCENDING), ("status", ASCENDING), ("updated_at", DESCENDING)]
-        )
-        await self.db.sessions.create_index(
-            [("client_id", ASCENDING), ("status", ASCENDING), ("updated_at", DESCENDING)]
-        )
-        await self.db.sessions.create_index([("chart_profile_id", ASCENDING)])
-        await self.db.sessions.create_index([("active_leaf_id", ASCENDING)])
-        await self.db.messages.create_index(
-            [("session_id", ASCENDING), ("created_at", ASCENDING)]
-        )
-        await self.db.messages.create_index([("parent_id", ASCENDING)])
-        await self.db.messages.create_index(
-            [("session_id", ASCENDING), ("status", ASCENDING)]
-        )
-        await self.db.tool_events.create_index(
-            [("session_id", ASCENDING), ("message_id", ASCENDING), ("created_at", ASCENDING)]
-        )
-
     async def mark_stale_streaming_messages_failed(self) -> int:
         result = await self.db.messages.update_many(
-            {"role": "assistant", "status": "streaming"},
+            {"role": MessageRole.ASSISTANT.value, "status": MessageStatus.STREAMING.value},
             {
                 "$set": {
                     "status": MessageStatus.FAILED.value,
@@ -107,45 +88,42 @@ class MongoChatStore:
         session_id = ObjectId()
         root_id = ObjectId()
 
+        profile_doc = ChartProfileDocument(
+            _id=profile_id,
+            client_id=client_id,
+            display_name=display_name,
+            birth_metadata=asdict(birth_info),
+            status=RecordStatus.ACTIVE,
+            created_at=now,
+            updated_at=now,
+        )
+        root_message = MessageDocument(
+            _id=root_id,
+            session_id=session_id,
+            parent_id=None,
+            role=MessageRole.ASSISTANT,
+            content=root_greeting,
+            status=MessageStatus.CONFIRMED,
+            created_at=now,
+            updated_at=now,
+        )
+        session_doc = SessionDocument(
+            _id=session_id,
+            client_id=client_id,
+            chart_profile_id=profile_id,
+            active_leaf_id=root_id,
+            status=RecordStatus.ACTIVE,
+            created_at=now,
+            updated_at=now,
+        )
+
+        async def _txn_callback(mongo_session):
+            await profile_doc.insert(session=mongo_session)
+            await root_message.insert(session=mongo_session)
+            await session_doc.insert(session=mongo_session)
+
         async with self.db.client.start_session() as mongo_session:
-            async with await mongo_session.start_transaction():
-                await self.db.chart_profiles.insert_one(
-                    ChartProfileDocument(
-                        _id=profile_id,
-                        client_id=client_id,
-                        display_name=display_name,
-                        birth_metadata=asdict(birth_info),
-                        status=RecordStatus.ACTIVE,
-                        created_at=now,
-                        updated_at=now,
-                    ).to_mongo(),
-                    session=mongo_session,
-                )
-                await self.db.messages.insert_one(
-                    MessageDocument(
-                        _id=root_id,
-                        session_id=session_id,
-                        parent_id=None,
-                        role=MessageRole.ASSISTANT,
-                        content=root_greeting,
-                        status=MessageStatus.CONFIRMED,
-                        created_at=now,
-                        updated_at=now,
-                    ).to_mongo(),
-                    session=mongo_session,
-                )
-                await self.db.sessions.insert_one(
-                    SessionDocument(
-                        _id=session_id,
-                        client_id=client_id,
-                        chart_profile_id=profile_id,
-                        active_leaf_id=root_id,
-                        status=RecordStatus.ACTIVE,
-                        created_at=now,
-                        updated_at=now,
-                    ).to_mongo(),
-                    session=mongo_session,
-                )
+            await mongo_session.with_transaction(_txn_callback)
 
         return ChartSessionCreated(
             chart_profile_id=str(profile_id),
@@ -155,23 +133,21 @@ class MongoChatStore:
 
     async def get_session(self, *, client_id: str, session_id: str) -> SessionRecord:
         session_oid = _oid(session_id)
-        session_raw = await self.db.sessions.find_one(
-            {"_id": session_oid, "client_id": client_id, "status": RecordStatus.ACTIVE.value}
+        session_doc = await SessionDocument.find_one(
+            SessionDocument.id == session_oid,
+            SessionDocument.client_id == client_id,
+            SessionDocument.status == RecordStatus.ACTIVE,
         )
-        if not session_raw:
+        if not session_doc:
             raise NotFoundError("Session not found")
-        session_doc = SessionDocument.model_validate(session_raw)
 
-        profile_raw = await self.db.chart_profiles.find_one(
-            {
-                "_id": session_doc.chart_profile_id,
-                "client_id": client_id,
-                "status": RecordStatus.ACTIVE.value,
-            }
+        profile_doc = await ChartProfileDocument.find_one(
+            ChartProfileDocument.id == session_doc.chart_profile_id,
+            ChartProfileDocument.client_id == client_id,
+            ChartProfileDocument.status == RecordStatus.ACTIVE,
         )
-        if not profile_raw:
+        if not profile_doc:
             raise NotFoundError("Chart profile not found")
-        profile_doc = ChartProfileDocument.model_validate(profile_raw)
 
         messages = await self._active_path(session_doc.active_leaf_id)
         return SessionRecord(
@@ -185,31 +161,33 @@ class MongoChatStore:
         )
 
     async def list_sessions(self, *, client_id: str) -> list[SessionInfo]:
-        cursor = self.db.sessions.find(
-            {"client_id": client_id, "status": RecordStatus.ACTIVE.value},
-            sort=[("updated_at", DESCENDING)],
-            limit=100,
-        )
-        sessions = [SessionDocument.model_validate(doc) async for doc in cursor]
+        sessions = await SessionDocument.find(
+            SessionDocument.client_id == client_id,
+            SessionDocument.status == RecordStatus.ACTIVE,
+        ).sort(-SessionDocument.updated_at).limit(100).to_list()
+
         if not sessions:
             return []
 
         profile_ids = [doc.chart_profile_id for doc in sessions]
         profiles: dict[ObjectId, ChartProfileDocument] = {}
-        async for doc in self.db.chart_profiles.find({"_id": {"$in": profile_ids}}):
-            profile = ChartProfileDocument.model_validate(doc)
-            profiles[profile.id] = profile
+        async for doc in ChartProfileDocument.find(
+            In(ChartProfileDocument.id, profile_ids)
+        ):
+            profiles[doc.id] = doc
 
         leaf_ids = [doc.active_leaf_id for doc in sessions]
         leaves: dict[ObjectId, MessageDocument] = {}
-        async for doc in self.db.messages.find({"_id": {"$in": leaf_ids}}):
-            leaf = MessageDocument.model_validate(doc)
-            leaves[leaf.id] = leaf
+        async for doc in MessageDocument.find(In(MessageDocument.id, leaf_ids)):
+            leaves[doc.id] = doc
 
         summaries: list[SessionInfo] = []
         for doc in sessions:
             profile = profiles.get(doc.chart_profile_id)
             leaf = leaves.get(doc.active_leaf_id)
+            message_count = await self.db.messages.count_documents(
+                {"session_id": doc.id, "status": {"$ne": MessageStatus.DELETED.value}}
+            )
             summaries.append(
                 SessionInfo(
                     session_id=str(doc.id),
@@ -218,9 +196,7 @@ class MongoChatStore:
                     display_name=profile.display_name if profile else "Giấu tên",
                     birth_year=profile.birth_metadata.get("year") if profile else None,
                     last_message_preview=(leaf.content if leaf else "")[:120],
-                    message_count=await self.db.messages.count_documents(
-                        {"session_id": doc.id, "status": {"$ne": MessageStatus.DELETED.value}}
-                    ),
+                    message_count=message_count,
                     updated_at=doc.updated_at,
                 )
             )
@@ -229,24 +205,27 @@ class MongoChatStore:
     async def soft_delete_session(self, *, client_id: str, session_id: str) -> None:
         session_oid = _oid(session_id)
         now = _utc_now()
+
+        async def _txn_callback(mongo_session):
+            result = await self.db.sessions.update_one(
+                {
+                    "_id": session_oid,
+                    "client_id": client_id,
+                    "status": RecordStatus.ACTIVE.value,
+                },
+                {"$set": {"status": RecordStatus.DELETED.value, "updated_at": now}},
+                session=mongo_session,
+            )
+            if result.matched_count == 0:
+                raise NotFoundError("Session not found")
+            await self.db.messages.update_many(
+                {"session_id": session_oid, "status": {"$ne": MessageStatus.DELETED.value}},
+                {"$set": {"status": MessageStatus.DELETED.value, "updated_at": now}},
+                session=mongo_session,
+            )
+
         async with self.db.client.start_session() as mongo_session:
-            async with await mongo_session.start_transaction():
-                result = await self.db.sessions.update_one(
-                    {
-                        "_id": session_oid,
-                        "client_id": client_id,
-                        "status": RecordStatus.ACTIVE.value,
-                    },
-                    {"$set": {"status": RecordStatus.DELETED.value, "updated_at": now}},
-                    session=mongo_session,
-                )
-                if result.matched_count == 0:
-                    raise NotFoundError("Session not found")
-                await self.db.messages.update_many(
-                    {"session_id": session_oid, "status": {"$ne": MessageStatus.DELETED.value}},
-                    {"$set": {"status": MessageStatus.DELETED.value, "updated_at": now}},
-                    session=mongo_session,
-                )
+            await mongo_session.with_transaction(_txn_callback)
 
     async def start_chat_turn(
         self,
@@ -261,72 +240,65 @@ class MongoChatStore:
         now = _utc_now()
         user_id = ObjectId()
         assistant_id = ObjectId()
+        profile_doc: ChartProfileDocument | None = None
+
+        async def _txn_callback(mongo_session):
+            nonlocal profile_doc
+            session_doc = await SessionDocument.find_one(
+                SessionDocument.id == session_oid,
+                SessionDocument.client_id == client_id,
+                SessionDocument.status == RecordStatus.ACTIVE,
+                session=mongo_session,
+            )
+            if not session_doc:
+                raise NotFoundError("Session not found")
+            if session_doc.active_leaf_id != parent_oid:
+                raise InvalidChatParentError("Parent message is not the active leaf")
+
+            parent_doc = await MessageDocument.find_one(
+                MessageDocument.id == parent_oid,
+                MessageDocument.session_id == session_oid,
+                MessageDocument.status == MessageStatus.CONFIRMED,
+                session=mongo_session,
+            )
+            if not parent_doc:
+                raise InvalidChatParentError("Parent message is not confirmed")
+
+            profile_doc = await ChartProfileDocument.find_one(
+                ChartProfileDocument.id == session_doc.chart_profile_id,
+                ChartProfileDocument.client_id == session_doc.client_id,
+                ChartProfileDocument.status == RecordStatus.ACTIVE,
+                session=mongo_session,
+            )
+            if not profile_doc:
+                raise NotFoundError("Chart profile not found")
+
+            await MessageDocument(
+                _id=user_id,
+                session_id=session_oid,
+                parent_id=parent_oid,
+                role=MessageRole.USER,
+                content=content,
+                status=MessageStatus.CONFIRMED,
+                created_at=now,
+                updated_at=now,
+            ).insert(session=mongo_session)
+            await MessageDocument(
+                _id=assistant_id,
+                session_id=session_oid,
+                parent_id=user_id,
+                role=MessageRole.ASSISTANT,
+                content="",
+                status=MessageStatus.STREAMING,
+                created_at=now,
+                updated_at=now,
+            ).insert(session=mongo_session)
 
         async with self.db.client.start_session() as mongo_session:
-            async with await mongo_session.start_transaction():
-                session_raw = await self.db.sessions.find_one(
-                    {
-                        "_id": session_oid,
-                        "client_id": client_id,
-                        "status": RecordStatus.ACTIVE.value,
-                    },
-                    session=mongo_session,
-                )
-                if not session_raw:
-                    raise NotFoundError("Session not found")
-                session_doc = SessionDocument.model_validate(session_raw)
-                if session_doc.active_leaf_id != parent_oid:
-                    raise InvalidChatParentError("Parent message is not the active leaf")
+            await mongo_session.with_transaction(_txn_callback)
 
-                parent_raw = await self.db.messages.find_one(
-                    {
-                        "_id": parent_oid,
-                        "session_id": session_oid,
-                        "status": MessageStatus.CONFIRMED.value,
-                    },
-                    session=mongo_session,
-                )
-                if not parent_raw:
-                    raise InvalidChatParentError("Parent message is not confirmed")
-
-                profile_raw = await self.db.chart_profiles.find_one(
-                    {
-                        "_id": session_doc.chart_profile_id,
-                        "client_id": session_doc.client_id,
-                        "status": RecordStatus.ACTIVE.value,
-                    },
-                    session=mongo_session,
-                )
-                if not profile_raw:
-                    raise NotFoundError("Chart profile not found")
-                profile_doc = ChartProfileDocument.model_validate(profile_raw)
-
-                await self.db.messages.insert_one(
-                    MessageDocument(
-                        _id=user_id,
-                        session_id=session_oid,
-                        parent_id=parent_oid,
-                        role=MessageRole.USER,
-                        content=content,
-                        status=MessageStatus.CONFIRMED,
-                        created_at=now,
-                        updated_at=now,
-                    ).to_mongo(),
-                    session=mongo_session,
-                )
-                await self.db.messages.insert_one(
-                    MessageDocument(
-                        _id=assistant_id,
-                        session_id=session_oid,
-                        parent_id=user_id,
-                        role=MessageRole.ASSISTANT,
-                        content="",
-                        status=MessageStatus.STREAMING,
-                        created_at=now,
-                        updated_at=now,
-                    ).to_mongo(),
-                    session=mongo_session,
-                )
+        if profile_doc is None:
+            raise NotFoundError("Chart profile not found")
 
         history_docs = await self._active_path(parent_oid)
         return ChatTurnStart(
@@ -346,37 +318,52 @@ class MongoChatStore:
         session_oid = _oid(session_id)
         assistant_oid = _oid(assistant_message_id)
         now = _utc_now()
+
+        async def _txn_callback(mongo_session):
+            # STEP 1: Touch the session first to match soft_delete_session's lock hierarchy
+            session_check = await SessionDocument.find_one(
+                SessionDocument.id == session_oid,
+                SessionDocument.status == RecordStatus.ACTIVE,
+                session=mongo_session,
+            )
+            if not session_check:
+                raise NotFoundError("Active session not found")
+
+            updated = await self.db.messages.find_one_and_update(
+                {
+                    "_id": assistant_oid,
+                    "session_id": session_oid,
+                    "role": MessageRole.ASSISTANT.value,
+                    "status": MessageStatus.STREAMING.value,
+                },
+                {
+                    "$set": {
+                        "content": content,
+                        "status": MessageStatus.CONFIRMED.value,
+                        "updated_at": now,
+                    }
+                },
+                return_document=ReturnDocument.AFTER,
+                session=mongo_session,
+            )
+            if not updated:
+                raise NotFoundError("Assistant message not found")
+
+            result = await self.db.sessions.update_one(
+                {"_id": session_oid, "status": RecordStatus.ACTIVE.value},
+                {
+                    "$set": {
+                        "active_leaf_id": assistant_oid,
+                        "updated_at": now,
+                    }
+                },
+                session=mongo_session,
+            )
+            if result.matched_count == 0:
+                raise NotFoundError("Session not found or was deleted during confirmation")
+
         async with self.db.client.start_session() as mongo_session:
-            async with await mongo_session.start_transaction():
-                updated = await self.db.messages.find_one_and_update(
-                    {
-                        "_id": assistant_oid,
-                        "session_id": session_oid,
-                        "role": MessageRole.ASSISTANT.value,
-                        "status": MessageStatus.STREAMING.value,
-                    },
-                    {
-                        "$set": {
-                            "content": content,
-                            "status": MessageStatus.CONFIRMED.value,
-                            "updated_at": now,
-                        }
-                    },
-                    return_document=ReturnDocument.AFTER,
-                    session=mongo_session,
-                )
-                if not updated:
-                    raise NotFoundError("Assistant message not found")
-                await self.db.sessions.update_one(
-                    {"_id": session_oid, "status": RecordStatus.ACTIVE.value},
-                    {
-                        "$set": {
-                            "active_leaf_id": assistant_oid,
-                            "updated_at": now,
-                        }
-                    },
-                    session=mongo_session,
-                )
+            await mongo_session.with_transaction(_txn_callback)
 
     async def mark_assistant_message_failed(
         self,
@@ -415,31 +402,29 @@ class MongoChatStore:
         name: str | None,
         payload: Any,
     ) -> None:
-        await self.db.tool_events.insert_one(
-            ToolEventDocument(
-                _id=ObjectId(),
-                session_id=_oid(session_id),
-                message_id=_oid(message_id),
-                type=ToolEventType(event_type),
-                tool_call_id=tool_call_id,
-                name=name,
-                payload=payload,
-                created_at=_utc_now(),
-            ).to_mongo()
-        )
+        await ToolEventDocument(
+            _id=ObjectId(),
+            session_id=_oid(session_id),
+            message_id=_oid(message_id),
+            type=ToolEventType(event_type),
+            tool_call_id=tool_call_id,
+            name=name,
+            payload=payload,
+            created_at=_utc_now(),
+        ).insert()
 
     async def _active_path(self, leaf_id: ObjectId) -> list[MessageDocument]:
         docs: list[MessageDocument] = []
         current: ObjectId | None = leaf_id
         while current is not None:
-            doc = await self.db.messages.find_one(
-                {"_id": current, "status": {"$ne": MessageStatus.DELETED.value}}
+            doc = await MessageDocument.find_one(
+                MessageDocument.id == current,
+                MessageDocument.status != MessageStatus.DELETED,
             )
             if not doc:
                 break
-            message_doc = MessageDocument.model_validate(doc)
-            docs.append(message_doc)
-            current = message_doc.parent_id
+            docs.append(doc)
+            current = doc.parent_id
         docs.reverse()
         return docs
 
@@ -461,30 +446,35 @@ class MongoChatStore:
         }
         if error is not None:
             update["$set"]["error"] = error
+
+        async def _txn_callback(mongo_session):
+            updated = await self.db.messages.find_one_and_update(
+                {
+                    "_id": _oid(assistant_message_id),
+                    "role": MessageRole.ASSISTANT.value,
+                    "status": MessageStatus.STREAMING.value,
+                },
+                update,
+                return_document=ReturnDocument.AFTER,
+                session=mongo_session,
+            )
+            if not updated:
+                raise NotFoundError("Assistant message not found")
+            parent_id = updated.get("parent_id")
+            if parent_id is None:
+                raise InvalidChatParentError("Assistant message has no user parent")
+            result = await self.db.sessions.update_one(
+                {"_id": updated["session_id"], "status": RecordStatus.ACTIVE.value},
+                {
+                    "$set": {
+                        "active_leaf_id": parent_id,
+                        "updated_at": now,
+                    }
+                },
+                session=mongo_session,
+            )
+            if result.matched_count == 0:
+                raise NotFoundError("Session not found or was deleted during terminal update")
+
         async with self.db.client.start_session() as mongo_session:
-            async with await mongo_session.start_transaction():
-                updated = await self.db.messages.find_one_and_update(
-                    {
-                        "_id": _oid(assistant_message_id),
-                        "role": MessageRole.ASSISTANT.value,
-                        "status": MessageStatus.STREAMING.value,
-                    },
-                    update,
-                    return_document=ReturnDocument.AFTER,
-                    session=mongo_session,
-                )
-                if not updated:
-                    raise NotFoundError("Assistant message not found")
-                message_doc = MessageDocument.model_validate(updated)
-                if message_doc.parent_id is None:
-                    raise InvalidChatParentError("Assistant message has no user parent")
-                await self.db.sessions.update_one(
-                    {"_id": message_doc.session_id, "status": RecordStatus.ACTIVE.value},
-                    {
-                        "$set": {
-                            "active_leaf_id": message_doc.parent_id,
-                            "updated_at": now,
-                        }
-                    },
-                    session=mongo_session,
-                )
+            await mongo_session.with_transaction(_txn_callback)

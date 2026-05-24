@@ -107,7 +107,7 @@ def test_storage_document_models_make_required_lifecycle_fields_explicit() -> No
     session_id = ObjectId()
     message_id = ObjectId()
 
-    profile_doc = ChartProfileDocument(
+    profile_doc = ChartProfileDocument.model_construct(
         _id=profile_id,
         client_id="client-1",
         display_name="Test",
@@ -115,8 +115,8 @@ def test_storage_document_models_make_required_lifecycle_fields_explicit() -> No
         status=RecordStatus.ACTIVE,
         created_at=now,
         updated_at=now,
-    ).to_mongo()
-    session_doc = SessionDocument(
+    )
+    session_doc = SessionDocument.model_construct(
         _id=session_id,
         client_id="client-1",
         chart_profile_id=profile_id,
@@ -124,8 +124,8 @@ def test_storage_document_models_make_required_lifecycle_fields_explicit() -> No
         status=RecordStatus.ACTIVE,
         created_at=now,
         updated_at=now,
-    ).to_mongo()
-    message_doc = MessageDocument(
+    )
+    message_doc = MessageDocument.model_construct(
         _id=message_id,
         session_id=session_id,
         parent_id=None,
@@ -134,17 +134,17 @@ def test_storage_document_models_make_required_lifecycle_fields_explicit() -> No
         status=MessageStatus.CONFIRMED,
         created_at=now,
         updated_at=now,
-    ).to_mongo()
+    )
 
-    assert profile_doc["status"] == "active"
-    assert profile_doc["updated_at"] == now
-    assert session_doc["active_leaf_id"] == message_id
-    assert message_doc["status"] == "confirmed"
+    assert profile_doc.status == "active"
+    assert profile_doc.updated_at == now
+    assert session_doc.active_leaf_id == message_id
+    assert message_doc.status == "confirmed"
 
 
 def test_message_document_converts_to_domain_message() -> None:
     now = _utc_now()
-    doc = MessageDocument(
+    doc = MessageDocument.model_construct(
         _id=ObjectId(),
         session_id=ObjectId(),
         parent_id=None,
@@ -279,6 +279,9 @@ def test_terminal_failed_assistant_moves_session_leaf_to_user_parent() -> None:
         async def start_transaction(self):
             return Transaction()
 
+        async def with_transaction(self, callback):
+            return await callback(self)
+
     class Client:
         def start_session(self):
             return Session()
@@ -293,16 +296,20 @@ def test_terminal_failed_assistant_moves_session_leaf_to_user_parent() -> None:
             assert update["$set"]["status"] == "failed"
             assert update["$set"]["content"] == "partial"
             assert update["$set"]["error"] == "boom"
-            return MessageDocument(
-                _id=assistant_id,
-                session_id=session_id,
-                parent_id=user_id,
-                role=MessageRole.ASSISTANT,
-                content="partial",
-                status=MessageStatus.FAILED,
-                created_at=_utc_now(),
-                updated_at=_utc_now(),
-            ).to_mongo()
+            return {
+                "_id": assistant_id,
+                "session_id": session_id,
+                "parent_id": user_id,
+                "role": MessageRole.ASSISTANT.value,
+                "content": "partial",
+                "status": MessageStatus.FAILED.value,
+                "created_at": _utc_now(),
+                "updated_at": _utc_now(),
+            }
+
+    class _UpdateResult:
+        def __init__(self) -> None:
+            self.matched_count = 1
 
     class Sessions:
         def __init__(self) -> None:
@@ -310,6 +317,7 @@ def test_terminal_failed_assistant_moves_session_leaf_to_user_parent() -> None:
 
         async def update_one(self, query, update, *, session):
             self.update = (query, update)
+            return _UpdateResult()
 
     class Db:
         def __init__(self) -> None:

@@ -78,7 +78,15 @@ class ApiState:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    from beanie import init_beanie
     from pymongo.asynchronous.mongo_client import AsyncMongoClient
+
+    from api.chat.store.documents import (
+        ChartProfileDocument,
+        MessageDocument,
+        SessionDocument,
+        ToolEventDocument,
+    )
 
     settings = ApiSettings.from_env()
     mongo_client = AsyncMongoClient(
@@ -93,8 +101,16 @@ async def lifespan(app: FastAPI):
             "or set MONGODB_URI to a reachable replica set."
         )
         raise
+    await init_beanie(
+        database=mongo_client[settings.mongodb_db],
+        document_models=[
+            ChartProfileDocument,
+            MessageDocument,
+            SessionDocument,
+            ToolEventDocument,
+        ],
+    )
     store = MongoChatStore(mongo_client[settings.mongodb_db])
-    await store.ensure_indexes()
     stale_count = await store.mark_stale_streaming_messages_failed()
     if stale_count:
         logging.info("Marked %s stale streaming messages as failed", stale_count)
