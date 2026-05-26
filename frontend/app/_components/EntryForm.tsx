@@ -3,9 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Calendar, UserProfile } from "../_lib/types";
-import { saveStash } from "../_lib/session-store";
+import {
+  loadAnonymousOwnerId,
+  saveAnonymousOwnerId,
+  saveStash,
+} from "../_lib/session-store";
 import { EntryFormSchema } from "../_lib/schemas";
 import { useBuildLaso } from "@/services/api/v1/laso/build";
+import {
+  createAnonymousOwner,
+  createChartProfile,
+  createChatSession,
+} from "@/services/api/v1/conversation-history";
 import { Btn } from "./Buttons";
 import { Eyebrow } from "./Eyebrow";
 
@@ -15,16 +24,16 @@ export function EntryForm() {
   const [name, setName] = useState("");
   const [gender, setGender] = useState<"M" | "F">("M");
   const [calendar, setCalendar] = useState<Calendar>("am");
-  const [date, setDate] = useState(1);
+  const [day, setDay] = useState(1);
   const [month, setMonth] = useState(1);
   const [year, setYear] = useState(1999);
   const [hour, setHour] = useState(12);
   const [minute, setMinute] = useState(30);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const parsed = EntryFormSchema.safeParse({ date, month, year, hour, minute, gender });
+  async function submitForm() {
+    const parsed = EntryFormSchema.safeParse({ day, month, year, hour, minute, gender });
     if (!parsed.success) {
       const errs: Record<string, string> = {};
       for (const issue of parsed.error.issues) {
@@ -39,15 +48,48 @@ export function EntryForm() {
     const { minute: _m, ...apiPayload } = parsed.data;
     void _m;
 
+    setSubmitting(true);
     try {
+      let ownerId = loadAnonymousOwnerId();
+      if (!ownerId) {
+        ownerId = await createAnonymousOwner();
+        saveAnonymousOwnerId(ownerId);
+      }
+
       const laso = await buildLaso.mutateAsync(apiPayload);
-      const profile: UserProfile = { name, gender, calendar, date, month, year, hour, minute };
-      saveStash({ laso, profile, fetchedAt: new Date().toISOString() });
+      const chartProfileId = await createChartProfile({
+        ownerId,
+        idempotencyKey: clientOperationId(),
+        displayName: name || "Giấu tên",
+        birthInfo: apiPayload,
+      });
+      const sessionId = await createChatSession({
+        ownerId,
+        chartProfileId,
+        idempotencyKey: clientOperationId(),
+        title: name || "Lá số mới",
+      });
+      const profile: UserProfile = { name, gender, calendar, day, month, year, hour, minute };
+      saveStash({
+        laso,
+        profile,
+        ownerId,
+        chartProfileId,
+        sessionId,
+        fetchedAt: new Date().toISOString(),
+      });
       router.push("/chart");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Không lập được lá số. Thử lại?";
       setFieldErrors({ _form: msg });
+    } finally {
+      setSubmitting(false);
     }
+  }
+
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    void submitForm();
   }
 
   return (
@@ -88,11 +130,11 @@ export function EntryForm() {
 
         <Group label="Ngày sinh">
           <div className="flex gap-1.5">
-            <NumInput label="Ngày" value={date} min={1} max={31} onChange={setDate} flex={1} />
+            <NumInput label="Ngày" value={day} min={1} max={31} onChange={setDay} flex={1} />
             <NumInput label="Tháng" value={month} min={1} max={12} onChange={setMonth} flex={1} />
             <NumInput label="Năm" value={year} min={1900} max={2099} onChange={setYear} flex={1.6} />
           </div>
-          {fieldErrors.date && <div className="text-[11px] text-[var(--color-crimson)] mt-1">{fieldErrors.date}</div>}
+          {fieldErrors.day && <div className="text-[11px] text-[var(--color-crimson)] mt-1">{fieldErrors.day}</div>}
         </Group>
 
         <Group label="Giờ sinh">
@@ -107,8 +149,14 @@ export function EntryForm() {
 
         {fieldErrors._form && <div className="text-[13px] text-[var(--color-crimson)]">{fieldErrors._form}</div>}
 
-        <Btn type="submit" variant="crimson" disabled={buildLaso.isPending} className="justify-center py-3.5 text-[15px] tracking-[0.4px] mt-2">
-          {buildLaso.isPending ? "Đang an lá số…" : "✦ An lá số · trò chuyện với thầy"}
+        <Btn
+          type="button"
+          variant="crimson"
+          disabled={submitting}
+          className="justify-center py-3.5 text-[15px] tracking-[0.4px] mt-2"
+          onClick={() => void submitForm()}
+        >
+          {submitting ? "Đang an lá số…" : "✦ An lá số · trò chuyện với thầy"}
         </Btn>
         <div className="text-center text-[11px] text-[var(--color-ink-3)] -mt-1">
           Tiếp tục → bạn đồng ý <button type="button" className="text-[var(--color-crimson)] underline-offset-2 hover:underline cursor-pointer">điều khoản</button> & <button type="button" className="text-[var(--color-crimson)] underline-offset-2 hover:underline cursor-pointer">quyền riêng tư</button>
@@ -116,6 +164,13 @@ export function EntryForm() {
       </div>
     </form>
   );
+}
+
+function clientOperationId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

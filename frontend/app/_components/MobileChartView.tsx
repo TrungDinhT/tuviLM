@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import type { ChatMessage as Msg, ChatToolEntry, CungPayload, SessionStash, OverlayKind } from "../_lib/types";
-import { loadStash } from "../_lib/session-store";
-import { seedOpeningMessage, SUGGESTED_CHIPS } from "../_data/mock-chat";
+import type { ChatMessage as Msg, ChatToolEntry, ChatMessageRole, CungPayload, SessionStash, OverlayKind } from "../_lib/types";
+import { loadStash, saveStash } from "../_lib/session-store";
+import { SUGGESTED_CHIPS } from "../_data/chat-suggestions";
 import { useStreamChat } from "@/services/api/v1/chat/send";
+import { getChatSession, type ChatMessagePayload } from "@/services/api/v1/conversation-history";
 import { StickToBottom } from "use-stick-to-bottom";
 import { getSaoDetail } from "../_data/mock-stars";
 import { Chart } from "./Chart";
@@ -58,8 +59,28 @@ export function MobileChartView() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStash(s);
     setHydrated(true);
-    setMessages(seedOpeningMessage(s.laso));
   }, [router]);
+
+  useEffect(() => {
+    if (!stash?.ownerId || !stash.sessionId) return;
+
+    let cancelled = false;
+    void getChatSession({
+      ownerId: stash.ownerId,
+      sessionId: stash.sessionId,
+    })
+      .then((session) => {
+        if (cancelled) return;
+        setMessages(session.messages.map(chatMessageFromPayload));
+      })
+      .catch(() => {
+        if (!cancelled) setMessages([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [stash]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -87,6 +108,8 @@ export function MobileChartView() {
 
   const onSend = useCallback(
     (body: string) => {
+      if (!stash?.ownerId || !stash.sessionId) return;
+
       const aiId = `ai-${Date.now()}`;
       setMessages((prev) => [
         ...prev,
@@ -105,9 +128,14 @@ export function MobileChartView() {
       chat.mutate(
         {
           message: body,
+          ownerId: stash.ownerId,
+          sessionId: stash.sessionId,
           signal: ctrl.signal,
           onEvent: (event) => {
             switch (event.type) {
+              case "ids":
+              case "duplicate_in_progress":
+                break;
               case "text":
                 updateAi((m) => ({ ...m, body: m.body + event.delta }));
                 break;
@@ -165,12 +193,26 @@ export function MobileChartView() {
         },
       );
     },
-    [chat],
+    [chat, stash],
   );
 
   const onRefClick = useCallback((kind: "ref" | "sao", value: string) => {
     if (kind === "sao") setSelectedSao(value);
     else setSelectedRole(value);
+  }, []);
+
+  const onSessionChange = useCallback((sessionId: string) => {
+    setStash((current) => {
+      if (!current) return current;
+      const next = {
+        ...current,
+        sessionId,
+        fetchedAt: new Date().toISOString(),
+      };
+      saveStash(next);
+      return next;
+    });
+    setMessages([]);
   }, []);
 
   if (!hydrated || !stash) {
@@ -418,7 +460,27 @@ export function MobileChartView() {
       })()}
 
       {openOverlay === "daiVan" && <DaiVanModal onClose={() => setOpenOverlay(null)} />}
-      {openOverlay === "lichSu" && <LichSuDrawer onClose={() => setOpenOverlay(null)} />}
+      {openOverlay === "lichSu" && (
+        <LichSuDrawer
+          ownerId={stash.ownerId}
+          chartProfileId={stash.chartProfileId}
+          currentSessionId={stash.sessionId}
+          onSessionChange={onSessionChange}
+          onClose={() => setOpenOverlay(null)}
+        />
+      )}
     </div>
   );
+}
+
+function chatMessageFromPayload(message: ChatMessagePayload): Msg {
+  return {
+    id: message.id,
+    sender: roleToSender(message.role),
+    body: message.content,
+  };
+}
+
+function roleToSender(role: ChatMessageRole): Msg["sender"] {
+  return role === "user" ? "me" : "ai";
 }

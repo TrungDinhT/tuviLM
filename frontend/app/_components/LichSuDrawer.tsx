@@ -1,14 +1,75 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { Eyebrow } from "./Eyebrow";
 import { Btn, Chip } from "./Buttons";
-import { MOCK_HISTORY } from "../_data/mock-history";
+import {
+  createChatSession,
+  listChatSessions,
+  type ChatSessionSummaryPayload,
+} from "@/services/api/v1/conversation-history";
 
 interface LichSuDrawerProps {
+  ownerId?: string;
+  chartProfileId?: string;
+  currentSessionId?: string;
+  onSessionChange: (sessionId: string) => void;
   onClose: () => void;
 }
 
-export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
+export function LichSuDrawer({
+  ownerId,
+  chartProfileId,
+  currentSessionId,
+  onSessionChange,
+  onClose,
+}: LichSuDrawerProps) {
+  const [sessions, setSessions] = useState<ChatSessionSummaryPayload[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+
+  useEffect(() => {
+    if (!ownerId || !chartProfileId) return;
+
+    let cancelled = false;
+    void listChatSessions({ ownerId, chartProfileId })
+      .then((items) => {
+        if (cancelled) return;
+        setError(null);
+        setSessions(items);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Không tải được lịch sử");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ownerId, chartProfileId]);
+
+  const grouped = useMemo(() => groupSessions(sessions), [sessions]);
+  const messageCount = sessions.reduce((acc, item) => acc + item.message_count, 0);
+
+  async function startNewSession() {
+    if (!ownerId || !chartProfileId || creating) return;
+
+    setCreating(true);
+    try {
+      const sessionId = await createChatSession({
+        ownerId,
+        chartProfileId,
+        idempotencyKey: clientOperationId(),
+        title: "Phiên mới",
+      });
+      onSessionChange(sessionId);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Không tạo được phiên mới");
+    } finally {
+      setCreating(false);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-[rgba(244,237,224,0.55)] anim-fade-in" onClick={onClose} />
@@ -28,7 +89,7 @@ export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
                 Sổ tay trò chuyện
               </h2>
               <div className="text-[12px] text-[var(--color-ink-3)] mt-1">
-                {MOCK_HISTORY.reduce((acc, g) => acc + g.items.length, 0)} phiên · {MOCK_HISTORY.reduce((acc, g) => acc + g.items.reduce((s, it) => s + it.count, 0), 0)} câu thầy đã trả lời
+                {sessions.length} phiên · {messageCount} tin đã lưu
               </div>
             </div>
             <Btn variant="ghost" className="text-[16px]" onClick={onClose} aria-label="Đóng">✕</Btn>
@@ -62,7 +123,17 @@ export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
 
         {/* Session list */}
         <div className="flex-1 py-2 overflow-auto">
-          {MOCK_HISTORY.map((s) => (
+          {error && (
+            <div className="px-8 py-4 font-serif italic text-[14px] text-[var(--color-crimson)]">
+              {error}
+            </div>
+          )}
+          {!error && grouped.length === 0 && (
+            <div className="px-8 py-4 font-serif italic text-[14px] text-[var(--color-ink-3)]">
+              Chưa có phiên trò chuyện nào.
+            </div>
+          )}
+          {grouped.map((s) => (
             <div key={`day-${s.date}`}>
               <div className="px-8 pt-3.5 pb-1.5 text-[10px] text-[var(--color-ink-3)] font-semibold tracking-[1.5px] uppercase flex items-baseline gap-3">
                 <span>{s.date}</span>
@@ -70,19 +141,19 @@ export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
               </div>
               {s.items.map((it) => (
                 <button
-                  key={`it-${s.date}-${it.time}-${it.q.slice(0,16)}`}
+                  key={it.id}
                   type="button"
                   className="w-full text-left px-8 py-3 cursor-pointer transition-colors"
                   style={{
-                    borderLeft: it.current ? "3px solid var(--color-crimson)" : "3px solid transparent",
-                    background: it.current ? "rgba(139,42,31,0.06)" : "transparent",
+                    borderLeft: it.id === currentSessionId ? "3px solid var(--color-crimson)" : "3px solid transparent",
+                    background: it.id === currentSessionId ? "rgba(139,42,31,0.06)" : "transparent",
                   }}
                 >
                   <div className="flex justify-between items-baseline gap-3">
                     <div className="flex-1">
                       <div className="font-serif text-[17px] leading-[1.3] text-[var(--color-ink)]">
                         {it.starred && <span className="text-[var(--color-gold)] mr-1.5">★</span>}
-                        {it.q}
+                        {it.title}
                       </div>
                     </div>
                     <span className="text-[11px] text-[var(--color-ink-3)] font-serif">{it.time}</span>
@@ -92,10 +163,10 @@ export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
                       className="px-2 py-px border border-[rgba(26,22,17,0.14)] text-[10px] tracking-[0.3px] text-[var(--color-crimson)]"
                       style={{ background: "rgba(255,252,245,0.8)" }}
                     >
-                      {it.cung}
+                      {it.label}
                     </span>
-                    <span className="font-serif italic text-[12px]">{it.mention}</span>
-                    <span className="ml-auto">{it.count} tin</span>
+                    <span className="font-serif italic text-[12px]">{it.updated}</span>
+                    <span className="ml-auto">{it.messageCount} tin</span>
                   </div>
                 </button>
               ))}
@@ -108,12 +179,76 @@ export function LichSuDrawer({ onClose }: LichSuDrawerProps) {
           className="px-8 py-4 border-t border-[rgba(26,22,17,0.14)] flex gap-2.5"
           style={{ background: "var(--color-paper-2)" }}
         >
-          <Btn variant="crimson" className="flex-1 justify-center text-[13px]" onClick={onClose}>
-            ＋ Bắt đầu phiên mới
+          <Btn
+            variant="crimson"
+            className="flex-1 justify-center text-[13px]"
+            onClick={startNewSession}
+            disabled={creating || !ownerId || !chartProfileId}
+          >
+            {creating ? "Đang tạo…" : "＋ Bắt đầu phiên mới"}
           </Btn>
           <Btn variant="ghost" className="text-[16px]" aria-label="Mở liên kết">↗</Btn>
         </div>
       </div>
     </div>
   );
+}
+
+function clientOperationId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+interface GroupedSession {
+  date: string;
+  items: Array<{
+    id: string;
+    title: string;
+    time: string;
+    updated: string;
+    label: string;
+    messageCount: number;
+    starred: boolean;
+  }>;
+}
+
+function groupSessions(sessions: ChatSessionSummaryPayload[]): GroupedSession[] {
+  const groups = new Map<string, GroupedSession["items"]>();
+  const ordered = [...sessions].sort(
+    (a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at),
+  );
+
+  for (const session of ordered) {
+    const updatedAt = new Date(session.updated_at);
+    const key = formatDate(updatedAt);
+    const item = {
+      id: session.id,
+      title: session.title || "Phiên chưa đặt tên",
+      time: formatTime(updatedAt),
+      updated: "Cập nhật gần nhất",
+      label: "Phiên",
+      messageCount: session.message_count,
+      starred: false,
+    };
+    groups.set(key, [...(groups.get(key) ?? []), item]);
+  }
+
+  return [...groups.entries()].map(([date, items]) => ({ date, items }));
+}
+
+function formatDate(value: Date): string {
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(value);
+}
+
+function formatTime(value: Date): string {
+  return new Intl.DateTimeFormat("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(value);
 }

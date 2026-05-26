@@ -26,7 +26,7 @@ export interface BuildLasoResponse {
 }
 
 export interface BuildLasoRequest {
-  date: number;
+  day: number;
   month: number;
   year: number;
   hour: number;
@@ -39,7 +39,7 @@ export interface UserProfile {
   name: string;
   gender: "M" | "F";
   calendar: Calendar;
-  date: number;
+  day: number;
   month: number;
   year: number;
   hour: number;
@@ -49,10 +49,14 @@ export interface UserProfile {
 export interface SessionStash {
   laso: BuildLasoResponse;
   profile: UserProfile;
+  ownerId?: string;
+  chartProfileId?: string;
+  sessionId?: string;
   fetchedAt: string; // ISO
 }
 
 export type Sender = "ai" | "me";
+export type ChatMessageRole = "user" | "assistant";
 
 export interface ChatToolEntry {
   id: string;

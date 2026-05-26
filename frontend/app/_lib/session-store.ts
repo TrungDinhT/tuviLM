@@ -1,6 +1,7 @@
 import type { SessionStash } from "./types";
 
 const KEY = "tuvi:laso";
+const OWNER_KEY = "tuvi:anonymous-owner-id";
 
 export function saveStash(stash: SessionStash): void {
   if (typeof window === "undefined") return;
@@ -34,4 +35,14 @@ export function loadStash(): SessionStash | null {
 export function clearStash(): void {
   if (typeof window === "undefined") return;
   sessionStorage.removeItem(KEY);
+}
+
+export function loadAnonymousOwnerId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(OWNER_KEY);
+}
+
+export function saveAnonymousOwnerId(ownerId: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(OWNER_KEY, ownerId);
 }

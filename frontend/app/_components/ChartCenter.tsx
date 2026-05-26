@@ -27,7 +27,7 @@ export function ChartCenter({ laso, profile, cellSize }: ChartCenterProps) {
       <div className={`text-[var(--color-ink-3)] leading-[1.4] mt-0.5 tracking-[0.2px] ${veryTight ? "text-[9px]" : tight ? "text-[9.5px]" : "text-[11px]"}`}>
         {veryTight
           ? `${sex} ${profile.year}`
-          : <>{sex} · {profile.year}<br />{String(profile.date).padStart(2, "0")}/{String(profile.month).padStart(2, "0")} {calLabel} · {String(profile.hour).padStart(2, "0")}:{String(profile.minute).padStart(2, "0")}</>
+          : <>{sex} · {profile.year}<br />{String(profile.day).padStart(2, "0")}/{String(profile.month).padStart(2, "0")} {calLabel} · {String(profile.hour).padStart(2, "0")}:{String(profile.minute).padStart(2, "0")}</>
         }
       </div>
       {!veryTight && (

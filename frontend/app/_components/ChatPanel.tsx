@@ -4,7 +4,7 @@ import type { ChatMessage as Msg } from "../_lib/types";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { Chip } from "./Buttons";
-import { SUGGESTED_CHIPS } from "../_data/mock-chat";
+import { SUGGESTED_CHIPS } from "../_data/chat-suggestions";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 
 interface ChatPanelProps {

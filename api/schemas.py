@@ -1,24 +1,100 @@
 from __future__ import annotations
 
-from typing import Any, Literal
+from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from api.chat.models import ChatMessageStatus, ChatRole
 
-class TuviTimePayload(BaseModel):
-    date: int = Field(ge=1, le=31)
+
+class BirthInfoPayload(BaseModel):
+    calendar: Literal["solar"] = "solar"
     month: int = Field(ge=1, le=12)
     year: int = Field(ge=1900, le=2099)
+    day: int = Field(ge=1, le=31)
     hour: int = Field(ge=0, le=23)
     gender: Literal["M", "F"]
 
 
-class BuildLasoRequest(TuviTimePayload):
+class BuildLasoRequest(BirthInfoPayload):
     pass
 
 
 class BuildSaoLuuRequest(BaseModel):
-    observation_time: TuviTimePayload
+    observation_time: BirthInfoPayload
+
+
+class CreateAnonymousResponse(BaseModel):
+    owner_id: str
+
+
+class CreateChartProfileRequest(BaseModel):
+    display_name: str
+    birth_info: BirthInfoPayload
+
+
+class ChartProfilePayload(BaseModel):
+    id: str
+    display_name: str
+    birth_info: BirthInfoPayload
+    created_at: datetime
+    updated_at: datetime
+
+
+class CreateChartProfileResponse(BaseModel):
+    chart_profile: ChartProfilePayload
+
+
+class ListChartProfilesResponse(BaseModel):
+    chart_profiles: list[ChartProfilePayload]
+
+
+class CreateSessionRequest(BaseModel):
+    title: str | None = None
+
+
+class ChatMessagePayload(BaseModel):
+    id: str
+    role: ChatRole
+    content: str
+    status: ChatMessageStatus
+    created_at: datetime
+    updated_at: datetime
+
+
+class ChatSessionPayload(BaseModel):
+    id: str
+    chart_profile_id: str
+    title: str | None = None
+    messages: list[ChatMessagePayload]
+    created_at: datetime
+    updated_at: datetime
+
+
+class CreateSessionResponse(BaseModel):
+    session: ChatSessionPayload
+
+
+class ChatSessionSummaryPayload(BaseModel):
+    id: str
+    chart_profile_id: str
+    title: str | None = None
+    message_count: int
+    created_at: datetime
+    updated_at: datetime
+
+
+class ListSessionsResponse(BaseModel):
+    sessions: list[ChatSessionSummaryPayload]
+
+
+class GetSessionResponse(BaseModel):
+    session: ChatSessionPayload
+
+
+class SessionChatStreamRequest(BaseModel):
+    content: str = Field(min_length=1)
 
 
 class StarPayload(BaseModel):
@@ -53,18 +129,3 @@ class BuildLasoResponse(BaseModel):
 
 class BuildSaoLuuResponse(BaseModel):
     cung_by_position: dict[str, CungPayload]
-
-
-class ChatRequest(BaseModel):
-    message: str
-
-
-class ChatToolCall(BaseModel):
-    id: str | None = None
-    name: str
-    arguments: Any
-
-
-class ChatResponse(BaseModel):
-    answer: str
-    tool_calls: list[ChatToolCall] = Field(default_factory=list)

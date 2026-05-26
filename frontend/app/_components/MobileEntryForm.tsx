@@ -3,9 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Calendar, UserProfile } from "../_lib/types";
-import { saveStash } from "../_lib/session-store";
+import {
+  loadAnonymousOwnerId,
+  saveAnonymousOwnerId,
+  saveStash,
+} from "../_lib/session-store";
 import { EntryFormSchema } from "../_lib/schemas";
 import { useBuildLaso } from "@/services/api/v1/laso/build";
+import {
+  createAnonymousOwner,
+  createChartProfile,
+  createChatSession,
+} from "@/services/api/v1/conversation-history";
 import { Btn } from "./Buttons";
 
 export function MobileEntryForm() {
@@ -14,16 +23,16 @@ export function MobileEntryForm() {
   const [name, setName] = useState("");
   const [gender, setGender] = useState<"M" | "F">("M");
   const [calendar, setCalendar] = useState<Calendar>("am");
-  const [date, setDate] = useState(1);
+  const [day, setDay] = useState(1);
   const [month, setMonth] = useState(1);
   const [year, setYear] = useState(1999);
   const [hour, setHour] = useState(12);
   const [minute, setMinute] = useState(30);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const parsed = EntryFormSchema.safeParse({ date, month, year, hour, minute, gender });
+  async function submitForm() {
+    const parsed = EntryFormSchema.safeParse({ day, month, year, hour, minute, gender });
     if (!parsed.success) {
       const errs: Record<string, string> = {};
       for (const issue of parsed.error.issues) {
@@ -38,15 +47,48 @@ export function MobileEntryForm() {
     const { minute: _m, ...apiPayload } = parsed.data;
     void _m;
 
+    setSubmitting(true);
     try {
+      let ownerId = loadAnonymousOwnerId();
+      if (!ownerId) {
+        ownerId = await createAnonymousOwner();
+        saveAnonymousOwnerId(ownerId);
+      }
+
       const laso = await buildLaso.mutateAsync(apiPayload);
-      const profile: UserProfile = { name, gender, calendar, date, month, year, hour, minute };
-      saveStash({ laso, profile, fetchedAt: new Date().toISOString() });
+      const chartProfileId = await createChartProfile({
+        ownerId,
+        idempotencyKey: clientOperationId(),
+        displayName: name || "Giấu tên",
+        birthInfo: apiPayload,
+      });
+      const sessionId = await createChatSession({
+        ownerId,
+        chartProfileId,
+        idempotencyKey: clientOperationId(),
+        title: name || "Lá số mới",
+      });
+      const profile: UserProfile = { name, gender, calendar, day, month, year, hour, minute };
+      saveStash({
+        laso,
+        profile,
+        ownerId,
+        chartProfileId,
+        sessionId,
+        fetchedAt: new Date().toISOString(),
+      });
       router.push("/chart");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Không lập được lá số. Thử lại?";
       setFieldErrors({ _form: msg });
+    } finally {
+      setSubmitting(false);
     }
+  }
+
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    void submitForm();
   }
 
   return (
@@ -90,11 +132,11 @@ export function MobileEntryForm() {
 
         <MLabel label="Ngày sinh">
           <div className="flex gap-1">
-            <MNum label="Ngày" value={date} min={1} max={31} onChange={setDate} flex={1} />
+            <MNum label="Ngày" value={day} min={1} max={31} onChange={setDay} flex={1} />
             <MNum label="Tháng" value={month} min={1} max={12} onChange={setMonth} flex={1} />
             <MNum label="Năm" value={year} min={1900} max={2099} onChange={setYear} flex={1.6} />
           </div>
-          {fieldErrors.date && <div className="text-[10px] text-[var(--color-crimson)] mt-1">{fieldErrors.date}</div>}
+          {fieldErrors.day && <div className="text-[10px] text-[var(--color-crimson)] mt-1">{fieldErrors.day}</div>}
         </MLabel>
 
         <MLabel label="Giờ sinh">
@@ -118,15 +160,23 @@ export function MobileEntryForm() {
       </div>
 
       <Btn
-        type="submit"
+        type="button"
         variant="crimson"
-        disabled={buildLaso.isPending}
+        disabled={submitting}
         className="justify-center py-3 text-[13px] tracking-[0.4px] mt-3.5"
+        onClick={() => void submitForm()}
       >
-        {buildLaso.isPending ? "Đang an lá số…" : "✦ An lá số"}
+        {submitting ? "Đang an lá số…" : "✦ An lá số"}
       </Btn>
     </form>
   );
+}
+
+function clientOperationId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function MLabel({ label, children }: { label: string; children: React.ReactNode }) {

@@ -15,9 +15,9 @@ Planned module layout:
 api/chat/
   models.py          # storage-agnostic Pydantic models / DTOs
   contracts.py       # ConversationHistoryStore Protocol
-  mongo/
+  storage/
     documents.py     # Beanie Document classes
-    store.py         # BeanieConversationHistoryStore implementation
+    store.py         # MongoConversationHistoryStore implementation
     mappers.py       # Beanie <-> domain model conversion
 ```
 
@@ -26,12 +26,12 @@ Rules:
 - `api/chat/models.py` contains storage-agnostic Pydantic DTOs used by the
   conversation history contract and application code.
 - `api/chat/contracts.py` exposes the `ConversationHistoryStore` protocol.
-- `api/chat/mongo/documents.py` contains Beanie `Document` classes and other
+- `api/chat/storage/documents.py` contains Beanie `Document` classes and other
   Mongo-specific persistence models.
-- `api/chat/mongo/store.py` implements `ConversationHistoryStore` using Beanie.
-- `api/chat/mongo/mappers.py` contains explicit conversions between Beanie
+- `api/chat/storage/store.py` implements `ConversationHistoryStore` using Beanie.
+- `api/chat/storage/mappers.py` contains explicit conversions between Beanie
   documents and storage-agnostic DTOs.
-- Beanie document classes must not escape `api/chat/mongo/`.
+- Beanie document classes must not escape `api/chat/storage/`.
 - API handlers and agent orchestration should depend on `api/chat/models.py` and
   `api/chat/contracts.py`, not direct MongoDB or Beanie APIs.
 - Keep `api/schemas.py` for HTTP request/response schemas. Do not pass
@@ -41,6 +41,9 @@ Rules:
 Rationale:
 
 - Beanie gives convenient MongoDB document modeling for V1.
+- The package is named `storage` rather than `mongo` because the chat module has
+  one active storage adapter; the folder should name the responsibility while the
+  concrete class name carries the backend detail.
 - A protocol boundary keeps MongoDB as an adapter detail rather than a domain
   boundary.
 - A later PostgreSQL implementation can provide its own persistence models and
@@ -150,10 +153,14 @@ Persist only the visible chat transcript in V1.
 A stored `ChatMessage` represents a user-visible message:
 
 - message id
-- role: user or assistant
+- role: `ChatRole` (`user` or `assistant`)
 - content
-- status
+- status: `ChatMessageStatus`
 - timestamps
+
+Roles, chat message statuses, and message operation statuses are represented as
+shared `StrEnum` types in `api/chat/models.py` and reused by HTTP schemas,
+storage documents, and route/store logic.
 
 Do not persist Pydantic AI native message objects, tool calls, tool results, or
 streamed debug events in V1.
@@ -378,20 +385,34 @@ Rationale:
 
 ## Decision 10: Testing Strategy
 
-Use two levels of tests:
+Use a test pyramid split by responsibility:
 
-- protocol/service-level tests with fake or in-memory store behavior where
-  possible
-- Mongo/Beanie adapter integration tests when a local test MongoDB is available
+- route/API behavior tests should depend on the `ConversationHistoryStore`
+  protocol and use a small fake/mock store when persistence correctness is not
+  the subject of the test
+- Mongo adapter integration tests should exercise `api/chat/storage/store.py`
+  against a real MongoDB when validating persistence behavior, Beanie mapping,
+  soft delete, indexes, idempotency, and embedded message updates
 
-The implementation plan should define the exact test fixtures and commands.
+Do not replace Mongo adapter integration tests with an in-memory fake. The fake
+exists only to keep route tests focused on HTTP behavior, request/response
+mapping, streaming event handling, and error translation.
+
+The initial local setup may use `docker compose` with a MongoDB service. If the
+manual service step becomes noisy in local development or CI, introduce
+Testcontainers later so the MongoDB dependency can be started and torn down by
+the test fixture itself.
 
 Rationale:
 
-- Store contract behavior should be testable without requiring MongoDB for every
-  test.
-- Beanie-specific mapping, indexes, and idempotency persistence still need
-  adapter-level coverage.
+- The `ConversationHistoryStore` protocol is useful when route tests exercise
+  the contract rather than the concrete Mongo implementation.
+- Route tests should not require Docker just to verify HTTP status mapping or
+  SSE event shape.
+- Beanie-specific mapping, indexes, soft delete, and idempotency persistence
+  still need real database coverage.
+- Testcontainers can improve automation later without changing the production
+  storage boundary.
 
 ## Decision 11: Soft Delete Scope
 
@@ -453,7 +474,7 @@ Rationale:
 
 ## Decision 12: Local Docker Compose
 
-Add a local `docker_compose.yaml` for development.
+Add a local `docker-compose.yaml` for development.
 
 The compose setup should support MongoDB only for now:
 
@@ -504,6 +525,10 @@ MONGODB_DB=tuvilm
 
 Add Beanie/MongoDB dependencies to `pyproject.toml`.
 
+Use PyMongo's async client with Beanie 2. The implementation uses
+`pymongo.AsyncMongoClient` rather than Motor because Beanie 2 expects the
+PyMongo async client metadata API.
+
 For V1 persisted chat, reconstruct agent context from:
 
 - visible transcript stored in `Session.messages[]`
@@ -527,7 +552,7 @@ api/chat/
   models.py          # storage-agnostic Pydantic models / DTOs
   contracts.py       # ConversationHistoryStore Protocol
   routes.py          # FastAPI router for conversation endpoints
-  mongo/
+  storage/
     documents.py
     store.py
     mappers.py

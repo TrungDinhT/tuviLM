@@ -11,7 +11,7 @@ function isValidCalendarDate(year: number, month: number, day: number): boolean 
 
 export const EntryFormSchema = z
   .object({
-    date: z
+    day: z
       .number({ message: "Ngày phải là số" })
       .int("Ngày phải là số nguyên")
       .min(1, "Ngày không hợp lệ")
@@ -39,11 +39,11 @@ export const EntryFormSchema = z
     gender: z.enum(["M", "F"]),
   })
   .superRefine((v, ctx) => {
-    if (!isValidCalendarDate(v.year, v.month, v.date)) {
+    if (!isValidCalendarDate(v.year, v.month, v.day)) {
       ctx.addIssue({
         code: "custom",
-        path: ["date"],
-        message: `Ngày ${v.date}/${v.month}/${v.year} không tồn tại`,
+        path: ["day"],
+        message: `Ngày ${v.day}/${v.month}/${v.year} không tồn tại`,
       });
     }
   });

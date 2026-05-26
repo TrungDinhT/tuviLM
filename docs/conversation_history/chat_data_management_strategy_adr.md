@@ -146,6 +146,10 @@ The exact Python protocols, repository classes, database libraries, indexes,
 transactions, and migration mechanics are deferred to the implementation-ready
 design.
 
+The V1 implementation uses Beanie with PyMongo's async client behind this
+boundary. That library choice remains an adapter detail rather than part of the
+domain model.
+
 The logical model should remain portable:
 
 - MongoDB V1 can store a session aggregate as one document with embedded
@@ -214,7 +218,6 @@ relationships, message statuses, soft deletion, and idempotency behavior.
 
 - exact endpoint contracts
 - exact repository/protocol definitions
-- MongoDB library choice
 - PostgreSQL library choice
 - index definitions
 - transaction mechanics for a future dedicated idempotency ledger

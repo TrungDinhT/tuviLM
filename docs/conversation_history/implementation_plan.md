@@ -11,18 +11,19 @@ the PR remains reviewable:
 4. persisted session-scoped chat streaming
 5. tests and manual verification
 
-The implementation adds new conversation-history endpoints beside the current
-legacy `/api/v1/laso/build`, `/api/v1/chat`, and `/api/v1/chat/stream`
-endpoints. Existing endpoints stay in place for frontend migration.
+The implementation adds conversation-history endpoints beside the existing
+chart-building endpoints. The legacy `/api/v1/chat` and `/api/v1/chat/stream`
+routes were retired after the frontend started sending chat through persisted
+sessions.
 
 ## Runtime And Dependencies
 
 Add MongoDB persistence dependencies to `pyproject.toml`:
 
 - `beanie`
-- `motor`
+- `pymongo` async client support, provided transitively by Beanie
 
-Add a root-level `docker_compose.yaml` with a MongoDB service only. The API and
+Add a root-level `docker-compose.yaml` with a MongoDB service only. The API and
 frontend continue running through local development commands.
 
 Use environment variables:
@@ -44,6 +45,9 @@ Register these Beanie documents:
 Store the initialized `ConversationHistoryStore` in app state so routes can
 retrieve it through request dependency helpers.
 
+Implementation note: Beanie 2 uses PyMongo's async client interface. Use
+`pymongo.AsyncMongoClient` with timezone-aware reads rather than Motor.
+
 ## Module Layout
 
 Create the conversation history implementation under `api/chat/`:
@@ -54,7 +58,7 @@ api/chat/
   models.py
   contracts.py
   routes.py
-  mongo/
+  storage/
     __init__.py
     documents.py
     mappers.py
@@ -66,11 +70,12 @@ Responsibilities:
 - `models.py`: storage-agnostic Pydantic DTOs and enums
 - `contracts.py`: `ConversationHistoryStore` protocol and store result types
 - `routes.py`: FastAPI router mounted by `api/main.py`
-- `mongo/documents.py`: Beanie `Document` classes
-- `mongo/mappers.py`: Beanie document to DTO conversion
-- `mongo/store.py`: Beanie-backed implementation of `ConversationHistoryStore`
+- `storage/documents.py`: Beanie `Document` classes
+- `storage/mappers.py`: Beanie document to DTO conversion
+- `storage/store.py`: `MongoConversationHistoryStore`, the Mongo-backed
+  implementation of `ConversationHistoryStore`
 
-Beanie document classes must not escape `api/chat/mongo/`.
+Beanie document classes must not escape `api/chat/storage/`.
 
 ## Domain DTOs
 
@@ -91,9 +96,10 @@ Define storage-agnostic DTOs in `api/chat/models.py`:
   - timestamps
 - `ChatMessage`
   - id
-  - role: user or assistant
+  - role: `ChatRole` (`user` or `assistant`)
   - content
-  - status: pending, confirmed, failed, or cancelled
+  - status: `ChatMessageStatus` (`pending`, `confirmed`, `failed`, or
+    `cancelled`)
   - timestamps
 - `ChatSession`
   - id
@@ -113,6 +119,12 @@ Define storage-agnostic DTOs in `api/chat/models.py`:
 - `ReservedMessagePair`
   - user message
   - assistant message
+  - operation status: `MessageOperationStatus`
+
+Represent chat roles, chat message statuses, and message operation statuses with
+shared `StrEnum` types in `api/chat/models.py`. HTTP schemas and storage
+documents should reuse those enums so route, store, and persistence logic do not
+compare scattered raw strings.
 
 Domain IDs are strings. Mongo V1 may expose ObjectId values as strings for
 top-level chart profile and session ids. Embedded message ids should be
@@ -134,7 +146,7 @@ persistence adapter.
 
 ## Mongo Documents
 
-Define Beanie documents in `api/chat/mongo/documents.py`.
+Define Beanie documents in `api/chat/storage/documents.py`.
 
 Use Beanie `DocumentWithSoftDelete` for top-level resource documents:
 
@@ -291,9 +303,9 @@ class CreateSessionRequest(BaseModel):
 
 class ChatMessagePayload(BaseModel):
     id: str
-    role: Literal["user", "assistant"]
+    role: ChatRole
     content: str
-    status: Literal["pending", "confirmed", "failed", "cancelled"]
+    status: ChatMessageStatus
     created_at: datetime
     updated_at: datetime
 
@@ -419,8 +431,8 @@ POST /api/v1/sessions/{session_id}/chat/stream
 
 ## Persisted Chat Stream
 
-Add `POST /api/v1/sessions/{session_id}/chat/stream` beside the existing legacy
-`POST /api/v1/chat/stream`.
+Use `POST /api/v1/sessions/{session_id}/chat/stream` as the session-scoped
+streaming endpoint.
 
 Request body:
 
@@ -652,14 +664,28 @@ purging is out of scope.
 
 ## Tests
 
-Add focused tests for the store contract and routes.
+Add focused tests for the store contract, Mongo adapter, and routes.
+
+Use a pyramid split by responsibility:
+
+- route/API behavior tests use a small fake/mock `ConversationHistoryStore`
+  unless the test is specifically about persistence correctness
+- Mongo adapter integration tests use `MongoConversationHistoryStore` against a
+  real MongoDB instance
+- pure mapper/DTO tests stay database-free
+
+Keep the initial Mongo integration fixture compatible with the local
+`docker-compose.yaml` service. Testcontainers is a valid later improvement for
+local development or CI if manually starting MongoDB becomes too noisy; adopting
+it should not change the `ConversationHistoryStore` protocol or production
+storage code.
 
 DTO/mapper tests:
 
 - `BirthInfoPayload.day` maps to domain `BirthInfo.day`
 - Beanie documents convert to storage-agnostic DTOs without leaking Beanie types
 
-Store tests:
+Mongo adapter tests:
 
 - create anonymous endpoint returns a generated owner id
 - create chart profile requires owner id
@@ -690,7 +716,7 @@ Route tests:
 
 Manual verification:
 
-1. Start MongoDB with `docker compose -f docker_compose.yaml up`.
+1. Start MongoDB with `docker compose -f docker-compose.yaml up`.
 2. Run the API locally with MongoDB env vars.
 3. Create an anonymous owner with `POST /api/v1/anonymous` and store the
    returned owner id.
@@ -712,3 +738,27 @@ session, and chat-history UI to the new endpoints.
 
 Delete endpoints, account linking, durable tool traces, summarization, message
 extraction, and PostgreSQL implementation are out of scope for this pass.
+
+## Implementation Status
+
+Implemented in the current branch:
+
+- MongoDB runtime via `docker-compose.yaml`
+- Mongo-backed storage adapter using Beanie and `pymongo.AsyncMongoClient`
+- storage-agnostic DTOs and store contract
+- chart profile and session APIs
+- soft delete for sessions and chart profiles, including profile cascade
+- embedded visible transcript messages
+- session-scoped persisted chat streaming
+- frontend creation flow for anonymous owner, chart profile, and session
+- frontend session-scoped chat streaming without the legacy chat fallback
+- `api/main.py` cleanup so chat-history routes live in `api/chat/routes.py`
+- Mongo-backed integration tests for the conversation history API
+
+Still deferred:
+
+- account/auth migration
+- durable tool traces
+- summarization
+- message extraction if session documents approach MongoDB limits
+- PostgreSQL adapter
