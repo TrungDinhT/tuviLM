@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import asyncio
 import os
 from datetime import UTC, datetime
 from uuid import uuid4
 
 import httpx
 import pytest
+from beanie import PydanticObjectId
 from pymongo import AsyncMongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from pydantic_ai import PartStartEvent, TextPart
@@ -330,6 +332,46 @@ async def test_reserve_message_pair_and_finalize_assistant_message(mongo_store) 
     assert context.session.messages[-1].content == "Career looks strong."
 
 
+async def test_finalize_assistant_message_does_not_overwrite_terminal_message(
+    mongo_store,
+) -> None:
+    profile = await _create_profile(mongo_store)
+    session = await _create_session(mongo_store, profile.id)
+    pair = await mongo_store.reserve_message_pair(
+        "anon_owner",
+        session.id,
+        user_content="Tell me about career.",
+        idempotency_key="message-1",
+    )
+
+    first = await mongo_store.finalize_assistant_message(
+        "anon_owner",
+        session.id,
+        pair.assistant_message.id,
+        content="Career looks strong.",
+        status=ChatMessageStatus.CONFIRMED,
+    )
+    second = await mongo_store.finalize_assistant_message(
+        "anon_owner",
+        session.id,
+        pair.assistant_message.id,
+        content="Partial answer before failure.",
+        status=ChatMessageStatus.FAILED,
+    )
+    context = await mongo_store.load_session_context("anon_owner", session.id)
+    document = await ChatSessionDocument.find_one(
+        ChatSessionDocument.id == PydanticObjectId(session.id)
+    )
+
+    assert first.content == "Career looks strong."
+    assert second.content == "Career looks strong."
+    assert second.status == ChatMessageStatus.CONFIRMED
+    assert context.session.messages[-1].content == "Career looks strong."
+    assert context.session.messages[-1].status == ChatMessageStatus.CONFIRMED
+    assert document is not None
+    assert document.message_operations[-1].status == MessageOperationStatus.COMPLETED
+
+
 async def test_reserve_message_pair_rejects_second_pending_stream(mongo_store) -> None:
     profile = await _create_profile(mongo_store)
     session = await _create_session(mongo_store, profile.id)
@@ -348,6 +390,62 @@ async def test_reserve_message_pair_rejects_second_pending_stream(mongo_store) -
             user_content="Tell me about love.",
             idempotency_key="message-2",
         )
+
+
+async def test_reserve_message_pair_concurrent_same_key_replays_one_pair(
+    mongo_store,
+) -> None:
+    profile = await _create_profile(mongo_store)
+    session = await _create_session(mongo_store, profile.id)
+
+    first, second = await asyncio.gather(
+        mongo_store.reserve_message_pair(
+            "anon_owner",
+            session.id,
+            user_content="Tell me about career.",
+            idempotency_key="message-1",
+        ),
+        mongo_store.reserve_message_pair(
+            "anon_owner",
+            session.id,
+            user_content="Tell me about career.",
+            idempotency_key="message-1",
+        ),
+    )
+    context = await mongo_store.load_session_context("anon_owner", session.id)
+
+    assert first.user_message.id == second.user_message.id
+    assert first.assistant_message.id == second.assistant_message.id
+    assert len(context.session.messages) == 2
+
+
+async def test_reserve_message_pair_concurrent_different_keys_allows_one_stream(
+    mongo_store,
+) -> None:
+    profile = await _create_profile(mongo_store)
+    session = await _create_session(mongo_store, profile.id)
+
+    results = await asyncio.gather(
+        mongo_store.reserve_message_pair(
+            "anon_owner",
+            session.id,
+            user_content="Tell me about career.",
+            idempotency_key="message-1",
+        ),
+        mongo_store.reserve_message_pair(
+            "anon_owner",
+            session.id,
+            user_content="Tell me about love.",
+            idempotency_key="message-2",
+        ),
+        return_exceptions=True,
+    )
+    context = await mongo_store.load_session_context("anon_owner", session.id)
+
+    assert sum(isinstance(result, ReservedMessagePair) for result in results) == 1
+    assert sum(isinstance(result, DuplicateStreamInProgressError) for result in results) == 1
+    assert len(context.session.messages) == 2
+    assert context.session.messages[-1].status == ChatMessageStatus.PENDING
 
 
 async def test_mongo_delete_session_hides_it_from_session_list(mongo_store) -> None:

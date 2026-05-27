@@ -143,6 +143,10 @@ export function LichSuDrawer({
                 <button
                   key={it.id}
                   type="button"
+                  onClick={() => {
+                    onSessionChange(it.id);
+                    onClose();
+                  }}
                   className="w-full text-left px-8 py-3 cursor-pointer transition-colors"
                   style={{
                     borderLeft: it.id === currentSessionId ? "3px solid var(--color-crimson)" : "3px solid transparent",

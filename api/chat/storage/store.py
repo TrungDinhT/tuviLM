@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from hashlib import sha256
 from typing import Self
 from uuid import uuid4
 
 from beanie import PydanticObjectId, init_beanie
+from beanie.odm.operators.find.array import ElemMatch
+from beanie.odm.operators.find.logical import Not
+from beanie.odm.operators.update.array import Push
+from beanie.odm.operators.update.general import Set
+from beanie.odm.queries.update import UpdateResponse
 from pydantic import BaseModel
 from pymongo import AsyncMongoClient
 from pymongo.errors import DuplicateKeyError
@@ -98,10 +104,8 @@ class MongoConversationHistoryStore:
             await document.insert()
         except DuplicateKeyError:
             existing = await ChartProfileDocument.find_one(
-                {
-                    "owner_id": owner_id,
-                    "creation_idempotency_key": idempotency_key,
-                }
+                ChartProfileDocument.owner_id == owner_id,
+                ChartProfileDocument.creation_idempotency_key == idempotency_key,
             )
             if existing is None:
                 raise
@@ -112,14 +116,16 @@ class MongoConversationHistoryStore:
         return chart_profile_from_document(document)
 
     async def list_chart_profiles(self, owner_id: str) -> list[ChartProfile]:
-        documents = await ChartProfileDocument.find({"owner_id": owner_id}).to_list()
+        documents = await ChartProfileDocument.find(
+            ChartProfileDocument.owner_id == owner_id
+        ).to_list()
         return [chart_profile_from_document(document) for document in documents]
 
     async def delete_chart_profile(self, owner_id: str, chart_profile_id: str) -> None:
         profile = await _require_chart_profile(owner_id, chart_profile_id)
         await profile.delete()
         async for session in ChatSessionDocument.find(
-            {"chart_profile_id": chart_profile_id}
+            ChatSessionDocument.chart_profile_id == chart_profile_id
         ):
             await session.delete()
 
@@ -145,10 +151,8 @@ class MongoConversationHistoryStore:
             await document.insert()
         except DuplicateKeyError:
             existing = await ChatSessionDocument.find_one(
-                {
-                    "chart_profile_id": chart_profile_id,
-                    "creation_idempotency_key": idempotency_key,
-                }
+                ChatSessionDocument.chart_profile_id == chart_profile_id,
+                ChatSessionDocument.creation_idempotency_key == idempotency_key,
             )
             if existing is None:
                 raise
@@ -163,7 +167,7 @@ class MongoConversationHistoryStore:
     ) -> list[ChatSessionSummary]:
         await _require_chart_profile(owner_id, chart_profile_id)
         documents = await ChatSessionDocument.find(
-            {"chart_profile_id": chart_profile_id}
+            ChatSessionDocument.chart_profile_id == chart_profile_id
         ).to_list()
         return [chat_session_summary_from_document(document) for document in documents]
 
@@ -213,33 +217,33 @@ class MongoConversationHistoryStore:
         status: ChatMessageStatus,
     ) -> ChatMessage:
         session = await _get_session_for_owner(owner_id, session_id)
+        update_fields, array_filters = _build_assistant_finalization_update(
+            assistant_message_id,
+            content=content,
+            status=status,
+        )
+        updated_session = await ChatSessionDocument.find_one(
+            ChatSessionDocument.id == session.id,
+            _pending_assistant_message_filter(assistant_message_id),
+        ).update(
+            Set(update_fields),
+            array_filters=array_filters,
+            response_type=UpdateResponse.NEW_DOCUMENT,
+        )
+        if updated_session is None:
+            updated_session = await _get_session_for_owner(owner_id, session_id)
 
-        for message in session.messages:
-            if message.id != assistant_message_id or message.role != ChatRole.ASSISTANT:
-                continue
+        return _require_assistant_message(
+            updated_session,
+            assistant_message_id,
+        )
 
-            now = utc_now()
-            message.content = content
-            message.status = status
-            message.updated_at = now
-            session.updated_at = now
 
-            operation_status = {
-                ChatMessageStatus.CONFIRMED: MessageOperationStatus.COMPLETED,
-                ChatMessageStatus.FAILED: MessageOperationStatus.FAILED,
-                ChatMessageStatus.CANCELLED: MessageOperationStatus.CANCELLED,
-            }.get(status)
-            if operation_status is not None:
-                for operation in session.message_operations:
-                    if operation.assistant_message_id == assistant_message_id:
-                        operation.status = operation_status
-                        operation.updated_at = now
-                        break
-
-            await session.save()
-            return chat_message_from_document(message)
-
-        raise NotFoundError
+@dataclass(frozen=True)
+class _MessageReservation:
+    user_message: ChatMessage
+    assistant_message: ChatMessage
+    operation: MessageOperationDocument
 
 
 def _find_message_operation(
@@ -254,6 +258,73 @@ def _find_message_operation(
         ),
         None,
     )
+
+
+def _require_assistant_message(
+    session: ChatSessionDocument,
+    assistant_message_id: str,
+) -> ChatMessage:
+    for message in session.messages:
+        if message.id == assistant_message_id and message.role == ChatRole.ASSISTANT:
+            return chat_message_from_document(message)
+    raise NotFoundError
+
+
+def _build_assistant_finalization_update(
+    assistant_message_id: str,
+    *,
+    content: str,
+    status: ChatMessageStatus,
+):
+    now = utc_now()
+    update_fields = {
+        "messages.$[message].content": content,
+        "messages.$[message].status": status,
+        "messages.$[message].updated_at": now,
+        "updated_at": now,
+    }
+    array_filters = [_pending_assistant_message_array_filter(assistant_message_id)]
+
+    operation_status = _message_operation_status_for(status)
+    if operation_status is not None:
+        update_fields.update(
+            {
+                "message_operations.$[operation].status": operation_status,
+                "message_operations.$[operation].updated_at": now,
+            }
+        )
+        array_filters.append({"operation.assistant_message_id": assistant_message_id})
+
+    return update_fields, array_filters
+
+
+def _message_operation_status_for(
+    message_status: ChatMessageStatus,
+) -> MessageOperationStatus | None:
+    return {
+        ChatMessageStatus.CONFIRMED: MessageOperationStatus.COMPLETED,
+        ChatMessageStatus.FAILED: MessageOperationStatus.FAILED,
+        ChatMessageStatus.CANCELLED: MessageOperationStatus.CANCELLED,
+    }.get(message_status)
+
+
+def _pending_assistant_message_filter(assistant_message_id: str):
+    return ElemMatch(
+        ChatSessionDocument.messages,
+        {
+            "id": assistant_message_id,
+            "role": ChatRole.ASSISTANT,
+            "status": ChatMessageStatus.PENDING,
+        },
+    )
+
+
+def _pending_assistant_message_array_filter(assistant_message_id: str):
+    return {
+        "message.id": assistant_message_id,
+        "message.role": ChatRole.ASSISTANT,
+        "message.status": ChatMessageStatus.PENDING,
+    }
 
 
 def _replay_reserved_message_pair(
@@ -305,13 +376,31 @@ async def _reserve_new_message_pair(
     idempotency_key: str,
     fingerprint: str,
 ) -> ReservedMessagePair:
-    if any(
-        message.role == ChatRole.ASSISTANT
-        and message.status == ChatMessageStatus.PENDING
-        for message in session.messages
-    ):
-        raise DuplicateStreamInProgressError
+    reservation = _new_message_reservation(
+        user_content=user_content,
+        idempotency_key=idempotency_key,
+        fingerprint=fingerprint,
+    )
+    updated_session = await _append_message_reservation(session, reservation)
+    if updated_session is None:
+        return await _replay_or_reject_after_reservation_miss(
+            str(session.id),
+            idempotency_key=idempotency_key,
+            fingerprint=fingerprint,
+        )
 
+    return ReservedMessagePair(
+        user_message=chat_message_from_document(reservation.user_message),
+        assistant_message=chat_message_from_document(reservation.assistant_message),
+    )
+
+
+def _new_message_reservation(
+    *,
+    user_content: str,
+    idempotency_key: str,
+    fingerprint: str,
+) -> _MessageReservation:
     now = utc_now()
     user_message = ChatMessage(
         id=str(uuid4()),
@@ -329,23 +418,94 @@ async def _reserve_new_message_pair(
         created_at=now,
         updated_at=now,
     )
-    session.messages.extend([user_message, assistant_message])
-    session.message_operations.append(
-        MessageOperationDocument(
-            idempotency_key=idempotency_key,
-            request_fingerprint=fingerprint,
-            user_message_id=user_message.id,
-            assistant_message_id=assistant_message.id,
-            status=MessageOperationStatus.IN_PROGRESS,
-            created_at=now,
-            updated_at=now,
+    operation=MessageOperationDocument(
+        idempotency_key=idempotency_key,
+        request_fingerprint=fingerprint,
+        user_message_id=user_message.id,
+        assistant_message_id=assistant_message.id,
+        status=MessageOperationStatus.IN_PROGRESS,
+        created_at=now,
+        updated_at=now,
+    )
+    return _MessageReservation(
+        user_message=user_message,
+        assistant_message=assistant_message,
+        operation=operation,
+    )
+
+
+async def _append_message_reservation(
+    session: ChatSessionDocument,
+    reservation: _MessageReservation,
+) -> ChatSessionDocument | None:
+    return await ChatSessionDocument.find_one(
+        ChatSessionDocument.id == session.id,
+        _no_message_operation_filter(reservation.operation.idempotency_key),
+        _no_pending_assistant_message_filter(),
+    ).update(
+        Push(
+            {
+                ChatSessionDocument.messages: {
+                    "$each": [
+                        reservation.user_message.model_dump(mode="python"),
+                        reservation.assistant_message.model_dump(mode="python"),
+                    ]
+                },
+                ChatSessionDocument.message_operations: (
+                    reservation.operation.model_dump(mode="python")
+                ),
+            }
+        ),
+        Set({ChatSessionDocument.updated_at: reservation.user_message.updated_at}),
+        response_type=UpdateResponse.NEW_DOCUMENT,
+    )
+
+
+def _no_message_operation_filter(idempotency_key: str):
+    return Not(
+        ElemMatch(
+            ChatSessionDocument.message_operations,
+            {"idempotency_key": idempotency_key},
         )
     )
-    session.updated_at = now
-    await session.save()
-    return ReservedMessagePair(
-        user_message=chat_message_from_document(user_message),
-        assistant_message=chat_message_from_document(assistant_message),
+
+
+def _no_pending_assistant_message_filter():
+    return Not(
+        ElemMatch(
+            ChatSessionDocument.messages,
+            {
+                "role": ChatRole.ASSISTANT,
+                "status": ChatMessageStatus.PENDING,
+            },
+        )
+    )
+
+
+async def _replay_or_reject_after_reservation_miss(
+    session_id: str,
+    *,
+    idempotency_key: str,
+    fingerprint: str,
+) -> ReservedMessagePair:
+    current_session = await _get_session(session_id)
+    existing_operation = _find_message_operation(current_session, idempotency_key)
+    if existing_operation is not None:
+        return _replay_reserved_message_pair(
+            current_session,
+            existing_operation,
+            fingerprint=fingerprint,
+        )
+    if _has_pending_assistant_message(current_session):
+        raise DuplicateStreamInProgressError
+    raise NotFoundError
+
+
+def _has_pending_assistant_message(session: ChatSessionDocument) -> bool:
+    return any(
+        message.role == ChatRole.ASSISTANT
+        and message.status == ChatMessageStatus.PENDING
+        for message in session.messages
     )
 
 
@@ -364,7 +524,8 @@ async def _require_chart_profile(
         raise NotFoundError
 
     profile = await ChartProfileDocument.find_one(
-        {"_id": chart_profile_object_id, "owner_id": owner_id}
+        ChartProfileDocument.id == chart_profile_object_id,
+        ChartProfileDocument.owner_id == owner_id,
     )
     if profile is None:
         raise NotFoundError
@@ -377,7 +538,9 @@ async def _get_session(session_id: str) -> ChatSessionDocument:
     if session_object_id is None:
         raise NotFoundError
 
-    session = await ChatSessionDocument.find_one({"_id": session_object_id})
+    session = await ChatSessionDocument.find_one(
+        ChatSessionDocument.id == session_object_id
+    )
     if session is None:
         raise NotFoundError
 
