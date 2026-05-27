@@ -17,6 +17,7 @@ api/chat/
   contracts.py       # ConversationHistoryStore Protocol
   storage/
     documents.py     # Beanie Document classes
+    settings.py      # MongoConversationHistorySettings
     store.py         # MongoConversationHistoryStore implementation
     mappers.py       # Beanie <-> domain model conversion
 ```
@@ -28,6 +29,8 @@ Rules:
 - `api/chat/contracts.py` exposes the `ConversationHistoryStore` protocol.
 - `api/chat/storage/documents.py` contains Beanie `Document` classes and other
   Mongo-specific persistence models.
+- `api/chat/storage/settings.py` contains Mongo-specific settings for the
+  conversation history store adapter.
 - `api/chat/storage/store.py` implements `ConversationHistoryStore` using Beanie.
 - `api/chat/storage/mappers.py` contains explicit conversions between Beanie
   documents and storage-agnostic DTOs.
@@ -519,8 +522,9 @@ Stage the implementation in the plan:
 Use environment variables:
 
 ```text
-MONGODB_URI=mongodb://localhost:27017
-MONGODB_DB=tuvilm
+CONVERSATION_HISTORY_STORE__URI=mongodb://localhost:27017
+CONVERSATION_HISTORY_STORE__DATABASE_NAME=tuvilm
+CONVERSATION_HISTORY_STORE__TZ_AWARE=true
 ```
 
 Add Beanie/MongoDB dependencies to `pyproject.toml`.

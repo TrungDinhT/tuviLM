@@ -29,12 +29,13 @@ frontend continue running through local development commands.
 Use environment variables:
 
 ```text
-MONGODB_URI=mongodb://localhost:27017
-MONGODB_DB=tuvilm
+CONVERSATION_HISTORY_STORE__URI=mongodb://localhost:27017
+CONVERSATION_HISTORY_STORE__DATABASE_NAME=tuvilm
+CONVERSATION_HISTORY_STORE__TZ_AWARE=true
 ```
 
 Add an API settings module if one does not already exist. It should read those
-variables with defaults suitable for local development.
+variables and validate that the MongoDB URI is configured.
 
 Initialize MongoDB and Beanie in the FastAPI lifespan before serving requests.
 Register these Beanie documents:
@@ -72,10 +73,13 @@ Responsibilities:
 - `routes.py`: FastAPI router mounted by `api/main.py`
 - `storage/documents.py`: Beanie `Document` classes
 - `storage/mappers.py`: Beanie document to DTO conversion
+- `storage/settings.py`: Mongo-specific settings for the conversation history store
 - `storage/store.py`: `MongoConversationHistoryStore`, the Mongo-backed
   implementation of `ConversationHistoryStore`
 
-Beanie document classes must not escape `api/chat/storage/`.
+Beanie document classes and Mongo-specific settings must not escape
+`api/chat/storage/` except through app composition in `api/settings.py` and
+`api/main.py`.
 
 ## Domain DTOs
 
