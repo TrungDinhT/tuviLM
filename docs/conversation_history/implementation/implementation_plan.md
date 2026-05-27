@@ -32,6 +32,7 @@ Use environment variables:
 CONVERSATION_HISTORY_STORE__URI=mongodb://localhost:27017
 CONVERSATION_HISTORY_STORE__DATABASE_NAME=tuvilm
 CONVERSATION_HISTORY_STORE__TZ_AWARE=true
+CONVERSATION_HISTORY_STORE__STALE_PENDING_AFTER_SECONDS=900
 ```
 
 Add an API settings module if one does not already exist. It should read those
@@ -215,7 +216,7 @@ Use timezone-aware UTC timestamps for `created_at` and `updated_at`.
 
 Define `ConversationHistoryStore` in `api/chat/contracts.py`. It owns owner
 access checks, idempotency, message reservation/finalization, session context
-loading, and stale pending cleanup.
+loading, soft-delete behavior, and stale pending cleanup.
 
 The contract should expose operations equivalent to:
 
@@ -246,15 +247,16 @@ Routes translate those exceptions into HTTP/SSE responses.
 
 ## HTTP Schemas And Routes
 
-Define new conversation endpoint request/response schemas in `api/schemas.py`.
-Keep `api/chat/models.py` for storage-agnostic conversation history DTOs.
-Routes should map `api.schemas` payloads into `api/chat/models.py` DTOs before
-calling the store contract.
+Define only the HTTP wrapper schemas in `api/schemas.py`. Keep
+`api/chat/models.py` for storage-agnostic conversation history DTOs, and reuse
+those DTOs directly when the HTTP contract is identical to the domain shape.
+Routes should avoid field-copying mappers for identical request/response models.
 
-Replace the existing `TuviTimePayload` API model with `BirthInfoPayload`:
+Replace the existing `TuviTimePayload` API model with the shared
+`api.chat.models.BirthInfo` DTO:
 
 ```python
-class BirthInfoPayload(BaseModel):
+class BirthInfo(BaseModel):
     calendar: Literal["solar"] = "solar"
     year: int = Field(ge=1900, le=2099)
     month: int = Field(ge=1, le=12)
@@ -263,7 +265,7 @@ class BirthInfoPayload(BaseModel):
     gender: Literal["M", "F"]
 ```
 
-`BuildLasoRequest` can inherit from `BirthInfoPayload`. Existing endpoint code
+`BuildLasoRequest` can inherit from `BirthInfo`. Existing endpoint code
 and frontend request types should move from `date` to `day`.
 
 Use wrapped response bodies for list endpoints so pagination metadata can be
@@ -282,13 +284,13 @@ class CreateAnonymousResponse(BaseModel):
 
 class CreateChartProfileRequest(BaseModel):
     display_name: str
-    birth_info: BirthInfoPayload
+    birth_info: BirthInfo
 
 
 class ChartProfilePayload(BaseModel):
     id: str
     display_name: str
-    birth_info: BirthInfoPayload
+    birth_info: BirthInfo
     created_at: datetime
     updated_at: datetime
 
@@ -305,43 +307,16 @@ class CreateSessionRequest(BaseModel):
     title: str | None = None
 
 
-class ChatMessagePayload(BaseModel):
-    id: str
-    role: ChatRole
-    content: str
-    status: ChatMessageStatus
-    created_at: datetime
-    updated_at: datetime
-
-
-class ChatSessionPayload(BaseModel):
-    id: str
-    chart_profile_id: str
-    title: str | None = None
-    messages: list[ChatMessagePayload]
-    created_at: datetime
-    updated_at: datetime
-
-
-class ChatSessionSummaryPayload(BaseModel):
-    id: str
-    chart_profile_id: str
-    title: str | None = None
-    message_count: int
-    created_at: datetime
-    updated_at: datetime
-
-
 class CreateSessionResponse(BaseModel):
-    session: ChatSessionPayload
+    session: ChatSession
 
 
 class ListSessionsResponse(BaseModel):
-    sessions: list[ChatSessionSummaryPayload]
+    sessions: list[ChatSessionSummary]
 
 
 class GetSessionResponse(BaseModel):
-    session: ChatSessionPayload
+    session: ChatSession
 
 
 class SessionChatStreamRequest(BaseModel):
@@ -357,10 +332,14 @@ X-Anonymous-Owner-Id: anon_...
 Idempotency-Key: random-client-operation-id
 ```
 
+`ChartProfilePayload` intentionally omits `owner_id` from public responses even
+though the internal `ChartProfile` DTO carries it.
+
 `X-Anonymous-Owner-Id` is not required for `POST /api/v1/anonymous`. All chart
 profile, session, and chat-history endpoints require it.
 `Idempotency-Key` is required for chart profile creation, session creation, and
-session-scoped chat streaming. It is not required for `POST /api/v1/anonymous`.
+session-scoped chat streaming. Blank idempotency keys are rejected by request
+validation. It is not required for `POST /api/v1/anonymous`.
 
 Endpoints:
 
@@ -389,6 +368,7 @@ POST /api/v1/sessions/{session_id}/chat/stream
 
 - accepts display name and birth info
 - requires owner header
+- returns `400` when the owner header is blank
 - returns created or replayed chart profile
 
 `GET /api/v1/chart-profiles`:
@@ -422,7 +402,7 @@ POST /api/v1/sessions/{session_id}/chat/stream
 - requires owner header
 - loads session context through the store
 - returns session with embedded visible messages
-- triggers lazy stale-pending cleanup
+- triggers stale-pending cleanup before returning the session
 
 `DELETE /api/v1/sessions/{session_id}`:
 
@@ -508,6 +488,13 @@ Then close with:
 ```json
 { "type": "done", "status": "duplicate_in_progress" }
 ```
+
+Completed, failed, or cancelled stream retry with the same idempotency key:
+
+- emits the original ids
+- emits the stored terminal assistant content as a text event when non-empty
+- closes with the stored terminal status
+- does not invoke the agent again
 
 Do not persist assistant content token by token.
 
@@ -686,7 +673,7 @@ storage code.
 
 DTO/mapper tests:
 
-- `BirthInfoPayload.day` maps to domain `BirthInfo.day`
+- `BirthInfo.day` is used consistently across API and domain models
 - Beanie documents convert to storage-agnostic DTOs without leaking Beanie types
 
 Mongo adapter tests:
@@ -697,12 +684,13 @@ Mongo adapter tests:
   profile
 - same idempotency key with different payload returns conflict
 - create/list sessions validates owner through chart profile
-- loading a session performs lazy stale-pending cleanup
 - deleting a session hides it from normal list/load paths
 - deleting a chart profile hides it and cascades soft deletion to its sessions
 - deleting a chart profile with many sessions uses explicit store cascade logic
 - reserving a message pair appends one user message and one pending assistant
   message
+- stale pending assistant placeholders are marked failed and do not block later
+  reservations
 - retrying stream reservation with same key does not append duplicates
 - finalizing assistant message handles confirmed, failed, and cancelled
 - stream finalization can update an already-reserved assistant message in a
@@ -717,6 +705,11 @@ Route tests:
 - deleting a chart profile returns `204 No Content` and removes it from lists
 - session-scoped stream emits ids before text
 - duplicate in-progress stream emits `duplicate_in_progress`
+- terminal stream replay returns stored assistant content/status without starting
+  generation again
+- stream cancellation finalizes the assistant message as `cancelled`
+- blank idempotency key is rejected on mutating endpoints
+- blank owner header on chart profile creation returns a client error
 
 Manual verification:
 
@@ -736,12 +729,12 @@ Manual verification:
 
 ## Rollout Notes
 
-The first implementation pass adds new backend capability without removing
-legacy endpoints. Frontend migration can then wire existing mocked profile,
-session, and chat-history UI to the new endpoints.
+The first implementation pass adds new backend capability and wires the frontend
+entry form, session history drawer, and session-scoped streaming path to the new
+endpoints.
 
-Delete endpoints, account linking, durable tool traces, summarization, message
-extraction, and PostgreSQL implementation are out of scope for this pass.
+Account linking, durable tool traces, summarization, message extraction, and a
+PostgreSQL implementation are out of scope for this pass.
 
 ## Implementation Status
 
@@ -754,6 +747,11 @@ Implemented in the current branch:
 - soft delete for sessions and chart profiles, including profile cascade
 - embedded visible transcript messages
 - session-scoped persisted chat streaming
+- stream cancellation and failure finalization
+- idempotent terminal stream replay without rerunning the agent
+- duplicate in-progress stream replay
+- blank idempotency-key validation on mutating endpoints
+- stale pending assistant cleanup before session load and stream reservation
 - frontend creation flow for anonymous owner, chart profile, and session
 - frontend session-scoped chat streaming without the legacy chat fallback
 - `api/main.py` cleanup so chat-history routes live in `api/chat/routes.py`

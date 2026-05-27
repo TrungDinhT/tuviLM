@@ -9,7 +9,7 @@ the final implementation plan itself.
 Use Beanie for the MongoDB V1 adapter, but keep Beanie isolated behind a
 storage-agnostic conversation history contract.
 
-Planned module layout:
+Module layout:
 
 ```text
 api/chat/
@@ -119,10 +119,10 @@ Conceptual shape:
 ```python
 class BirthInfo(BaseModel):
     calendar: Literal["solar"] = "solar"
-    year: int
-    month: int
-    day: int
-    hour: int
+    year: int = Field(ge=1900, le=2099)
+    month: int = Field(ge=1, le=12)
+    day: int = Field(ge=1, le=31)
+    hour: int = Field(ge=0, le=23)
     gender: Literal["M", "F"]
 ```
 
@@ -135,7 +135,7 @@ Rules:
 - `study_year` / observation year is not part of `birth_info`.
 - `study_year` belongs to transient request/session interactions when the user
   asks for a chart view for a specific year.
-- Replace the current API `TuviTimePayload` with `BirthInfoPayload`.
+- Replace the current API `TuviTimePayload` with the shared `BirthInfo` model.
 - Use `day` only in the API and domain model. Do not keep temporary `date`
   compatibility.
 
@@ -145,9 +145,8 @@ Rationale:
   future calendar support.
 - `day` is clearer than `date` because it names a date component, not a full
   calendar date.
-- Keeping domain `BirthInfo` separate from `api.schemas.BirthInfoPayload`
-  preserves the distinction between HTTP wire payloads and conversation history
-  domain DTOs.
+- Reusing `BirthInfo` for the HTTP wire shape avoids duplicate DTOs when the API
+  contract and conversation-history domain shape are identical.
 
 ## Decision 4: Durable Message History Format
 
@@ -212,9 +211,9 @@ Streaming write behavior:
 
 Do not persist assistant content token by token in V1.
 
-If a hard process crash leaves an assistant message stuck in `pending`, lazy
-cleanup should run when the session is loaded. Stale pending assistant messages
-older than the configured threshold should be marked `failed`.
+If a hard process crash leaves an assistant message stuck in `pending`, stale
+cleanup marks pending assistant messages older than a configured threshold as
+`failed` during session load or before a new stream reservation.
 
 Rationale:
 
@@ -224,7 +223,8 @@ Rationale:
   user already saw.
 - `cancelled` is distinct from `failed` because user/client interruption is not
   the same as model or server failure.
-- Lazy cleanup is simpler than a startup job or background worker for V1.
+- Stale cleanup is the backstop for hard crashes that bypass normal stream
+  finalization.
 
 ## Decision 6: Idempotency
 
@@ -334,9 +334,9 @@ Store responsibilities:
 - session context loading with the associated chart profile
 - message pair reservation for streaming
 - assistant message finalization
-- lazy cleanup of stale pending assistant messages when loading a session
+- stale cleanup of old pending assistant messages
 
-Exact protocol method signatures are deferred to the implementation plan.
+The concrete protocol is defined in `api/chat/contracts.py`.
 
 Rationale:
 
@@ -485,8 +485,8 @@ The compose setup should support MongoDB only for now:
 - providing a repeatable path for manual end-to-end testing
 - allowing the API and frontend to keep running from local development commands
 
-The exact services, ports, environment variables, and commands are deferred to
-the implementation plan.
+The current settings include the Mongo URI, database name, timezone awareness,
+and stale pending cleanup threshold.
 
 Rationale:
 
@@ -525,6 +525,7 @@ Use environment variables:
 CONVERSATION_HISTORY_STORE__URI=mongodb://localhost:27017
 CONVERSATION_HISTORY_STORE__DATABASE_NAME=tuvilm
 CONVERSATION_HISTORY_STORE__TZ_AWARE=true
+CONVERSATION_HISTORY_STORE__STALE_PENDING_AFTER_SECONDS=900
 ```
 
 Add Beanie/MongoDB dependencies to `pyproject.toml`.

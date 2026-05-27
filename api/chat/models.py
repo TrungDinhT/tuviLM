@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ChatRole(StrEnum):
@@ -28,10 +28,10 @@ class MessageOperationStatus(StrEnum):
 
 class BirthInfo(BaseModel):
     calendar: Literal["solar"] = "solar"
-    year: int
-    month: int
-    day: int
-    hour: int
+    year: int = Field(ge=1900, le=2099)
+    month: int = Field(ge=1, le=12)
+    day: int = Field(ge=1, le=31)
+    hour: int = Field(ge=0, le=23)
     gender: Literal["M", "F"]
 
 

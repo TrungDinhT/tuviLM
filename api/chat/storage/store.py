@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import timedelta
 from hashlib import sha256
 from typing import Self
 from uuid import uuid4
@@ -55,9 +56,11 @@ class MongoConversationHistoryStore:
         *,
         mongo_client: AsyncMongoClient,
         database_name: str,
+        stale_pending_after: timedelta = timedelta(minutes=15),
     ) -> None:
         self._mongo_client = mongo_client
         self._database_name = database_name
+        self._stale_pending_after = stale_pending_after
 
     @classmethod
     async def connect(
@@ -68,6 +71,9 @@ class MongoConversationHistoryStore:
         store = cls(
             mongo_client=mongo_client,
             database_name=settings.database_name,
+            stale_pending_after=timedelta(
+                seconds=settings.stale_pending_after_seconds
+            ),
         )
         await store._initialize_storage()
         return store
@@ -176,6 +182,11 @@ class MongoConversationHistoryStore:
         await session.delete()
 
     async def load_session_context(self, owner_id: str, session_id: str) -> SessionContext:
+        await _cleanup_stale_pending_messages(
+            owner_id=owner_id,
+            session_id=session_id,
+            stale_pending_after=self._stale_pending_after,
+        )
         session = await _get_session(session_id)
         profile = await _require_chart_profile(owner_id, session.chart_profile_id)
         return SessionContext(
@@ -191,6 +202,11 @@ class MongoConversationHistoryStore:
         user_content: str,
         idempotency_key: str,
     ) -> ReservedMessagePair:
+        await _cleanup_stale_pending_messages(
+            owner_id=owner_id,
+            session_id=session_id,
+            stale_pending_after=self._stale_pending_after,
+        )
         session = await _get_session_for_owner(owner_id, session_id)
         fingerprint = _compute_fingerprint(user_content)
         existing_operation = _find_message_operation(session, idempotency_key)
@@ -270,6 +286,60 @@ def _require_assistant_message(
     raise NotFoundError
 
 
+async def _cleanup_stale_pending_messages(
+    *,
+    owner_id: str,
+    session_id: str,
+    stale_pending_after: timedelta,
+) -> None:
+    session = await _get_session_for_owner(owner_id, session_id)
+    cutoff = utc_now() - stale_pending_after
+    stale_message_ids = [
+        message.id
+        for message in session.messages
+        if message.role == ChatRole.ASSISTANT
+        and message.status == ChatMessageStatus.PENDING
+        and message.updated_at <= cutoff
+    ]
+    if not stale_message_ids:
+        return
+
+    update_fields, array_filters = _build_stale_pending_cleanup_update(
+        stale_message_ids,
+        cutoff=cutoff,
+    )
+    await ChatSessionDocument.find_one(
+        ChatSessionDocument.id == session.id,
+        _stale_pending_assistant_messages_filter(stale_message_ids, cutoff=cutoff),
+    ).update(
+        Set(update_fields),
+        array_filters=array_filters,
+    )
+
+
+def _build_stale_pending_cleanup_update(
+    assistant_message_ids: list[str],
+    *,
+    cutoff,
+):
+    now = utc_now()
+    update_fields = {
+        "messages.$[message].status": ChatMessageStatus.FAILED,
+        "messages.$[message].updated_at": now,
+        "message_operations.$[operation].status": MessageOperationStatus.FAILED,
+        "message_operations.$[operation].updated_at": now,
+        "updated_at": now,
+    }
+    array_filters = [
+        _stale_pending_assistant_message_array_filter(
+            assistant_message_ids,
+            cutoff=cutoff,
+        ),
+        _in_progress_message_operation_array_filter(assistant_message_ids),
+    ]
+    return update_fields, array_filters
+
+
 def _build_assistant_finalization_update(
     assistant_message_id: str,
     *,
@@ -324,6 +394,42 @@ def _pending_assistant_message_array_filter(assistant_message_id: str):
         "message.id": assistant_message_id,
         "message.role": ChatRole.ASSISTANT,
         "message.status": ChatMessageStatus.PENDING,
+    }
+
+
+def _stale_pending_assistant_messages_filter(
+    assistant_message_ids: list[str],
+    *,
+    cutoff,
+):
+    return ElemMatch(
+        ChatSessionDocument.messages,
+        {
+            "id": {"$in": assistant_message_ids},
+            "role": ChatRole.ASSISTANT,
+            "status": ChatMessageStatus.PENDING,
+            "updated_at": {"$lte": cutoff},
+        },
+    )
+
+
+def _stale_pending_assistant_message_array_filter(
+    assistant_message_ids: list[str],
+    *,
+    cutoff,
+):
+    return {
+        "message.id": {"$in": assistant_message_ids},
+        "message.role": ChatRole.ASSISTANT,
+        "message.status": ChatMessageStatus.PENDING,
+        "message.updated_at": {"$lte": cutoff},
+    }
+
+
+def _in_progress_message_operation_array_filter(assistant_message_ids: list[str]):
+    return {
+        "operation.assistant_message_id": {"$in": assistant_message_ids},
+        "operation.status": MessageOperationStatus.IN_PROGRESS,
     }
 
 

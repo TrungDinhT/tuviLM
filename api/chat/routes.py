@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import secrets
 from datetime import datetime
-from typing import Any
+from typing import Any, AsyncIterator
 
 from fastapi import APIRouter, Header, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
@@ -23,6 +24,7 @@ from api.chat.contracts import (
     ConversationHistoryStore,
     DuplicateStreamInProgressError,
     IdempotencyConflictError,
+    MissingOwnerIdError,
 )
 from api.chat.contracts import NotFoundError
 from api.chat.models import (
@@ -31,18 +33,14 @@ from api.chat.models import (
     ChatMessage,
     ChatMessageStatus,
     ChatRole,
-    ChatSession,
-    ChatSessionSummary,
     CreateChartProfileInput,
     CreateSessionInput,
     MessageOperationStatus,
+    ReservedMessagePair,
     SessionContext,
 )
 from api.schemas import (
-    BirthInfoPayload,
     ChartProfilePayload,
-    ChatMessagePayload,
-    ChatSessionPayload,
     CreateAnonymousResponse,
     CreateChartProfileRequest,
     CreateChartProfileResponse,
@@ -50,7 +48,6 @@ from api.schemas import (
     CreateSessionResponse,
     GetSessionResponse,
     ListChartProfilesResponse,
-    ChatSessionSummaryPayload,
     ListSessionsResponse,
     SessionChatStreamRequest,
 )
@@ -72,19 +69,21 @@ async def create_chart_profile(
     payload: CreateChartProfileRequest,
     request: Request,
     owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
-    idempotency_key: str = Header(alias="Idempotency-Key"),
+    idempotency_key: str = Header(alias="Idempotency-Key", min_length=1),
 ) -> CreateChartProfileResponse:
     try:
         profile = await _get_store(request).create_chart_profile(
             owner_id,
             CreateChartProfileInput(
                 display_name=payload.display_name,
-                birth_info=_birth_info_from_payload(payload.birth_info),
+                birth_info=payload.birth_info,
             ),
             idempotency_key=idempotency_key,
         )
     except IdempotencyConflictError:
         raise HTTPException(status_code=409, detail="Idempotency key conflict.")
+    except MissingOwnerIdError:
+        raise HTTPException(status_code=400, detail="Anonymous owner id is required.")
     return CreateChartProfileResponse(chart_profile=_chart_profile_payload(profile))
 
 
@@ -121,7 +120,7 @@ async def create_session(
     payload: CreateSessionRequest,
     request: Request,
     owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
-    idempotency_key: str = Header(alias="Idempotency-Key"),
+    idempotency_key: str = Header(alias="Idempotency-Key", min_length=1),
 ) -> CreateSessionResponse:
     try:
         session = await _get_store(request).create_session(
@@ -135,7 +134,7 @@ async def create_session(
     except IdempotencyConflictError:
         raise HTTPException(status_code=409, detail="Idempotency key conflict.")
 
-    return CreateSessionResponse(session=_chat_session_payload(session))
+    return CreateSessionResponse(session=session)
 
 
 @router.get(
@@ -152,9 +151,7 @@ async def list_sessions(
     except NotFoundError:
         raise HTTPException(status_code=404, detail="Chart profile not found.")
 
-    return ListSessionsResponse(
-        sessions=[_chat_session_summary_payload(session) for session in sessions]
-    )
+    return ListSessionsResponse(sessions=sessions)
 
 
 @router.get("/sessions/{session_id}", response_model=GetSessionResponse)
@@ -168,7 +165,7 @@ async def get_session(
     except NotFoundError:
         raise HTTPException(status_code=404, detail="Session not found.")
 
-    return GetSessionResponse(session=_chat_session_payload(context.session))
+    return GetSessionResponse(session=context.session)
 
 
 @router.delete("/sessions/{session_id}", status_code=204)
@@ -190,16 +187,50 @@ async def session_chat_stream(
     payload: SessionChatStreamRequest,
     request: Request,
     owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
-    idempotency_key: str = Header(alias="Idempotency-Key"),
+    idempotency_key: str = Header(alias="Idempotency-Key", min_length=1),
 ) -> StreamingResponse:
     store = _get_store(request)
+    context, history_messages, pair = await _reserve_session_chat_stream(
+        store=store,
+        owner_id=owner_id,
+        session_id=session_id,
+        content=payload.content,
+        idempotency_key=idempotency_key,
+    )
+
+    replay_response = _replayed_stream_response(pair)
+    if replay_response is not None:
+        return replay_response
+
+    return _streaming_response(
+        _new_session_chat_stream(
+            request=request,
+            store=store,
+            owner_id=owner_id,
+            session_id=session_id,
+            context=context,
+            history_messages=history_messages,
+            pair=pair,
+            content=payload.content,
+        )
+    )
+
+
+async def _reserve_session_chat_stream(
+    *,
+    store: ConversationHistoryStore,
+    owner_id: str,
+    session_id: str,
+    content: str,
+    idempotency_key: str,
+) -> tuple[SessionContext, list[ChatMessage], ReservedMessagePair]:
     try:
         context = await store.load_session_context(owner_id, session_id)
         history_messages = list(context.session.messages)
         pair = await store.reserve_message_pair(
             owner_id,
             session_id,
-            user_content=payload.content,
+            user_content=content,
             idempotency_key=idempotency_key,
         )
     except NotFoundError:
@@ -209,66 +240,109 @@ async def session_chat_stream(
     except DuplicateStreamInProgressError:
         raise HTTPException(status_code=409, detail="Stream already in progress.")
 
+    return context, history_messages, pair
+
+
+def _replayed_stream_response(pair: ReservedMessagePair) -> StreamingResponse | None:
+    if not pair.replayed:
+        return None
+
     if pair.replayed and pair.operation_status == MessageOperationStatus.IN_PROGRESS:
-        async def duplicate_gen():
-            yield _sse(
-                {
-                    "type": "duplicate_in_progress",
-                    "user_message_id": pair.user_message.id,
-                    "assistant_message_id": pair.assistant_message.id,
-                    "status": pair.assistant_message.status,
-                }
-            )
-            yield _sse({"type": "done", "status": "duplicate_in_progress"})
+        return _streaming_response(_duplicate_in_progress_stream(pair))
 
-        return StreamingResponse(
-            duplicate_gen(),
-            media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    return _streaming_response(_terminal_replay_stream(pair))
+
+
+async def _duplicate_in_progress_stream(
+    pair: ReservedMessagePair,
+) -> AsyncIterator[str]:
+    yield _sse(
+        {
+            "type": "duplicate_in_progress",
+            "user_message_id": pair.user_message.id,
+            "assistant_message_id": pair.assistant_message.id,
+            "status": pair.assistant_message.status,
+        }
+    )
+    yield _sse({"type": "done", "status": "duplicate_in_progress"})
+
+
+async def _terminal_replay_stream(pair: ReservedMessagePair) -> AsyncIterator[str]:
+    yield _sse(
+        {
+            "type": "ids",
+            "user_message_id": pair.user_message.id,
+            "assistant_message_id": pair.assistant_message.id,
+        }
+    )
+    if pair.assistant_message.content:
+        yield _sse({"type": "text", "delta": pair.assistant_message.content})
+    yield _sse({"type": "done", "status": pair.assistant_message.status})
+
+
+async def _new_session_chat_stream(
+    *,
+    request: Request,
+    store: ConversationHistoryStore,
+    owner_id: str,
+    session_id: str,
+    context: SessionContext,
+    history_messages: list[ChatMessage],
+    pair: ReservedMessagePair,
+    content: str,
+) -> AsyncIterator[str]:
+    assistant_content: list[str] = []
+    yield _sse(
+        {
+            "type": "ids",
+            "user_message_id": pair.user_message.id,
+            "assistant_message_id": pair.assistant_message.id,
+        }
+    )
+
+    try:
+        async for event in _stream_session_chat_events(
+            request=request,
+            context=context,
+            content=content,
+            history_messages=history_messages,
+        ):
+            if event.get("type") == "text":
+                assistant_content.append(str(event.get("delta", "")))
+            yield _sse(event)
+
+        await store.finalize_assistant_message(
+            owner_id,
+            session_id,
+            pair.assistant_message.id,
+            content="".join(assistant_content),
+            status=ChatMessageStatus.CONFIRMED,
         )
-
-    async def gen():
-        assistant_content: list[str] = []
-        yield _sse(
-            {
-                "type": "ids",
-                "user_message_id": pair.user_message.id,
-                "assistant_message_id": pair.assistant_message.id,
-            }
+        yield _sse({"type": "done", "status": ChatMessageStatus.CONFIRMED})
+    except asyncio.CancelledError:
+        await store.finalize_assistant_message(
+            owner_id,
+            session_id,
+            pair.assistant_message.id,
+            content="".join(assistant_content),
+            status=ChatMessageStatus.CANCELLED,
         )
+        raise
+    except Exception as exc:
+        await store.finalize_assistant_message(
+            owner_id,
+            session_id,
+            pair.assistant_message.id,
+            content="".join(assistant_content),
+            status=ChatMessageStatus.FAILED,
+        )
+        yield _sse({"type": "error", "message": str(exc)})
+        yield _sse({"type": "done", "status": ChatMessageStatus.FAILED})
 
-        try:
-            async for event in _stream_session_chat_events(
-                request=request,
-                context=context,
-                content=payload.content,
-                history_messages=history_messages,
-            ):
-                if event.get("type") == "text":
-                    assistant_content.append(str(event.get("delta", "")))
-                yield _sse(event)
 
-            await store.finalize_assistant_message(
-                owner_id,
-                session_id,
-                pair.assistant_message.id,
-                content="".join(assistant_content),
-                status=ChatMessageStatus.CONFIRMED,
-            )
-            yield _sse({"type": "done", "status": ChatMessageStatus.CONFIRMED})
-        except Exception as exc:
-            await store.finalize_assistant_message(
-                owner_id,
-                session_id,
-                pair.assistant_message.id,
-                content="".join(assistant_content),
-                status=ChatMessageStatus.FAILED,
-            )
-            yield _sse({"type": "error", "message": str(exc)})
-            yield _sse({"type": "done", "status": ChatMessageStatus.FAILED})
-
+def _streaming_response(stream: AsyncIterator[str]) -> StreamingResponse:
     return StreamingResponse(
-        gen(),
+        stream,
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
@@ -417,64 +491,11 @@ def _serialize_agent_event(event: Any) -> dict[str, Any] | None:
             return None
 
 
-def _birth_info_from_payload(payload: BirthInfoPayload) -> BirthInfo:
-    return BirthInfo(
-        calendar=payload.calendar,
-        year=payload.year,
-        month=payload.month,
-        day=payload.day,
-        hour=payload.hour,
-        gender=payload.gender,
-    )
-
-
 def _chart_profile_payload(profile: ChartProfile) -> ChartProfilePayload:
     return ChartProfilePayload(
         id=profile.id,
         display_name=profile.display_name,
-        birth_info=BirthInfoPayload(
-            calendar=profile.birth_info.calendar,
-            year=profile.birth_info.year,
-            month=profile.birth_info.month,
-            day=profile.birth_info.day,
-            hour=profile.birth_info.hour,
-            gender=profile.birth_info.gender,
-        ),
+        birth_info=profile.birth_info,
         created_at=profile.created_at,
         updated_at=profile.updated_at,
-    )
-
-
-def _chat_session_payload(session: ChatSession) -> ChatSessionPayload:
-    return ChatSessionPayload(
-        id=session.id,
-        chart_profile_id=session.chart_profile_id,
-        title=session.title,
-        messages=[_chat_message_payload(message) for message in session.messages],
-        created_at=session.created_at,
-        updated_at=session.updated_at,
-    )
-
-
-def _chat_message_payload(message: ChatMessage) -> ChatMessagePayload:
-    return ChatMessagePayload(
-        id=message.id,
-        role=message.role,
-        content=message.content,
-        status=message.status,
-        created_at=message.created_at,
-        updated_at=message.updated_at,
-    )
-
-
-def _chat_session_summary_payload(
-    session: ChatSessionSummary,
-) -> ChatSessionSummaryPayload:
-    return ChatSessionSummaryPayload(
-        id=session.id,
-        chart_profile_id=session.chart_profile_id,
-        title=session.title,
-        message_count=session.message_count,
-        created_at=session.created_at,
-        updated_at=session.updated_at,
     )

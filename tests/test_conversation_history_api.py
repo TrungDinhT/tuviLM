@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import os
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 import httpx
@@ -193,6 +193,75 @@ async def test_chart_profile_endpoints_use_store(api_client, fake_store) -> None
     assert [profile["display_name"] for profile in list_response.json()["chart_profiles"]] == [
         "Me"
     ]
+
+
+async def test_create_chart_profile_rejects_blank_owner_id(
+    api_client,
+    fake_store,
+) -> None:
+    response = await api_client.post(
+        "/api/v1/chart-profiles",
+        headers={
+            "X-Anonymous-Owner-Id": "",
+            "Idempotency-Key": "create-profile-1",
+        },
+        json={
+            "display_name": "Me",
+            "birth_info": {
+                "calendar": "solar",
+                "year": 1996,
+                "month": 4,
+                "day": 15,
+                "hour": 10,
+                "gender": "M",
+            },
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Anonymous owner id is required."
+
+
+async def test_mutating_routes_reject_blank_idempotency_key(
+    api_client,
+    fake_store,
+) -> None:
+    profile = await _create_profile(fake_store)
+    session = await _create_session(fake_store, profile.id)
+    headers = {
+        "X-Anonymous-Owner-Id": "anon_owner",
+        "Idempotency-Key": "",
+    }
+
+    profile_response = await api_client.post(
+        "/api/v1/chart-profiles",
+        headers=headers,
+        json={
+            "display_name": "Me",
+            "birth_info": {
+                "calendar": "solar",
+                "year": 1996,
+                "month": 4,
+                "day": 15,
+                "hour": 10,
+                "gender": "M",
+            },
+        },
+    )
+    session_response = await api_client.post(
+        f"/api/v1/chart-profiles/{profile.id}/sessions",
+        headers=headers,
+        json={"title": "Career"},
+    )
+    stream_response = await api_client.post(
+        f"/api/v1/sessions/{session.id}/chat/stream",
+        headers=headers,
+        json={"content": "Tell me about career."},
+    )
+
+    assert profile_response.status_code == 422
+    assert session_response.status_code == 422
+    assert stream_response.status_code == 422
 
 
 async def test_session_endpoints_use_store(api_client, fake_store) -> None:
@@ -392,6 +461,83 @@ async def test_reserve_message_pair_rejects_second_pending_stream(mongo_store) -
         )
 
 
+async def test_stale_pending_message_is_failed_and_allows_new_reservation(
+    mongo_store,
+) -> None:
+    profile = await _create_profile(mongo_store)
+    session = await _create_session(mongo_store, profile.id)
+    pair = await mongo_store.reserve_message_pair(
+        "anon_owner",
+        session.id,
+        user_content="Tell me about career.",
+        idempotency_key="message-1",
+    )
+    document = await ChatSessionDocument.find_one(
+        ChatSessionDocument.id == PydanticObjectId(session.id)
+    )
+    assert document is not None
+    stale_time = datetime.now(UTC) - timedelta(minutes=16)
+    document.messages[-1].updated_at = stale_time
+    document.message_operations[-1].updated_at = stale_time
+    await document.save()
+
+    cleaned_context = await mongo_store.load_session_context("anon_owner", session.id)
+    new_pair = await mongo_store.reserve_message_pair(
+        "anon_owner",
+        session.id,
+        user_content="Tell me about love.",
+        idempotency_key="message-2",
+    )
+    final_context = await mongo_store.load_session_context("anon_owner", session.id)
+    updated_document = await ChatSessionDocument.find_one(
+        ChatSessionDocument.id == PydanticObjectId(session.id)
+    )
+
+    assert cleaned_context.session.messages[-1].id == pair.assistant_message.id
+    assert cleaned_context.session.messages[-1].status == ChatMessageStatus.FAILED
+    assert new_pair.assistant_message.status == ChatMessageStatus.PENDING
+    assert len(final_context.session.messages) == 4
+    assert final_context.session.messages[-1].id == new_pair.assistant_message.id
+    assert final_context.session.messages[-1].status == ChatMessageStatus.PENDING
+    assert updated_document is not None
+    assert updated_document.message_operations[0].status == MessageOperationStatus.FAILED
+    assert updated_document.message_operations[1].status == MessageOperationStatus.IN_PROGRESS
+
+
+async def test_stale_pending_message_is_cleaned_before_reservation(
+    mongo_store,
+) -> None:
+    profile = await _create_profile(mongo_store)
+    session = await _create_session(mongo_store, profile.id)
+    old_pair = await mongo_store.reserve_message_pair(
+        "anon_owner",
+        session.id,
+        user_content="Tell me about career.",
+        idempotency_key="message-1",
+    )
+    document = await ChatSessionDocument.find_one(
+        ChatSessionDocument.id == PydanticObjectId(session.id)
+    )
+    assert document is not None
+    stale_time = datetime.now(UTC) - timedelta(minutes=16)
+    document.messages[-1].updated_at = stale_time
+    document.message_operations[-1].updated_at = stale_time
+    await document.save()
+
+    new_pair = await mongo_store.reserve_message_pair(
+        "anon_owner",
+        session.id,
+        user_content="Tell me about love.",
+        idempotency_key="message-2",
+    )
+    context = await mongo_store.load_session_context("anon_owner", session.id)
+
+    assert context.session.messages[1].id == old_pair.assistant_message.id
+    assert context.session.messages[1].status == ChatMessageStatus.FAILED
+    assert context.session.messages[-1].id == new_pair.assistant_message.id
+    assert context.session.messages[-1].status == ChatMessageStatus.PENDING
+
+
 async def test_reserve_message_pair_concurrent_same_key_replays_one_pair(
     mongo_store,
 ) -> None:
@@ -499,6 +645,33 @@ async def test_session_chat_stream_persists_confirmed_assistant_message(
     assert context.session.messages[-1].status == ChatMessageStatus.CONFIRMED
 
 
+async def test_session_chat_stream_cancellation_marks_assistant_cancelled(
+    api_client,
+    fake_store,
+) -> None:
+    async def cancelled_streamer(*args, **kwargs):
+        yield {"type": "text", "delta": "Partial answer."}
+        raise asyncio.CancelledError
+
+    app.state.session_chat_streamer = cancelled_streamer
+    profile = await _create_profile(fake_store)
+    session = await _create_session(fake_store, profile.id)
+
+    with pytest.raises((asyncio.CancelledError, AssertionError)):
+        await api_client.post(
+            f"/api/v1/sessions/{session.id}/chat/stream",
+            headers={
+                "X-Anonymous-Owner-Id": "anon_owner",
+                "Idempotency-Key": "message-1",
+            },
+            json={"content": "Tell me about career."},
+        )
+    context = await fake_store.load_session_context("anon_owner", session.id)
+
+    assert context.session.messages[-1].content == "Partial answer."
+    assert context.session.messages[-1].status == ChatMessageStatus.CANCELLED
+
+
 async def test_session_chat_stream_default_runner_reconstructs_agent_context(
     api_client,
     fake_store,
@@ -592,6 +765,41 @@ async def test_session_chat_stream_duplicate_pending_request_does_not_start_gene
     assert '"type": "duplicate_in_progress"' in response.text
     assert pair.assistant_message.id in response.text
     assert '"type": "done", "status": "duplicate_in_progress"' in response.text
+
+
+async def test_session_chat_stream_completed_replay_does_not_start_generation(
+    api_client,
+    fake_store,
+) -> None:
+    async def fail_if_called(*args, **kwargs):
+        raise AssertionError("completed replay should not start generation")
+        yield {}
+
+    app.state.session_chat_streamer = fail_if_called
+    profile = await _create_profile(fake_store)
+    session = await _create_session(fake_store, profile.id)
+    pair = _reserved_pair(
+        user_content="Tell me about career.",
+        replayed=True,
+        operation_status=MessageOperationStatus.COMPLETED,
+    )
+    pair.assistant_message.content = "Career looks strong."
+    pair.assistant_message.status = ChatMessageStatus.CONFIRMED
+    fake_store.reserve_result = pair
+
+    response = await api_client.post(
+        f"/api/v1/sessions/{session.id}/chat/stream",
+        headers={
+            "X-Anonymous-Owner-Id": "anon_owner",
+            "Idempotency-Key": "message-1",
+        },
+        json={"content": "Tell me about career."},
+    )
+
+    assert response.status_code == 200
+    assert '"type": "ids"' in response.text
+    assert '"type": "text", "delta": "Career looks strong."' in response.text
+    assert '"type": "done", "status": "confirmed"' in response.text
 
 
 async def test_create_chart_profile_endpoint_returns_conflict_for_idempotency_mismatch(

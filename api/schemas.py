@@ -1,28 +1,18 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from api.chat.models import ChatMessageStatus, ChatRole
+from api.chat.models import BirthInfo, ChatSession, ChatSessionSummary
 
 
-class BirthInfoPayload(BaseModel):
-    calendar: Literal["solar"] = "solar"
-    month: int = Field(ge=1, le=12)
-    year: int = Field(ge=1900, le=2099)
-    day: int = Field(ge=1, le=31)
-    hour: int = Field(ge=0, le=23)
-    gender: Literal["M", "F"]
-
-
-class BuildLasoRequest(BirthInfoPayload):
+class BuildLasoRequest(BirthInfo):
     pass
 
 
 class BuildSaoLuuRequest(BaseModel):
-    observation_time: BirthInfoPayload
+    observation_time: BirthInfo
 
 
 class CreateAnonymousResponse(BaseModel):
@@ -31,13 +21,13 @@ class CreateAnonymousResponse(BaseModel):
 
 class CreateChartProfileRequest(BaseModel):
     display_name: str
-    birth_info: BirthInfoPayload
+    birth_info: BirthInfo
 
 
 class ChartProfilePayload(BaseModel):
     id: str
     display_name: str
-    birth_info: BirthInfoPayload
+    birth_info: BirthInfo
     created_at: datetime
     updated_at: datetime
 
@@ -54,43 +44,16 @@ class CreateSessionRequest(BaseModel):
     title: str | None = None
 
 
-class ChatMessagePayload(BaseModel):
-    id: str
-    role: ChatRole
-    content: str
-    status: ChatMessageStatus
-    created_at: datetime
-    updated_at: datetime
-
-
-class ChatSessionPayload(BaseModel):
-    id: str
-    chart_profile_id: str
-    title: str | None = None
-    messages: list[ChatMessagePayload]
-    created_at: datetime
-    updated_at: datetime
-
-
 class CreateSessionResponse(BaseModel):
-    session: ChatSessionPayload
-
-
-class ChatSessionSummaryPayload(BaseModel):
-    id: str
-    chart_profile_id: str
-    title: str | None = None
-    message_count: int
-    created_at: datetime
-    updated_at: datetime
+    session: ChatSession
 
 
 class ListSessionsResponse(BaseModel):
-    sessions: list[ChatSessionSummaryPayload]
+    sessions: list[ChatSessionSummary]
 
 
 class GetSessionResponse(BaseModel):
-    session: ChatSessionPayload
+    session: ChatSession
 
 
 class SessionChatStreamRequest(BaseModel):
