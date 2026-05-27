@@ -54,9 +54,7 @@ class ApiState:
 async def lifespan(app: FastAPI):
     settings = get_settings()
     conversation_history_store = await MongoConversationHistoryStore.connect(
-        mongodb_uri=settings.mongodb_uri,
-        database_name=settings.mongodb_db,
-        tz_aware=True,
+        settings.conversation_history_store,
     )
     agent_deps = TuviAgentDeps(
         agent=build_tuvi_agent(model="openai:gpt-5.4-mini"),

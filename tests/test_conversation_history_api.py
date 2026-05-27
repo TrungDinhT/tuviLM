@@ -43,8 +43,14 @@ from src.agent.deps import TuviAgentDeps
 
 pytestmark = pytest.mark.anyio
 
-MONGODB_URI = os.environ.get("MONGODB_URI", "mongodb://localhost:27017")
-MONGODB_TEST_DB = os.environ.get("MONGODB_TEST_DB", "tuvilm_test")
+MONGODB_URI = os.environ.get(
+    "CONVERSATION_HISTORY_STORE__URI",
+    "mongodb://localhost:27017",
+)
+MONGODB_TEST_DB = os.environ.get(
+    "CONVERSATION_HISTORY_STORE_TEST_DATABASE_NAME",
+    "tuvilm_test",
+)
 
 
 @pytest.fixture(scope="session")
@@ -74,11 +80,11 @@ async def mongo_store():
     database = client[MONGODB_TEST_DB]
     await database.drop_collection(ChartProfileDocument.Settings.name)
     await database.drop_collection(ChatSessionDocument.Settings.name)
-    store = await MongoConversationHistoryStore.connect(
-        mongodb_uri=MONGODB_URI,
+    store = MongoConversationHistoryStore(
+        mongo_client=client,
         database_name=MONGODB_TEST_DB,
-        tz_aware=True,
     )
+    await store._initialize_storage()
 
     previous_api_state = getattr(app.state, "api_state", None)
     app.state.api_state = ApiState(
@@ -96,7 +102,6 @@ async def mongo_store():
             del app.state.session_chat_streamer
         await database.drop_collection(ChartProfileDocument.Settings.name)
         await database.drop_collection(ChatSessionDocument.Settings.name)
-        await client.close()
         await store.close()
 
 

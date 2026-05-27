@@ -40,6 +40,7 @@ from api.chat.storage.mappers import (
     chat_session_from_document,
     chat_session_summary_from_document,
 )
+from api.chat.storage.settings import MongoConversationHistorySettings
 
 
 class MongoConversationHistoryStore:
@@ -55,21 +56,21 @@ class MongoConversationHistoryStore:
     @classmethod
     async def connect(
         cls,
-        *,
-        database_name: str,
-        mongodb_uri: str,
-        **client_kwargs,
+        settings: MongoConversationHistorySettings,
     ) -> Self:
-        mongo_client = AsyncMongoClient(mongodb_uri, **client_kwargs)
+        mongo_client = AsyncMongoClient(settings.uri, tz_aware=settings.tz_aware)
         store = cls(
             mongo_client=mongo_client,
-            database_name=database_name,
+            database_name=settings.database_name,
         )
+        await store._initialize_storage()
+        return store
+
+    async def _initialize_storage(self) -> None:
         await init_beanie(
-            database=mongo_client[database_name],
+            database=self._mongo_client[self._database_name],
             document_models=[ChartProfileDocument, ChatSessionDocument],
         )
-        return store
 
     async def close(self) -> None:
         await self._mongo_client.close()
