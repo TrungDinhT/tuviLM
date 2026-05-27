@@ -320,7 +320,7 @@ opposite, or giap relationships.
 
 ## Worked Examples
 
-### Khoc, Hu, Ty, Ngo, Tien Ban Hau Phu
+### Khốc, Hư, Tý, Ngọ, tiền bần hậu phú
 
 Source:
 
@@ -361,7 +361,7 @@ Reasoning:
 - `Khoc, Hu toa thu` means both stars are in `menh`.
 - `dong cung` becomes `stars_meeting` with `scope: dong_cung`.
 
-### Liem Trinh Mao Dau Gia Sat
+### Đồng, Nguyệt hãm cung gia Sát
 
 Source:
 
