@@ -6,13 +6,12 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
 
-from beanie import init_beanie
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from api._parse import to_cung_payload_map
+from api.chat.contracts import ConversationHistoryStore
 from api.chat.routes import router as chat_router
-from api.chat.storage.documents import ChartProfileDocument, ChatSessionDocument
 from api.chat.storage.store import MongoConversationHistoryStore
 from api.schemas import (
     BuildLasoRequest,
@@ -21,7 +20,6 @@ from api.schemas import (
     BuildSaoLuuResponse,
 )
 from api.settings import get_settings
-from pymongo import AsyncMongoClient
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
 from src.refactored.la_so import LaSo
@@ -39,6 +37,7 @@ logging.basicConfig(
 @dataclass(slots=True)
 class ApiState:
     agent_deps: TuviAgentDeps
+    conversation_history_store: ConversationHistoryStore
 
     @property
     def has_la_so(self) -> bool:
@@ -54,22 +53,23 @@ class ApiState:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
-    mongo_client = AsyncMongoClient(settings.mongodb_uri, tz_aware=True)
-    await init_beanie(
-        database=mongo_client[settings.mongodb_db],
-        document_models=[ChartProfileDocument, ChatSessionDocument],
+    conversation_history_store = await MongoConversationHistoryStore.connect(
+        mongodb_uri=settings.mongodb_uri,
+        database_name=settings.mongodb_db,
+        tz_aware=True,
     )
-    agent_deps = TuviAgentDeps(book_root="./data/tuvitanbien_chunking_compact/part_2")
-    agent_deps.agent = build_tuvi_agent(model="openai:gpt-5.4-mini")
+    agent_deps = TuviAgentDeps(
+        agent=build_tuvi_agent(model="openai:gpt-5.4-mini"),
+        book_root="./data/tuvitanbien_chunking_compact/part_2",
+    )
     app.state.api_state = ApiState(
         agent_deps=agent_deps,
+        conversation_history_store=conversation_history_store,
     )
-    app.state.mongo_client = mongo_client
-    app.state.conversation_history_store = MongoConversationHistoryStore()
     try:
         yield
     finally:
-        await mongo_client.close()
+        await conversation_history_store.close()
 
 
 app = FastAPI(title="TuviLM API", version="0.1.0", lifespan=lifespan)

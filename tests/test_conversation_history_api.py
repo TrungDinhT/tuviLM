@@ -2,12 +2,10 @@ from __future__ import annotations
 
 import os
 from datetime import UTC, datetime
-from types import SimpleNamespace
 from uuid import uuid4
 
 import httpx
 import pytest
-from beanie import init_beanie
 from pymongo import AsyncMongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from pydantic_ai import PartStartEvent, TextPart
@@ -76,42 +74,56 @@ async def mongo_store():
     database = client[MONGODB_TEST_DB]
     await database.drop_collection(ChartProfileDocument.Settings.name)
     await database.drop_collection(ChatSessionDocument.Settings.name)
-    await init_beanie(
-        database=database,
-        document_models=[ChartProfileDocument, ChatSessionDocument],
+    store = await MongoConversationHistoryStore.connect(
+        mongodb_uri=MONGODB_URI,
+        database_name=MONGODB_TEST_DB,
+        tz_aware=True,
     )
 
-    store = MongoConversationHistoryStore()
-    previous_store = getattr(app.state, "conversation_history_store", None)
-    app.state.conversation_history_store = store
+    previous_api_state = getattr(app.state, "api_state", None)
+    app.state.api_state = ApiState(
+        agent_deps=getattr(previous_api_state, "agent_deps", TuviAgentDeps(book_root="")),
+        conversation_history_store=store,
+    )
     try:
         yield store
     finally:
-        if previous_store is not None:
-            app.state.conversation_history_store = previous_store
+        if previous_api_state is not None:
+            app.state.api_state = previous_api_state
+        elif hasattr(app.state, "api_state"):
+            del app.state.api_state
         if hasattr(app.state, "session_chat_streamer"):
             del app.state.session_chat_streamer
         await database.drop_collection(ChartProfileDocument.Settings.name)
         await database.drop_collection(ChatSessionDocument.Settings.name)
         await client.close()
+        await store.close()
 
 
 @pytest.fixture()
 async def fake_store():
     store = FakeConversationHistoryStore()
-    previous_store = getattr(app.state, "conversation_history_store", None)
-    app.state.conversation_history_store = store
+    previous_api_state = getattr(app.state, "api_state", None)
+    app.state.api_state = ApiState(
+        agent_deps=getattr(previous_api_state, "agent_deps", TuviAgentDeps(book_root="")),
+        conversation_history_store=store,
+    )
     try:
         yield store
     finally:
-        if previous_store is not None:
-            app.state.conversation_history_store = previous_store
+        if previous_api_state is not None:
+            app.state.api_state = previous_api_state
+        elif hasattr(app.state, "api_state"):
+            del app.state.api_state
         if hasattr(app.state, "session_chat_streamer"):
             del app.state.session_chat_streamer
 
 
 async def test_build_laso_accepts_birth_info_day_field(api_client) -> None:
-    app.state.api_state = ApiState(agent_deps=TuviAgentDeps(book_root=""))
+    app.state.api_state = ApiState(
+        agent_deps=TuviAgentDeps(book_root=""),
+        conversation_history_store=FakeConversationHistoryStore(),
+    )
 
     response = await api_client.post(
         "/api/v1/laso/build",
@@ -409,8 +421,9 @@ async def test_session_chat_stream_default_runner_reconstructs_agent_context(
             return FakeStream()
 
     fake_agent = FakeAgent()
-    app.state.api_state = SimpleNamespace(
-        agent_deps=TuviAgentDeps(agent=fake_agent, book_root="")
+    app.state.api_state = ApiState(
+        agent_deps=TuviAgentDeps(agent=fake_agent, book_root=""),
+        conversation_history_store=fake_store,
     )
     profile = await _create_profile(fake_store)
     session = fake_store.add_session(

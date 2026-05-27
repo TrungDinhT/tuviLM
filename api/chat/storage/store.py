@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from hashlib import sha256
+from typing import Self
 from uuid import uuid4
 
-from beanie import PydanticObjectId
+from beanie import PydanticObjectId, init_beanie
 from pydantic import BaseModel
+from pymongo import AsyncMongoClient
 from pymongo.errors import DuplicateKeyError
 
 from api.chat.contracts import (
@@ -41,6 +43,37 @@ from api.chat.storage.mappers import (
 
 
 class MongoConversationHistoryStore:
+    def __init__(
+        self,
+        *,
+        mongo_client: AsyncMongoClient,
+        database_name: str,
+    ) -> None:
+        self._mongo_client = mongo_client
+        self._database_name = database_name
+
+    @classmethod
+    async def connect(
+        cls,
+        *,
+        database_name: str,
+        mongodb_uri: str,
+        **client_kwargs,
+    ) -> Self:
+        mongo_client = AsyncMongoClient(mongodb_uri, **client_kwargs)
+        store = cls(
+            mongo_client=mongo_client,
+            database_name=database_name,
+        )
+        await init_beanie(
+            database=mongo_client[database_name],
+            document_models=[ChartProfileDocument, ChatSessionDocument],
+        )
+        return store
+
+    async def close(self) -> None:
+        await self._mongo_client.close()
+
     async def create_chart_profile(
         self,
         owner_id: str | None,

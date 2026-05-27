@@ -1,1 +1,1 @@
-"""MongoDB adapter for conversation history."""
+"""Implementation for conversation history."""

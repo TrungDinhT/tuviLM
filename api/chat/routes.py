@@ -275,7 +275,7 @@ async def session_chat_stream(
 
 
 def _get_store(request: Request) -> ConversationHistoryStore:
-    return request.app.state.conversation_history_store
+    return request.app.state.api_state.conversation_history_store
 
 
 def _sse(event: dict[str, Any]) -> str:
