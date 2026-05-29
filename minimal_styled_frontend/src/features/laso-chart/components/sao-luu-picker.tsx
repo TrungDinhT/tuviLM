@@ -13,25 +13,34 @@ export function SaoLuuPicker() {
   const lastInput = useChartStore((s) => s.lastInput);
 
   const [year, setYear] = useState<string>(() => new Date().getFullYear().toString());
-  const [error, setError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const mutation = useBuildSaoLuu();
   const { mutate } = mutation;
 
+  const parsed = Number(year);
+  const validationError =
+    !Number.isInteger(parsed) || parsed < 1900 || parsed > 2099
+      ? year === ''
+        ? null
+        : 'Vui lòng nhập năm hợp lệ (1900–2099).'
+      : null;
+
+  const displayError = validationError || apiError;
+
   useEffect(() => {
-    const parsed = Number(year);
-    if (!Number.isInteger(parsed) || parsed < 1900 || parsed > 2099) {
-      setError(year === '' ? null : 'Vui lòng nhập năm hợp lệ (1900–2099).');
+    const parsedYear = Number(year);
+    if (!Number.isInteger(parsedYear) || parsedYear < 1900 || parsedYear > 2099) {
       return;
     }
-    setError(null);
     const handle = setTimeout(() => {
+      setApiError(null);
       mutate(
         {
           observation_time: {
             date: 1,
             month: 1,
-            year: parsed,
+            year: parsedYear,
             hour: 0,
             gender: lastInput?.gender ?? 'M',
           },
@@ -39,7 +48,7 @@ export function SaoLuuPicker() {
         {
           onSuccess: (res) => setOverlay(res),
           onError: (err) =>
-            setError(isApiError(err) ? apiErrorMessage(err) : 'Đã có lỗi xảy ra.'),
+            setApiError(isApiError(err) ? apiErrorMessage(err) : 'Đã có lỗi xảy ra.'),
         },
       );
     }, 300);
@@ -60,12 +69,15 @@ export function SaoLuuPicker() {
               min={1800}
               max={2200}
               value={year}
-              onChange={(e) => setYear(e.target.value)}
+              onChange={(e) => {
+                setYear(e.target.value);
+                setApiError(null);
+              }}
             />
           </Field>
         </FieldGroup>
 
-        {error && <div className="mt-3 text-xs text-destructive">{error}</div>}
+        {displayError && <div className="mt-3 text-xs text-destructive">{displayError}</div>}
       </CardContent>
     </Card>
   );
