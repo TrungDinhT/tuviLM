@@ -2,21 +2,25 @@
   {
     "id": "hoa_loc",
     "name": "Hóa Lộc",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "hoa_quyen",
     "name": "Hóa Quyền",
-    "ngu_hanh": "Mộc"
+    "ngu_hanh": "Mộc",
+    "sao_type": ["Cát"]
   },
   {
     "id": "hoa_khoa",
     "name": "Hóa Khoa",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "hoa_ky",
     "name": "Hóa Kỵ",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Hung"]
   }
 ]

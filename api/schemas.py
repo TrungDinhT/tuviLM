@@ -25,6 +25,7 @@ class StarPayload(BaseModel):
     name: str
     display: str
     element: str
+    sao_type: list[str] = Field(default_factory=list)
 
 
 # TODO : Need to adapt with new view
@@ -33,7 +34,7 @@ class CungPayload(BaseModel):
     role: str | None = None
     chinh_tinh: list[str]
     phu_tinh: list[StarPayload]
-    tuhoa: list[str]
+    tuhoa: list[StarPayload]
     trang_sinh: str | None = None
     is_tuan: bool = False
     is_triet: bool = False

@@ -24,6 +24,7 @@ class Status(StrEnum):
 
 class SaoType(StrEnum):
     CAT = "Cát"
+    HUNG = "Hung"
     SAT = "Sát"
     PHUC = "Phúc"
     VAN = "Văn"
@@ -39,6 +40,7 @@ class ChinhPhuTinh(ComponentBase):
 
 class TuHoa(ComponentBase):
     ngu_hanh: NguHanh
+    sao_type: list[SaoType] = Field(default_factory=list)
 
 
 class VongTrangSinh(ComponentBase):

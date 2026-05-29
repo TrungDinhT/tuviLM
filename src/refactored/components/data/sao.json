@@ -2,57 +2,68 @@
   {
     "id": "thien_tai",
     "name": "Thiên Tài",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_tho",
     "name": "Thiên Thọ",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_su",
     "name": "Thiên Sứ",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Hung"]
   },
   {
     "id": "thien_thuong",
     "name": "Thiên Thương",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Hung"]
   },
   {
     "id": "ta_phu",
     "name": "Tả Phù",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "huu_bat",
     "name": "Hữu Bật",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "tam_thai",
     "name": "Tam Thai",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "bat_toa",
     "name": "Bát Toạ",
-    "ngu_hanh": "Mộc"
+    "ngu_hanh": "Mộc",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_giai",
     "name": "Thiên Giải",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "dia_giai",
     "name": "Địa Giải",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_hinh",
     "name": "Thiên Hình",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "thien_dieu",
@@ -62,152 +73,182 @@
   {
     "id": "thien_y",
     "name": "Thiên Y",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_khoi",
     "name": "Thiên Khôi",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_viet",
     "name": "Thiên Việt",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "luu_ha",
     "name": "Lưu Hà",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Hung"]
   },
   {
     "id": "thien_tru",
     "name": "Thiên Trù",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_quan",
     "name": "Thiên Quan",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_phuc",
     "name": "Thiên Phúc",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "co_than",
     "name": "Cô Thần",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Hung"]
   },
   {
     "id": "qua_tu",
     "name": "Quả Tú",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Hung"]
   },
   {
     "id": "thien_hi",
     "name": "Thiên Hỉ",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "hong_loan",
     "name": "Hồng Loan",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "giai_than",
     "name": "Giải Thần",
-    "ngu_hanh": "Mộc"
+    "ngu_hanh": "Mộc",
+    "sao_type": ["Cát"]
   },
   {
     "id": "phuong_cac",
     "name": "Phượng Các",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_ma",
     "name": "Thiên Mã",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "pha_toai",
     "name": "Phá Toái",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "hoa_cai",
     "name": "Hoa Cái",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Cát"]
   },
   {
     "id": "dao_hoa",
     "name": "Đào Hoa",
-    "ngu_hanh": "Mộc"
+    "ngu_hanh": "Mộc",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_khoc",
     "name": "Thiên Khốc",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Hung"]
   },
   {
     "id": "kiep_sat",
     "name": "Kiếp Sát",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "dia_khong",
     "name": "Địa Không",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "dia_kiep",
     "name": "Địa Kiếp",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "van_xuong",
     "name": "Văn Xương",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Cát"]
   },
   {
     "id": "van_khuc",
     "name": "Văn Khúc",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "an_quang",
     "name": "Ân Quang",
-    "ngu_hanh": "Mộc"
+    "ngu_hanh": "Mộc",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_quy",
     "name": "Thiên Quý",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thai_phu",
     "name": "Thai Phụ",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Cát"]
   },
   {
     "id": "phong_cao",
     "name": "Phong Cáo",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "dau_quan",
     "name": "Đẩu Quân",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "hoa_tinh",
     "name": "Hỏa Tinh",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "linh_tinh",
     "name": "Linh Tinh",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "tu_vi",
@@ -296,17 +337,20 @@
   {
     "id": "loc_ton",
     "name": "Lộc Tồn",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "bac_si",
     "name": "Bác Sĩ",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "luc_si",
     "name": "Lực Sĩ",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "kinh_duong",
@@ -316,167 +360,200 @@
   {
     "id": "thanh_long",
     "name": "Thanh Long",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "tieu_hao",
     "name": "Tiểu Hao",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "ln_van_tinh",
     "name": "LN Văn Tinh",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "tuong_quan",
     "name": "Tướng Quân",
-    "ngu_hanh": "Mộc"
+    "ngu_hanh": "Mộc",
+    "sao_type": ["Hung"]
   },
   {
     "id": "tau_thu",
     "name": "Tấu Thư",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Cát"]
   },
   {
     "id": "duong_phu",
     "name": "Đường Phù",
-    "ngu_hanh": "Mộc"
+    "ngu_hanh": "Mộc",
+    "sao_type": ["Cát"]
   },
   {
     "id": "phi_liem",
     "name": "Phi Liêm",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "hy_than",
     "name": "Hỷ Thần",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "benh_phu",
     "name": "Bệnh Phù",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Hung"]
   },
   {
     "id": "quoc_an",
     "name": "Quốc Ấn",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "dai_hao",
     "name": "Đại Hao",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "phuc_binh",
     "name": "Phục Binh",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "da_la",
     "name": "Đà La",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Hung"]
   },
   {
     "id": "quan_phur",
     "name": "Quan Phủ",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "thai_tue",
     "name": "Thái Tuế",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "thieu_duong",
     "name": "Thiếu Dương",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_khong",
     "name": "Thiên Không",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "tang_mon",
     "name": "Tang Môn",
-    "ngu_hanh": "Mộc"
+    "ngu_hanh": "Mộc",
+    "sao_type": ["Hung"]
   },
   {
     "id": "thieu_am",
     "name": "Thiếu Âm",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "quan_phuf",
     "name": "Quan Phù",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "long_tri",
     "name": "Long Trì",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "tu_phu",
     "name": "Tử Phù",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Hung"]
   },
   {
     "id": "nguyet_duc",
     "name": "Nguyệt Đức",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "tue_pha",
     "name": "Tuế Phá",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "thien_hu",
     "name": "Thiên Hư",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Hung"]
   },
   {
     "id": "long_duc",
     "name": "Long Đức",
-    "ngu_hanh": "Thủy"
+    "ngu_hanh": "Thủy",
+    "sao_type": ["Cát"]
   },
   {
     "id": "bach_ho",
     "name": "Bạch Hổ",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Hung"]
   },
   {
     "id": "sao_phuc_duc",
     "name": "Phúc Đức",
-    "ngu_hanh": "Thổ"
+    "ngu_hanh": "Thổ",
+    "sao_type": ["Cát"]
   },
   {
     "id": "thien_duc",
     "name": "Thiên Đức",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Cát"]
   },
   {
     "id": "dieu_khach",
     "name": "Điếu Khách",
-    "ngu_hanh": "Hỏa"
+    "ngu_hanh": "Hỏa",
+    "sao_type": ["Hung"]
   },
   {
     "id": "truc_phu",
     "name": "Trực Phù",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Hung"]
   },
   {
     "id": "thien_la",
     "name": "Thiên La",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Hung"]
   },
   {
     "id": "dia_vong",
     "name": "Địa Võng",
-    "ngu_hanh": "Kim"
+    "ngu_hanh": "Kim",
+    "sao_type": ["Hung"]
   },
   {
     "id": "trang_sinh",

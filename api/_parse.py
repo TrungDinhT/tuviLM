@@ -34,7 +34,7 @@ def to_cung_payload(cung_view: CungView) -> CungPayload:
     chinh_tinh: list[str] = []
     is_tuan: bool = False
     is_triet: bool = False
-    tu_hoa: list[str] = []
+    tu_hoa: list[StarPayload] = []
     trang_sinh: str
 
     for component_view in cung_view.components:
@@ -47,7 +47,14 @@ def to_cung_payload(cung_view: CungView) -> CungPayload:
             if component.is_chinh_tinh:
                 chinh_tinh.append(sao_str)
         elif isinstance(component, TuHoa):
-            tu_hoa.append(component.name)
+            tu_hoa.append(
+                StarPayload(
+                    name=component.name,
+                    display=component.name,
+                    element=component.ngu_hanh.value,
+                    sao_type=[st.value for st in component.sao_type],
+                )
+            )
         elif isinstance(component, VongTrangSinh):
             trang_sinh = component.name
         elif isinstance(component, TuanTriet):
@@ -87,4 +94,5 @@ def to_sao_payload(component: ChinhPhuTinh, cung_view: CungView) -> StarPayload:
         name=component.name,
         display=sao_str,
         element=component.ngu_hanh.value,
+        sao_type=[st.value for st in component.sao_type],
     )
