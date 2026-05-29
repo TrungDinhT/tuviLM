@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from api.chat.storage.settings import MongoConversationHistorySettings
@@ -14,7 +15,9 @@ class ApiSettings(BaseSettings):
         extra="ignore",
     )
 
-    conversation_history_store: MongoConversationHistorySettings
+    conversation_history_store: MongoConversationHistorySettings = Field(
+        default_factory=MongoConversationHistorySettings
+    )
 
 
 @lru_cache
