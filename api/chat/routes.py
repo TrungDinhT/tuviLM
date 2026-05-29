@@ -7,7 +7,7 @@ import secrets
 from datetime import datetime
 from typing import Any, AsyncIterator
 
-from fastapi import APIRouter, Header, HTTPException, Request, Response
+from fastapi import APIRouter, Header, Request, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import StreamingResponse
 from pydantic_ai import (
@@ -21,13 +21,7 @@ from pydantic_ai import (
 )
 from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, UserPromptPart
 
-from api.chat.contracts import (
-    ConversationHistoryStore,
-    DuplicateStreamInProgressError,
-    IdempotencyConflictError,
-    MissingOwnerIdError,
-)
-from api.chat.contracts import NotFoundError
+from api.chat.contracts import ConversationHistoryStore
 from api.chat.models import (
     BirthInfo,
     ChartProfile,
@@ -74,19 +68,14 @@ async def create_chart_profile(
     owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
     idempotency_key: str = Header(alias="Idempotency-Key", min_length=1),
 ) -> CreateChartProfileResponse:
-    try:
-        profile = await _get_store(request).create_chart_profile(
-            owner_id,
-            CreateChartProfileInput(
-                display_name=payload.display_name,
-                birth_info=payload.birth_info,
-            ),
-            idempotency_key=idempotency_key,
-        )
-    except IdempotencyConflictError:
-        raise HTTPException(status_code=409, detail="Idempotency key conflict.")
-    except MissingOwnerIdError:
-        raise HTTPException(status_code=400, detail="Anonymous owner id is required.")
+    profile = await _get_store(request).create_chart_profile(
+        owner_id,
+        CreateChartProfileInput(
+            display_name=payload.display_name,
+            birth_info=payload.birth_info,
+        ),
+        idempotency_key=idempotency_key,
+    )
     return CreateChartProfileResponse(chart_profile=_chart_profile_payload(profile))
 
 
@@ -107,10 +96,7 @@ async def delete_chart_profile(
     request: Request,
     owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
 ) -> Response:
-    try:
-        await _get_store(request).delete_chart_profile(owner_id, chart_profile_id)
-    except NotFoundError:
-        raise HTTPException(status_code=404, detail="Chart profile not found.")
+    await _get_store(request).delete_chart_profile(owner_id, chart_profile_id)
     return Response(status_code=204)
 
 
@@ -125,18 +111,12 @@ async def create_session(
     owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
     idempotency_key: str = Header(alias="Idempotency-Key", min_length=1),
 ) -> CreateSessionResponse:
-    try:
-        session = await _get_store(request).create_session(
-            owner_id,
-            chart_profile_id,
-            CreateSessionInput(title=payload.title),
-            idempotency_key=idempotency_key,
-        )
-    except NotFoundError:
-        raise HTTPException(status_code=404, detail="Chart profile not found.")
-    except IdempotencyConflictError:
-        raise HTTPException(status_code=409, detail="Idempotency key conflict.")
-
+    session = await _get_store(request).create_session(
+        owner_id,
+        chart_profile_id,
+        CreateSessionInput(title=payload.title),
+        idempotency_key=idempotency_key,
+    )
     return CreateSessionResponse(session=session)
 
 
@@ -149,11 +129,7 @@ async def list_sessions(
     request: Request,
     owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
 ) -> ListSessionsResponse:
-    try:
-        sessions = await _get_store(request).list_sessions(owner_id, chart_profile_id)
-    except NotFoundError:
-        raise HTTPException(status_code=404, detail="Chart profile not found.")
-
+    sessions = await _get_store(request).list_sessions(owner_id, chart_profile_id)
     return ListSessionsResponse(sessions=sessions)
 
 
@@ -163,11 +139,7 @@ async def get_session(
     request: Request,
     owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
 ) -> GetSessionResponse:
-    try:
-        context = await _get_store(request).load_session_context(owner_id, session_id)
-    except NotFoundError:
-        raise HTTPException(status_code=404, detail="Session not found.")
-
+    context = await _get_store(request).load_session_context(owner_id, session_id)
     return GetSessionResponse(session=context.session)
 
 
@@ -177,10 +149,7 @@ async def delete_session(
     request: Request,
     owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
 ) -> Response:
-    try:
-        await _get_store(request).delete_session(owner_id, session_id)
-    except NotFoundError:
-        raise HTTPException(status_code=404, detail="Session not found.")
+    await _get_store(request).delete_session(owner_id, session_id)
     return Response(status_code=204)
 
 
@@ -228,22 +197,14 @@ async def _reserve_session_chat_stream(
     content: str,
     idempotency_key: str,
 ) -> tuple[SessionContext, list[ChatMessage], ReservedMessagePair]:
-    try:
-        context = await store.load_session_context(owner_id, session_id)
-        history_messages = list(context.session.messages)
-        pair = await store.reserve_message_pair(
-            owner_id,
-            session_id,
-            user_content=content,
-            idempotency_key=idempotency_key,
-        )
-    except NotFoundError:
-        raise HTTPException(status_code=404, detail="Session not found.")
-    except IdempotencyConflictError:
-        raise HTTPException(status_code=409, detail="Idempotency key conflict.")
-    except DuplicateStreamInProgressError:
-        raise HTTPException(status_code=409, detail="Stream already in progress.")
-
+    context = await store.load_session_context(owner_id, session_id)
+    history_messages = list(context.session.messages)
+    pair = await store.reserve_message_pair(
+        owner_id,
+        session_id,
+        user_content=content,
+        idempotency_key=idempotency_key,
+    )
     return context, history_messages, pair
 
 
