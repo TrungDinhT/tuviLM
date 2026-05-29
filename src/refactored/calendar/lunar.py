@@ -134,21 +134,17 @@ def find_lunar_date(jd: int, ly: list[LunarDate]) -> LunarDate:
     )
 
 
-def get_lunar_date(day: int, month: int, year: int) -> LunarDate:
-    ly = get_year_info(year)
-
-    jd = jdn(day, month, year)
-
-    if jd < ly[0].julian_day_number:
-        ly = get_year_info(year - 1)
-
-    return find_lunar_date(jd, ly)
-
-
 def solar_to_lunar_date(time: dt.datetime) -> LunarDate:
     """Convert a solar datetime to the Vietnamese lunar date.
 
     The conversion uses precomputed lunar year data for years 1800-2199.
     Timezone and hour-boundary rules are handled by callers before conversion.
     """
-    return get_lunar_date(time.day, time.month, time.year)
+    ly = get_year_info(time.year)
+
+    jd = jdn(time.day, time.month, time.year)
+
+    if jd < ly[0].julian_day_number:
+        ly = get_year_info(time.year - 1)
+
+    return find_lunar_date(jd, ly)
