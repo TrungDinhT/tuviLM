@@ -201,9 +201,10 @@ async def session_chat_stream(
         idempotency_key=idempotency_key,
     )
 
-    replay_response = _replayed_stream_response(pair)
-    if replay_response is not None:
-        return replay_response
+    if pair.replayed:
+        if pair.operation_status == MessageOperationStatus.IN_PROGRESS:
+            return _streaming_response(_duplicate_in_progress_stream(pair))
+        return _streaming_response(_terminal_replay_stream(pair))
 
     return _streaming_response(
         _new_session_chat_stream(
@@ -244,16 +245,6 @@ async def _reserve_session_chat_stream(
         raise HTTPException(status_code=409, detail="Stream already in progress.")
 
     return context, history_messages, pair
-
-
-def _replayed_stream_response(pair: ReservedMessagePair) -> StreamingResponse | None:
-    if not pair.replayed:
-        return None
-
-    if pair.replayed and pair.operation_status == MessageOperationStatus.IN_PROGRESS:
-        return _streaming_response(_duplicate_in_progress_stream(pair))
-
-    return _streaming_response(_terminal_replay_stream(pair))
 
 
 async def _duplicate_in_progress_stream(
@@ -323,13 +314,33 @@ async def _new_session_chat_stream(
         )
         yield _sse({"type": "done", "status": ChatMessageStatus.CONFIRMED})
     except asyncio.CancelledError:
-        await store.finalize_assistant_message(
+        logger.info(
+            "Session chat stream cancelled: owner_id=%s session_id=%s assistant_message_id=%s",
             owner_id,
             session_id,
             pair.assistant_message.id,
-            content="".join(assistant_content),
-            status=ChatMessageStatus.CANCELLED,
         )
+        try:
+            await asyncio.wait_for(
+                asyncio.shield(
+                    store.finalize_assistant_message(
+                        owner_id,
+                        session_id,
+                        pair.assistant_message.id,
+                        content="".join(assistant_content),
+                        status=ChatMessageStatus.CANCELLED,
+                    )
+                ),
+                timeout=2,
+            )
+        except Exception:
+            logger.exception(
+                "Failed to finalize cancelled session chat stream: "
+                "owner_id=%s session_id=%s assistant_message_id=%s",
+                owner_id,
+                session_id,
+                pair.assistant_message.id,
+            )
         raise
     except Exception as exc:
         logger.exception(

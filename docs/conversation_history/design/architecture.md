@@ -197,6 +197,35 @@ Terminal states:
 - `failed`: model/server error, possibly with partial content
 - `cancelled`: client disconnected, possibly with partial content
 
+`cancelled` currently means the HTTP stream task was cancelled, usually because
+the client disconnected, refreshed, aborted the request, or the server shut down
+the in-flight stream. The backend should persist the cancelled status and
+re-raise the cancellation rather than trying to send a final cancelled SSE event,
+because the original client may no longer be connected.
+
+## Future: Explicit Stop Generation
+
+The frontend should eventually support a Stop Generating button. That should be
+modeled as an application-level cancellation flow, not as `asyncio.CancelledError`
+handling.
+
+Expected shape:
+
+- client starts a stream with `POST /sessions/{session_id}/chat/stream`
+- backend stores enough operation identity to target the active generation
+- client sends an explicit stop request for the active operation
+- backend propagates cancellation to the active agent/model run so token
+  generation actually stops, finalizes the assistant message as `cancelled`, and
+  keeps any useful partial content
+- if the stream is still connected, backend may send a terminal SSE event such
+  as `done` with status `cancelled`
+- if the stream is already gone, clients learn the final status by reloading the
+  session
+
+This keeps transport cancellation and intentional user cancellation distinct:
+transport cancellation is a request lifecycle event, while Stop Generating is a
+product action that can have its own API, UX, and persistence semantics.
+
 ## Retry And Idempotency
 
 Idempotency protects durable writes, not the SSE transport itself.
