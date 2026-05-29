@@ -8,6 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { abbreviateStarStatus } from '@/lib/utils';
 import { useChartStore } from '@/store/chart-store';
 
 interface Props {
@@ -53,7 +54,7 @@ export function CungDetailSheet({ open, onOpenChange }: Props) {
               ) : (
                 <ul className="flex flex-col gap-0.5">
                   {cung.chinh_tinh.map((s) => (
-                    <li key={s} className="font-medium">{s}</li>
+                    <li key={s} className="font-medium">{abbreviateStarStatus(s)}</li>
                   ))}
                 </ul>
               )}
@@ -65,7 +66,7 @@ export function CungDetailSheet({ open, onOpenChange }: Props) {
               ) : (
                 <ul className="flex flex-wrap gap-x-3 gap-y-1 text-muted-foreground">
                   {cung.phu_tinh.map((s) => (
-                    <li key={s.name}>{s.display}</li>
+                    <li key={s.name}>{abbreviateStarStatus(s.display)}</li>
                   ))}
                 </ul>
               )}
@@ -77,7 +78,7 @@ export function CungDetailSheet({ open, onOpenChange }: Props) {
               ) : (
                 <ul className="flex flex-wrap gap-1.5">
                   {cung.tuhoa.map((t) => (
-                    <Badge key={t} variant="secondary">{t}</Badge>
+                    <Badge key={t.name} variant="secondary">{t.display}</Badge>
                   ))}
                 </ul>
               )}
@@ -87,7 +88,7 @@ export function CungDetailSheet({ open, onOpenChange }: Props) {
               <Section title="Sao lưu">
                 <ul className="flex flex-wrap gap-x-3 gap-y-1 text-muted-foreground">
                   {saoLuu.map((s) => (
-                    <li key={s.name}>{s.display}</li>
+                    <li key={s.name}>{abbreviateStarStatus(s.display)}</li>
                   ))}
                 </ul>
               </Section>

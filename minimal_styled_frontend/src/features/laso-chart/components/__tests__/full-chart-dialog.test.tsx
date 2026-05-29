@@ -40,7 +40,7 @@ function makeResponse(richTy = false): BuildLasoResponse {
           ? makeCung(d, {
               chinh_tinh: ['Tử Vi (Miếu)'],
               phu_tinh: [{ name: 'Tả Phụ', display: 'Tả Phụ', element: 'Thổ' }],
-              tuhoa: ['Hóa Lộc'],
+              tuhoa: [{ name: 'hoa_loc', display: 'Hóa Lộc', element: 'Thổ' }],
               trang_sinh: 'Trường Sinh',
             })
           : makeCung(d),
@@ -74,18 +74,17 @@ describe('FullChartDialog', () => {
 
   it('renders phụ tinh, tứ hóa, and trang sinh inside the cells (variant=full)', () => {
     render(<FullChartDialog open={true} onOpenChange={() => {}} />);
-    expect(screen.getByText('Tử Vi (Miếu)')).toBeInTheDocument();
+    expect(screen.getByText('Tử Vi (M)')).toBeInTheDocument();
     expect(screen.getByText('Tả Phụ')).toBeInTheDocument();
     expect(screen.getByText('Hóa Lộc')).toBeInTheDocument();
-    expect(screen.getByText('Trường Sinh')).toBeInTheDocument();
+    expect(screen.getByText(/Trường Sinh/)).toBeInTheDocument();
   });
 
   it('grid container has aspect-[2/3] so each 4×4 cell is w:h = 2:3', () => {
     render(<FullChartDialog open={true} onOpenChange={() => {}} />);
     const grid = screen.getByTestId('full-chart-grid');
     expect(grid.className).toContain('aspect-[2/3]');
-    expect(grid.className).toContain('grid-cols-4');
-    expect(grid.className).toContain('grid-rows-4');
+    expect(grid.className).toContain('fc-grid');
   });
 
   it('returns null when no chart is loaded', () => {

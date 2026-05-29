@@ -99,7 +99,7 @@ describe('CompactChart', () => {
     const noisyCung: Cung = makeCung('Tý', {
       chinh_tinh: ['Tử Vi (Miếu)'],
       phu_tinh: [{ name: 'Tả Phụ', display: 'Tả Phụ', element: 'Thổ' }],
-      tuhoa: ['Hóa Lộc'],
+      tuhoa: [{ name: 'hoa_loc', display: 'Hóa Lộc', element: 'Thổ' }],
       trang_sinh: 'Trường Sinh',
       is_tuan: true,
       is_triet: true,
@@ -125,7 +125,7 @@ describe('CompactChart', () => {
     });
     render(<CompactChart />);
     // Compact cell of Tý: chính tinh string visible.
-    expect(screen.getByText('Tử Vi (Miếu)')).toBeInTheDocument();
+    expect(screen.getByText('Tử Vi (M)')).toBeInTheDocument();
     // None of the stripped fields should appear.
     expect(screen.queryByText('Tả Phụ')).not.toBeInTheDocument();
     expect(screen.queryByText('Hóa Lộc')).not.toBeInTheDocument();

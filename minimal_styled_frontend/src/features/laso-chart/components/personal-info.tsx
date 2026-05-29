@@ -1,9 +1,12 @@
+import { cn } from '@/lib/utils';
 import type { BuildLasoResponse } from '@/lib/api/schemas';
 import type { BirthInput } from '@/store/chart-store';
 
 interface Props {
   response: BuildLasoResponse;
   input: BirthInput | null;
+  className?: string;
+  variant?: 'compact' | 'full';
 }
 
 function formatBirth(input: BirthInput | null): string | null {
@@ -14,10 +17,15 @@ function formatBirth(input: BirthInput | null): string | null {
   return `${dd}.${mm}.${input.year} · ${hh}:00`;
 }
 
-export function PersonalInfo({ response, input }: Props) {
+export function PersonalInfo({ response, input, className, variant = 'compact' }: Props) {
   const birth = formatBirth(input);
+  const isFull = variant === 'full';
   return (
-    <div className="col-start-2 row-start-2 col-span-2 row-span-2 flex flex-col justify-center gap-1 overflow-hidden bg-card p-3">
+    <div className={cn(
+      'flex flex-col justify-center gap-1 overflow-hidden p-3',
+      !isFull && 'col-start-2 row-start-2 col-span-2 row-span-2 bg-card',
+      className,
+    )}>
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Lá số tử vi</div>
       {input?.name && (
         <div className="text-sm leading-tight font-medium">{input.name}</div>

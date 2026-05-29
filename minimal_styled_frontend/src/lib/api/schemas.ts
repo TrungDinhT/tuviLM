@@ -24,6 +24,7 @@ export const StarSchema = z.object({
   name: z.string(),
   display: z.string(),
   element: z.string(),
+  sao_type: z.array(z.string()).optional(),
 });
 export type Star = z.infer<typeof StarSchema>;
 
@@ -32,7 +33,7 @@ export const CungSchema = z.object({
   role: z.string().nullable().optional(),
   chinh_tinh: z.array(z.string()),
   phu_tinh: z.array(StarSchema),
-  tuhoa: z.array(z.string()),
+  tuhoa: z.array(StarSchema),
   trang_sinh: z.string().nullable().optional(),
   is_tuan: z.boolean(),
   is_triet: z.boolean(),
