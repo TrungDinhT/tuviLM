@@ -1,0 +1,2007 @@
+# Vietnamese lunar year reference data used by src.refactored.calendar.lunar.
+# Each year stores the decoded structure that was previously packed in Ho Ngoc Duc-style year codes.
+# regular_month_lengths is ordered from lunar month 1 through lunar month 12.
+supported_years:
+  min: 1800
+  max: 2199
+years:
+  1800:
+    tet_offset_days: 24
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  1801:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30]
+  1802:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30, 29]
+  1803:
+    tet_offset_days: 22
+    leap_month: 1
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  1804:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 29, 30, 30, 29, 30, 30, 30]
+  1805:
+    tet_offset_days: 30
+    leap_month: 8
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 29, 30, 30, 30, 30, 29]
+  1806:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 29, 30, 29, 30, 30, 29]
+  1807:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30]
+  1808:
+    tet_offset_days: 27
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 29, 30, 29, 29, 30, 29]
+  1809:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  1810:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29, 30]
+  1811:
+    tet_offset_days: 24
+    leap_month: 2
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 29, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30]
+  1812:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  1813:
+    tet_offset_days: 31
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 29, 30, 29, 30, 30, 30, 29]
+  1814:
+    tet_offset_days: 20
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 30, 29, 29, 29, 30, 29, 30, 30, 29, 30]
+  1815:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  1816:
+    tet_offset_days: 28
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  1817:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 29, 30, 29]
+  1818:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 30, 29, 30, 29, 29, 30]
+  1819:
+    tet_offset_days: 25
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 30, 30, 29, 30, 30, 29, 30, 29]
+  1820:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30]
+  1821:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29, 30]
+  1822:
+    tet_offset_days: 22
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 30]
+  1823:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 29, 30, 29, 30, 29, 30, 30]
+  1824:
+    tet_offset_days: 30
+    leap_month: 7
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 29, 30, 29, 30, 30]
+  1825:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  1826:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  1827:
+    tet_offset_days: 26
+    leap_month: 5
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 30, 29]
+  1828:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  1829:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]
+  1830:
+    tet_offset_days: 24
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 30]
+  1831:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  1832:
+    tet_offset_days: 32
+    leap_month: 9
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 30, 30, 30]
+  1833:
+    tet_offset_days: 50
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  1834:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  1835:
+    tet_offset_days: 28
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  1836:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  1837:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30]
+  1838:
+    tet_offset_days: 25
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30]
+  1839:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  1840:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  1841:
+    tet_offset_days: 22
+    leap_month: 3
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 29, 29, 30, 29, 30, 29, 30, 29, 30]
+  1842:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 29]
+  1843:
+    tet_offset_days: 29
+    leap_month: 7
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 29, 29, 30, 29, 30, 29]
+  1844:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  1845:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  1846:
+    tet_offset_days: 26
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29]
+  1847:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30]
+  1848:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  1849:
+    tet_offset_days: 23
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 30]
+  1850:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30]
+  1851:
+    tet_offset_days: 31
+    leap_month: 8
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  1852:
+    tet_offset_days: 50
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 29, 30]
+  1853:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  1854:
+    tet_offset_days: 28
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 30, 29, 30, 29, 30]
+  1855:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29]
+  1856:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30]
+  1857:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 29, 30, 30, 29, 30, 29, 30, 30, 30]
+  1858:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30]
+  1859:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30]
+  1860:
+    tet_offset_days: 22
+    leap_month: 3
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30]
+  1861:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 29, 30]
+  1862:
+    tet_offset_days: 29
+    leap_month: 8
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 30, 29, 29, 30]
+  1863:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30]
+  1864:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  1865:
+    tet_offset_days: 26
+    leap_month: 5
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30, 29]
+  1866:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30, 30]
+  1867:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 30]
+  1868:
+    tet_offset_days: 24
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 30, 29]
+  1869:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 29]
+  1870:
+    tet_offset_days: 30
+    leap_month: 10
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 30, 29, 29, 30, 30, 29]
+  1871:
+    tet_offset_days: 49
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 29, 30]
+  1872:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 30, 29, 30]
+  1873:
+    tet_offset_days: 28
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30]
+  1874:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  1875:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29]
+  1876:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 29, 30, 29, 30, 29, 30, 30, 29, 30]
+  1877:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  1878:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  1879:
+    tet_offset_days: 21
+    leap_month: 3
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  1880:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 30, 29, 30, 29, 29, 30]
+  1881:
+    tet_offset_days: 29
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 30, 30, 29, 30, 29]
+  1882:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]
+  1883:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29, 30]
+  1884:
+    tet_offset_days: 27
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]
+  1885:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  1886:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  1887:
+    tet_offset_days: 23
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 30]
+  1888:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  1889:
+    tet_offset_days: 30
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  1890:
+    tet_offset_days: 20
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30]
+  1891:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]
+  1892:
+    tet_offset_days: 29
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 29, 30, 29, 29, 30, 30, 30, 29, 30, 30, 30]
+  1893:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  1894:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  1895:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29]
+  1896:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  1897:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29]
+  1898:
+    tet_offset_days: 21
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  1899:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30]
+  1900:
+    tet_offset_days: 30
+    leap_month: 8
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 30, 30, 30, 29, 30]
+  1901:
+    tet_offset_days: 49
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  1902:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  1903:
+    tet_offset_days: 28
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 29, 30, 30, 29, 30]
+  1904:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29]
+  1905:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 30]
+  1906:
+    tet_offset_days: 24
+    leap_month: 4
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  1907:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  1908:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 30, 29, 30, 29, 30, 30, 29, 30]
+  1909:
+    tet_offset_days: 21
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30]
+  1910:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  1911:
+    tet_offset_days: 29
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 30]
+  1912:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30]
+  1913:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 29, 30, 29, 30]
+  1914:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 29, 30, 29, 30]
+  1915:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 29]
+  1916:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  1917:
+    tet_offset_days: 22
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29]
+  1918:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]
+  1919:
+    tet_offset_days: 31
+    leap_month: 7
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 30]
+  1920:
+    tet_offset_days: 50
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 30]
+  1921:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30]
+  1922:
+    tet_offset_days: 27
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 30]
+  1923:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30]
+  1924:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  1925:
+    tet_offset_days: 24
+    leap_month: 4
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30]
+  1926:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  1927:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 30]
+  1928:
+    tet_offset_days: 22
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 30, 30, 30]
+  1929:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 30]
+  1930:
+    tet_offset_days: 29
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 29, 29, 30, 29, 30, 29, 30, 30, 29]
+  1931:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  1932:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30]
+  1933:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 29, 30]
+  1934:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 30, 29, 30]
+  1935:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  1936:
+    tet_offset_days: 23
+    leap_month: 3
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 29, 29, 29, 30, 30, 29, 30, 30, 30, 29]
+  1937:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29]
+  1938:
+    tet_offset_days: 30
+    leap_month: 7
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 30, 29, 29, 30, 29, 29, 29, 30, 30, 29, 30]
+  1939:
+    tet_offset_days: 49
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  1940:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  1941:
+    tet_offset_days: 26
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 29, 29, 30, 29, 30, 29]
+  1942:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  1943:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  1944:
+    tet_offset_days: 24
+    leap_month: 4
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 30]
+  1945:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29, 30]
+  1946:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 29, 30]
+  1947:
+    tet_offset_days: 21
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  1948:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  1949:
+    tet_offset_days: 28
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  1950:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 30, 29, 29, 30, 29, 30, 29]
+  1951:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  1952:
+    tet_offset_days: 26
+    leap_month: 5
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 30, 29, 30, 29, 30]
+  1953:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 30, 29, 30, 30, 29, 30, 29]
+  1954:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 30]
+  1955:
+    tet_offset_days: 23
+    leap_month: 3
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  1956:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  1957:
+    tet_offset_days: 30
+    leap_month: 8
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 30, 29, 30, 29]
+  1958:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  1959:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29]
+  1960:
+    tet_offset_days: 27
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 30, 29, 30, 29, 30, 29]
+  1961:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30]
+  1962:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  1963:
+    tet_offset_days: 24
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  1964:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  1965:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29]
+  1966:
+    tet_offset_days: 20
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 30, 30, 29, 29, 30, 29, 29, 30, 30, 29]
+  1967:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 29]
+  1968:
+    tet_offset_days: 28
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29, 29]
+  1969:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  1970:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30]
+  1971:
+    tet_offset_days: 26
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 29, 30, 30, 29, 30, 30, 30, 29, 30]
+  1972:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 29, 30]
+  1973:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30]
+  1974:
+    tet_offset_days: 22
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 30]
+  1975:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 30, 29, 29, 30, 29, 30]
+  1976:
+    tet_offset_days: 30
+    leap_month: 8
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  1977:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 29]
+  1978:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 30, 29, 30, 29]
+  1979:
+    tet_offset_days: 27
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 29]
+  1980:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]
+  1981:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30]
+  1982:
+    tet_offset_days: 24
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 30, 30]
+  1983:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30]
+  1984:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30]
+  1985:
+    tet_offset_days: 20
+    leap_month: 2
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30]
+  1986:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 30, 29, 30, 29, 29, 30, 29]
+  1987:
+    tet_offset_days: 28
+    leap_month: 7
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 29]
+  1988:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  1989:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30, 30]
+  1990:
+    tet_offset_days: 26
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 30]
+  1991:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 30]
+  1992:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30]
+  1993:
+    tet_offset_days: 22
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  1994:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30]
+  1995:
+    tet_offset_days: 30
+    leap_month: 8
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30]
+  1996:
+    tet_offset_days: 49
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  1997:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30]
+  1998:
+    tet_offset_days: 27
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30]
+  1999:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29]
+  2000:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 29]
+  2001:
+    tet_offset_days: 23
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 30]
+  2002:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  2003:
+    tet_offset_days: 31
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 30, 29, 29, 30, 29, 30]
+  2004:
+    tet_offset_days: 21
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  2005:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  2006:
+    tet_offset_days: 28
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 30, 30, 30, 29, 30, 29]
+  2007:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29, 30]
+  2008:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  2009:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 30]
+  2010:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  2011:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  2012:
+    tet_offset_days: 22
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  2013:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  2014:
+    tet_offset_days: 30
+    leap_month: 9
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30]
+  2015:
+    tet_offset_days: 49
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 30, 30, 29, 30, 29]
+  2016:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 30]
+  2017:
+    tet_offset_days: 27
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 29, 30, 29, 30, 30, 30]
+  2018:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 30]
+  2019:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 29, 30, 29, 29, 30, 30]
+  2020:
+    tet_offset_days: 24
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 30, 30, 29, 29, 30, 29, 29, 30, 30]
+  2021:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29]
+  2022:
+    tet_offset_days: 31
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  2023:
+    tet_offset_days: 21
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29, 30]
+  2024:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  2025:
+    tet_offset_days: 28
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 30, 29, 30, 30, 30, 29]
+  2026:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 30, 29]
+  2027:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29]
+  2028:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 30, 29, 29, 30, 30, 29]
+  2029:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 29, 30, 29]
+  2030:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  2031:
+    tet_offset_days: 22
+    leap_month: 3
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  2032:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30]
+  2033:
+    tet_offset_days: 30
+    leap_month: 11
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 30]
+  2034:
+    tet_offset_days: 49
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 30, 30, 29, 30]
+  2035:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30]
+  2036:
+    tet_offset_days: 27
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 29, 29, 30, 29, 30, 30]
+  2037:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 30, 29, 29, 30, 29, 30]
+  2038:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 29, 30, 29]
+  2039:
+    tet_offset_days: 23
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 30, 30, 29, 30, 29, 29, 30, 29]
+  2040:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 30, 29, 30, 29]
+  2041:
+    tet_offset_days: 31
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30]
+  2042:
+    tet_offset_days: 21
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]
+  2043:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30]
+  2044:
+    tet_offset_days: 29
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  2045:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30]
+  2046:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30]
+  2047:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 30, 29, 29, 30, 29, 30]
+  2048:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 30, 29, 30, 29, 29, 30, 29]
+  2049:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 30, 29]
+  2050:
+    tet_offset_days: 22
+    leap_month: 3
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  2051:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 30, 29, 30, 30, 30]
+  2052:
+    tet_offset_days: 31
+    leap_month: 8
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 30, 30, 30, 29]
+  2053:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 30]
+  2054:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 30]
+  2055:
+    tet_offset_days: 27
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 29, 29, 30, 29, 30, 29]
+  2056:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 30, 29, 29, 30, 29, 30]
+  2057:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  2058:
+    tet_offset_days: 23
+    leap_month: 4
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 30, 29, 30, 29, 30, 29]
+  2059:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30]
+  2060:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29]
+  2061:
+    tet_offset_days: 20
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29]
+  2062:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  2063:
+    tet_offset_days: 28
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  2064:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  2065:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 30]
+  2066:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 30, 30, 29, 30, 29, 30, 29, 30]
+  2067:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  2068:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 30, 29, 30, 30, 29, 30]
+  2069:
+    tet_offset_days: 22
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30]
+  2070:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  2071:
+    tet_offset_days: 30
+    leap_month: 8
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 30, 29, 30, 30]
+  2072:
+    tet_offset_days: 49
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 29, 29, 30, 30]
+  2073:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 29, 30, 29, 29, 30]
+  2074:
+    tet_offset_days: 26
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  2075:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  2076:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 29]
+  2077:
+    tet_offset_days: 23
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  2078:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  2079:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  2080:
+    tet_offset_days: 21
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 29, 30, 29, 30, 30, 30]
+  2081:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 29, 30, 29, 29, 30, 30]
+  2082:
+    tet_offset_days: 28
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 30, 29, 29, 30, 30]
+  2083:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29]
+  2084:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  2085:
+    tet_offset_days: 25
+    leap_month: 5
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30]
+  2086:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  2087:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  2088:
+    tet_offset_days: 23
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 30, 30, 29]
+  2089:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 29, 30, 29, 30, 30, 29]
+  2090:
+    tet_offset_days: 29
+    leap_month: 8
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  2091:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 29, 30, 29]
+  2092:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 29, 30]
+  2093:
+    tet_offset_days: 26
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  2094:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30]
+  2095:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  2096:
+    tet_offset_days: 24
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 30, 30, 29, 30]
+  2097:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 29, 30, 29, 30, 30, 29, 30]
+  2098:
+    tet_offset_days: 31
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 29, 30, 29, 30, 29, 30]
+  2099:
+    tet_offset_days: 20
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  2100:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 29, 30, 29]
+  2101:
+    tet_offset_days: 28
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 30, 30, 29, 29, 30, 29]
+  2102:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29]
+  2103:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]
+  2104:
+    tet_offset_days: 27
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 30]
+  2105:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 29, 30, 29, 30, 30, 29, 30, 30]
+  2106:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 29, 30, 29, 30, 29, 30, 30]
+  2107:
+    tet_offset_days: 23
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  2108:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  2109:
+    tet_offset_days: 30
+    leap_month: 9
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  2110:
+    tet_offset_days: 49
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 30, 29, 29, 30, 29]
+  2111:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  2112:
+    tet_offset_days: 28
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 30, 29, 30, 30, 29]
+  2113:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 30, 29, 30, 30, 30]
+  2114:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  2115:
+    tet_offset_days: 25
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  2116:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  2117:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  2118:
+    tet_offset_days: 21
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 30, 30, 29, 29, 30, 29, 30, 29, 30]
+  2119:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  2120:
+    tet_offset_days: 29
+    leap_month: 7
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29]
+  2121:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 30, 29, 30, 30, 29, 30]
+  2122:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  2123:
+    tet_offset_days: 26
+    leap_month: 5
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 29, 29, 29, 30, 29, 30, 30, 30, 29]
+  2124:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 29, 30]
+  2125:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 29]
+  2126:
+    tet_offset_days: 22
+    leap_month: 4
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 30, 30, 29, 29, 29, 30, 29, 30, 29, 30, 29]
+  2127:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  2128:
+    tet_offset_days: 31
+    leap_month: 11
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 30]
+  2129:
+    tet_offset_days: 49
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29]
+  2130:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30]
+  2131:
+    tet_offset_days: 28
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30]
+  2132:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 29, 30, 30]
+  2133:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 29, 30, 30, 29, 30]
+  2134:
+    tet_offset_days: 24
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 30]
+  2135:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 29, 30]
+  2136:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  2137:
+    tet_offset_days: 21
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  2138:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 30, 29, 30, 30, 29, 30, 29]
+  2139:
+    tet_offset_days: 29
+    leap_month: 7
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 29]
+  2140:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 30]
+  2141:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30, 30]
+  2142:
+    tet_offset_days: 26
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 29, 30, 30, 30]
+  2143:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 30]
+  2144:
+    tet_offset_days: 34
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 29, 30]
+  2145:
+    tet_offset_days: 22
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 30, 30, 29, 30, 29, 30, 29, 29, 30]
+  2146:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30]
+  2147:
+    tet_offset_days: 31
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  2148:
+    tet_offset_days: 20
+    leap_month: 1
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29]
+  2149:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 30]
+  2150:
+    tet_offset_days: 28
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  2151:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 29, 30, 29, 30, 30, 29]
+  2152:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 29]
+  2153:
+    tet_offset_days: 23
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 30, 29, 30, 30, 29, 30, 29, 29, 30, 29]
+  2154:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 29, 30]
+  2155:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29, 30]
+  2156:
+    tet_offset_days: 22
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 29, 30, 30, 29, 30, 30, 29, 30, 30, 29, 30]
+  2157:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  2158:
+    tet_offset_days: 29
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 30, 30, 30, 29, 30]
+  2159:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 29, 30, 30, 29, 30]
+  2160:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  2161:
+    tet_offset_days: 25
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  2162:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  2163:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 30, 29, 30, 29, 29, 30]
+  2164:
+    tet_offset_days: 23
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 30, 30, 29, 30, 30, 29, 29, 30]
+  2165:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]
+  2166:
+    tet_offset_days: 31
+    leap_month: 10
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 29, 30, 29, 29, 30, 29, 30, 30, 30, 30, 30]
+  2167:
+    tet_offset_days: 50
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 30]
+  2168:
+    tet_offset_days: 39
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  2169:
+    tet_offset_days: 27
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 30]
+  2170:
+    tet_offset_days: 46
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  2171:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29]
+  2172:
+    tet_offset_days: 24
+    leap_month: 5
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 30, 29, 30, 29, 30, 29]
+  2173:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  2174:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 29]
+  2175:
+    tet_offset_days: 21
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 30]
+  2176:
+    tet_offset_days: 41
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  2177:
+    tet_offset_days: 29
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 30, 29, 30, 30, 30]
+  2178:
+    tet_offset_days: 48
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  2179:
+    tet_offset_days: 37
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30]
+  2180:
+    tet_offset_days: 26
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30]
+  2181:
+    tet_offset_days: 44
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  2182:
+    tet_offset_days: 33
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30]
+  2183:
+    tet_offset_days: 23
+    leap_month: 4
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30]
+  2184:
+    tet_offset_days: 42
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29]
+  2185:
+    tet_offset_days: 30
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 30]
+  2186:
+    tet_offset_days: 20
+    leap_month: 2
+    leap_month_length_days: 29
+    regular_month_lengths: [29, 30, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30]
+  2187:
+    tet_offset_days: 38
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29]
+  2188:
+    tet_offset_days: 27
+    leap_month: 6
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29]
+  2189:
+    tet_offset_days: 45
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30]
+  2190:
+    tet_offset_days: 35
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29]
+  2191:
+    tet_offset_days: 24
+    leap_month: 5
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 30, 29, 30, 30, 29, 30, 29]
+  2192:
+    tet_offset_days: 43
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30]
+  2193:
+    tet_offset_days: 32
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 29, 30]
+  2194:
+    tet_offset_days: 21
+    leap_month: 3
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 29, 30, 29, 30, 29, 29, 30, 30, 29, 30, 30]
+  2195:
+    tet_offset_days: 40
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29, 30]
+  2196:
+    tet_offset_days: 29
+    leap_month: 7
+    leap_month_length_days: 29
+    regular_month_lengths: [30, 30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30]
+  2197:
+    tet_offset_days: 47
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 29, 30, 29, 29, 30, 29, 30]
+  2198:
+    tet_offset_days: 36
+    leap_month: null
+    leap_month_length_days: null
+    regular_month_lengths: [30, 29, 30, 30, 29, 30, 29, 30, 29, 30, 29, 29]
+  2199:
+    tet_offset_days: 25
+    leap_month: 6
+    leap_month_length_days: 30
+    regular_month_lengths: [30, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30]

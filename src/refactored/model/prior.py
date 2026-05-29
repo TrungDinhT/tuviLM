@@ -4,7 +4,7 @@ from functools import cached_property
 
 import pydantic
 
-from src.external_lib.day_from_js import get_lunar_date
+from src.refactored.calendar import solar_to_lunar_date
 from src.refactored.model.elementary import DiaChi, ThienCan
 
 
@@ -57,7 +57,7 @@ class LaSoPrior(pydantic.BaseModel):
         else:
             hour = DiaChi.from_index((time.hour + 1) // 2)
 
-        lunar_date = get_lunar_date(time.day, time.month, time.year)
+        lunar_date = solar_to_lunar_date(time)
 
         return cls(
             hour=hour,
