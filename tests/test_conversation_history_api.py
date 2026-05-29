@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
@@ -645,6 +646,37 @@ async def test_session_chat_stream_persists_confirmed_assistant_message(
     assert context.session.messages[-1].status == ChatMessageStatus.CONFIRMED
 
 
+async def test_session_chat_stream_logs_generation_failure(
+    api_client,
+    fake_store,
+    caplog,
+) -> None:
+    async def failing_streamer(*args, **kwargs):
+        yield {"type": "text", "delta": "Partial answer."}
+        raise RuntimeError("upstream 429 rate limit")
+
+    caplog.set_level(logging.ERROR, logger="api.chat.routes")
+    app.state.session_chat_streamer = failing_streamer
+    profile = await _create_profile(fake_store)
+    session = await _create_session(fake_store, profile.id)
+
+    response = await api_client.post(
+        f"/api/v1/sessions/{session.id}/chat/stream",
+        headers={
+            "X-Anonymous-Owner-Id": "anon_owner",
+            "Idempotency-Key": "message-1",
+        },
+        json={"content": "Tell me about career."},
+    )
+    context = await fake_store.load_session_context("anon_owner", session.id)
+
+    assert response.status_code == 200
+    assert '"type": "error", "message": "upstream 429 rate limit"' in response.text
+    assert context.session.messages[-1].status == ChatMessageStatus.FAILED
+    assert "Session chat stream failed" in caplog.text
+    assert "upstream 429 rate limit" in caplog.text
+
+
 async def test_session_chat_stream_cancellation_marks_assistant_cancelled(
     api_client,
     fake_store,
@@ -805,7 +837,9 @@ async def test_session_chat_stream_completed_replay_does_not_start_generation(
 async def test_create_chart_profile_endpoint_returns_conflict_for_idempotency_mismatch(
     api_client,
     fake_store,
+    caplog,
 ) -> None:
+    caplog.set_level(logging.WARNING, logger="api.main")
     fake_store.create_chart_profile_errors = [None, IdempotencyConflictError()]
     headers = {
         "X-Anonymous-Owner-Id": "anon_owner",
@@ -845,6 +879,9 @@ async def test_create_chart_profile_endpoint_returns_conflict_for_idempotency_mi
 
     assert first_response.status_code == 200
     assert second_response.status_code == 409
+    assert second_response.json()["detail"] == "Idempotency key conflict."
+    assert "HTTP exception: method=POST path=/api/v1/chart-profiles status_code=409" in caplog.text
+    assert "Idempotency key conflict." in caplog.text
 
 
 async def test_chart_profile_document_maps_to_domain_dto() -> None:

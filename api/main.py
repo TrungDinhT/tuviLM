@@ -7,7 +7,9 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from api._parse import to_cung_payload_map
 from api.chat.contracts import ConversationHistoryStore
@@ -26,6 +28,8 @@ from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.view.builder import build_laso_view
 
+
+logger = logging.getLogger(__name__)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -80,6 +84,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def log_http_exception(request: Request, exc: StarletteHTTPException):
+    logger.warning(
+        "HTTP exception: method=%s path=%s status_code=%s detail=%r",
+        request.method,
+        request.url.path,
+        exc.status_code,
+        exc.detail,
+    )
+    return await http_exception_handler(request, exc)
 
 
 def get_api_state(request: Request) -> ApiState:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import secrets
 from datetime import datetime
 from typing import Any, AsyncIterator
@@ -55,6 +56,8 @@ from src.agent.deps import TuviAgentDeps
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
 
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1")
 
@@ -329,6 +332,12 @@ async def _new_session_chat_stream(
         )
         raise
     except Exception as exc:
+        logger.exception(
+            "Session chat stream failed: owner_id=%s session_id=%s assistant_message_id=%s",
+            owner_id,
+            session_id,
+            pair.assistant_message.id,
+        )
         await store.finalize_assistant_message(
             owner_id,
             session_id,
