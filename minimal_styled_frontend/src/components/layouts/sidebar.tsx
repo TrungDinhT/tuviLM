@@ -14,7 +14,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-60 shrink-0 flex-col gap-1 border-r border-border bg-sidebar p-3 text-sidebar-foreground lg:flex">
+    <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-1 overflow-y-auto border-r border-border bg-sidebar p-3 text-sidebar-foreground lg:flex">
       <Link href="/" className="flex items-center gap-2 px-2 py-3">
         <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <Compass className="size-4" />
