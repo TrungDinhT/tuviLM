@@ -220,7 +220,7 @@ async def test_create_chart_profile_rejects_blank_owner_id(
     )
 
     assert response.status_code == 400
-    assert response.json()["detail"] == "Anonymous owner id is required."
+    assert response.json()["detail"] == "Owner id is required."
 
 
 async def test_mutating_routes_reject_blank_idempotency_key(
