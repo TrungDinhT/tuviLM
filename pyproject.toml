@@ -3,7 +3,7 @@ name = "tuvilm"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 authors = [
     { name = "lephuock", email = "phuockhanhnk94@gmail.com" },
     { name = "TrungDinhT", email = "dinhthanhtrung1996@gmail.com" },

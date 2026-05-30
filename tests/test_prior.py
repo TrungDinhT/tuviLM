@@ -1,5 +1,8 @@
+import datetime as dt
+
 import pytest
 
+from src.refactored.context.natal import NatalContext
 from src.refactored.model.elementary import (
     CircleDirection,
     DiaChi,
@@ -7,7 +10,6 @@ from src.refactored.model.elementary import (
     ThienCan,
 )
 from src.refactored.model.prior import Gender, LaSoPrior, LunarYear
-from src.refactored.context.natal import NatalContext
 
 
 def test_circle_direction_supports_multiplier_semantics():
@@ -35,6 +37,54 @@ def test_lunar_year_from_year_uses_cyclic_enum_indexes(
 
     assert lunar_year.thien_can == expected_thien_can
     assert lunar_year.dia_chi == expected_dia_chi
+
+
+@pytest.mark.parametrize(
+    "solar_day, expected_lunar",
+    [
+        (dt.date(1998, 4, 4), (8, 3, 1998)),
+        (dt.date(1996, 12, 19), (10, 11, 1996)),
+        (dt.date(1999, 3, 9), (22, 1, 1999)),
+        (dt.date(2000, 3, 18), (13, 2, 2000)),
+        (dt.date(1999, 9, 2), (23, 7, 1999)),
+        (dt.date(2024, 2, 10), (1, 1, 2024)),
+        (dt.date(2024, 2, 9), (30, 12, 2023)),
+        (dt.date(2023, 3, 22), (1, 2, 2023)),
+        (dt.date(2000, 1, 1), (25, 11, 1999)),
+        (dt.date(1999, 12, 31), (24, 11, 1999)),
+    ],
+)
+def test_from_solar_day_preserves_current_lunar_conversion_fixtures(
+    solar_day: dt.date,
+    expected_lunar: tuple[int, int, int],
+):
+    prior = LaSoPrior.from_solar_day(
+        dt.datetime.combine(solar_day, dt.time(hour=12)),
+        Gender.MALE,
+    )
+
+    assert (prior.date, prior.month, prior.year) == expected_lunar
+    assert prior.hour == DiaChi.NGO
+
+
+@pytest.mark.parametrize(
+    "solar_day, expected_lunar",
+    [
+        (dt.date(1996, 12, 19), (11, 11, 1996)),
+        (dt.date(2024, 2, 9), (1, 1, 2024)),
+    ],
+)
+def test_from_solar_day_keeps_23h_rollover_behavior(
+    solar_day: dt.date,
+    expected_lunar: tuple[int, int, int],
+):
+    prior = LaSoPrior.from_solar_day(
+        dt.datetime.combine(solar_day, dt.time(hour=23)),
+        Gender.MALE,
+    )
+
+    assert (prior.date, prior.month, prior.year) == expected_lunar
+    assert prior.hour == DiaChi.TY
 
 
 def test_natal_context_from_prior_derives_menh_position_and_cuc():
