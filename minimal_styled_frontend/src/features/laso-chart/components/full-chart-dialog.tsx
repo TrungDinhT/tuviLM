@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useChartStore } from '@/store/chart-store';
-import { CungCell } from './cung-cell';
+import { CungCellFull } from './cung-cell-full';
 import { CungDetailSheet } from './cung-detail-sheet';
 import { PersonalInfo } from './personal-info';
 import { CUNG_GRID } from '../types';
@@ -92,12 +92,11 @@ export function FullChartDialog({ open, onOpenChange }: Props) {
               if (!cung) return null;
               const overlay = saoLuuOverlay?.cung_by_position[position]?.saoLuu;
               return (
-                <CungCell
+                <CungCellFull
                   key={position}
                   cung={cung}
                   saoLuu={overlay}
                   selected={selected === position}
-                  variant="full"
                   onClick={() => {
                     selectCung(position);
                     setDetailOpen(true);

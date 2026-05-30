@@ -1,0 +1,26 @@
+:root {
+  /* Star colors — referenced in JS via getStarColorVar() and in full-chart.css */
+  --star-tu-vi: #b8860b;
+  --star-thien-phu: #b8860b;
+  --star-thai-duong: #ff0000;
+  --star-vu-khuc: #808080;
+  --star-liem-trinh: #ff0000;
+  --star-that-sat: #808080;
+  --star-tham-lang: #00008b;
+  --star-pha-quan: #00008b;
+  --star-thien-dong: #00008b;
+  --star-thien-co: #008000;
+  --star-thai-am: #00008b;
+  --star-thien-luong: #008000;
+  --star-cu-mon: #00008b;
+  --star-thien-tuong: #00008b;
+  --star-default: #374151;
+
+  /* Element colors */
+  --element-kim: #808080;
+  --element-moc: #008000;
+  --element-thuy: #00008b;
+  --element-hoa: #ff0000;
+  --element-tho: #b8860b;
+  --element-default: #374151;
+}

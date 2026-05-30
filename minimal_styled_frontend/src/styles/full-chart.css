@@ -1,6 +1,32 @@
 /* Styles adapted from feature/new_frontend frontend/src/styles.css
    for the full-chart dialog and its cells. */
 
+:root {
+  /* Full-chart UI tokens */
+  --fc-border: #d5c8b3;
+  --fc-cell-bg: #fffdfa;
+  --fc-selected-border: #8b5e34;
+  --fc-selected-shadow: rgba(139, 94, 52, 0.25);
+  --fc-cung-than-border: #8b5e34;
+  --fc-age-color: #855a31;
+  --fc-role-color: #2a2d34;
+  --fc-tuhoa-color: #855a31;
+  --fc-divider-color: #d0d7de;
+  --fc-star-sub-color: #374151;
+  --fc-trangsinh-color: #667085;
+  --fc-position-color: #8b5e34;
+  --fc-center-border: #d4bfa5;
+  --fc-center-bg-start: #fff6e9;
+  --fc-center-bg-end: #f2e0c3;
+  --fc-center-name-color: #2a2d34;
+  --fc-center-birth-color: #6b7280;
+  --fc-center-line-color: #8b5e34;
+  --fc-badge-bg: #9e2a2b;
+  --fc-badge-color: #fff;
+  --fc-badge-shadow: rgba(26, 22, 17, 0.3);
+  --fc-center-label-color: #6b7280;
+}
+
 .fc-grid {
   position: relative;
   padding: 10px;
@@ -13,10 +39,10 @@
 }
 
 .fc-cell {
-  border: 1px solid #d5c8b3;
+  border: 1px solid var(--fc-border);
   border-radius: 10px;
   text-align: left;
-  background: #fffdfa;
+  background: var(--fc-cell-bg);
   padding: 8px;
   overflow: hidden;
   cursor: pointer;
@@ -26,12 +52,12 @@
 }
 
 .fc-cell.selected {
-  border: 2px solid #8b5e34;
-  box-shadow: 0 0 0 2px rgba(139, 94, 52, 0.25);
+  border: 2px solid var(--fc-selected-border);
+  box-shadow: 0 0 0 2px var(--fc-selected-shadow);
 }
 
 .fc-cell.cung-than {
-  border: 1px solid #8b5e34;
+  border: 1px solid var(--fc-cung-than-border);
 }
 
 .fc-age {
@@ -40,7 +66,7 @@
   right: 8px;
   font-size: 12px;
   font-weight: 700;
-  color: #855a31;
+  color: var(--fc-age-color);
   line-height: 1;
 }
 
@@ -49,7 +75,7 @@
   font-size: 13px;
   font-weight: 600;
   text-align: center;
-  color: #2a2d34;
+  color: var(--fc-role-color);
 }
 
 .fc-main-tuhoa-row {
@@ -88,7 +114,7 @@
 
 .fc-star-tuhoa {
   font-size: 10px;
-  color: #855a31;
+  color: var(--fc-tuhoa-color);
   font-weight: 600;
   line-height: 1.2;
 }
@@ -96,12 +122,12 @@
 .fc-divider {
   margin: 4px 0;
   border: none;
-  border-top: 1px dashed #d0d7de;
+  border-top: 1px dashed var(--fc-divider-color);
 }
 
 .fc-star-sub {
   font-size: 10px;
-  color: #374151;
+  color: var(--fc-star-sub-color);
   line-height: 1.3;
 }
 
@@ -133,14 +159,14 @@
 .fc-trangsinh {
   margin-top: auto;
   font-size: 10px;
-  color: #667085;
+  color: var(--fc-trangsinh-color);
   text-align: center;
 }
 
 .fc-position {
   font-size: 10px;
   font-weight: 500;
-  color: #8b5e34;
+  color: var(--fc-position-color);
 }
 
 .fc-center {
@@ -150,9 +176,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px dashed #d4bfa5;
+  border: 1px dashed var(--fc-center-border);
   border-radius: 10px;
-  background: radial-gradient(circle at center, #fff6e9 0%, #f2e0c3 100%);
+  background: radial-gradient(circle at center, var(--fc-center-bg-start) 0%, var(--fc-center-bg-end) 100%);
   text-align: center;
   gap: 6px;
   padding: 12px;
@@ -161,18 +187,18 @@
 .fc-center-name {
   font-size: 15px;
   font-weight: 500;
-  color: #2a2d34;
+  color: var(--fc-center-name-color);
 }
 
 .fc-center-birth {
   font-size: 11px;
-  color: #6b7280;
+  color: var(--fc-center-birth-color);
 }
 
 .fc-center-line {
   font-size: 13px;
   font-weight: 600;
-  color: #8b5e34;
+  color: var(--fc-center-line-color);
   letter-spacing: 0.02em;
 }
 
@@ -185,11 +211,11 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   border-radius: 4px;
-  background: #9e2a2b;
-  color: #fff;
+  background: var(--fc-badge-bg);
+  color: var(--fc-badge-color);
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 2px 6px rgba(26, 22, 17, 0.3);
+  box-shadow: 0 2px 6px var(--fc-badge-shadow);
   transform: translate(-50%, -50%);
 }
 
@@ -197,5 +223,5 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #6b7280;
+  color: var(--fc-center-label-color);
 }

@@ -1,18 +1,22 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Send, Sparkles } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Plus, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
-import { cn } from '@/lib/utils';
 import { useChartStore } from '@/store/chart-store';
 import { useChat } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
-import type { BuildLasoResponse } from '@/lib/api/schemas';
 import { INITIAL_GREETING, QUICK_PROMPTS, type ChatMessage } from '../data';
+import { MessageBubble } from './message-bubble';
+
+function patchLastMessage(prev: ChatMessage[], update: Partial<ChatMessage>): ChatMessage[] {
+  const next = [...prev];
+  const last = next[next.length - 1];
+  if (last && last.status === 'pending') {
+    next[next.length - 1] = { ...last, ...update };
+  }
+  return next;
+}
 
 export function ChatPanel() {
   const lastInput = useChartStore((s) => s.lastInput);
@@ -40,33 +44,20 @@ export function ChatPanel() {
     ]);
     setInput('');
 
-    const applyBuildResponse = (resp: BuildLasoResponse) => {
-      if (lastInput) setCurrent(lastInput, resp);
-    };
-
     chat.mutate(
-      { message, lastInput, applyBuildResponse },
       {
-        onSuccess: (resp) => {
-          setMessages((prev) => {
-            const next = [...prev];
-            const last = next[next.length - 1];
-            if (last && last.status === 'pending') {
-              next[next.length - 1] = { role: 'ai', text: resp.answer, status: 'ok' };
-            }
-            return next;
-          });
+        message,
+        lastInput,
+        applyBuildResponse: (resp) => {
+          if (lastInput) setCurrent(lastInput, resp);
         },
+      },
+      {
+        onSuccess: (resp) =>
+          setMessages((prev) => patchLastMessage(prev, { role: 'ai', text: resp.answer, status: 'ok' })),
         onError: (err) => {
           const text = isApiError(err) ? apiErrorMessage(err) : 'Đã có lỗi xảy ra.';
-          setMessages((prev) => {
-            const next = [...prev];
-            const last = next[next.length - 1];
-            if (last && last.status === 'pending') {
-              next[next.length - 1] = { role: 'ai', text, status: 'error' };
-            }
-            return next;
-          });
+          setMessages((prev) => patchLastMessage(prev, { role: 'ai', text, status: 'error' }));
         },
       },
     );
@@ -82,7 +73,11 @@ export function ChatPanel() {
       >
         <div className="mx-auto flex w-full max-w-[900px] flex-col gap-3 px-4 py-4 lg:px-6 lg:py-5">
           {messages.map((m, i) => (
-            <Bubble key={i} message={m} isResyncing={chat.isResyncing && m.status === 'pending'} />
+            <MessageBubble
+              key={i}
+              message={m}
+              isResyncing={chat.isResyncing && m.status === 'pending'}
+            />
           ))}
         </div>
       </div>
@@ -130,55 +125,6 @@ export function ChatPanel() {
             <Send className="size-4" />
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function Bubble({ message, isResyncing }: { message: ChatMessage; isResyncing: boolean }) {
-  const isAi = message.role === 'ai';
-  const isPending = message.status === 'pending';
-  const isError = message.status === 'error';
-  return (
-    <div
-      className={cn(
-        'flex max-w-[90%] gap-2',
-        isAi ? 'items-start self-start' : 'items-start self-end justify-end',
-      )}
-    >
-      {isAi && (
-        <Avatar className="mt-0.5 size-7">
-          <AvatarFallback className="bg-foreground text-background">
-            <Sparkles className="size-3" />
-          </AvatarFallback>
-        </Avatar>
-      )}
-      <div
-        className={cn(
-          'rounded-xl px-3 py-2 text-sm leading-relaxed',
-          isAi
-            ? isError
-              ? 'bg-destructive/10 text-destructive whitespace-pre-line'
-              : 'bg-muted text-foreground'
-            : 'bg-primary text-primary-foreground whitespace-pre-line',
-        )}
-      >
-        {isPending ? (
-          <div className="flex flex-col gap-1">
-            <Spinner className="size-4" />
-            {isResyncing && (
-              <span className="text-xs text-muted-foreground">
-                (đang đồng bộ lại lá số…)
-              </span>
-            )}
-          </div>
-        ) : isAi ? (
-          <div className="prose prose-sm prose-neutral max-w-none prose-headings:font-semibold prose-headings:mt-3 prose-headings:mb-1 prose-p:my-2 first:prose-p:mt-0 last:prose-p:mb-0 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-pre:my-2 prose-pre:bg-background prose-pre:text-foreground prose-pre:rounded-md prose-pre:p-3 prose-code:before:hidden prose-code:after:hidden prose-code:bg-background prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:font-normal prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-hr:my-3">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>
-          </div>
-        ) : (
-          message.text
-        )}
       </div>
     </div>
   );

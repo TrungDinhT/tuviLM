@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useChartStore } from '@/store/chart-store';
-import { CungCell } from './cung-cell';
+import { CungCellCompact } from './cung-cell-compact';
 import { CungDetailSheet } from './cung-detail-sheet';
 import { PersonalInfo } from './personal-info';
 import { CUNG_GRID } from '../types';
@@ -10,7 +10,6 @@ import { CUNG_GRID } from '../types';
 export function CompactChart() {
   const current = useChartStore((s) => s.current);
   const lastInput = useChartStore((s) => s.lastInput);
-  const saoLuuOverlay = useChartStore((s) => s.saoLuuOverlay);
   const selected = useChartStore((s) => s.selectedCungPosition);
   const selectCung = useChartStore((s) => s.selectCung);
   const [open, setOpen] = useState(false);
@@ -24,12 +23,10 @@ export function CompactChart() {
         {CUNG_GRID.map(({ row, col, position }) => {
           const cung = current.cung_by_position[position];
           if (!cung) return null;
-          const overlay = saoLuuOverlay?.cung_by_position[position]?.saoLuu;
           return (
-            <CungCell
+            <CungCellCompact
               key={position}
               cung={cung}
-              saoLuu={overlay}
               selected={selected === position}
               onClick={() => {
                 selectCung(position);
