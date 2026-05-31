@@ -2,7 +2,7 @@
 
 import { abbreviateStarStatus, cn } from '@/lib/utils';
 import type { Cung, Star } from '@/lib/api/schemas';
-import { isCat, isHung, getStarColorVar, getElementColorVar } from '../lib/star-colors';
+import { isCat, isHung, getStarColorVar, getElementColorVar } from '@/features/laso-chart/lib/star-colors';
 
 interface Props {
   cung: Cung;
