@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useIsDesktop } from '@/hooks/use-is-desktop';
 import { AppHeader } from './app-header';
 import { Sidebar } from './sidebar';
 import { BottomTabBar } from './bottom-tab-bar';
@@ -28,6 +29,7 @@ function setStoredCollapsed(value: boolean) {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(getStoredCollapsed);
+  const isDesktop = useIsDesktop();
 
   useEffect(() => {
     setStoredCollapsed(collapsed);
@@ -35,7 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-muted/40">
-      <Sidebar collapsed={collapsed} />
+      {isDesktop && <Sidebar collapsed={collapsed} />}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="sticky top-0 z-50">
           <AppHeader collapsed={collapsed} onToggleSidebar={() => setCollapsed((v) => !v)} />

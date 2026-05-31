@@ -27,7 +27,7 @@ export function AppHeader({ collapsed, onToggleSidebar }: AppHeaderProps) {
           type="button"
           onClick={onToggleSidebar}
           title={collapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
-          className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          className="hidden size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground lg:flex"
         >
           {collapsed ? <PanelLeft className="size-5" /> : <PanelLeftClose className="size-5" />}
         </button>
