@@ -373,19 +373,15 @@ def render_node(node: dict, stars: list[str], parent_list: list, index: int, dep
             for j, child in enumerate(list(node["children"])):
                 render_node(child, stars, node["children"], j, depth + 1)
 
-            if depth < 1:
-                ac = st.columns(2)
-                with ac[0]:
-                    if st.button("+ Leaf", key=f"{key}_add_leaf"):
-                        node["children"].append(new_leaf())
-                        st.rerun()
-                with ac[1]:
-                    if st.button("+ Group", key=f"{key}_add_group"):
-                        node["children"].append(new_group())
-                        st.rerun()
-            else:
+            ac = st.columns(2)
+            with ac[0]:
                 if st.button("+ Leaf", key=f"{key}_add_leaf"):
                     node["children"].append(new_leaf())
+                    st.rerun()
+            with ac[1]:
+                nested_op = "any" if node["operator"] == "all" else "all"
+                if st.button(f"+ Nested {nested_op}", key=f"{key}_add_group"):
+                    node["children"].append(new_group(operator=nested_op))
                     st.rerun()
 
 
