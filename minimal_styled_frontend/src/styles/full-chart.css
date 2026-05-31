@@ -25,30 +25,40 @@
   --fc-badge-color: #fff;
   --fc-badge-shadow: rgba(26, 22, 17, 0.3);
   --fc-center-label-color: #6b7280;
+  --fc-text-sub-star: clamp(6px, 7.5cqi, 14px);
 }
 
 .fc-grid {
+  aspect-ratio: 2 / 3;
   position: relative;
-  padding: 10px;
+  padding: clamp(0px, 1cqi, 10px);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(4, 1fr);
-  gap: 4px;
+  gap: clamp(1px, 0.5cqi, 4px);
   background: transparent;
-  border-radius: 14px;
+  border-radius: clamp(0px, 1cqi, 14px);
+  container-type: inline-size;
 }
 
 .fc-cell {
   border: 1px solid var(--fc-border);
-  border-radius: 10px;
+  border-radius: clamp(4px, 1cqi, 10px);
   text-align: left;
   background: var(--fc-cell-bg);
-  padding: 8px;
-  overflow: hidden;
+  padding: clamp(4px, 1cqi, 8px);
+  overflow-y: auto;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   position: relative;
+  container-type: inline-size;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.fc-cell::-webkit-scrollbar {
+  display: none;
 }
 
 .fc-cell.selected {
@@ -64,22 +74,23 @@
   position: absolute;
   top: 6px;
   right: 8px;
-  font-size: 12px;
+  font-size: clamp(9px, 8cqi, 12px);
   font-weight: 700;
   color: var(--fc-age-color);
   line-height: 1;
 }
 
 .fc-role {
-  margin: 2px 0 4px 0;
-  font-size: 13px;
+  margin: 0;
+  padding: 2px 0 4px 0;
+  font-size: clamp(6px, 8cqi, 16px);
   font-weight: 600;
   text-align: center;
   color: var(--fc-role-color);
 }
 
 .fc-main-tuhoa-row {
-  min-height: 28px;
+  min-height: clamp(15px, 18cqi, 28px);
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -108,15 +119,16 @@
 
 .fc-star-main {
   font-weight: 700;
-  font-size: 11px;
-  line-height: 1.2;
+  font-size: clamp(6px, 8cqi, 16px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .fc-star-tuhoa {
-  font-size: 10px;
+  font-size: var(--fc-text-sub-star);
   color: var(--fc-tuhoa-color);
   font-weight: 600;
-  line-height: 1.2;
 }
 
 .fc-divider {
@@ -126,7 +138,7 @@
 }
 
 .fc-star-sub {
-  font-size: 10px;
+  font-size: var(--fc-text-sub-star);
   color: var(--fc-star-sub-color);
   line-height: 1.3;
 }
@@ -149,7 +161,7 @@
 }
 
 .fc-star-luu-divider {
-  font-size: 10px;
+  font-size: var(--fc-text-sub-star);
   font-weight: 700;
   color: #5b3d20;
   text-align: center;
@@ -158,7 +170,7 @@
 
 .fc-trangsinh {
   margin-top: auto;
-  font-size: 10px;
+  font-size: var(--fc-text-sub-star);
   color: var(--fc-trangsinh-color);
   text-align: center;
 }
@@ -182,31 +194,44 @@
   text-align: center;
   gap: 6px;
   padding: 12px;
+  container-type: inline-size;
 }
 
 .fc-center-name {
-  font-size: 15px;
+  font-size: clamp(11px, 6cqi, 15px);
   font-weight: 500;
   color: var(--fc-center-name-color);
 }
 
 .fc-center-birth {
-  font-size: 11px;
+  font-size: clamp(9px, 4.5cqi, 11px);
   color: var(--fc-center-birth-color);
 }
 
 .fc-center-line {
-  font-size: 13px;
+  font-size: clamp(10px, 5cqi, 13px);
   font-weight: 600;
   color: var(--fc-center-line-color);
   letter-spacing: 0.02em;
+}
+
+.fc-info-label {
+  font-size: clamp(8px, 4cqi, 10px);
+}
+
+.fc-info-name {
+  font-size: clamp(11px, 6cqi, 15px);
+}
+
+.fc-info-value {
+  font-size: clamp(9px, 4.5cqi, 11px);
 }
 
 .fc-badge-tuan-triet {
   position: absolute;
   z-index: 10;
   padding: 2px 6px;
-  font-size: 8px;
+  font-size: clamp(6px, 1.2cqi, 9px);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;

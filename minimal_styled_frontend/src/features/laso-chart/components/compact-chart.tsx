@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useChartStore } from '@/store/chart-store';
+import '@/styles/compact-chart.css';
 import { CungCellCompact } from './cung-cell-compact';
 import { CungDetailSheet } from './cung-detail-sheet';
 import { PersonalInfo } from './personal-info';
@@ -18,24 +19,26 @@ export function CompactChart() {
 
   return (
     <>
-      <div className="grid aspect-square grid-cols-4 grid-rows-4 gap-px overflow-hidden rounded-md bg-border">
-        <PersonalInfo response={current} input={lastInput} />
-        {CUNG_GRID.map(({ row, col, position }) => {
-          const cung = current.cung_by_position[position];
-          if (!cung) return null;
-          return (
-            <CungCellCompact
-              key={position}
-              cung={cung}
-              selected={selected === position}
-              onClick={() => {
-                selectCung(position);
-                setOpen(true);
-              }}
-              style={{ gridRow: row, gridColumn: col }}
-            />
-          );
-        })}
+      <div className="w-full overflow-auto">
+        <div className="grid aspect-square min-w-[320px] grid-cols-4 grid-rows-4 gap-px overflow-hidden rounded-md bg-border">
+          <PersonalInfo response={current} input={lastInput} />
+          {CUNG_GRID.map(({ row, col, position }) => {
+            const cung = current.cung_by_position[position];
+            if (!cung) return null;
+            return (
+              <CungCellCompact
+                key={position}
+                cung={cung}
+                selected={selected === position}
+                onClick={() => {
+                  selectCung(position);
+                  setOpen(true);
+                }}
+                style={{ gridRow: row, gridColumn: col }}
+              />
+            );
+          })}
+        </div>
       </div>
 
       <CungDetailSheet

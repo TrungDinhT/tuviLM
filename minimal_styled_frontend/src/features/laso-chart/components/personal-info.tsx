@@ -23,31 +23,37 @@ export function PersonalInfo({ response, input, className, variant = 'compact' }
   return (
     <div className={cn(
       'flex flex-col justify-center gap-1 overflow-hidden p-3',
-      !isFull && 'col-start-2 row-start-2 col-span-2 row-span-2 bg-card',
+      !isFull && 'cc-personal-info col-start-2 row-start-2 col-span-2 row-span-2 bg-card',
       className,
     )}>
-      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Lá số tử vi</div>
+      <div className={cn('uppercase tracking-wide text-muted-foreground', isFull ? 'fc-info-label' : 'cc-info-label')}>
+        Lá số tử vi
+      </div>
       {input?.name && (
-        <div className="text-sm leading-tight font-medium">{input.name}</div>
+        <div className={cn('leading-tight font-medium', isFull ? 'fc-info-name' : 'cc-info-name')}>
+          {input.name}
+        </div>
       )}
       {birth && (
-        <div className="text-[11px] leading-snug text-muted-foreground">{birth}</div>
+        <div className={cn('leading-snug text-muted-foreground', isFull ? 'fc-info-value' : 'cc-info-value')}>
+          {birth}
+        </div>
       )}
       <div className="my-1 h-px bg-border" />
-      <Row k="Bản mệnh" v={response.ban_menh_name} />
-      <Row k="Cục mệnh" v={response.cuc_name} />
-      <Row k="Quan hệ" v={response.menh_cuc_relation_label} />
+      <Row k="Bản mệnh" v={response.ban_menh_name} isFull={isFull} />
+      <Row k="Cục mệnh" v={response.cuc_name} isFull={isFull} />
+      <Row k="Quan hệ" v={response.menh_cuc_relation_label} isFull={isFull} />
     </div>
   );
 }
 
-function Row({ k, v }: { k: string; v: string }) {
+function Row({ k, v, isFull }: { k: string; v: string; isFull: boolean }) {
   return (
     <div className="flex flex-col leading-snug">
-      <span className="text-[9px] uppercase tracking-wide whitespace-nowrap text-muted-foreground">
+      <span className={cn('uppercase tracking-wide whitespace-nowrap text-muted-foreground', isFull ? 'fc-info-label' : 'cc-info-label')}>
         {k}
       </span>
-      <span className="text-[11px] text-foreground">{v}</span>
+      <span className={cn('text-foreground', isFull ? 'fc-info-value' : 'cc-info-value')}>{v}</span>
     </div>
   );
 }

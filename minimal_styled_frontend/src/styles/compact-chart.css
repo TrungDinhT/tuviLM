@@ -1,0 +1,40 @@
+/* Compact chart container queries for responsive font sizing.
+   Imported by CompactChart to cover CungCellCompact and PersonalInfo (compact variant). */
+
+.cc-cell {
+  container-type: inline-size;
+  aspect-ratio: 1;
+}
+
+.cc-cell::-webkit-scrollbar {
+  display: none;
+}
+
+.cc-position {
+  font-size: clamp(8px, 9cqi, 10px);
+  background: inherit;
+}
+
+.cc-star-main {
+  font-size: clamp(7px, 8cqi, 9px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* PersonalInfo — compact variant (lives inside the 2×2 center grid area) */
+.cc-personal-info {
+  container-type: inline-size;
+}
+
+.cc-info-label {
+  font-size: clamp(8px, 4.5cqi, 10px);
+}
+
+.cc-info-name {
+  font-size: clamp(10px, 6cqi, 14px);
+}
+
+.cc-info-value {
+  font-size: clamp(9px, 5cqi, 11px);
+}

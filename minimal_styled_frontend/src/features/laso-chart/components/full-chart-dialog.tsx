@@ -75,17 +75,18 @@ export function FullChartDialog({ open, onOpenChange }: Props) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="flex max-h-[95vh] w-full max-w-[min(95vw,calc(95vh*2/3))] flex-col gap-3 overflow-hidden p-4">
+        <DialogContent className="flex max-h-[95vh] w-full max-w-[max(520px,min(95vw,calc((95vh-120px)*2/3)))] flex-col gap-3 overflow-hidden p-4">
           <DialogHeader>
             <DialogTitle>Lá số chi tiết</DialogTitle>
             <DialogDescription>
               Chạm vào một cung để xem mô tả đầy đủ.
             </DialogDescription>
           </DialogHeader>
-          <div
-            data-testid="full-chart-grid"
-            className="fc-grid aspect-[2/3] min-h-0 overflow-hidden rounded-md"
-          >
+          <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
+            <div
+              data-testid="full-chart-grid"
+              className="fc-grid rounded-md"
+            >
             <PersonalInfo response={current} input={lastInput} variant="full" className="fc-center" />
             {CUNG_GRID.map(({ row, col, position }) => {
               const cung = current.cung_by_position[position];
@@ -125,6 +126,7 @@ export function FullChartDialog({ open, onOpenChange }: Props) {
                 </div>
               );
             })}
+          </div>
           </div>
         </DialogContent>
       </Dialog>

@@ -17,11 +17,11 @@ export function CungCellCompact({ cung, selected, onClick, style }: Props) {
       onClick={onClick}
       style={style}
       className={cn(
-        'flex min-w-0 flex-col gap-1 overflow-hidden bg-card p-1 text-left',
+        'cc-cell flex min-w-0 flex-col gap-1 bg-card p-1 text-left',
         selected && 'ring-2 ring-inset ring-primary',
       )}
     >
-      <div className="text-[10px] leading-tight font-medium text-primary">
+      <div className="cc-position leading-tight font-medium text-primary">
         {cung.position}
       </div>
 
@@ -30,8 +30,7 @@ export function CungCellCompact({ cung, selected, onClick, style }: Props) {
           {cung.chinh_tinh.map((star) => (
             <div
               key={star}
-              className="leading-tight font-medium text-foreground"
-              style={{ fontSize: '9px' }}
+              className="cc-star-main leading-tight font-medium text-foreground"
             >
               {abbreviateStarStatus(star)}
             </div>

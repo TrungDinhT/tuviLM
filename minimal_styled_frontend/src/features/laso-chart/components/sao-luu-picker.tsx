@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useBuildSaoLuu } from '@/lib/api/hooks';
@@ -56,29 +56,27 @@ export function SaoLuuPicker() {
   }, [year, lastInput?.gender, mutate, setOverlay]);
 
   return (
-    <Card size="sm">
-      <CardHeader></CardHeader>
-      <CardContent>
-        <FieldGroup>
-          <Field className="flex-row">
-            <FieldLabel htmlFor="sl-year">Xem năm</FieldLabel>
-            <Input
-              id="sl-year"
-              type="number"
-              inputMode="numeric"
-              min={1800}
-              max={2200}
-              value={year}
-              onChange={(e) => {
-                setYear(e.target.value);
-                setApiError(null);
-              }}
-            />
-          </Field>
-        </FieldGroup>
+    <div className="flex flex-col gap-3">
+      <FieldGroup>
+        <Field className="flex-row">
+          <FieldLabel htmlFor="sl-year">Xem năm</FieldLabel>
+          <Input
+            className='z-50'
+            id="sl-year"
+            type="number"
+            inputMode="numeric"
+            min={1800}
+            max={2200}
+            value={year}
+            onChange={(e) => {
+              setYear(e.target.value);
+              setApiError(null);
+            }}
+          />
+        </Field>
+      </FieldGroup>
 
-        {displayError && <div className="mt-3 text-xs text-destructive">{displayError}</div>}
-      </CardContent>
-    </Card>
+      {displayError && <div className="text-xs text-destructive">{displayError}</div>}
+    </div>
   );
 }
