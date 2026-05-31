@@ -90,7 +90,7 @@
 }
 
 .fc-main-tuhoa-row {
-  min-height: clamp(15px, 18cqi, 28px);
+  min-height: clamp(15px, 25cqi, 40px);
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -128,7 +128,6 @@
 .fc-star-tuhoa {
   font-size: var(--fc-text-sub-star);
   color: var(--fc-tuhoa-color);
-  font-weight: 600;
 }
 
 .fc-divider {
