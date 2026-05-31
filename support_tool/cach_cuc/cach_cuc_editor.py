@@ -54,7 +54,7 @@ def load_stars() -> list[str]:
     return [s["id"] for s in data]
 
 
-def new_leaf(ctype: str = "can_match") -> dict:
+def new_leaf(ctype: str = "stars_meeting") -> dict:
     return {
         "_kind": "leaf",
         "_key": f"leaf_{uuid.uuid4().hex[:8]}",
