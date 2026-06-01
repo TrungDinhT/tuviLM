@@ -51,8 +51,9 @@ def sanitize_id(value: str) -> str:
 def load_stars() -> list[str]:
     with STARS_PATH.open("r", encoding="utf-8") as f:
         data = json.load(f)
-    return [s["id"] for s in data]
-
+    all_id = [s["id"] for s in data]
+    all_id.extend(["hoa_quyen", "hoa_loc", "hoa_khoa", "hoa_ky", "tuan", "triet"])
+    return all_id
 
 def new_leaf(ctype: str = "stars_meeting") -> dict:
     return {
