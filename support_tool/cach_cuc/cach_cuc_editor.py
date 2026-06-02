@@ -63,6 +63,14 @@ def new_leaf(ctype: str = "stars_meeting") -> dict:
     }
 
 
+def new_no_tuan_triet_leaf() -> dict:
+    leaf = new_leaf("no_stars")
+    leaf["in_palace"] = PALACES[0]
+    leaf["stars"] = ["tuan", "triet"]
+    leaf["group"] = None
+    return leaf
+
+
 def new_group(operator: str = "all") -> dict:
     return {
         "_kind": "group",
@@ -374,12 +382,16 @@ def render_node(node: dict, stars: list[str], parent_list: list, index: int, dep
             for j, child in enumerate(list(node["children"])):
                 render_node(child, stars, node["children"], j, depth + 1)
 
-            ac = st.columns(2)
+            ac = st.columns(3)
             with ac[0]:
                 if st.button("+ Leaf", key=f"{key}_add_leaf"):
                     node["children"].append(new_leaf())
                     st.rerun()
             with ac[1]:
+                if st.button("+ No Tuan/Triet", key=f"{key}_add_no_tuan_triet"):
+                    node["children"].append(new_no_tuan_triet_leaf())
+                    st.rerun()
+            with ac[2]:
                 nested_op = "any" if node["operator"] == "all" else "all"
                 if st.button(f"+ Nested {nested_op}", key=f"{key}_add_group"):
                     node["children"].append(new_group(operator=nested_op))
@@ -429,12 +441,16 @@ def main() -> None:
     for i, child in enumerate(list(root["children"])):
         render_node(child, stars, root["children"], i, depth=0)
 
-    add_cols = st.columns(2)
+    add_cols = st.columns(3)
     with add_cols[0]:
         if st.button("+ Add condition"):
             root["children"].append(new_leaf())
             st.rerun()
     with add_cols[1]:
+        if st.button("+ Add no Tuan/Triet"):
+            root["children"].append(new_no_tuan_triet_leaf())
+            st.rerun()
+    with add_cols[2]:
         if st.button("+ Add nested group"):
             root["children"].append(new_group())
             st.rerun()
