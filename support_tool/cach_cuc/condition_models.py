@@ -2,8 +2,12 @@ from __future__ import annotations
 
 import re
 from typing import Annotated, Literal
+import annotated_types as at
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+
+from src.refactored.components.definitions.cung_role import Role
+from src.refactored.model.elementary import DiaChi, ThienCan
 
 
 _BLANK_LINE_RE = re.compile(r"\n\s*\n+")
@@ -20,6 +24,7 @@ Scope = Literal[
     "xung_chieu",
     "giap",
 ]
+Brightness = Literal["mieu", "vuong", "dac", "binh hoa", "ham"]
 
 
 class BaseCondition(BaseModel):
@@ -28,12 +33,12 @@ class BaseCondition(BaseModel):
 
 class CanMatchCondition(BaseCondition):
     type: Literal["can_match"] = "can_match"
-    can: list[str]
+    can: Annotated[list[ThienCan], at.MinLen(1)]
 
 
 class CanExcludeCondition(BaseCondition):
     type: Literal["can_exclude"] = "can_exclude"
-    can: list[str]
+    can: Annotated[list[ThienCan], at.MinLen(1)]
 
 
 class GenderMatchCondition(BaseCondition):
@@ -43,25 +48,25 @@ class GenderMatchCondition(BaseCondition):
 
 class PalaceAtCondition(BaseCondition):
     type: Literal["palace_at"] = "palace_at"
-    palace: str
-    chi: list[str]
+    palace: Role
+    chi: Annotated[DiaChi, at.MinLen(1)]
 
 
 class OnlyChinhTinhCondition(BaseCondition):
     type: Literal["only_chinh_tinh"] = "only_chinh_tinh"
-    palace: str
+    palace: Role
     star: str
 
 
 class StarBrightnessCondition(BaseCondition):
     type: Literal["star_brightness"] = "star_brightness"
     stars: list[str]
-    brightness: list[str]
+    brightness: Annotated[list[Brightness], at.MinLen(1)]
 
 
 class StarInPalaceCondition(BaseCondition):
     type: Literal["star_in_palace"] = "star_in_palace"
-    palace: str
+    palace: Role
     stars: list[str] | None = None
     group: str | None = None
     mode: Mode | None = None
@@ -77,7 +82,7 @@ class StarInPalaceCondition(BaseCondition):
 
 class StarAtChiCondition(BaseCondition):
     type: Literal["star_at_chi"] = "star_at_chi"
-    at_chi: list[str]
+    at_chi: Annotated[DiaChi, at.MinLen(1)]
     stars: list[str] | None = None
     group: str | None = None
     mode: Mode | None = None
