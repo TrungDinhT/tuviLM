@@ -122,14 +122,14 @@ LeafCondition = Annotated[
 
 
 class AllCondition(BaseModel):
-    all: list[Condition]
+    _all: list[Condition] = Field(..., alias="all")
 
 
 class AnyCondition(BaseModel):
-    any: list[Condition]
+    _any: list[Condition] = Field(..., alias="any")
 
 class NotCondition(BaseModel):
-    not_: Condition = Field(..., alias="not")
+    _not: Condition = Field(..., alias="not")
 
 
 Condition = LeafCondition | AllCondition | AnyCondition | NotCondition
