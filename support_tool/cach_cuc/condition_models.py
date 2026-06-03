@@ -47,13 +47,6 @@ class PalaceAtCondition(BaseCondition):
     chi: list[str]
 
 
-class NoStarsCondition(BaseCondition):
-    type: Literal["no_stars"] = "no_stars"
-    in_palace: str
-    stars: list[str] | None = None
-    group: str | None = None
-
-
 class OnlyChinhTinhCondition(BaseCondition):
     type: Literal["only_chinh_tinh"] = "only_chinh_tinh"
     palace: str
@@ -119,7 +112,6 @@ LeafCondition = Annotated[
     | CanExcludeCondition
     | GenderMatchCondition
     | PalaceAtCondition
-    | NoStarsCondition
     | OnlyChinhTinhCondition
     | StarBrightnessCondition
     | StarInPalaceCondition
@@ -136,8 +128,11 @@ class AllCondition(BaseModel):
 class AnyCondition(BaseModel):
     any: list[Condition]
 
+class NotCondition(BaseModel):
+    not_: Condition = Field(..., alias="not")
 
-Condition = LeafCondition | AllCondition | AnyCondition
+
+Condition = LeafCondition | AllCondition | AnyCondition | NotCondition
 
 
 class Group(BaseModel):
