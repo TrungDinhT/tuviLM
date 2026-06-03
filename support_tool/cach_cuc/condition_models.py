@@ -49,7 +49,7 @@ class GenderMatchCondition(BaseCondition):
 class PalaceAtCondition(BaseCondition):
     type: Literal["palace_at"] = "palace_at"
     palace: Role
-    chi: Annotated[DiaChi, at.MinLen(1)]
+    chi: Annotated[list[DiaChi], at.MinLen(1)]
 
 
 class OnlyChinhTinhCondition(BaseCondition):
@@ -82,7 +82,7 @@ class StarInPalaceCondition(BaseCondition):
 
 class StarAtChiCondition(BaseCondition):
     type: Literal["star_at_chi"] = "star_at_chi"
-    at_chi: Annotated[DiaChi, at.MinLen(1)]
+    at_chi: Annotated[list[DiaChi], at.MinLen(1)]
     stars: list[str] = Field(default_factory=list)
     group: str | None = None
     mode: Mode | None = None
@@ -127,14 +127,14 @@ LeafCondition = Annotated[
 
 
 class AllCondition(BaseModel):
-    _all: list[Condition] = Field(..., alias="all")
+    all_: list[Condition] = Field(..., alias="all")
 
 
 class AnyCondition(BaseModel):
-    _any: list[Condition] = Field(..., alias="any")
+    any_: list[Condition] = Field(..., alias="any")
 
 class NotCondition(BaseModel):
-    _not: Condition = Field(..., alias="not")
+    not_: Condition = Field(..., alias="not")
 
 
 Condition = LeafCondition | AllCondition | AnyCondition | NotCondition
