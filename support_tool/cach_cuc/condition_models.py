@@ -163,5 +163,6 @@ class CachCucData(BaseModel):
 
 AllCondition.model_rebuild()
 AnyCondition.model_rebuild()
+NotCondition.model_rebuild()
 CachCuc.model_rebuild()
 CachCucData.model_rebuild()
