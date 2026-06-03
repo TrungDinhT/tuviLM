@@ -67,7 +67,7 @@ class StarBrightnessCondition(BaseCondition):
 class StarInPalaceCondition(BaseCondition):
     type: Literal["star_in_palace"] = "star_in_palace"
     palace: Role
-    stars: list[str] | None = None
+    stars: list[str] = Field(default_factory=list)
     group: str | None = None
     mode: Mode | None = None
 
@@ -75,7 +75,7 @@ class StarInPalaceCondition(BaseCondition):
     def _validate_group_mode(self) -> StarInPalaceCondition:
         if self.mode is not None and self.group is None:
             raise ValueError("mode is only valid when group is set")
-        if self.stars is None and self.group is None:
+        if not self.stars and self.group is None:
             raise ValueError("star_in_palace requires stars or group")
         return self
 
@@ -83,7 +83,7 @@ class StarInPalaceCondition(BaseCondition):
 class StarAtChiCondition(BaseCondition):
     type: Literal["star_at_chi"] = "star_at_chi"
     at_chi: Annotated[DiaChi, at.MinLen(1)]
-    stars: list[str] | None = None
+    stars: list[str] = Field(default_factory=list)
     group: str | None = None
     mode: Mode | None = None
 
@@ -91,7 +91,7 @@ class StarAtChiCondition(BaseCondition):
     def _validate_group_mode(self) -> StarAtChiCondition:
         if self.mode is not None and self.group is None:
             raise ValueError("mode is only valid when group is set")
-        if self.stars is None and self.group is None:
+        if not self.stars and self.group is None:
             raise ValueError("star_at_chi requires stars or group")
         return self
 
@@ -99,7 +99,7 @@ class StarAtChiCondition(BaseCondition):
 class StarsMeetingCondition(BaseCondition):
     type: Literal["stars_meeting"] = "stars_meeting"
     scope: Scope
-    stars: list[str] | None = None
+    stars: list[str] = Field(default_factory=list)
     group: str | None = None
     mode: Mode | None = None
 
@@ -107,7 +107,7 @@ class StarsMeetingCondition(BaseCondition):
     def _validate_group_mode(self) -> StarsMeetingCondition:
         if self.mode is not None and self.group is None:
             raise ValueError("mode is only valid when group is set")
-        if self.stars is None and self.group is None:
+        if not self.stars and self.group is None:
             raise ValueError("stars_meeting requires stars or group")
         return self
 
