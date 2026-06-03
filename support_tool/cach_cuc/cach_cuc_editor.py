@@ -32,7 +32,6 @@ CONDITION_TYPES = [
     "can_exclude",
     "can_match",
     "gender_match",
-    "no_stars",
     "only_chinh_tinh",
     "palace_at",
     "star_at_chi",
@@ -63,12 +62,27 @@ def new_leaf(ctype: str = "stars_meeting") -> dict:
     }
 
 
-def new_no_tuan_triet_leaf() -> dict:
-    leaf = new_leaf("no_stars")
-    leaf["in_palace"] = PALACES[0]
+def new_not_node() -> dict:
+    return {
+        "_kind": "not",
+        "_key": f"not_{uuid.uuid4().hex[:8]}",
+        "children": [],
+    }
+
+
+def new_tuan_triet_leaf() -> dict:
+    leaf = new_leaf("star_in_palace")
+    leaf["palace"] = PALACES[0]
     leaf["stars"] = ["tuan", "triet"]
     leaf["group"] = None
+    leaf["mode"] = None
     return leaf
+
+
+def new_no_tuan_triet_not_node() -> dict:
+    not_node = new_not_node()
+    not_node["children"].append(new_tuan_triet_leaf())
+    return not_node
 
 
 def new_group(operator: str = "all") -> dict:
@@ -125,35 +139,6 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             index=safe_index(GENDERS, cond.get("gender")),
             key=f"{key}_gender",
         )
-
-    elif ctype == "no_stars":
-        cond["in_palace"] = st.selectbox(
-            "in_palace",
-            PALACES,
-            index=safe_index(PALACES, cond.get("in_palace")),
-            key=f"{key}_in_palace",
-        )
-        use_group = st.checkbox(
-            "use group",
-            value=cond.get("group") is not None,
-            key=f"{key}_use_group",
-        )
-        if use_group:
-            cond["group"] = st.selectbox(
-                "group",
-                GROUPS,
-                index=safe_index(GROUPS, cond.get("group")),
-                key=f"{key}_group",
-            )
-            cond["stars"] = None
-        else:
-            cond["stars"] = st.multiselect(
-                "stars",
-                stars,
-                default=safe_default_list(stars, cond.get("stars")),
-                key=f"{key}_stars",
-            )
-            cond["group"] = None
 
     elif ctype == "only_chinh_tinh":
         cond["palace"] = st.selectbox(
@@ -328,7 +313,6 @@ def leaf_to_dict(cond: dict) -> dict:
         "can_exclude": ["can"],
         "can_match": ["can"],
         "gender_match": ["gender"],
-        "no_stars": ["in_palace", "group", "stars"],
         "only_chinh_tinh": ["palace", "star"],
         "palace_at": ["palace", "chi"],
         "star_at_chi": ["stars", "at_chi", "group", "mode"],
@@ -350,6 +334,11 @@ def leaf_to_dict(cond: dict) -> dict:
 def node_to_dict(node: dict) -> dict:
     if node["_kind"] == "leaf":
         return leaf_to_dict(node)
+    if node["_kind"] == "not":
+        children = node.get("children", [])
+        if children:
+            return {"not": node_to_dict(children[0])}
+        return {}
     return {node["operator"]: [node_to_dict(child) for child in node["children"]]}
 
 
@@ -358,7 +347,12 @@ def render_node(node: dict, stars: list[str], parent_list: list, index: int, dep
     with st.container(border=True):
         header = st.columns([5, 1, 1])
         with header[0]:
-            label = "Leaf" if node["_kind"] == "leaf" else f"Group ({node['operator']})"
+            if node["_kind"] == "leaf":
+                label = "Leaf"
+            elif node["_kind"] == "not":
+                label = "NOT"
+            else:
+                label = f"Group ({node['operator']})"
             st.markdown(f"**#{index + 1} — {label}**")
         with header[1]:
             if index > 0 and st.button("↑", key=f"{key}_up"):
@@ -371,6 +365,20 @@ def render_node(node: dict, stars: list[str], parent_list: list, index: int, dep
 
         if node["_kind"] == "leaf":
             render_leaf(node, stars)
+        elif node["_kind"] == "not":
+            children = node.setdefault("children", [])
+            if children:
+                render_node(children[0], stars, children, 0, depth + 1)
+            else:
+                ac = st.columns(2)
+                with ac[0]:
+                    if st.button("+ Leaf", key=f"{key}_add_leaf"):
+                        children.append(new_leaf())
+                        st.rerun()
+                with ac[1]:
+                    if st.button("+ Group", key=f"{key}_add_group"):
+                        children.append(new_group("all"))
+                        st.rerun()
         else:
             node["operator"] = st.radio(
                 "operator",
@@ -382,19 +390,23 @@ def render_node(node: dict, stars: list[str], parent_list: list, index: int, dep
             for j, child in enumerate(list(node["children"])):
                 render_node(child, stars, node["children"], j, depth + 1)
 
-            ac = st.columns(3)
+            ac = st.columns(4)
             with ac[0]:
                 if st.button("+ Leaf", key=f"{key}_add_leaf"):
                     node["children"].append(new_leaf())
                     st.rerun()
             with ac[1]:
                 if st.button("+ No Tuan/Triet", key=f"{key}_add_no_tuan_triet"):
-                    node["children"].append(new_no_tuan_triet_leaf())
+                    node["children"].append(new_no_tuan_triet_not_node())
                     st.rerun()
             with ac[2]:
                 nested_op = "any" if node["operator"] == "all" else "all"
                 if st.button(f"+ Nested {nested_op}", key=f"{key}_add_group"):
                     node["children"].append(new_group(operator=nested_op))
+                    st.rerun()
+            with ac[3]:
+                if st.button("+ NOT", key=f"{key}_add_not"):
+                    node["children"].append(new_not_node())
                     st.rerun()
 
 
@@ -441,18 +453,22 @@ def main() -> None:
     for i, child in enumerate(list(root["children"])):
         render_node(child, stars, root["children"], i, depth=0)
 
-    add_cols = st.columns(3)
+    add_cols = st.columns(4)
     with add_cols[0]:
         if st.button("+ Add condition"):
             root["children"].append(new_leaf())
             st.rerun()
     with add_cols[1]:
         if st.button("+ Add no Tuan/Triet"):
-            root["children"].append(new_no_tuan_triet_leaf())
+            root["children"].append(new_no_tuan_triet_not_node())
             st.rerun()
     with add_cols[2]:
         if st.button("+ Add nested group"):
             root["children"].append(new_group())
+            st.rerun()
+    with add_cols[3]:
+        if st.button("+ Add NOT"):
+            root["children"].append(new_not_node())
             st.rerun()
 
     st.markdown("---")
