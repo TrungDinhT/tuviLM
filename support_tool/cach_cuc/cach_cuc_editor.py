@@ -24,6 +24,8 @@ from support_tool.cach_cuc.condition_models import Brightness, CachCuc, DiaChi, 
 
 STARS_PATH = ROOT / "src/refactored/components/data/sao.json"
 DEFAULT_EXPORT_FILENAME = "cach_cuc_reviewed.yaml"
+SELECTED_ENTRY_WIDGET_KEY = "selected_entry_select"
+ORIGINAL_ENTRY_PLACEHOLDER = ""
 
 PALACES = [role.value for role in Role]
 CHI = [chi.value for chi in DiaChi]
@@ -719,6 +721,8 @@ def render_node(node: dict, stars: list[str], parent_list: list, index: int, dep
 
 
 def init_state() -> None:
+    if st.session_state.get("export_path") is None:
+        st.session_state.pop("export_path", None)
     if "entries" not in st.session_state:
         st.session_state.entries = {}
     if "original_entries" not in st.session_state:
@@ -729,24 +733,94 @@ def init_state() -> None:
         st.session_state.saved_ids = set()
     if "selected_id" not in st.session_state:
         st.session_state.selected_id = None
+    if "pending_selected_entry_widget" not in st.session_state:
+        st.session_state.pending_selected_entry_widget = None
     if "source_data" not in st.session_state:
         st.session_state.source_data = {}
     if "entry_list_refresh" not in st.session_state:
         st.session_state.entry_list_refresh = 0
+    if "export_cache_path" not in st.session_state:
+        st.session_state.export_cache_path = None
+    if "export_payload" not in st.session_state:
+        st.session_state.export_payload = {"groups": DEFAULT_GROUPS, "cach_cuc": []}
+    if "export_entries_by_id" not in st.session_state:
+        st.session_state.export_entries_by_id = {}
 
 
 def refresh_entry_lists() -> None:
     st.session_state.entry_list_refresh = st.session_state.get("entry_list_refresh", 0) + 1
 
 
+def select_entry(cc_id: str) -> None:
+    st.session_state.selected_id = cc_id
+    st.session_state.pending_selected_entry_widget = (
+        cc_id
+        if cc_id in st.session_state.original_entries
+        else ORIGINAL_ENTRY_PLACEHOLDER
+    )
+
+
+def apply_pending_entry_selection(original_ids: list[str]) -> None:
+    options = [ORIGINAL_ENTRY_PLACEHOLDER] + original_ids
+    pending = st.session_state.get("pending_selected_entry_widget")
+    if pending is not None:
+        st.session_state[SELECTED_ENTRY_WIDGET_KEY] = pending if pending in options else ORIGINAL_ENTRY_PLACEHOLDER
+        st.session_state.pending_selected_entry_widget = None
+    elif st.session_state.get(SELECTED_ENTRY_WIDGET_KEY) not in options:
+        st.session_state[SELECTED_ENTRY_WIDGET_KEY] = (
+            st.session_state.selected_id
+            if st.session_state.selected_id in original_ids
+            else ORIGINAL_ENTRY_PLACEHOLDER
+        )
+
+
+def entry_review_status(cc_id: str) -> str:
+    is_modified = cc_id in st.session_state.modified_ids
+    is_saved = cc_id in st.session_state.export_entries_by_id
+    if is_modified and is_saved:
+        return "modified in memory, already saved"
+    if is_modified:
+        return "modified in memory"
+    if is_saved:
+        return "saved in export file"
+    return "original"
+
+
+def review_entry_ids() -> list[str]:
+    return sorted(st.session_state.modified_ids | set(st.session_state.export_entries_by_id))
+
+
+def in_progress_entry_ids() -> list[str]:
+    return sorted(st.session_state.modified_ids)
+
+
+def saved_entry_ids() -> list[str]:
+    return sorted(st.session_state.export_entries_by_id)
+
+
+def sync_export_cache_to_memory() -> None:
+    for cc_id, entry in st.session_state.export_entries_by_id.items():
+        state_entry = imported_entry_to_state(entry)
+        st.session_state.entries[cc_id] = state_entry
+        st.session_state.saved_ids.add(cc_id)
+
+
+def select_entry_from_widget(widget_key: str) -> None:
+    cc_id = st.session_state.get(widget_key)
+    if cc_id:
+        select_entry(cc_id)
+
+
 def reset_form() -> None:
     selected_id = st.session_state.get("selected_id")
     if not selected_id:
         return
-    original = st.session_state.original_entries.get(selected_id)
-    if original is None:
+    if selected_id in st.session_state.export_entries_by_id:
+        st.session_state.entries[selected_id] = imported_entry_to_state(st.session_state.export_entries_by_id[selected_id])
+    elif selected_id in st.session_state.original_entries:
+        st.session_state.entries[selected_id] = deepcopy(st.session_state.original_entries[selected_id])
+    else:
         return
-    st.session_state.entries[selected_id] = deepcopy(original)
     st.session_state.modified_ids.discard(selected_id)
     refresh_entry_lists()
 
@@ -769,10 +843,9 @@ def add_blank_entry() -> None:
         "import_notes": ["created manually"],
     }
     st.session_state.entries[cc_id] = entry
-    st.session_state.original_entries[cc_id] = deepcopy(entry)
     st.session_state.modified_ids.add(cc_id)
     st.session_state.saved_ids.discard(cc_id)
-    st.session_state.selected_id = cc_id
+    select_entry(cc_id)
     refresh_entry_lists()
 
 
@@ -781,9 +854,10 @@ def load_import_into_state(path: Path) -> None:
     st.session_state.entries = entries
     st.session_state.original_entries = deepcopy(entries)
     st.session_state.modified_ids = set()
-    st.session_state.saved_ids = set()
+    st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
     st.session_state.source_data = source_data
-    st.session_state.selected_id = next(iter(entries), None)
+    sync_export_cache_to_memory()
+    select_entry(next(iter(entries), None))
     refresh_entry_lists()
 
 
@@ -793,9 +867,10 @@ def load_uploaded_import_into_state(uploaded_file) -> None:
     st.session_state.entries = entries
     st.session_state.original_entries = deepcopy(entries)
     st.session_state.modified_ids = set()
-    st.session_state.saved_ids = set()
+    st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
     st.session_state.source_data = source_data
-    st.session_state.selected_id = next(iter(entries), None)
+    sync_export_cache_to_memory()
+    select_entry(next(iter(entries), None))
     refresh_entry_lists()
 
 
@@ -819,39 +894,63 @@ def render_entry_selector() -> None:
         add_blank_entry()
         st.rerun()
 
-    entry_ids = list(st.session_state.entries.keys())
-    if not entry_ids:
+    original_ids = list(st.session_state.original_entries.keys())
+    if not original_ids:
         st.sidebar.info("Load a cach_cuc YAML file to begin.")
         return
 
-    entry_number_by_id = {cc_id: index for index, cc_id in enumerate(entry_ids, start=1)}
+    entry_number_by_id = {cc_id: index for index, cc_id in enumerate(original_ids, start=1)}
+    entry_filter = st.sidebar.selectbox(
+        "Show",
+        ["All entries", "Modified entries", "Unmodified entries"],
+        key="entry_selector_filter",
+    )
+    if entry_filter == "Modified entries":
+        visible_ids = [cc_id for cc_id in original_ids if entry_review_status(cc_id) != "original"]
+    elif entry_filter == "Unmodified entries":
+        visible_ids = [cc_id for cc_id in original_ids if entry_review_status(cc_id) == "original"]
+    else:
+        visible_ids = original_ids
 
     def label_for(cc_id: str) -> str:
+        if not cc_id:
+            return "Choose an original entry..."
         entry = st.session_state.entries[cc_id]
-        prefix = "* " if cc_id in st.session_state.modified_ids else ""
+        status = entry_review_status(cc_id)
+        prefix = "" if status == "original" else "[M] "
         number = entry_number_by_id[cc_id]
         return f"{prefix}{number}. {entry.get('id') or cc_id} - {entry.get('name') or '(no name)'}"
 
+    if st.session_state.selected_id not in st.session_state.entries:
+        select_entry(original_ids[0])
+    apply_pending_entry_selection(visible_ids)
+
+    if not visible_ids:
+        st.sidebar.info(f"No {entry_filter.casefold()} to show.")
+        return
+
     selected = st.sidebar.selectbox(
         "Select cach_cuc",
-        entry_ids,
-        index=safe_index(entry_ids, st.session_state.selected_id),
+        [ORIGINAL_ENTRY_PLACEHOLDER] + visible_ids,
+        index=safe_index([ORIGINAL_ENTRY_PLACEHOLDER] + visible_ids, st.session_state.get(SELECTED_ENTRY_WIDGET_KEY)),
         format_func=label_for,
+        key=SELECTED_ENTRY_WIDGET_KEY,
     )
-    st.session_state.selected_id = selected
+    if selected:
+        st.session_state.selected_id = selected
 
     query = st.sidebar.text_input("Filter", placeholder="id or name")
     if query:
         matches = [
             cc_id
-            for cc_id in entry_ids
+            for cc_id in visible_ids
             if query.casefold() in cc_id.casefold()
             or query.casefold() in str(st.session_state.entries[cc_id].get("name", "")).casefold()
         ]
         st.sidebar.caption(f"{len(matches)} matches")
         for cc_id in matches[:20]:
             if st.sidebar.button(label_for(cc_id), key=f"jump_{cc_id}"):
-                st.session_state.selected_id = cc_id
+                select_entry(cc_id)
                 st.rerun()
 
 
@@ -860,6 +959,10 @@ def load_export_payload(path: Path) -> dict:
         return {"groups": DEFAULT_GROUPS, "cach_cuc": []}
     with path.open("r", encoding="utf-8") as f:
         payload = yaml.safe_load(f) or {}
+    return normalize_export_payload(payload)
+
+
+def normalize_export_payload(payload: Any) -> dict:
     if not isinstance(payload, dict):
         return {"groups": DEFAULT_GROUPS, "cach_cuc": []}
     payload.setdefault("groups", DEFAULT_GROUPS)
@@ -868,8 +971,49 @@ def load_export_payload(path: Path) -> dict:
     return payload
 
 
+def index_export_entries(payload: dict) -> dict[str, dict]:
+    entries_by_id = {}
+    for entry in payload.get("cach_cuc", []):
+        if isinstance(entry, dict) and entry.get("id"):
+            entries_by_id[entry["id"]] = entry
+    return entries_by_id
+
+
+def ensure_export_cache(path: Path) -> None:
+    normalized_path = str(path.expanduser())
+    if st.session_state.export_cache_path == normalized_path:
+        return
+    payload = load_export_payload(Path(normalized_path))
+    st.session_state.export_cache_path = normalized_path
+    st.session_state.export_payload = payload
+    st.session_state.export_entries_by_id = index_export_entries(payload)
+    st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
+    sync_export_cache_to_memory()
+
+
+def load_export_payload_into_cache(payload: dict, path: Path) -> None:
+    st.session_state.export_cache_path = str(path.expanduser())
+    st.session_state.export_payload = normalize_export_payload(payload)
+    st.session_state.export_entries_by_id = index_export_entries(st.session_state.export_payload)
+    st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
+    sync_export_cache_to_memory()
+    refresh_entry_lists()
+
+
+def current_export_path() -> Path:
+    export_file = st.session_state.get("export_path") or DEFAULT_EXPORT_FILENAME
+    return Path(export_file).expanduser()
+
+
+def write_export_cache(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        yaml.safe_dump(st.session_state.export_payload, f, allow_unicode=True, sort_keys=False)
+
+
 def upsert_entries_to_export(path: Path, entries: list[dict]) -> None:
-    payload = load_export_payload(path)
+    ensure_export_cache(path)
+    payload = st.session_state.export_payload
     existing_entries = [entry for entry in payload.get("cach_cuc", []) if isinstance(entry, dict)]
     index_by_id = {entry.get("id"): index for index, entry in enumerate(existing_entries) if entry.get("id")}
 
@@ -884,75 +1028,120 @@ def upsert_entries_to_export(path: Path, entries: list[dict]) -> None:
             existing_entries.append(entry)
 
     payload["cach_cuc"] = existing_entries
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        yaml.safe_dump(payload, f, allow_unicode=True, sort_keys=False)
+    st.session_state.export_payload = payload
+    st.session_state.export_entries_by_id = index_export_entries(payload)
+    st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
+    write_export_cache(path)
 
 
-def export_entry_options(path: Path) -> dict[str, str]:
-    payload = load_export_payload(path)
-    options = {}
-    for entry in payload.get("cach_cuc", []):
-        if not isinstance(entry, dict) or not entry.get("id"):
-            continue
-        options[entry["id"]] = entry.get("name") or "(no name)"
-    return options
-
-
-def render_entry_id_dropdown(label: str, ids: list[str], names_by_id: dict[str, str], empty_message: str, key: str) -> None:
+def render_entry_id_dropdown(
+    label: str,
+    ids: list[str],
+    names_by_id: dict[str, str],
+    empty_message: str,
+    key: str,
+    status_by_id: dict[str, str] | None = None,
+    on_change=None,
+    args: tuple = (),
+) -> None:
     if not ids:
         st.caption(empty_message)
         return
+    options = [""] + ids
+    if st.session_state.get(key) not in options:
+        st.session_state[key] = ""
     st.selectbox(
         label,
-        ids,
-        format_func=lambda cc_id: f"{cc_id} - {names_by_id.get(cc_id) or '(no name)'}",
-        key=f"{key}_{st.session_state.entry_list_refresh}",
+        options,
+        format_func=lambda cc_id: (
+            "Choose an entry..."
+            if not cc_id
+            else (
+                f"[{status_by_id[cc_id]}] "
+                if status_by_id and cc_id in status_by_id
+                else ""
+            )
+            + f"{cc_id} - {names_by_id.get(cc_id) or '(no name)'}"
+        ),
+        key=key,
+        on_change=on_change,
+        args=args,
     )
 
 
 def render_save_panel(current_cach_cuc: dict) -> None:
-    export_path = Path(st.text_input("export file", value=DEFAULT_EXPORT_FILENAME, key="export_path")).expanduser()
-    modified_ids = sorted(st.session_state.modified_ids)
-    modified_names = {
-        cc_id: st.session_state.entries.get(cc_id, {}).get("name") or "(no name)"
-        for cc_id in modified_ids
-    }
-    saved_names = export_entry_options(export_path)
-    saved_ids = sorted(saved_names)
-    st.session_state.saved_ids = set(saved_ids)
+    st.caption("Export file")
+    export_cols = st.columns([3, 1])
+    with export_cols[0]:
+        export_file = st.text_input("Save path", value=DEFAULT_EXPORT_FILENAME, key="export_path") or DEFAULT_EXPORT_FILENAME
+    export_path = Path(export_file).expanduser()
+    ensure_export_cache(export_path)
+    with export_cols[1]:
+        if st.button("Reload from path"):
+            st.session_state.export_cache_path = None
+            ensure_export_cache(export_path)
+            refresh_entry_lists()
+            st.rerun()
 
-    c1, c2 = st.columns(2)
-    with c1:
-        st.subheader(f"Modified entries ({len(modified_ids)})")
+    in_progress_ids = in_progress_entry_ids()
+    saved_ids = saved_entry_ids()
+    review_ids = sorted(set(in_progress_ids) | set(saved_ids))
+    review_names = {
+        cc_id: st.session_state.entries.get(cc_id, {}).get("name")
+        or st.session_state.export_entries_by_id.get(cc_id, {}).get("name")
+        or "(no name)"
+        for cc_id in review_ids
+    }
+    saved_status = {
+        cc_id: "edited"
+        for cc_id in saved_ids
+        if cc_id in st.session_state.modified_ids
+    }
+
+    st.subheader(f"Modified entries ({len(review_ids)})")
+    modified_cols = st.columns(2)
+    with modified_cols[0]:
         render_entry_id_dropdown(
-            "Modified entries",
-            modified_ids,
-            modified_names,
-            "No entries have been added to the modified list yet.",
-            "modified_entries_dropdown",
+            "In-progress",
+            in_progress_ids,
+            review_names,
+            "No entries are currently marked for saving.",
+            "in_progress_entries_dropdown",
+            on_change=select_entry_from_widget,
+            args=("in_progress_entries_dropdown",),
         )
-    with c2:
-        st.subheader(f"Entries in export file ({len(saved_ids)})")
+    with modified_cols[1]:
         render_entry_id_dropdown(
-            "Entries saved in export file",
+            "Saved",
             saved_ids,
-            saved_names,
+            review_names,
             "The export file does not contain saved entries yet.",
-            f"saved_entries_dropdown_{export_path}",
+            "saved_entries_dropdown",
+            status_by_id=saved_status,
+            on_change=select_entry_from_widget,
+            args=("saved_entries_dropdown",),
         )
 
     allow_invalid = st.checkbox("Allow saving entries that still have validation errors", value=False)
 
-    save_cols = st.columns([1, 1, 3])
+    selected_id = st.session_state.selected_id
+    is_in_progress = selected_id in st.session_state.modified_ids
+
+    save_cols = st.columns([1, 1, 1, 2])
     with save_cols[0]:
-        mark_modified = st.button("Add current entry to save list", type="primary")
+        remove_modified = st.button("Remove current entry from modified entries", disabled=not is_in_progress)
     with save_cols[1]:
-        save_modified = st.button("Save save-list entries")
+        mark_modified = st.button("Add current entry to modified list", disabled=is_in_progress)
     with save_cols[2]:
+        save_modified = st.button("Save in-progress entries")
+    with save_cols[3]:
         save_selected = st.button("Save current entry only")
 
-    selected_id = st.session_state.selected_id
+    if remove_modified and selected_id:
+        st.session_state.modified_ids.discard(selected_id)
+        refresh_entry_lists()
+        st.rerun()
+
     if mark_modified and selected_id:
         st.session_state.modified_ids.add(selected_id)
         refresh_entry_lists()
@@ -966,16 +1155,17 @@ def render_save_panel(current_cach_cuc: dict) -> None:
         else:
             upsert_entries_to_export(export_path, [current_cach_cuc])
             st.session_state.modified_ids.discard(selected_id)
-            st.session_state.saved_ids = set(export_entry_options(export_path))
+            st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
             refresh_entry_lists()
             st.success(f"Saved {selected_id} to {export_path}")
             st.rerun()
 
     if save_modified:
-        if not modified_ids:
+        memory_modified_ids = sorted(st.session_state.modified_ids)
+        if not memory_modified_ids:
             st.info("No modified entries to save.")
             return
-        entries = [entry_state_to_cach_cuc(st.session_state.entries[cc_id]) for cc_id in modified_ids]
+        entries = [entry_state_to_cach_cuc(st.session_state.entries[cc_id]) for cc_id in memory_modified_ids]
         errors_by_id = {entry["id"]: validation_errors(entry) for entry in entries}
         errors_by_id = {cc_id: errors for cc_id, errors in errors_by_id.items() if errors}
         if errors_by_id and not allow_invalid:
@@ -984,8 +1174,8 @@ def render_save_panel(current_cach_cuc: dict) -> None:
                 st.json(errors_by_id)
         else:
             upsert_entries_to_export(export_path, entries)
-            st.session_state.modified_ids.difference_update(modified_ids)
-            st.session_state.saved_ids = set(export_entry_options(export_path))
+            st.session_state.modified_ids.difference_update(memory_modified_ids)
+            st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
             refresh_entry_lists()
             st.success(f"Saved {len(entries)} modified entries to {export_path}")
             st.rerun()
@@ -996,6 +1186,7 @@ def main() -> None:
     st.title("Cach Cuc Editor")
 
     init_state()
+    ensure_export_cache(current_export_path())
     stars = load_stars()
     render_entry_selector()
 
@@ -1091,15 +1282,14 @@ def main() -> None:
     else:
         st.success("Entry validates against the normalized condition model.")
 
-    action_cols = st.columns([1, 1, 4])
+    can_discard_to_original = (
+        selected_id in st.session_state.original_entries
+        and entry_review_status(selected_id) != "original"
+    )
+    action_cols = st.columns([1, 5])
     with action_cols[0]:
-        if st.button("Discard edits for current entry"):
+        if st.button("Discard edits for current entry", disabled=not can_discard_to_original):
             reset_form()
-            st.rerun()
-    with action_cols[1]:
-        if st.button("Remove current entry from save list"):
-            st.session_state.modified_ids.discard(selected_id)
-            refresh_entry_lists()
             st.rerun()
 
     render_save_panel(cach_cuc)
