@@ -187,6 +187,10 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
         cond["type"] = "star_at_chi"
         cond["at_chi"] = cond.pop("chi", cond.get("at_chi", []))
         notes.append("star_at_fixed_chi -> star_at_chi")
+    elif ctype == "star_in_palace":
+        cond["type"] = "star_with_palace"
+        cond.setdefault("scope", "dong_cung")
+        notes.append("star_in_palace -> star_with_palace(scope=dong_cung)")
 
     if cond.get("type") in {"star_brightness", "star_with_palace", "star_at_chi", "stars_meeting"} and "star" in cond and "stars" not in cond:
         cond["stars"] = [cond.pop("star")]
