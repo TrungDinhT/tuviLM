@@ -6,6 +6,7 @@ Run with:
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 import uuid
 from copy import deepcopy
@@ -739,10 +740,10 @@ def init_state() -> None:
         st.session_state.saved_ids = set()
     if "selected_id" not in st.session_state:
         st.session_state.selected_id = None
-    if "pending_selected_entry_widget" not in st.session_state:
-        st.session_state.pending_selected_entry_widget = None
     if "source_data" not in st.session_state:
         st.session_state.source_data = {}
+    if "loaded_import_upload_token" not in st.session_state:
+        st.session_state.loaded_import_upload_token = None
     if "entry_list_refresh" not in st.session_state:
         st.session_state.entry_list_refresh = 0
     if "export_cache_path" not in st.session_state:
@@ -759,25 +760,14 @@ def refresh_entry_lists() -> None:
 
 def select_entry(cc_id: str) -> None:
     st.session_state.selected_id = cc_id
-    st.session_state.pending_selected_entry_widget = (
-        cc_id
-        if cc_id in st.session_state.original_entries
+
+
+def sync_entry_widget_to_selection(ids: list[str], widget_key: str) -> None:
+    st.session_state[widget_key] = (
+        st.session_state.selected_id
+        if st.session_state.selected_id in ids
         else ORIGINAL_ENTRY_PLACEHOLDER
     )
-
-
-def apply_pending_entry_selection(original_ids: list[str]) -> None:
-    options = [ORIGINAL_ENTRY_PLACEHOLDER] + original_ids
-    pending = st.session_state.get("pending_selected_entry_widget")
-    if pending is not None:
-        st.session_state[SELECTED_ENTRY_WIDGET_KEY] = pending if pending in options else ORIGINAL_ENTRY_PLACEHOLDER
-        st.session_state.pending_selected_entry_widget = None
-    elif st.session_state.get(SELECTED_ENTRY_WIDGET_KEY) not in options:
-        st.session_state[SELECTED_ENTRY_WIDGET_KEY] = (
-            st.session_state.selected_id
-            if st.session_state.selected_id in original_ids
-            else ORIGINAL_ENTRY_PLACEHOLDER
-        )
 
 
 def entry_review_status(cc_id: str) -> str:
@@ -883,15 +873,20 @@ def load_uploaded_import_into_state(uploaded_file) -> None:
 def render_entry_selector() -> None:
     st.sidebar.header("Import")
     uploaded_file = st.sidebar.file_uploader("YAML file", type=("yaml", "yml"))
-    if st.sidebar.button("Load file", type="primary"):
-        if uploaded_file is None:
-            st.sidebar.error("Choose a YAML file first.")
-        else:
+    if uploaded_file is not None:
+        payload_bytes = uploaded_file.getvalue()
+        upload_token = (
+            uploaded_file.name,
+            uploaded_file.size,
+            hashlib.sha1(payload_bytes).hexdigest(),
+        )
+        if st.session_state.loaded_import_upload_token != upload_token:
             try:
                 load_uploaded_import_into_state(uploaded_file)
             except Exception as exc:  # noqa: BLE001 - show Streamlit users the load failure.
                 st.sidebar.error(f"Could not load file: {exc}")
             else:
+                st.session_state.loaded_import_upload_token = upload_token
                 st.sidebar.success(f"Loaded {len(st.session_state.entries)} entries")
                 st.rerun()
 
@@ -917,6 +912,12 @@ def render_entry_selector() -> None:
         visible_ids = [cc_id for cc_id in original_ids if entry_review_status(cc_id) == "original"]
     else:
         visible_ids = original_ids
+    selector_key_by_filter = {
+        "All entries": f"{SELECTED_ENTRY_WIDGET_KEY}_all",
+        "Modified entries": f"{SELECTED_ENTRY_WIDGET_KEY}_modified",
+        "Unmodified entries": f"{SELECTED_ENTRY_WIDGET_KEY}_unmodified",
+    }
+    selected_entry_widget_key = selector_key_by_filter[entry_filter]
 
     def label_for(cc_id: str) -> str:
         if not cc_id:
@@ -929,21 +930,20 @@ def render_entry_selector() -> None:
 
     if st.session_state.selected_id not in st.session_state.entries:
         select_entry(original_ids[0])
-    apply_pending_entry_selection(visible_ids)
+    sync_entry_widget_to_selection(visible_ids, selected_entry_widget_key)
 
     if not visible_ids:
         st.sidebar.info(f"No {entry_filter.casefold()} to show.")
         return
 
-    selected = st.sidebar.selectbox(
+    st.sidebar.selectbox(
         "Select cach_cuc",
         [ORIGINAL_ENTRY_PLACEHOLDER] + visible_ids,
-        index=safe_index([ORIGINAL_ENTRY_PLACEHOLDER] + visible_ids, st.session_state.get(SELECTED_ENTRY_WIDGET_KEY)),
         format_func=label_for,
-        key=SELECTED_ENTRY_WIDGET_KEY,
+        key=selected_entry_widget_key,
+        on_change=select_entry_from_widget,
+        args=(selected_entry_widget_key,),
     )
-    if selected:
-        st.session_state.selected_id = selected
 
     query = st.sidebar.text_input("Filter", placeholder="id or name")
     if query:
@@ -1051,14 +1051,13 @@ def render_entry_id_dropdown(
     args: tuple = (),
 ) -> None:
     if not ids:
+        st.session_state[key] = ""
         st.caption(empty_message)
         return
-    options = [""] + ids
-    if st.session_state.get(key) not in options:
-        st.session_state[key] = ""
+    sync_entry_widget_to_selection(ids, key)
     st.selectbox(
         label,
-        options,
+        [ORIGINAL_ENTRY_PLACEHOLDER] + ids,
         format_func=lambda cc_id: (
             "Choose an entry..."
             if not cc_id
@@ -1139,7 +1138,7 @@ def render_save_panel(current_cach_cuc: dict) -> None:
     with save_cols[1]:
         mark_modified = st.button("Add current entry to modified list", disabled=is_in_progress)
     with save_cols[2]:
-        save_modified = st.button("Save in-progress entries")
+        save_modified = st.button("Save modified entries")
     with save_cols[3]:
         save_selected = st.button("Save current entry only")
 
