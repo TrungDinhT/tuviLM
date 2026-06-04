@@ -827,6 +827,12 @@ def unmark_entry_modified(cc_id: str) -> None:
     ]
 
 
+def mark_remediated_entries_modified() -> None:
+    for cc_id in reversed(list(st.session_state.entries)):
+        if st.session_state.entries[cc_id].get("import_notes"):
+            mark_entry_modified(cc_id)
+
+
 def sync_export_cache_to_memory() -> None:
     for cc_id, entry in st.session_state.export_entries_by_id.items():
         state_entry = imported_entry_to_state(entry)
@@ -878,7 +884,7 @@ def add_blank_entry() -> None:
     refresh_entry_lists()
 
 
-def load_import_into_state(path: Path) -> None:
+def load_import_into_state(path: Path, mark_remediated: bool = True) -> None:
     entries, source_data = load_cach_cuc_file(path)
     st.session_state.entries = entries
     st.session_state.original_entries = deepcopy(entries)
@@ -887,11 +893,13 @@ def load_import_into_state(path: Path) -> None:
     st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
     st.session_state.source_data = source_data
     sync_export_cache_to_memory()
+    if mark_remediated:
+        mark_remediated_entries_modified()
     select_entry(next(iter(entries), None))
     refresh_entry_lists()
 
 
-def load_uploaded_import_into_state(uploaded_file) -> None:
+def load_uploaded_import_into_state(uploaded_file, mark_remediated: bool = True) -> None:
     data = yaml.safe_load(uploaded_file.getvalue().decode("utf-8")) or {}
     entries, source_data = load_cach_cuc_data(data)
     st.session_state.entries = entries
@@ -901,12 +909,19 @@ def load_uploaded_import_into_state(uploaded_file) -> None:
     st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
     st.session_state.source_data = source_data
     sync_export_cache_to_memory()
+    if mark_remediated:
+        mark_remediated_entries_modified()
     select_entry(next(iter(entries), None))
     refresh_entry_lists()
 
 
 def render_entry_selector() -> None:
     st.sidebar.header("Import")
+    mark_remediated = st.sidebar.checkbox(
+        "Add remediated entries to In-progress",
+        value=True,
+        help="When import changes legacy YAML into the normalized model, mark those entries for review.",
+    )
     uploaded_file = st.sidebar.file_uploader("YAML file", type=("yaml", "yml"))
     if uploaded_file is not None:
         payload_bytes = uploaded_file.getvalue()
@@ -914,10 +929,11 @@ def render_entry_selector() -> None:
             uploaded_file.name,
             uploaded_file.size,
             hashlib.sha1(payload_bytes).hexdigest(),
+            mark_remediated,
         )
         if st.session_state.loaded_import_upload_token != upload_token:
             try:
-                load_uploaded_import_into_state(uploaded_file)
+                load_uploaded_import_into_state(uploaded_file, mark_remediated=mark_remediated)
             except Exception as exc:  # noqa: BLE001 - show Streamlit users the load failure.
                 st.sidebar.error(f"Could not load file: {exc}")
             else:
