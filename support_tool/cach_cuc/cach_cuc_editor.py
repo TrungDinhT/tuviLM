@@ -46,7 +46,7 @@ CONDITION_TYPES = [
     "palace_at",
     "star_at_chi",
     "star_brightness",
-    "star_in_palace",
+    "star_with_palace",
     "stars_meeting",
 ]
 INCOMPATIBLE_CONDITION_TYPES = {"no_stars", "bright_chinh_tinh", "stars_xor"}
@@ -187,10 +187,10 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
         cond["at_chi"] = cond.pop("chi", cond.get("at_chi", []))
         notes.append("star_at_fixed_chi -> star_at_chi")
 
-    if cond.get("type") in {"star_brightness", "star_in_palace", "star_at_chi", "stars_meeting"} and "star" in cond and "stars" not in cond:
+    if cond.get("type") in {"star_brightness", "star_with_palace", "star_at_chi", "stars_meeting"} and "star" in cond and "stars" not in cond:
         cond["stars"] = [cond.pop("star")]
         notes.append("star -> stars")
-    if cond.get("type") in {"star_in_palace", "star_at_chi", "stars_meeting"} and cond.get("mode") is not None and cond.get("group") is None:
+    if cond.get("type") in {"star_with_palace", "star_at_chi", "stars_meeting"} and cond.get("mode") is not None and cond.get("group") is None:
         cond.pop("mode", None)
         notes.append("dropped mode because no group is set")
 
@@ -204,13 +204,13 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
         cond["palace"] = normalize_token(old, PALACE_ALIASES)
         if old != cond["palace"]:
             notes.append(f"palace {old!r} -> {cond['palace']!r}")
-        elif cond.get("type") == "star_in_palace":
+        elif cond.get("type") == "star_with_palace":
             chi_value = normalize_token(old, CHI_ALIASES)
             if chi_value in CHI:
                 cond["type"] = "star_at_chi"
                 cond["at_chi"] = [chi_value]
                 cond.pop("palace", None)
-                notes.append(f"star_in_palace with chi-like palace {old!r} -> star_at_chi")
+                notes.append(f"star_with_palace with chi-like palace {old!r} -> star_at_chi")
     if "in_palace" in cond:
         old = cond["in_palace"]
         cond["in_palace"] = normalize_token(old, PALACE_ALIASES)
@@ -360,7 +360,7 @@ def new_not_node() -> dict:
 
 
 def new_tuan_triet_leaf() -> dict:
-    leaf = new_leaf("star_in_palace")
+    leaf = new_leaf("star_with_palace")
     leaf["palace"] = PALACES[0]
     leaf["stars"] = ["tuan", "triet"]
     leaf["group"] = None
@@ -507,12 +507,18 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             key=f"{key}_brightness",
         )
 
-    elif ctype == "star_in_palace":
+    elif ctype == "star_with_palace":
         cond["palace"] = st.selectbox(
             "palace",
             PALACES,
             index=safe_index(PALACES, cond.get("palace")),
             key=f"{key}_palace",
+        )
+        cond["scope"] = st.selectbox(
+            "scope",
+            SCOPES_MEETING,
+            index=safe_index(SCOPES_MEETING, cond.get("scope", "dong_cung")),
+            key=f"{key}_scope",
         )
         use_group = st.checkbox(
             "use group",
@@ -606,7 +612,7 @@ def leaf_to_dict(cond: dict) -> dict:
         "palace_at": ["palace", "chi"],
         "star_at_chi": ["stars", "at_chi", "group", "mode"],
         "star_brightness": ["stars", "brightness"],
-        "star_in_palace": ["palace", "stars", "group", "mode"],
+        "star_with_palace": ["palace", "scope", "stars", "group", "mode"],
         "stars_meeting": ["scope", "stars", "group", "mode"],
         "stars_xor": ["stars", "scope"],
     }
