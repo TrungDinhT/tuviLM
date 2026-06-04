@@ -740,6 +740,8 @@ def init_state() -> None:
         st.session_state.original_entries = {}
     if "modified_ids" not in st.session_state:
         st.session_state.modified_ids = set()
+    if "modified_order" not in st.session_state:
+        st.session_state.modified_order = []
     if "saved_ids" not in st.session_state:
         st.session_state.saved_ids = set()
     if "selected_id" not in st.session_state:
@@ -787,15 +789,42 @@ def entry_review_status(cc_id: str) -> str:
 
 
 def review_entry_ids() -> list[str]:
-    return sorted(st.session_state.modified_ids | set(st.session_state.export_entries_by_id))
+    return list(dict.fromkeys(in_progress_entry_ids() + saved_entry_ids()))
 
 
 def in_progress_entry_ids() -> list[str]:
-    return sorted(st.session_state.modified_ids)
+    ordered_ids = [
+        cc_id
+        for cc_id in st.session_state.modified_order
+        if cc_id in st.session_state.modified_ids
+    ]
+    missing_ids = [
+        cc_id
+        for cc_id in st.session_state.modified_ids
+        if cc_id not in set(ordered_ids)
+    ]
+    return ordered_ids + missing_ids
 
 
 def saved_entry_ids() -> list[str]:
-    return sorted(st.session_state.export_entries_by_id)
+    return list(st.session_state.export_entries_by_id)
+
+
+def mark_entry_modified(cc_id: str) -> None:
+    if not cc_id:
+        return
+    st.session_state.modified_ids.add(cc_id)
+    st.session_state.modified_order = [
+        cc_id,
+        *[existing_id for existing_id in st.session_state.modified_order if existing_id != cc_id],
+    ]
+
+
+def unmark_entry_modified(cc_id: str) -> None:
+    st.session_state.modified_ids.discard(cc_id)
+    st.session_state.modified_order = [
+        existing_id for existing_id in st.session_state.modified_order if existing_id != cc_id
+    ]
 
 
 def sync_export_cache_to_memory() -> None:
@@ -821,7 +850,7 @@ def reset_form() -> None:
         st.session_state.entries[selected_id] = deepcopy(st.session_state.original_entries[selected_id])
     else:
         return
-    st.session_state.modified_ids.discard(selected_id)
+    unmark_entry_modified(selected_id)
     refresh_entry_lists()
 
 
@@ -843,7 +872,7 @@ def add_blank_entry() -> None:
         "import_notes": ["created manually"],
     }
     st.session_state.entries[cc_id] = entry
-    st.session_state.modified_ids.add(cc_id)
+    mark_entry_modified(cc_id)
     st.session_state.saved_ids.discard(cc_id)
     select_entry(cc_id)
     refresh_entry_lists()
@@ -854,6 +883,7 @@ def load_import_into_state(path: Path) -> None:
     st.session_state.entries = entries
     st.session_state.original_entries = deepcopy(entries)
     st.session_state.modified_ids = set()
+    st.session_state.modified_order = []
     st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
     st.session_state.source_data = source_data
     sync_export_cache_to_memory()
@@ -867,6 +897,7 @@ def load_uploaded_import_into_state(uploaded_file) -> None:
     st.session_state.entries = entries
     st.session_state.original_entries = deepcopy(entries)
     st.session_state.modified_ids = set()
+    st.session_state.modified_order = []
     st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
     st.session_state.source_data = source_data
     sync_export_cache_to_memory()
@@ -1147,12 +1178,12 @@ def render_save_panel(current_cach_cuc: dict) -> None:
         save_selected = st.button("Save current entry only")
 
     if remove_modified and selected_id:
-        st.session_state.modified_ids.discard(selected_id)
+        unmark_entry_modified(selected_id)
         refresh_entry_lists()
         st.rerun()
 
     if mark_modified and selected_id:
-        st.session_state.modified_ids.add(selected_id)
+        mark_entry_modified(selected_id)
         refresh_entry_lists()
         st.success(f"Added {selected_id} to the modified entries list")
         st.rerun()
@@ -1163,14 +1194,14 @@ def render_save_panel(current_cach_cuc: dict) -> None:
             st.error("Selected entry has validation errors. Fix it or enable invalid saves.")
         else:
             upsert_entries_to_export(export_path, [current_cach_cuc])
-            st.session_state.modified_ids.discard(selected_id)
+            unmark_entry_modified(selected_id)
             st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
             refresh_entry_lists()
             st.success(f"Saved {selected_id} to {export_path}")
             st.rerun()
 
     if save_modified:
-        memory_modified_ids = sorted(st.session_state.modified_ids)
+        memory_modified_ids = in_progress_entry_ids()
         if not memory_modified_ids:
             st.info("No modified entries to save.")
             return
@@ -1183,7 +1214,8 @@ def render_save_panel(current_cach_cuc: dict) -> None:
                 st.json(errors_by_id)
         else:
             upsert_entries_to_export(export_path, entries)
-            st.session_state.modified_ids.difference_update(memory_modified_ids)
+            for cc_id in memory_modified_ids:
+                unmark_entry_modified(cc_id)
             st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
             refresh_entry_lists()
             st.success(f"Saved {len(entries)} modified entries to {export_path}")
