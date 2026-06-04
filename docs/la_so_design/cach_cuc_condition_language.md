@@ -27,7 +27,7 @@ Core factors:
 Examples of relations:
 
 - palace role to position: `palace_at`
-- star to palace role: `star_in_palace`
+- star to palace role: `star_with_palace`
 - star or group to earthly branch: `star_at_chi`
 - star to brightness: `star_brightness`
 - stars or group to each other by scope: `stars_meeting`
@@ -174,17 +174,30 @@ Use `any` when at least one child condition must be true:
 ```yaml
 conditions:
   any:
-  - type: star_in_palace
+  - type: star_with_palace
     palace: menh
     stars:
     - thien_ma
-  - type: star_in_palace
+  - type: star_with_palace
     palace: than
     stars:
     - thien_ma
 ```
 
 `all` and `any` may be nested.
+
+Use `not` to negate a single condition:
+
+```yaml
+conditions:
+  not:
+    type: star_with_palace
+    palace: menh
+    stars:
+    - thien_ky
+```
+
+`not` accepts any condition, including nested `all` or `any` blocks.
 
 
 ## Leaf Conditions
@@ -217,7 +230,7 @@ Matches a gender-specific rule.
 
 ```yaml
 type: gender_match
-gender: [male, female]
+gender: male  # or: female
 ```
 
 
@@ -232,25 +245,14 @@ chi: [chi_str]
 
 ```
 
-### `no_stars`
-
-Matches when stars or group members are absent from a palace.
-
-```yaml
-type: no_stars
-in_palace: role_str
-stars: [star_name]
-group: group_name
-```
-
 ### `only_chinh_tinh`
 
 Matches when the palace has only the specified main star.
 
 ```yaml
 type: only_chinh_tinh
-palace: [role_str]
-star: [star_name]
+palace: role_str
+star: star_name
 ```
 
 ### `star_brightness`
@@ -263,13 +265,15 @@ stars: [star_name]
 brightness: [star_brightness]
 ```
 
-### `star_in_palace`
+### `star_with_palace`
 
-Matches **ALL** stars inside a palace. Group would follow the mode.
+Matches stars inside a palace, optionally constraining their meeting scope.
+Group would follow the mode.
 
 ```yaml
-type: star_in_palace
+type: star_with_palace
 palace: role_str
+scope: scope_enum  # required; same values as stars_meeting; default dong_cung
 stars: [star_name]
 group: group_name
 mode: [any, all]
@@ -344,7 +348,7 @@ Extraction:
       chi:
       - Ty
       - Ngo
-    - type: star_in_palace
+    - type: star_with_palace
       palace: menh
       stars:
       - thien_hu
