@@ -12,15 +12,15 @@ cach_cuc:
       - bach_ho
       - tau_thu
     - any:
-      - type: star_in_palace
+      - type: star_with_palace
         palace: menh
         stars:
         - bach_ho
-      - type: star_in_palace
+      - type: star_with_palace
         palace: quan_loc
         stars:
         - bach_ho
-      - type: star_in_palace
+      - type: star_with_palace
         palace: cung_than
         stars:
         - bach_ho
