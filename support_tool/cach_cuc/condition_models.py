@@ -64,19 +64,20 @@ class StarBrightnessCondition(BaseCondition):
     brightness: Annotated[list[Brightness], at.MinLen(1)]
 
 
-class StarInPalaceCondition(BaseCondition):
-    type: Literal["star_in_palace"] = "star_in_palace"
+class StarWithPalaceCondition(BaseCondition):
+    type: Literal["star_with_palace"] = "star_with_palace"
     palace: Role
     stars: list[str] = Field(default_factory=list)
     group: str | None = None
     mode: Mode | None = None
+    scope: Scope
 
     @model_validator(mode="after")
-    def _validate_group_mode(self) -> StarInPalaceCondition:
+    def _validate_group_mode(self) -> StarWithPalaceCondition:
         if self.mode is not None and self.group is None:
             raise ValueError("mode is only valid when group is set")
         if not self.stars and self.group is None:
-            raise ValueError("star_in_palace requires stars or group")
+            raise ValueError("star_with_palace requires stars or group")
         return self
 
 
@@ -119,7 +120,7 @@ LeafCondition = Annotated[
     | PalaceAtCondition
     | OnlyChinhTinhCondition
     | StarBrightnessCondition
-    | StarInPalaceCondition
+    | StarWithPalaceCondition
     | StarAtChiCondition
     | StarsMeetingCondition,
     Field(discriminator="type"),
