@@ -143,6 +143,10 @@ BRIGHTNESS_ALIASES = {
     "hãm": "ham",
 }
 
+STAR_ALIASES = {
+    "thien_rieu": "thien_dieu",
+}
+
 
 @st.cache_data
 def load_stars() -> list[str]:
@@ -170,6 +174,19 @@ def normalize_tokens(values: Any, aliases: dict[str, str]) -> Any:
     return [normalize_token(value, aliases) for value in values]
 
 
+def normalize_star_fields(cond: dict, notes: list[str]) -> None:
+    if "star" in cond:
+        old = cond["star"]
+        cond["star"] = normalize_token(old, STAR_ALIASES)
+        if old != cond["star"]:
+            notes.append(f"star {old!r} -> {cond['star']!r}")
+    if "stars" in cond:
+        old = cond["stars"]
+        cond["stars"] = normalize_tokens(old, STAR_ALIASES)
+        if old != cond["stars"]:
+            notes.append("star values normalized")
+
+
 def normalize_leaf(raw: dict, notes: list[str]) -> dict:
     cond = deepcopy(raw)
     ctype = cond.get("type")
@@ -195,6 +212,7 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
     if cond.get("type") in {"star_brightness", "star_with_palace", "star_at_chi", "stars_meeting"} and "star" in cond and "stars" not in cond:
         cond["stars"] = [cond.pop("star")]
         notes.append("star -> stars")
+    normalize_star_fields(cond, notes)
     if cond.get("type") in {"star_with_palace", "star_at_chi", "stars_meeting"} and cond.get("mode") is not None and cond.get("group") is None:
         cond.pop("mode", None)
         notes.append("dropped mode because no group is set")
@@ -339,14 +357,43 @@ def entry_state_to_cach_cuc(entry: dict) -> dict:
 
 
 def validation_errors(cach_cuc: dict) -> list[str]:
+    errors = unknown_star_errors(cach_cuc)
     try:
         CachCuc.model_validate(cach_cuc)
     except ValidationError as exc:
-        return [
+        errors.extend(
             f"{'.'.join(str(part) for part in error['loc'])}: {error['msg']}"
             for error in exc.errors()
-        ]
-    return []
+        )
+    return errors
+
+
+def unknown_star_errors(cach_cuc: dict) -> list[str]:
+    known_stars = set(load_stars())
+    errors: list[str] = []
+
+    def visit(condition: Any, path: str) -> None:
+        if not isinstance(condition, dict):
+            return
+        if "all" in condition:
+            for index, child in enumerate(condition.get("all") or []):
+                visit(child, f"{path}.all[{index}]")
+            return
+        if "any" in condition:
+            for index, child in enumerate(condition.get("any") or []):
+                visit(child, f"{path}.any[{index}]")
+            return
+        if "not" in condition:
+            visit(condition.get("not"), f"{path}.not")
+            return
+        if condition.get("star") and condition["star"] not in known_stars:
+            errors.append(f"{path}.star: unknown star id {condition['star']!r}")
+        for index, star in enumerate(condition.get("stars") or []):
+            if star not in known_stars:
+                errors.append(f"{path}.stars[{index}]: unknown star id {star!r}")
+
+    visit(cach_cuc.get("conditions"), "conditions")
+    return errors
 
 def new_leaf(ctype: str = "stars_meeting") -> dict:
     return {
@@ -400,6 +447,12 @@ def safe_default_list(options: list[str], values) -> list[str]:
     return [v for v in values if v in options]
 
 
+def options_with_current_values(options: list[str], values) -> list[str]:
+    current_values = values if isinstance(values, list) else [values] if values else []
+    extras = [value for value in current_values if value not in options]
+    return [*options, *extras]
+
+
 def render_leaf(cond: dict, stars: list[str]) -> None:
     """Render fields for a leaf condition and update the dict in place."""
     key = cond["_key"]
@@ -441,10 +494,11 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             index=safe_index(PALACES, cond.get("palace")),
             key=f"{key}_palace",
         )
+        star_options = options_with_current_values(stars, cond.get("star"))
         cond["star"] = st.selectbox(
             "star",
-            stars,
-            index=safe_index(stars, cond.get("star")),
+            star_options,
+            index=safe_index(star_options, cond.get("star")),
             key=f"{key}_star",
         )
 
@@ -483,10 +537,11 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             )
             cond["stars"] = None
         else:
+            star_options = options_with_current_values(stars, cond.get("stars"))
             cond["stars"] = st.multiselect(
                 "stars",
-                stars,
-                default=safe_default_list(stars, cond.get("stars")),
+                star_options,
+                default=safe_default_list(star_options, cond.get("stars")),
                 key=f"{key}_stars",
             )
             cond["group"] = None
@@ -499,10 +554,11 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
         )
 
     elif ctype == "star_brightness":
+        star_options = options_with_current_values(stars, cond.get("stars"))
         cond["stars"] = st.multiselect(
             "stars",
-            stars,
-            default=safe_default_list(stars, cond.get("stars")),
+            star_options,
+            default=safe_default_list(star_options, cond.get("stars")),
             key=f"{key}_stars",
         )
         cond["brightness"] = st.multiselect(
@@ -545,10 +601,11 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             )
             cond["stars"] = None
         else:
+            star_options = options_with_current_values(stars, cond.get("stars"))
             cond["stars"] = st.multiselect(
                 "stars",
-                stars,
-                default=safe_default_list(stars, cond.get("stars")),
+                star_options,
+                default=safe_default_list(star_options, cond.get("stars")),
                 key=f"{key}_stars",
             )
             cond["group"] = None
@@ -581,20 +638,22 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             )
             cond["stars"] = None
         else:
+            star_options = options_with_current_values(stars, cond.get("stars"))
             cond["stars"] = st.multiselect(
                 "stars",
-                stars,
-                default=safe_default_list(stars, cond.get("stars")),
+                star_options,
+                default=safe_default_list(star_options, cond.get("stars")),
                 key=f"{key}_stars",
             )
             cond["group"] = None
             cond["mode"] = None
 
     elif ctype == "stars_xor":
+        star_options = options_with_current_values(stars, cond.get("stars"))
         cond["stars"] = st.multiselect(
             "stars",
-            stars,
-            default=safe_default_list(stars, cond.get("stars")),
+            star_options,
+            default=safe_default_list(star_options, cond.get("stars")),
             key=f"{key}_stars",
         )
         cond["scope"] = st.selectbox(
@@ -644,10 +703,20 @@ def node_to_dict(node: dict) -> dict:
     return {node["operator"]: [node_to_dict(child) for child in node["children"]]}
 
 
+def rekey_node(node: dict) -> dict:
+    copied = deepcopy(node)
+    kind = copied.get("_kind", "node")
+    copied["_key"] = _new_key(kind)
+    if copied.get("_kind") == "raw":
+        return copied
+    copied["children"] = [rekey_node(child) for child in copied.get("children", [])]
+    return copied
+
+
 def render_node(node: dict, stars: list[str], parent_list: list, index: int, depth: int = 0) -> None:
     key = node["_key"]
     with st.container(border=True):
-        header = st.columns([5, 1, 1])
+        header = st.columns([5, 1, 1, 1])
         with header[0]:
             if node["_kind"] == "leaf":
                 label = "Leaf"
@@ -663,6 +732,10 @@ def render_node(node: dict, stars: list[str], parent_list: list, index: int, dep
                 parent_list[index - 1], parent_list[index] = parent_list[index], parent_list[index - 1]
                 st.rerun()
         with header[2]:
+            if st.button("Copy", key=f"{key}_copy"):
+                parent_list.insert(index + 1, rekey_node(node))
+                st.rerun()
+        with header[3]:
             if st.button("✕", key=f"{key}_remove"):
                 parent_list.pop(index)
                 st.rerun()
@@ -742,6 +815,8 @@ def init_state() -> None:
         st.session_state.modified_ids = set()
     if "modified_order" not in st.session_state:
         st.session_state.modified_order = []
+    if "skipped_remediated_ids" not in st.session_state:
+        st.session_state.skipped_remediated_ids = set()
     if "saved_ids" not in st.session_state:
         st.session_state.saved_ids = set()
     if "selected_id" not in st.session_state:
@@ -827,9 +902,70 @@ def unmark_entry_modified(cc_id: str) -> None:
     ]
 
 
+def mark_entry_saved_clean(previous_id: str | None, saved_entry: dict) -> str | None:
+    saved_id = saved_entry.get("id")
+    for cc_id in {previous_id, saved_id}:
+        if cc_id:
+            unmark_entry_modified(cc_id)
+            st.session_state.skipped_remediated_ids.discard(cc_id)
+    if saved_id and saved_id in st.session_state.export_entries_by_id:
+        st.session_state.entries[saved_id] = imported_entry_to_state(st.session_state.export_entries_by_id[saved_id])
+        select_entry(saved_id)
+    return saved_id
+
+
+def baseline_cach_cuc_for_entry(cc_id: str) -> dict | None:
+    if cc_id in st.session_state.export_entries_by_id:
+        return entry_state_to_cach_cuc(imported_entry_to_state(st.session_state.export_entries_by_id[cc_id]))
+    if cc_id in st.session_state.original_entries:
+        return entry_state_to_cach_cuc(st.session_state.original_entries[cc_id])
+    return None
+
+
+def entry_matches_baseline(cc_id: str, current_cach_cuc: dict) -> bool:
+    baseline = baseline_cach_cuc_for_entry(cc_id)
+    return baseline is not None and current_cach_cuc == baseline
+
+
+def is_review_only_remediation(cc_id: str, current_cach_cuc: dict) -> bool:
+    return (
+        cc_id in st.session_state.modified_ids
+        and cc_id not in st.session_state.export_entries_by_id
+        and st.session_state.entries.get(cc_id, {}).get("import_notes")
+        and entry_matches_baseline(cc_id, current_cach_cuc)
+    )
+
+
+def skip_remediated_entry(cc_id: str) -> None:
+    st.session_state.skipped_remediated_ids.add(cc_id)
+    unmark_entry_modified(cc_id)
+
+
+def sync_current_entry_modified_state(cc_id: str, current_cach_cuc: dict) -> None:
+    was_modified = cc_id in st.session_state.modified_ids
+    baseline = baseline_cach_cuc_for_entry(cc_id)
+    if baseline is None or current_cach_cuc != baseline:
+        mark_entry_modified(cc_id)
+    elif (
+        cc_id in st.session_state.modified_ids
+        and cc_id not in st.session_state.export_entries_by_id
+        and st.session_state.entries.get(cc_id, {}).get("import_notes")
+        and cc_id not in st.session_state.skipped_remediated_ids
+    ):
+        mark_entry_modified(cc_id)
+    else:
+        unmark_entry_modified(cc_id)
+    if was_modified != (cc_id in st.session_state.modified_ids):
+        refresh_entry_lists()
+        st.rerun()
+
+
 def mark_remediated_entries_modified() -> None:
     for cc_id in reversed(list(st.session_state.entries)):
-        if st.session_state.entries[cc_id].get("import_notes"):
+        if (
+            st.session_state.entries[cc_id].get("import_notes")
+            and cc_id not in st.session_state.skipped_remediated_ids
+        ):
             mark_entry_modified(cc_id)
 
 
@@ -890,6 +1026,7 @@ def load_import_into_state(path: Path, mark_remediated: bool = True) -> None:
     st.session_state.original_entries = deepcopy(entries)
     st.session_state.modified_ids = set()
     st.session_state.modified_order = []
+    st.session_state.skipped_remediated_ids = set()
     st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
     st.session_state.source_data = source_data
     sync_export_cache_to_memory()
@@ -906,6 +1043,7 @@ def load_uploaded_import_into_state(uploaded_file, mark_remediated: bool = True)
     st.session_state.original_entries = deepcopy(entries)
     st.session_state.modified_ids = set()
     st.session_state.modified_order = []
+    st.session_state.skipped_remediated_ids = set()
     st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
     st.session_state.source_data = source_data
     sync_export_cache_to_memory()
@@ -1181,28 +1319,12 @@ def render_save_panel(current_cach_cuc: dict) -> None:
     allow_invalid = st.checkbox("Allow saving entries that still have validation errors", value=False)
 
     selected_id = st.session_state.selected_id
-    is_in_progress = selected_id in st.session_state.modified_ids
 
-    save_cols = st.columns([1, 1, 1, 2])
+    save_cols = st.columns([1, 2])
     with save_cols[0]:
-        remove_modified = st.button("Remove current entry from modified entries", disabled=not is_in_progress)
-    with save_cols[1]:
-        mark_modified = st.button("Add current entry to modified list", disabled=is_in_progress)
-    with save_cols[2]:
         save_modified = st.button("Save modified entries")
-    with save_cols[3]:
+    with save_cols[1]:
         save_selected = st.button("Save current entry only")
-
-    if remove_modified and selected_id:
-        unmark_entry_modified(selected_id)
-        refresh_entry_lists()
-        st.rerun()
-
-    if mark_modified and selected_id:
-        mark_entry_modified(selected_id)
-        refresh_entry_lists()
-        st.success(f"Added {selected_id} to the modified entries list")
-        st.rerun()
 
     if save_selected:
         errors = validation_errors(current_cach_cuc)
@@ -1210,10 +1332,10 @@ def render_save_panel(current_cach_cuc: dict) -> None:
             st.error("Selected entry has validation errors. Fix it or enable invalid saves.")
         else:
             upsert_entries_to_export(export_path, [current_cach_cuc])
-            unmark_entry_modified(selected_id)
+            saved_id = mark_entry_saved_clean(selected_id, current_cach_cuc)
             st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
             refresh_entry_lists()
-            st.success(f"Saved {selected_id} to {export_path}")
+            st.success(f"Saved {saved_id or selected_id} to {export_path}")
             st.rerun()
 
     if save_modified:
@@ -1230,8 +1352,8 @@ def render_save_panel(current_cach_cuc: dict) -> None:
                 st.json(errors_by_id)
         else:
             upsert_entries_to_export(export_path, entries)
-            for cc_id in memory_modified_ids:
-                unmark_entry_modified(cc_id)
+            for previous_id, entry in zip(memory_modified_ids, entries, strict=False):
+                mark_entry_saved_clean(previous_id, entry)
             st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
             refresh_entry_lists()
             st.success(f"Saved {len(entries)} modified entries to {export_path}")
@@ -1324,6 +1446,7 @@ def main() -> None:
     st.subheader("Preview & Save")
 
     cach_cuc = entry_state_to_cach_cuc(entry)
+    sync_current_entry_modified_state(selected_id, cach_cuc)
     errors = validation_errors(cach_cuc)
 
     with st.expander("YAML preview", expanded=True):
@@ -1343,10 +1466,16 @@ def main() -> None:
         selected_id in st.session_state.original_entries
         and entry_review_status(selected_id) != "original"
     )
-    action_cols = st.columns([1, 5])
+    can_skip_remediated = is_review_only_remediation(selected_id, cach_cuc)
+    action_cols = st.columns([1, 1, 4])
     with action_cols[0]:
         if st.button("Discard edits for current entry", disabled=not can_discard_to_original):
             reset_form()
+            st.rerun()
+    with action_cols[1]:
+        if st.button("Skip remediated entry", disabled=not can_skip_remediated):
+            skip_remediated_entry(selected_id)
+            refresh_entry_lists()
             st.rerun()
 
     render_save_panel(cach_cuc)
