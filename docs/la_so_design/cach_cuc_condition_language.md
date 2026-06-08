@@ -275,8 +275,9 @@ type: star_with_palace
 palace: role_str
 scope: scope_enum  # required; same values as stars_meeting; default dong_cung
 stars: [star_name]
-group: group_name
-mode: [any, all]
+group_name: group_name
+mode: [any, all]  # provide mode or at_least
+at_least: integer
 ```
 
 
@@ -288,8 +289,9 @@ Matches **ALL** stars at an exact position. Group would follow the mode.
 type: star_at_chi
 stars: [star_name]
 at_chi: [chi_str]
-group: group_name
-mode: [any, all]
+group_name: group_name
+mode: [any, all]  # provide mode or at_least
+at_least: integer
 ```
 
 
@@ -301,8 +303,9 @@ Matches explicit stars, group members, or both meeting under a specified scope.
 type: stars_meeting
 stars: [star_name]
 scope: scope_enum
-group: group_name
-mode: [any, all]
+group_name: group_name
+mode: [any, all]  # provide mode or at_least
+at_least: integer
 ```
 
 
@@ -401,7 +404,7 @@ Extraction:
       stars:
       - thien_dong
       scope: hoi_hop
-      group: sat_tinh
+      group_name: sat_tinh
       mode: any
 ```
 
@@ -409,15 +412,11 @@ Reasoning:
 
 - `Cung Mệnh an tại Ngọ` becomes `palace_at`.
 - `Đồng, Nguyệt tọa thủ đồng cung` becomes `stars_meeting` and `stars_in_palace`
-- `gặp Sát tinh hội hợp` becomes `stars_meeting` with group `sat_tinh` and mode `any`
+- `gặp Sát tinh hội hợp` becomes `stars_meeting` with `group_name: sat_tinh` and `mode: any`
 
-Open issue:
-
-`gặp nhiều Sát tinh hội hợp` literally means meeting many malefic stars. The
-current language can express meeting the group with `mode: any` or `mode: all`,
-but it cannot yet express a threshold such as "at least two stars from this
-group". Keep this as an unresolved precision gap until a threshold field is
-added.
+Use `at_least` when the text specifies a minimum number of members from a
+group, for example `at_least: 2`. A grouped condition must provide at least one
+of `mode` or `at_least`.
 
 
 
@@ -428,7 +427,7 @@ When extracting from a book page:
 - Preserve the original `name` as written in the source.
 - Keep `meaning` short and faithful to the text.
 - Prefer explicit stars in `stars` when the book names the stars directly.
-- Prefer `group` when the book names a category, such as sat tinh or luc cat.
+- Prefer `group_name` when the book names a category, such as sat tinh or luc cat.
 - Use `all` when the text requires every phrase to be true.
 - Use `any` when the text gives alternatives.
 - Use nested `any` of `all` blocks for pattern alternatives.
@@ -442,7 +441,7 @@ Before adding or editing a `cach_cuc`, check:
 
 - `id` is unique and snake case.
 - every condition has a valid `type`.
-- star ids and group ids are canonical.
+- star ids and `group_name` values are canonical.
 - alternatives are represented with `any`.
 - required combinations are represented with `all`.
 - generated YAML can be loaded by the Pydantic model.

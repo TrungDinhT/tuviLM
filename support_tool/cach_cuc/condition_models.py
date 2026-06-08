@@ -4,7 +4,7 @@ import re
 from typing import Annotated, Literal
 import annotated_types as at
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import AliasChoices, BaseModel, Field, field_validator, model_validator
 
 from src.refactored.components.definitions.cung_role import Role
 from src.refactored.model.elementary import DiaChi, ThienCan
@@ -15,6 +15,14 @@ _BLANK_LINE_RE = re.compile(r"\n\s*\n+")
 
 Gender = Literal["male", "female"]
 Mode = Literal["any", "all"]
+GroupName = Literal[
+    "luc_sat",
+    "sat_tinh",
+    "luc_cat",
+    "cat_tinh",
+    "tu_hoa",
+    "tam_hoa",
+]
 Scope = Literal[
     "tam_hop",
     "hoi_hop",
@@ -29,6 +37,26 @@ Brightness = Literal["mieu", "vuong", "dac", "binh hoa", "ham"]
 
 class BaseCondition(BaseModel):
     type: str
+
+
+class GroupSupportMixin(BaseModel):
+    group_name: GroupName | None = Field(
+        default=None,
+        validation_alias=AliasChoices("group_name", "group"),
+    )
+    mode: Mode | None = None
+    at_least: int | None = None
+
+    @model_validator(mode="after")
+    def _validate_group_support(self) -> GroupSupportMixin:
+        if self.group_name is None:
+            if self.mode is not None or self.at_least is not None:
+                raise ValueError(
+                    "mode and at_least are only valid when group_name is set"
+                )
+        elif self.mode is None and self.at_least is None:
+            raise ValueError("group_name requires mode or at_least")
+        return self
 
 
 class CanMatchCondition(BaseCondition):
@@ -64,52 +92,40 @@ class StarBrightnessCondition(BaseCondition):
     brightness: Annotated[list[Brightness], at.MinLen(1)]
 
 
-class StarWithPalaceCondition(BaseCondition):
+class StarWithPalaceCondition(BaseCondition, GroupSupportMixin):
     type: Literal["star_with_palace"] = "star_with_palace"
     palace: Role
     stars: list[str] = Field(default_factory=list)
-    group: str | None = None
-    mode: Mode | None = None
     scope: Scope
 
     @model_validator(mode="after")
     def _validate_group_mode(self) -> StarWithPalaceCondition:
-        if self.mode is not None and self.group is None:
-            raise ValueError("mode is only valid when group is set")
-        if not self.stars and self.group is None:
-            raise ValueError("star_with_palace requires stars or group")
+        if not self.stars and self.group_name is None:
+            raise ValueError("star_with_palace requires stars or group_name")
         return self
 
 
-class StarAtChiCondition(BaseCondition):
+class StarAtChiCondition(BaseCondition, GroupSupportMixin):
     type: Literal["star_at_chi"] = "star_at_chi"
     at_chi: Annotated[list[DiaChi], at.MinLen(1)]
     stars: list[str] = Field(default_factory=list)
-    group: str | None = None
-    mode: Mode | None = None
 
     @model_validator(mode="after")
     def _validate_group_mode(self) -> StarAtChiCondition:
-        if self.mode is not None and self.group is None:
-            raise ValueError("mode is only valid when group is set")
-        if not self.stars and self.group is None:
-            raise ValueError("star_at_chi requires stars or group")
+        if not self.stars and self.group_name is None:
+            raise ValueError("star_at_chi requires stars or group_name")
         return self
 
 
-class StarsMeetingCondition(BaseCondition):
+class StarsMeetingCondition(BaseCondition, GroupSupportMixin):
     type: Literal["stars_meeting"] = "stars_meeting"
     scope: Scope
     stars: list[str] = Field(default_factory=list)
-    group: str | None = None
-    mode: Mode | None = None
 
     @model_validator(mode="after")
     def _validate_group_mode(self) -> StarsMeetingCondition:
-        if self.mode is not None and self.group is None:
-            raise ValueError("mode is only valid when group is set")
-        if not self.stars and self.group is None:
-            raise ValueError("stars_meeting requires stars or group")
+        if not self.stars and self.group_name is None:
+            raise ValueError("stars_meeting requires stars or group_name")
         return self
 
 
