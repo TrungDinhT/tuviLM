@@ -213,9 +213,17 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
         cond["stars"] = [cond.pop("star")]
         notes.append("star -> stars")
     normalize_star_fields(cond, notes)
-    if cond.get("type") in {"star_with_palace", "star_at_chi", "stars_meeting"} and cond.get("mode") is not None and cond.get("group") is None:
-        cond.pop("mode", None)
-        notes.append("dropped mode because no group is set")
+    if "group" in cond and "group_name" not in cond:
+        cond["group_name"] = cond.pop("group")
+        notes.append("group -> group_name")
+    if (
+        cond.get("type")
+        in {"star_with_palace", "star_at_chi", "stars_meeting"}
+        and cond.get("group_name") is None
+    ):
+        for field in ("mode", "at_least"):
+            if cond.pop(field, None) is not None:
+                notes.append(f"dropped {field} because no group_name is set")
 
     if "can" in cond:
         old = cond["can"]
@@ -415,8 +423,9 @@ def new_tuan_triet_leaf() -> dict:
     leaf = new_leaf("star_with_palace")
     leaf["palace"] = PALACES[0]
     leaf["stars"] = ["tuan", "triet"]
-    leaf["group"] = None
+    leaf["group_name"] = None
     leaf["mode"] = None
+    leaf["at_least"] = None
     return leaf
 
 
@@ -451,6 +460,52 @@ def options_with_current_values(options: list[str], values) -> list[str]:
     current_values = values if isinstance(values, list) else [values] if values else []
     extras = [value for value in current_values if value not in options]
     return [*options, *extras]
+
+
+def render_group_support(cond: dict, key: str) -> bool:
+    use_group = st.checkbox(
+        "use group",
+        value=cond.get("group_name") is not None,
+        key=f"{key}_use_group",
+    )
+    if not use_group:
+        cond["group_name"] = None
+        cond["mode"] = None
+        cond["at_least"] = None
+        return False
+
+    cond["group_name"] = st.selectbox(
+        "group_name",
+        GROUPS,
+        index=safe_index(GROUPS, cond.get("group_name")),
+        key=f"{key}_group_name",
+    )
+    strategy = st.selectbox(
+        "group strategy",
+        ["mode", "at_least"],
+        index=1 if cond.get("at_least") is not None else 0,
+        key=f"{key}_group_strategy",
+    )
+    if strategy == "mode":
+        cond["mode"] = st.selectbox(
+            "mode",
+            MODES,
+            index=safe_index(MODES, cond.get("mode")),
+            key=f"{key}_mode",
+        )
+        cond["at_least"] = None
+    else:
+        cond["at_least"] = int(
+            st.number_input(
+                "at_least",
+                min_value=1,
+                value=max(1, cond.get("at_least") or 1),
+                step=1,
+                key=f"{key}_at_least",
+            )
+        )
+        cond["mode"] = None
+    return True
 
 
 def render_leaf(cond: dict, stars: list[str]) -> None:
@@ -517,35 +572,14 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
         )
 
     elif ctype == "star_at_chi":
-        use_group = st.checkbox(
-            "use group",
-            value=cond.get("group") is not None,
-            key=f"{key}_use_group",
+        render_group_support(cond, key)
+        star_options = options_with_current_values(stars, cond.get("stars"))
+        cond["stars"] = st.multiselect(
+            "stars",
+            star_options,
+            default=safe_default_list(star_options, cond.get("stars")),
+            key=f"{key}_stars",
         )
-        if use_group:
-            cond["group"] = st.selectbox(
-                "group",
-                GROUPS,
-                index=safe_index(GROUPS, cond.get("group")),
-                key=f"{key}_group",
-            )
-            cond["mode"] = st.selectbox(
-                "mode",
-                MODES,
-                index=safe_index(MODES, cond.get("mode")),
-                key=f"{key}_mode",
-            )
-            cond["stars"] = None
-        else:
-            star_options = options_with_current_values(stars, cond.get("stars"))
-            cond["stars"] = st.multiselect(
-                "stars",
-                star_options,
-                default=safe_default_list(star_options, cond.get("stars")),
-                key=f"{key}_stars",
-            )
-            cond["group"] = None
-            cond["mode"] = None
         cond["at_chi"] = st.multiselect(
             "at_chi",
             CHI,
@@ -581,35 +615,14 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             index=safe_index(SCOPES_MEETING, cond.get("scope", "dong_cung")),
             key=f"{key}_scope",
         )
-        use_group = st.checkbox(
-            "use group",
-            value=cond.get("group") is not None,
-            key=f"{key}_use_group",
+        render_group_support(cond, key)
+        star_options = options_with_current_values(stars, cond.get("stars"))
+        cond["stars"] = st.multiselect(
+            "stars",
+            star_options,
+            default=safe_default_list(star_options, cond.get("stars")),
+            key=f"{key}_stars",
         )
-        if use_group:
-            cond["group"] = st.selectbox(
-                "group",
-                GROUPS,
-                index=safe_index(GROUPS, cond.get("group")),
-                key=f"{key}_group",
-            )
-            cond["mode"] = st.selectbox(
-                "mode",
-                MODES,
-                index=safe_index(MODES, cond.get("mode")),
-                key=f"{key}_mode",
-            )
-            cond["stars"] = None
-        else:
-            star_options = options_with_current_values(stars, cond.get("stars"))
-            cond["stars"] = st.multiselect(
-                "stars",
-                star_options,
-                default=safe_default_list(star_options, cond.get("stars")),
-                key=f"{key}_stars",
-            )
-            cond["group"] = None
-            cond["mode"] = None
 
     elif ctype == "stars_meeting":
         cond["scope"] = st.selectbox(
@@ -618,35 +631,14 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             index=safe_index(SCOPES_MEETING, cond.get("scope")),
             key=f"{key}_scope",
         )
-        use_group = st.checkbox(
-            "use group",
-            value=cond.get("group") is not None,
-            key=f"{key}_use_group",
+        render_group_support(cond, key)
+        star_options = options_with_current_values(stars, cond.get("stars"))
+        cond["stars"] = st.multiselect(
+            "stars",
+            star_options,
+            default=safe_default_list(star_options, cond.get("stars")),
+            key=f"{key}_stars",
         )
-        if use_group:
-            cond["group"] = st.selectbox(
-                "group",
-                GROUPS,
-                index=safe_index(GROUPS, cond.get("group")),
-                key=f"{key}_group",
-            )
-            cond["mode"] = st.selectbox(
-                "mode",
-                MODES,
-                index=safe_index(MODES, cond.get("mode")),
-                key=f"{key}_mode",
-            )
-            cond["stars"] = None
-        else:
-            star_options = options_with_current_values(stars, cond.get("stars"))
-            cond["stars"] = st.multiselect(
-                "stars",
-                star_options,
-                default=safe_default_list(star_options, cond.get("stars")),
-                key=f"{key}_stars",
-            )
-            cond["group"] = None
-            cond["mode"] = None
 
     elif ctype == "stars_xor":
         star_options = options_with_current_values(stars, cond.get("stars"))
@@ -674,10 +666,17 @@ def leaf_to_dict(cond: dict) -> dict:
         "gender_match": ["gender"],
         "only_chinh_tinh": ["palace", "star"],
         "palace_at": ["palace", "chi"],
-        "star_at_chi": ["stars", "at_chi", "group", "mode"],
+        "star_at_chi": ["stars", "at_chi", "group_name", "mode", "at_least"],
         "star_brightness": ["stars", "brightness"],
-        "star_with_palace": ["palace", "scope", "stars", "group", "mode"],
-        "stars_meeting": ["scope", "stars", "group", "mode"],
+        "star_with_palace": [
+            "palace",
+            "scope",
+            "stars",
+            "group_name",
+            "mode",
+            "at_least",
+        ],
+        "stars_meeting": ["scope", "stars", "group_name", "mode", "at_least"],
         "stars_xor": ["stars", "scope"],
     }
     for field in fields_by_type.get(ctype, []):
