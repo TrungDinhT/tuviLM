@@ -27,10 +27,7 @@ Core factors:
 Examples of relations:
 
 - palace role to position: `palace_at`
-<<<<<<< HEAD:docs/la_so_design/cach_cuc_condition_language.md
 - Cung Than to palace role: `cung_than_at_palace`
-=======
->>>>>>> 1c5dbdc (docs: align documentation to models):src/refactored/docs/cach_cuc_condition_language.md
 - star to palace role: `star_with_palace`
 - star or group to earthly branch: `star_at_chi`
 - star to brightness: `star_brightness`
@@ -280,21 +277,13 @@ brightness: [star_brightness]
 
 ### `star_with_palace`
 
-<<<<<<< HEAD:docs/la_so_design/cach_cuc_condition_language.md
 Matches stars and an **anchor** palace whose positions are constrained by a meeting scope.
-=======
-Matches stars inside a palace, optionally constraining their meeting scope.
->>>>>>> 1c5dbdc (docs: align documentation to models):src/refactored/docs/cach_cuc_condition_language.md
 Group would follow the mode.
 
 ```yaml
 type: star_with_palace
 palace: role_str
-<<<<<<< HEAD:docs/la_so_design/cach_cuc_condition_language.md
 scope: scope_enum  # required; same values as stars_meeting
-=======
-scope: scope_enum  # required; same values as stars_meeting; default dong_cung
->>>>>>> 1c5dbdc (docs: align documentation to models):src/refactored/docs/cach_cuc_condition_language.md
 stars: [star_name]
 stars_matching_logic: [any, all]  # optional; default is any. Used only when group_name is not set.
 group_name: group_name  # optional
@@ -372,13 +361,8 @@ Extraction:
     - type: palace_at
       palace: menh
       chi:
-<<<<<<< HEAD:docs/la_so_design/cach_cuc_condition_language.md
       - ty
       - ngo
-=======
-      - Ty
-      - Ngo
->>>>>>> 1c5dbdc (docs: align documentation to models):src/refactored/docs/cach_cuc_condition_language.md
     - type: star_with_palace
       palace: menh
       stars:
