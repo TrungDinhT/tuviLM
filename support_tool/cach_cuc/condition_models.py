@@ -138,6 +138,7 @@ class StarsMeetingCondition(BaseCondition, GroupSupportMixin):
             self.stars_matching_logic = None
         return self
 
+
 class CungThanAtPalaceCondition(BaseCondition):
     type: Literal["cung_than_at_palace"] = "cung_than_at_palace"
     palace: Role
@@ -164,6 +165,7 @@ class AllCondition(BaseModel):
 
 class AnyCondition(BaseModel):
     any_: list[Condition] = Field(..., alias="any")
+
 
 class NotCondition(BaseModel):
     not_: Condition = Field(..., alias="not")
