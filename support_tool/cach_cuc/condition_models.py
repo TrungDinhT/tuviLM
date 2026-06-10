@@ -128,6 +128,10 @@ class StarsMeetingCondition(BaseCondition, GroupSupportMixin):
             raise ValueError("stars_meeting requires stars or group_name")
         return self
 
+class CungThanAtPalaceCondition(BaseCondition):
+    type: Literal["cung_than_at_palace"] = "cung_than_at_palace"
+    palace: Role
+
 
 LeafCondition = Annotated[
     CanMatchCondition
@@ -138,7 +142,8 @@ LeafCondition = Annotated[
     | StarBrightnessCondition
     | StarWithPalaceCondition
     | StarAtChiCondition
-    | StarsMeetingCondition,
+    | StarsMeetingCondition
+    | CungThanAtPalaceCondition,
     Field(discriminator="type"),
 ]
 
