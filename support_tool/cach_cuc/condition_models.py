@@ -138,6 +138,10 @@ class StarsMeetingCondition(BaseCondition, GroupSupportMixin):
             self.stars_matching_logic = None
         return self
 
+class CungThanAtPalaceCondition(BaseCondition):
+    type: Literal["cung_than_at_palace"] = "cung_than_at_palace"
+    palace: Role
+
 
 class CungThanAtPalaceCondition(BaseCondition):
     type: Literal["cung_than_at_palace"] = "cung_than_at_palace"
