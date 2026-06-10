@@ -42,6 +42,7 @@ OPERATORS = ["all", "any"]
 CONDITION_TYPES = [
     "can_exclude",
     "can_match",
+    "cung_than_at_palace",
     "gender_match",
     "only_chinh_tinh",
     "palace_at",
@@ -542,6 +543,14 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             key=f"{key}_gender",
         )
 
+    elif ctype == "cung_than_at_palace":
+        cond["palace"] = st.selectbox(
+            "palace",
+            PALACES,
+            index=safe_index(PALACES, cond.get("palace")),
+            key=f"{key}_palace",
+        )
+
     elif ctype == "only_chinh_tinh":
         cond["palace"] = st.selectbox(
             "palace",
@@ -663,6 +672,7 @@ def leaf_to_dict(cond: dict) -> dict:
     fields_by_type = {
         "can_exclude": ["can"],
         "can_match": ["can"],
+        "cung_than_at_palace": ["cung_than", "palace"],
         "gender_match": ["gender"],
         "only_chinh_tinh": ["palace", "star"],
         "palace_at": ["palace", "chi"],

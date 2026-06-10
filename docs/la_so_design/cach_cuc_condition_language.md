@@ -27,6 +27,7 @@ Core factors:
 Examples of relations:
 
 - palace role to position: `palace_at`
+- Cung Than to palace role: `cung_than_at_palace`
 - star to palace role: `star_with_palace`
 - star or group to earthly branch: `star_at_chi`
 - star to brightness: `star_brightness`
@@ -233,6 +234,15 @@ type: gender_match
 gender: male  # or: female
 ```
 
+### `cung_than_at_palace`
+
+Matches when the specified Cung Than is located at a palace role.
+
+```yaml
+type: cung_than_at_palace
+cung_than: cung_than_name
+palace: role_str
+```
 
 ### `palace_at`
 
