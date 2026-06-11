@@ -1029,6 +1029,31 @@ def add_blank_entry() -> None:
     refresh_entry_lists()
 
 
+def duplicate_entry(source_key: str) -> str | None:
+    source_entry = st.session_state.entries.get(source_key)
+    if source_entry is None:
+        return None
+
+    source_id = source_entry.get("id") or source_key
+    copied_id = f"{source_id}_copy"
+    if (
+        copied_id in st.session_state.entries
+        or copied_id in st.session_state.export_entries_by_id
+    ):
+        return None
+
+    copied_entry = deepcopy(source_entry)
+    copied_entry["id"] = copied_id
+    copied_entry["root"] = rekey_node(source_entry["root"])
+    copied_entry["import_notes"] = [f"duplicated from {source_id}"]
+    st.session_state.entries[copied_id] = copied_entry
+    mark_entry_modified(copied_id)
+    st.session_state.saved_ids.discard(copied_id)
+    select_entry(copied_id)
+    refresh_entry_lists()
+    return copied_id
+
+
 def load_import_into_state(path: Path, mark_remediated: bool = True) -> None:
     entries, source_data = load_cach_cuc_file(path)
     st.session_state.entries = entries
@@ -1476,7 +1501,7 @@ def main() -> None:
         and entry_review_status(selected_id) != "original"
     )
     can_skip_remediated = is_review_only_remediation(selected_id, cach_cuc)
-    action_cols = st.columns([1, 1, 4])
+    action_cols = st.columns([1, 1, 1, 3])
     with action_cols[0]:
         if st.button("Discard edits for current entry", disabled=not can_discard_to_original):
             reset_form()
@@ -1486,6 +1511,14 @@ def main() -> None:
             skip_remediated_entry(selected_id)
             refresh_entry_lists()
             st.rerun()
+    with action_cols[2]:
+        if st.button("Duplicate current entry"):
+            copied_id = duplicate_entry(selected_id)
+            if copied_id is None:
+                source_id = entry.get("id") or selected_id
+                st.error(f"Cannot duplicate: {source_id}_copy already exists.")
+            else:
+                st.rerun()
 
     render_save_panel(cach_cuc)
 
