@@ -241,10 +241,6 @@ Matches when the specified Cung Than is located at a palace role.
 
 ```yaml
 type: cung_than_at_palace
-<<<<<<< HEAD:docs/la_so_design/cach_cuc_condition_language.md
-=======
-cung_than: cung_than_name
->>>>>>> 7c568ba (feat: add cung_than_at_palace):src/refactored/docs/cach_cuc_condition_language.md
 palace: role_str
 ```
 
