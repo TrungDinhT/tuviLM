@@ -22,6 +22,7 @@ GroupName = Literal[
     "cat_tinh",
     "tu_hoa",
     "tam_hoa",
+    "xuong_khuc_khoa_tue_tau",
 ]
 Scope = Literal[
     "tam_hop",
@@ -97,11 +98,14 @@ class StarWithPalaceCondition(BaseCondition, GroupSupportMixin):
     palace: Role
     stars: list[str] = Field(default_factory=list)
     scope: Scope
+    stars_matching_logic: Mode | None = "any"
 
     @model_validator(mode="after")
     def _validate_group_mode(self) -> StarWithPalaceCondition:
         if not self.stars and self.group_name is None:
             raise ValueError("star_with_palace requires stars or group_name")
+        if self.group_name is not None:
+            self.stars_matching_logic = None
         return self
 
 
@@ -121,11 +125,14 @@ class StarsMeetingCondition(BaseCondition, GroupSupportMixin):
     type: Literal["stars_meeting"] = "stars_meeting"
     scope: Scope
     stars: list[str] = Field(default_factory=list)
+    stars_matching_logic: Mode | None = "any"
 
     @model_validator(mode="after")
     def _validate_group_mode(self) -> StarsMeetingCondition:
         if not self.stars and self.group_name is None:
             raise ValueError("stars_meeting requires stars or group_name")
+        if self.group_name is not None:
+            self.stars_matching_logic = None
         return self
 
 class CungThanAtPalaceCondition(BaseCondition):
