@@ -127,6 +127,7 @@ luc_cat: [ta_phu, huu_bat, thien_khoi, thien_viet, van_xuong, van_khuc]
 cat_tinh: [ta_phu, huu_bat, thien_khoi, thien_viet, van_xuong, van_khuc]
 tu_hoa: [hoa_khoa, hoa_quyen, hoa_loc, hoa_ky]
 tam_hoa: [hoa_khoa, hoa_quyen, hoa_loc]
+xuong_khuc_khoa_tue_tau: [van_xuong, van_khuc, hoa_khoa, thai_tue, tau_thu]
 ```
 
 ### Stars
@@ -285,9 +286,10 @@ type: star_with_palace
 palace: role_str
 scope: scope_enum  # required; same values as stars_meeting; default dong_cung
 stars: [star_name]
-group_name: group_name
-mode: [any, all]  # provide mode or at_least
-at_least: integer
+stars_matching_logic: [any, all]  # optional; default is any. Used only when group_name is not set.
+group_name: group_name  # optional
+mode: [any, all]  # provide mode or at_least; used only when group_name is set
+at_least: integer  # used only when group_name is set
 ```
 
 
@@ -313,9 +315,10 @@ Matches explicit stars, group members, or both meeting under a specified scope.
 type: stars_meeting
 stars: [star_name]
 scope: scope_enum
-group_name: group_name
-mode: [any, all]  # provide mode or at_least
-at_least: integer
+stars_matching_logic: [any, all]  # optional; default is any. Used only when group_name is not set.
+group_name: group_name  # optional
+mode: [any, all]  # provide mode or at_least; used only when group_name is set
+at_least: integer  # used only when group_name is set
 ```
 
 

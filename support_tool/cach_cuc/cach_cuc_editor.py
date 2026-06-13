@@ -33,7 +33,7 @@ CHI = [chi.value for chi in DiaChi]
 CAN = [can.value for can in ThienCan]
 SCOPES_MEETING = list(get_args(Scope))
 SCOPES_XOR = ["hoi_hop", "dong_hoac_xung", "dong_cung", "nhi_hop", "xung_chieu"]
-GROUPS = ["luc_sat", "sat_tinh", "luc_cat", "cat_tinh", "tu_hoa", "tam_hoa"]
+GROUPS = ["luc_sat", "sat_tinh", "luc_cat", "cat_tinh", "tu_hoa", "tam_hoa", "xuong_khuc_khoa_tue_tau"]
 BRIGHTNESS = list(get_args(Brightness))
 GENDERS = list(get_args(Gender))
 MODES = list(get_args(Mode))
@@ -67,6 +67,7 @@ DEFAULT_GROUPS = {
     "cat_tinh": {"stars": ["ta_phu", "huu_bat", "thien_khoi", "thien_viet", "van_xuong", "van_khuc"]},
     "tu_hoa": {"stars": ["hoa_khoa", "hoa_quyen", "hoa_loc", "hoa_ky"]},
     "tam_hoa": {"stars": ["hoa_khoa", "hoa_quyen", "hoa_loc"]},
+    "xuong_khuc_khoa_tue_tau": {"stars": ["van_xuong", "van_khuc", "hoa_khoa", "thai_tue", "tau_thu"]},
 }
 
 PALACE_ALIASES = {
@@ -225,6 +226,11 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
         for field in ("mode", "at_least"):
             if cond.pop(field, None) is not None:
                 notes.append(f"dropped {field} because no group_name is set")
+    if cond.get("type") in {"star_with_palace", "stars_meeting"}:
+        if cond.get("group_name") is None:
+            cond.setdefault("stars_matching_logic", "any")
+        else:
+            cond["stars_matching_logic"] = None
 
     if "can" in cond:
         old = cond["can"]
@@ -624,7 +630,16 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             index=safe_index(SCOPES_MEETING, cond.get("scope", "dong_cung")),
             key=f"{key}_scope",
         )
-        render_group_support(cond, key)
+        has_group = render_group_support(cond, key)
+        if not has_group:
+            cond["stars_matching_logic"] = st.selectbox(
+                "stars matching logic",
+                MODES,
+                index=safe_index(MODES, cond.get("stars_matching_logic")),
+                key=f"{key}_stars_matching_logic",
+            )
+        else:
+            cond["stars_matching_logic"] = None
         star_options = options_with_current_values(stars, cond.get("stars"))
         cond["stars"] = st.multiselect(
             "stars",
@@ -640,7 +655,16 @@ def render_leaf(cond: dict, stars: list[str]) -> None:
             index=safe_index(SCOPES_MEETING, cond.get("scope")),
             key=f"{key}_scope",
         )
-        render_group_support(cond, key)
+        has_group = render_group_support(cond, key)
+        if not has_group:
+            cond["stars_matching_logic"] = st.selectbox(
+                "stars matching logic",
+                MODES,
+                index=safe_index(MODES, cond.get("stars_matching_logic")),
+                key=f"{key}_stars_matching_logic",
+            )
+        else:
+            cond["stars_matching_logic"] = None
         star_options = options_with_current_values(stars, cond.get("stars"))
         cond["stars"] = st.multiselect(
             "stars",
@@ -682,11 +706,19 @@ def leaf_to_dict(cond: dict) -> dict:
             "palace",
             "scope",
             "stars",
+            "stars_matching_logic",
             "group_name",
             "mode",
             "at_least",
         ],
-        "stars_meeting": ["scope", "stars", "group_name", "mode", "at_least"],
+        "stars_meeting": [
+            "scope",
+            "stars",
+            "stars_matching_logic",
+            "group_name",
+            "mode",
+            "at_least",
+        ],
         "stars_xor": ["stars", "scope"],
     }
     for field in fields_by_type.get(ctype, []):
