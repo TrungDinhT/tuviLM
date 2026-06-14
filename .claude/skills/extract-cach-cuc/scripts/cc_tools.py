@@ -3,6 +3,7 @@
 
 Subcommands:
   vocab                       Dump canonical ids (stars, roles, chi, can, brightness, scopes, groups).
+  schema                      Dump condition model shape, auto-derived from the pydantic models.
   validate <file...>          Pydantic-validate file(s); report duplicate ids + unknown star ids.
   dedup    <file...>          Detect records with semantically identical conditions (across the union).
   check    <tmp> <reviewed>   Preflight gate: validate both, id clashes, cross-file condition collisions.
@@ -19,7 +20,7 @@ import json
 import os
 import sys
 from collections import Counter, defaultdict
-from typing import Any, get_args
+from typing import Any, Literal, Union, get_args, get_origin
 
 
 def find_repo_root(start: str) -> str:
@@ -140,13 +141,23 @@ def _unknown_star_ids(data: dict, valid: set[str]) -> dict[str, list[str]]:
 
 
 # ----------------------------------------------------------------------------- commands
-def cmd_vocab(_args) -> int:
+def cmd_vocab(args) -> int:
     stars = _read_json("sao.json") + _read_json("tuhoa.json")
     roles = _read_json("cung_role.json")
+    compact = getattr(args, "compact", False)
+    if compact:
+        # ids only — most compact. Full VN names (the bridge for book short-names) are dropped.
+        star_block: Any = sorted(s["id"] for s in stars)
+        role_block: Any = [r["id"] for r in roles]
+        special_block: Any = ["tuan", "triet"]
+    else:
+        star_block = {s["id"]: s.get("name", "") for s in stars}
+        role_block = {r["id"]: r.get("name", "") for r in roles}
+        special_block = {"tuan": "Tuần", "triet": "Triệt"}
     out = {
-        "stars": {s["id"]: s.get("name", "") for s in stars},
-        "roles": {r["id"]: r.get("name", "") for r in roles},
-        "special_stars": {"tuan": "Tuần", "triet": "Triệt"},
+        "stars": star_block,
+        "roles": role_block,
+        "special_stars": special_block,
         "chi": _members(cm.DiaChi),
         "can": _members(cm.ThienCan),
         "brightness": _members(cm.Brightness),
@@ -155,6 +166,82 @@ def cmd_vocab(_args) -> int:
         "modes": _members(cm.Mode),
     }
     print(json.dumps(out, ensure_ascii=False, indent=2, sort_keys=False))
+    return 0
+
+
+def _literal_aliases() -> dict[frozenset, str]:
+    """Map a Literal's value-set -> friendly alias name (resolved via `vocab`)."""
+    return {
+        frozenset(get_args(cm.GroupName)): "GroupName",
+        frozenset(get_args(cm.Scope)): "Scope",
+        frozenset(get_args(cm.Brightness)): "Brightness",
+        frozenset(get_args(cm.Mode)): "Mode",
+    }
+
+
+def _ann_str(ann: Any, aliases: dict[frozenset, str]) -> str:
+    """Render a (possibly nested) type annotation as a compact string."""
+    origin = get_origin(ann)
+    if origin is Literal:
+        vals = get_args(ann)
+        return aliases.get(frozenset(vals), "|".join(str(v) for v in vals))
+    if origin in (Union, getattr(__import__("types"), "UnionType", None)):
+        inner = [a for a in get_args(ann) if a is not type(None)]
+        return "|".join(_ann_str(a, aliases) for a in inner)
+    if origin in (list, set, tuple):
+        return f"list[{', '.join(_ann_str(a, aliases) for a in get_args(ann))}]"
+    return getattr(ann, "__name__", str(ann))
+
+
+def _leaf_classes() -> list[type]:
+    inner = get_args(cm.LeafCondition)  # Annotated[Union[...], FieldInfo] -> (Union, FieldInfo)
+    union = inner[0] if inner else cm.LeafCondition
+    return list(get_args(union))
+
+
+def _field_line(name: str, field: Any, aliases: dict[frozenset, str]) -> str:
+    type_str = _ann_str(field.annotation, aliases)
+    if field.is_required():
+        return f"{name}: {type_str}"
+    if field.default_factory is not None or field.default is None:
+        return f"{name}: {type_str} (opt)"
+    return f"{name}: {type_str} (opt, default {field.default!r})"
+
+
+def cmd_schema(_args) -> int:
+    aliases = _literal_aliases()
+
+    print("RECORD — one item under top-level `cach_cuc:`")
+    for name, field in cm.CachCuc.model_fields.items():
+        if name == "conditions":
+            print("  conditions: Condition (a leaf, or all/any/not — see below)")
+            continue
+        print(f"  {_field_line(name, field, aliases)}")
+
+    print("\nCONDITION = one leaf below, OR a combinator:")
+    print("  all: [Condition, ...]   every child must hold")
+    print("  any: [Condition, ...]   at least one child holds")
+    print("  not: Condition          negate one condition")
+
+    print("\nLEAF CONDITIONS — set `type:` to the leaf name; remaining fields:")
+    for cls in _leaf_classes():
+        leaf_type = cls.model_fields["type"].default
+        parts = [
+            _field_line(n, f, aliases)
+            for n, f in cls.model_fields.items()
+            if n != "type"
+        ]
+        print(f"  {leaf_type:<20} {'; '.join(parts)}")
+
+    print("\nMODEL RULES (enforced by validation):")
+    print("  - star_with_palace / star_at_chi / stars_meeting: need `stars` or `group_name`.")
+    print("  - group_name requires `mode` or `at_least`; both are valid ONLY with group_name.")
+    print("  - stars_matching_logic: how explicit `stars` must meet; auto-nulled when group_name set.")
+    print("  - GroupName values: " + ", ".join(get_args(cm.GroupName)))
+
+    print("\nVALUE TYPES — resolve ids via `cc_tools.py vocab`:")
+    print("  Role->roles  ThienCan->can  DiaChi->chi  Scope->scopes")
+    print("  GroupName->group_names  Brightness->brightness  Mode->modes  str(stars)->stars")
     return 0
 
 
@@ -290,7 +377,12 @@ def main() -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    sub.add_parser("vocab", help="dump canonical ids").set_defaults(fn=cmd_vocab)
+    p = sub.add_parser("vocab", help="dump canonical ids")
+    p.add_argument("--compact", action="store_true",
+                   help="ids only, drop full VN names (smaller, but loses the short-name bridge)")
+    p.set_defaults(fn=cmd_vocab)
+
+    sub.add_parser("schema", help="dump condition model shape (auto-derived from pydantic)").set_defaults(fn=cmd_schema)
 
     p = sub.add_parser("validate", help="pydantic-validate file(s); report dup ids + unknown star ids")
     p.add_argument("files", nargs="+")
