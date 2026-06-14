@@ -65,8 +65,8 @@ cach_cuc:
       stars:
       - thien_ma
       at_chi:
-      - Dan
-      - Than
+      - dan
+      - than
     - type: stars_meeting
       stars:
       - thien_ma
@@ -163,12 +163,12 @@ conditions:
   - type: palace_at
     palace: menh
     chi:
-    - Suu
+    - suu
   - type: star_at_chi
     stars:
     - thai_duong
     at_chi:
-    - Mui
+    - mui
 ```
 
 Use `any` when at least one child condition must be true:
@@ -211,8 +211,8 @@ Matches when the heavenly stem is any of the listed values.
 ```yaml
 type: can_match
 can:
-- Giap
-- At
+- giap
+- at
 ```
 
 ### `can_exclude`
@@ -222,8 +222,8 @@ Matches when the heavenly stem is none of the listed values.
 ```yaml
 type: can_exclude
 can:
-- Binh
-- Dinh
+- binh
+- dinh
 ```
 
 ### `gender_match`
@@ -241,7 +241,6 @@ Matches when the specified Cung Than is located at a palace role.
 
 ```yaml
 type: cung_than_at_palace
-cung_than: cung_than_name
 palace: role_str
 ```
 
@@ -284,7 +283,7 @@ Group would follow the mode.
 ```yaml
 type: star_with_palace
 palace: role_str
-scope: scope_enum  # required; same values as stars_meeting; default dong_cung
+scope: scope_enum  # required; same values as stars_meeting
 stars: [star_name]
 stars_matching_logic: [any, all]  # optional; default is any. Used only when group_name is not set.
 group_name: group_name  # optional
@@ -362,8 +361,8 @@ Extraction:
     - type: palace_at
       palace: menh
       chi:
-      - Ty
-      - Ngo
+      - ty
+      - ngo
     - type: star_with_palace
       palace: menh
       stars:
@@ -402,20 +401,14 @@ Extraction:
     - type: palace_at
       palace: menh
       chi:
-      - Ngo
-    - type: stars_meeting
+      - ngo
+    - type: star_with_palace
+      palace: menh
+      scope: dong_cung
       stars:
       - thien_dong
       - thai_am
-      scope: dong_cung
-    - type: stars_in_palace
-      palace: menh
-      stars:
-        - thien_dong
-        - thai_am
     - type: stars_meeting
-      stars:
-      - thien_dong
       scope: hoi_hop
       group_name: sat_tinh
       mode: any
@@ -424,8 +417,8 @@ Extraction:
 Reasoning:
 
 - `Cung Mệnh an tại Ngọ` becomes `palace_at`.
-- `Đồng, Nguyệt tọa thủ đồng cung` becomes `stars_meeting` and `stars_in_palace`
-- `gặp Sát tinh hội hợp` becomes `stars_meeting` with `group_name: sat_tinh` and `mode: any`
+- `Đồng, Nguyệt tọa thủ đồng cung` becomes `star_with_palace` anchored at `menh` with `scope: dong_cung` (both stars in the palace).
+- `gặp Sát tinh hội hợp` becomes `stars_meeting` with `group_name: sat_tinh` and `mode: any`.
 
 Use `at_least` when the text specifies a minimum number of members from a
 group, for example `at_least: 2`. A grouped condition must provide at least one
