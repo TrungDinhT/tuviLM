@@ -278,7 +278,7 @@ brightness: [star_brightness]
 
 ### `star_with_palace`
 
-Matches stars inside a palace, optionally constraining their meeting scope.
+Matches stars and an **anchor** palace whose positions are constrained by a meeting scope.
 Group would follow the mode.
 
 ```yaml
