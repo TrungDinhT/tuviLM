@@ -58,22 +58,22 @@ Mirror these in the `groups:` block at the top of `cach_cuc_reviewed.yaml`.
 - WITHOUT explicit name, WITHOUT chính tinh → 0 (e.g. thiên diêu gặp long phượng)
 
 ## Extraction rules
-- Preserve original `name` verbatim; keep `meaning` short and faithful, don't replicate `evidence` keep the essential meaning of the cach_cuc; include a concise `evidence`
-  (raw source text) per record.
+- Preserve original `name` verbatim; keep `meaning` short and faithful, keep only the essential meaning, do not repeat the cach_cuc condition; include a very concise `evidence` (raw source text) per record only if it doesn't repeat the cach_cuc condition or the meaning.
 - Explicit `stars` when the book names stars; `group_name` when it names a category.
 - `all` = every phrase must hold; `any` = alternatives; nest `any` of `all` for pattern alternatives.
 - Do NOT invent conditions unsupported by the source page. If a condition can't be represented, add a
   note outside the model rather than overloading a leaf type.
-- Special cases:
+- Notes:
+  - **Too general cach_cuc**: The cach_cucs contain only the principal star at the menh palace and are only about characteristics or appearance should be ignored.
   - **Tuần / Triệt:** the book usually names both, but EITHER one is enough — model as `any` of the
     two (and across both Mệnh and Thân when the text says "Mệnh hay Thân").
   - **Meeting the main star(s):** when stars meet the main star the cách cục is about, prefer
     `star_with_palace` (anchor `menh`) over `stars_meeting` — the palace is the anchor for the meeting.
-  - **Vague quantity** — "nhiều Sát tinh", "nhiều cát tinh", "nhiều sao sáng sủa (tốt đẹp)", "nhiều
-    sao mờ ám (xấu xa)" — map to the matching group (`sat_tinh` / `cat_tinh`) with `at_least: 2`
+  - **Vague quantity** — "nhiều Sát tinh", "nhiều cát tinh" — map to the matching group (`sat_tinh` / `cat_tinh`) with `at_least: 2`
     ("nhiều" = several, so ≥2), NOT `mode: any`. When the book also names example stars ("nhất là Tử
     Vi, Tướng…"), keep `group_name` + `at_least: 2` as the core and add named stars in `stars` only if
     they sharpen the rule.
+  - **Vague condition** - "nhiều sao sáng sủa", "nhiều sao mờ ám xấu xa" - we don't know yet how to correctly express those conditions, so skip cach_cuc like that. On the other hand, if the book mentions that, and also mentions special cases with specific stars or group, then only extract the cach_cuc for such special cases.
 
 ## Dedup — merge rule
 Different cách cục can carry different names + meanings but the EXACT same conditions; they must
