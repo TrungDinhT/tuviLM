@@ -23,6 +23,7 @@ GroupName = Literal[
     "tu_hoa",
     "tam_hoa",
     "xuong_khuc_khoa_tue_tau",
+    "cat_tinh_tam_hoa",
 ]
 Scope = Literal[
     "tam_hop",
