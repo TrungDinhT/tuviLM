@@ -68,6 +68,8 @@ DEFAULT_GROUPS = {
     "tu_hoa": {"stars": ["hoa_khoa", "hoa_quyen", "hoa_loc", "hoa_ky"]},
     "tam_hoa": {"stars": ["hoa_khoa", "hoa_quyen", "hoa_loc"]},
     "xuong_khuc_khoa_tue_tau": {"stars": ["van_xuong", "van_khuc", "hoa_khoa", "thai_tue", "tau_thu"]},
+    "khong_kiep_hao_ky_tue": {"stars": ["dia_khong", "dia_kiep", "dai_hao", "tieu_hao", "hoa_ky", "thai_tue"]},
+    "tu_phu_xuong_khuc_khoi_viet": {"stars": ["tu_vi", "thien_phu", "van_xuong", "van_khuc", "thien_khoi", "thien_viet"]},
 }
 
 PALACE_ALIASES = {
