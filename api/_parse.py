@@ -32,6 +32,7 @@ def to_cung_payload_map(la_so: LaSoView) -> dict[str, CungPayload]:
 
 def to_cung_payload(cung_view: CungView) -> CungPayload:
     chinh_tinh: list[str] = []
+    phu_tinh: list[StarPayload] = []
     is_tuan: bool = False
     is_triet: bool = False
     tu_hoa: list[str] = []
@@ -46,6 +47,8 @@ def to_cung_payload(cung_view: CungView) -> CungPayload:
             sao_str = f"{component.name} ({status})" if status else component.name
             if component.is_chinh_tinh:
                 chinh_tinh.append(sao_str)
+            else:
+                phu_tinh.append(to_sao_payload(component, cung_view))
         elif isinstance(component, TuHoa):
             tu_hoa.append(component.name)
         elif isinstance(component, VongTrangSinh):
@@ -60,12 +63,7 @@ def to_cung_payload(cung_view: CungView) -> CungPayload:
         position=cung_view.dia_chi_entity.name,
         role=cung_view.role.name,
         chinh_tinh=chinh_tinh,
-        phu_tinh=[
-            to_sao_payload(comp.component, cung_view)
-            for comp in cung_view.components
-            if isinstance(comp.component, ChinhPhuTinh)
-            and not comp.component.is_chinh_tinh
-        ],
+        phu_tinh=phu_tinh,
         tuhoa=tu_hoa,
         trang_sinh=trang_sinh if trang_sinh else None,
         is_tuan=is_tuan,
