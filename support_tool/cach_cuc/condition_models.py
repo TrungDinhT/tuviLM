@@ -129,7 +129,6 @@ class StarsMeetingCondition(BaseCondition, GroupSupportMixin):
     type: Literal["stars_meeting"] = "stars_meeting"
     scope: Scope
     stars: list[str] = Field(default_factory=list)
-    stars_matching_logic: Mode | None = "any"
 
     @model_validator(mode="after")
     def _validate_group_mode(self) -> StarsMeetingCondition:
