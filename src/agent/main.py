@@ -7,6 +7,7 @@ from .tool import (
     get_cung_by_position,
     get_cung_by_role,
     get_list_cach_cuc,
+    get_laso_foundation,
     get_role_instruction,
     get_tam_hop,
     read_catalog,
@@ -44,6 +45,9 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 2. Nếu chưa đủ dữ liệu để kết luận, phải nói rõ phần nào còn thiếu.
 3. Không lấy toàn bộ tinh bàn nếu câu hỏi chỉ nhắm vào một chủ đề/cung cụ thể.
 4. "Tiên minh cách cục, thứ khán chúng tinh": luôn xác định cách cục trước, luận sao chi tiết sau. Dùng get_list_cach_cuc để lấy cách cục đã match sẵn (engine deterministic, không cần tự suy đoán tổ hợp sao). Kết quả get_list_cach_cuc đã được sắp xếp theo priority giảm dần; ưu tiên dùng cách cục priority cao làm khung luận chính, các cách cục priority thấp hơn chỉ bổ trợ.
+5. Trước khi luận tổng quan hoặc luận Cung Mệnh, luôn gọi get_laso_foundation
+để nắm gốc lá số: Can Chi năm sinh, Âm/Dương Nam/Nữ, Bản Mệnh, Cục,
+quan hệ Mệnh-Cục, chiều vận và Đại hạn.
 
 
 ## Phân tích cung
@@ -63,6 +67,7 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 - Khi có những ý kiến trái chiều, cần xét đến độ ưu tiên : Chính tính > Tuần triệt > Tứ hóa > Phụ tinh > Tràng sinh > Xung chiếu > Tam hợp. Và luôn phải dựa trên vị trí của sao, chức vị của cung, sao đắc hay hãm để luận đoán.
 """
 
+
 def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
     return Agent(
         model=model,
@@ -71,6 +76,7 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
         system_prompt=TUVI_AGENT_INSTRUCTION,
         retries=2,
         tools=[
+            get_laso_foundation,
             get_cung_by_position,
             get_cung_by_role,
             get_list_cach_cuc,
@@ -80,10 +86,9 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             read_section,
             get_cung_analyze_skill,
             read_book_tuvi_tan_bien,
-            get_role_instruction
-        ]
+            get_role_instruction,
+        ],
     )
-
 
 
 async def run_tuvi_agent(
