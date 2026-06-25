@@ -201,7 +201,7 @@ class CachCuc(BaseModel):
     meaning: str
     evidence: str | None = None
     conditions: Condition
-    related_to: Role | None = None
+    related_roles: list[Role] = Field(default_factory=list)
 
     @field_validator("evidence", mode="before")
     @classmethod
@@ -222,7 +222,7 @@ class CachCucToolResult(BaseModel):
     page: int
     priority: int = 0
     meaning: str
-    related_to: Role | None = None
+    related_roles: list[Role] = Field(default_factory=list)
 
     @classmethod
     def from_cach_cuc(cls, cach_cuc: CachCuc) -> CachCucToolResult:
@@ -232,7 +232,7 @@ class CachCucToolResult(BaseModel):
             page=cach_cuc.page,
             priority=cach_cuc.priority,
             meaning=cach_cuc.meaning,
-            related_to=cach_cuc.related_to,
+            related_roles=list(cach_cuc.related_roles),
         )
 
 
