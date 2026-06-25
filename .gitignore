@@ -164,8 +164,11 @@ cython_debug/
 ./frontend/dist
 
 .agents/
-.claude/
 AGENTS.md
 CLAUDE.md
 skills-lock.json
 openspecs/
+.serena/
+.claude/
+docs/superpowers
+.playwright-mcp/

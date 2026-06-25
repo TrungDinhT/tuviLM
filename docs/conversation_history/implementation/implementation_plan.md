@@ -1,0 +1,766 @@
+# Conversation History Implementation Plan
+
+## Goal
+
+Implement the conversation history backend as one full vertical slice, staged so
+the PR remains reviewable:
+
+1. local MongoDB runtime, dependencies, and app configuration
+2. storage-agnostic chat DTOs, store contract, Beanie documents, and mappers
+3. chart profile and session APIs
+4. persisted session-scoped chat streaming
+5. tests and manual verification
+
+The implementation adds conversation-history endpoints beside the existing
+chart-building endpoints. The legacy `/api/v1/chat` and `/api/v1/chat/stream`
+routes were retired after the frontend started sending chat through persisted
+sessions.
+
+## Runtime And Dependencies
+
+Add MongoDB persistence dependencies to `pyproject.toml`:
+
+- `beanie`
+- `pymongo` async client support, provided transitively by Beanie
+
+Add a root-level `docker-compose.yaml` with a MongoDB service only. The API and
+frontend continue running through local development commands.
+
+Use environment variables:
+
+```text
+CONVERSATION_HISTORY_STORE__URI=mongodb://localhost:27017
+CONVERSATION_HISTORY_STORE__DATABASE_NAME=tuvilm
+CONVERSATION_HISTORY_STORE__TZ_AWARE=true
+CONVERSATION_HISTORY_STORE__STALE_PENDING_AFTER_SECONDS=900
+```
+
+Add an API settings module if one does not already exist. It should read those
+variables and validate that the MongoDB URI is configured.
+
+Initialize MongoDB and Beanie in the FastAPI lifespan before serving requests.
+Register these Beanie documents:
+
+- chart profile document
+- session document
+
+Store the initialized `ConversationHistoryStore` in app state so routes can
+retrieve it through request dependency helpers.
+
+Implementation note: Beanie 2 uses PyMongo's async client interface. Use
+`pymongo.AsyncMongoClient` with timezone-aware reads rather than Motor.
+
+## Module Layout
+
+Create the conversation history implementation under `api/chat/`:
+
+```text
+api/chat/
+  __init__.py
+  models.py
+  contracts.py
+  routes.py
+  storage/
+    __init__.py
+    documents.py
+    mappers.py
+    store.py
+```
+
+Responsibilities:
+
+- `models.py`: storage-agnostic Pydantic DTOs and enums
+- `contracts.py`: `ConversationHistoryStore` protocol and store result types
+- `routes.py`: FastAPI router mounted by `api/main.py`
+- `storage/documents.py`: Beanie `Document` classes
+- `storage/mappers.py`: Beanie document to DTO conversion
+- `storage/settings.py`: Mongo-specific settings for the conversation history store
+- `storage/store.py`: `MongoConversationHistoryStore`, the Mongo-backed
+  implementation of `ConversationHistoryStore`
+
+Beanie document classes and Mongo-specific settings must not escape
+`api/chat/storage/` except through app composition in `api/settings.py` and
+`api/main.py`.
+
+## Domain DTOs
+
+Define storage-agnostic DTOs in `api/chat/models.py`:
+
+- `BirthInfo`
+  - `calendar: Literal["solar"] = "solar"`
+  - `year`
+  - `month`
+  - `day`
+  - `hour`
+  - `gender: Literal["M", "F"]`
+- `ChartProfile`
+  - id
+  - owner id
+  - display name
+  - birth info
+  - timestamps
+- `ChatMessage`
+  - id
+  - role: `ChatRole` (`user` or `assistant`)
+  - content
+  - status: `ChatMessageStatus` (`pending`, `confirmed`, `failed`, or
+    `cancelled`)
+  - timestamps
+- `ChatSession`
+  - id
+  - chart profile id
+  - optional title
+  - timestamps
+  - embedded messages
+- `ChatSessionSummary`
+  - id
+  - chart profile id
+  - optional title
+  - message count
+  - timestamps
+- `SessionContext`
+  - chart profile
+  - session
+- `ReservedMessagePair`
+  - user message
+  - assistant message
+  - operation status: `MessageOperationStatus`
+
+Represent chat roles, chat message statuses, and message operation statuses with
+shared `StrEnum` types in `api/chat/models.py`. HTTP schemas and storage
+documents should reuse those enums so route, store, and persistence logic do not
+compare scattered raw strings.
+
+Domain IDs are strings. Mongo V1 may expose ObjectId values as strings for
+top-level chart profile and session ids. Embedded message ids should be
+server-generated UUID strings. Anonymous owner ids should be unguessable
+server-generated strings.
+
+Use timezone-aware UTC datetimes for all durable timestamps:
+
+```python
+datetime.now(datetime.UTC)
+```
+
+`BirthInfo.day` is the domain field. The API should also use `day`; do not keep
+temporary `date` compatibility.
+
+Do not include soft-delete metadata in storage-agnostic DTOs. The store returns
+visible resources through normal DTOs; `deleted_at` remains inside the
+persistence adapter.
+
+## Mongo Documents
+
+Define Beanie documents in `api/chat/storage/documents.py`.
+
+Use Beanie `DocumentWithSoftDelete` for top-level resource documents:
+
+- `ChartProfileDocument`
+- `ChatSessionDocument`
+
+`ChartProfileDocument`:
+
+- owner id
+- display name
+- birth info as an embedded Pydantic model
+- creation idempotency key
+- creation request fingerprint
+- `deleted_at` from `DocumentWithSoftDelete`
+- created/updated timestamps
+
+`ChatSessionDocument`:
+
+- chart profile id
+- optional title
+- creation idempotency key
+- creation request fingerprint
+- `deleted_at` from `DocumentWithSoftDelete`
+- created/updated timestamps
+- embedded message list
+- message operation registry
+
+Embedded message document:
+
+- string message id generated by the server
+- role
+- content
+- status
+- created/updated timestamps
+
+Message operation registry entry:
+
+- idempotency key
+- request fingerprint
+- user message id
+- assistant message id
+- operation status: in_progress, completed, failed, cancelled
+- created/updated timestamps
+
+Indexes:
+
+- chart profiles by owner id
+- unique chart profile creation idempotency index on owner id plus creation
+  idempotency key
+- sessions by chart profile id
+- unique session creation idempotency index on chart profile id plus creation
+  idempotency key
+- session message operation lookup support on message operation idempotency key
+  if useful
+
+Exact Mongo `_id` representation may use Beanie defaults internally, but DTOs and
+HTTP responses expose ids as strings.
+
+Use timezone-aware UTC timestamps for `created_at` and `updated_at`.
+
+## Store Contract
+
+Define `ConversationHistoryStore` in `api/chat/contracts.py`. It owns owner
+access checks, idempotency, message reservation/finalization, session context
+loading, soft-delete behavior, and stale pending cleanup.
+
+The contract should expose operations equivalent to:
+
+- create chart profile with required owner id and required idempotency key
+- list active chart profiles for an owner
+- soft-delete chart profile and cascade soft-delete its sessions
+- create session for a chart profile with required owner id and idempotency key
+- list active sessions for a chart profile and owner
+- load a session context by owner id and session id
+- soft-delete a session
+- reserve a user/assistant message pair for streaming with required idempotency
+  key
+- finalize an assistant message as confirmed, failed, or cancelled
+
+Create/list/load methods should return storage-agnostic DTOs from
+`api/chat/models.py`, never Beanie documents.
+
+The store should raise typed application exceptions for:
+
+- missing owner id where required
+- not found
+- forbidden owner access
+- missing idempotency key
+- idempotency payload mismatch
+- duplicate stream already in progress
+
+Routes translate those exceptions into HTTP/SSE responses.
+
+## HTTP Schemas And Routes
+
+Define only the HTTP wrapper schemas in `api/schemas.py`. Keep
+`api/chat/models.py` for storage-agnostic conversation history DTOs, and reuse
+those DTOs directly when the HTTP contract is identical to the domain shape.
+Routes should avoid field-copying mappers for identical request/response models.
+
+Replace the existing `TuviTimePayload` API model with the shared
+`api.chat.models.BirthInfo` DTO:
+
+```python
+class BirthInfo(BaseModel):
+    calendar: Literal["solar"] = "solar"
+    year: int = Field(ge=1900, le=2099)
+    month: int = Field(ge=1, le=12)
+    day: int = Field(ge=1, le=31)
+    hour: int = Field(ge=0, le=23)
+    gender: Literal["M", "F"]
+```
+
+`BuildLasoRequest` can inherit from `BirthInfo`. Existing endpoint code
+and frontend request types should move from `date` to `day`.
+
+Use wrapped response bodies for list endpoints so pagination metadata can be
+added later without changing the top-level shape.
+
+Session list endpoints should return lightweight summaries without embedded
+messages. Loading one session by id returns the full session with embedded
+messages.
+
+Add conversation-history API schemas equivalent to:
+
+```python
+class CreateAnonymousResponse(BaseModel):
+    owner_id: str
+
+
+class CreateChartProfileRequest(BaseModel):
+    display_name: str
+    birth_info: BirthInfo
+
+
+class ChartProfilePayload(BaseModel):
+    id: str
+    display_name: str
+    birth_info: BirthInfo
+    created_at: datetime
+    updated_at: datetime
+
+
+class CreateChartProfileResponse(BaseModel):
+    chart_profile: ChartProfilePayload
+
+
+class ListChartProfilesResponse(BaseModel):
+    chart_profiles: list[ChartProfilePayload]
+
+
+class CreateSessionRequest(BaseModel):
+    title: str | None = None
+
+
+class CreateSessionResponse(BaseModel):
+    session: ChatSession
+
+
+class ListSessionsResponse(BaseModel):
+    sessions: list[ChatSessionSummary]
+
+
+class GetSessionResponse(BaseModel):
+    session: ChatSession
+
+
+class SessionChatStreamRequest(BaseModel):
+    content: str = Field(min_length=1)
+```
+
+Mount a router from `api/chat/routes.py` in `api/main.py`.
+
+Use headers:
+
+```http
+X-Anonymous-Owner-Id: anon_...
+Idempotency-Key: random-client-operation-id
+```
+
+`ChartProfilePayload` intentionally omits `owner_id` from public responses even
+though the internal `ChartProfile` DTO carries it.
+
+`X-Anonymous-Owner-Id` is not required for `POST /api/v1/anonymous`. All chart
+profile, session, and chat-history endpoints require it.
+`Idempotency-Key` is required for chart profile creation, session creation, and
+session-scoped chat streaming. Blank idempotency keys are rejected by request
+validation. It is not required for `POST /api/v1/anonymous`.
+
+Endpoints:
+
+```text
+POST /api/v1/anonymous
+
+POST /api/v1/chart-profiles
+GET  /api/v1/chart-profiles
+DELETE /api/v1/chart-profiles/{chart_profile_id}
+
+POST /api/v1/chart-profiles/{chart_profile_id}/sessions
+GET  /api/v1/chart-profiles/{chart_profile_id}/sessions
+
+GET  /api/v1/sessions/{session_id}
+DELETE /api/v1/sessions/{session_id}
+POST /api/v1/sessions/{session_id}/chat/stream
+```
+
+`POST /api/v1/anonymous`:
+
+- creates a new server-issued anonymous owner id
+- returns `{ "owner_id": "..." }`
+- is called by the frontend when no owner id is available in local storage
+
+`POST /api/v1/chart-profiles`:
+
+- accepts display name and birth info
+- requires owner header
+- returns `400` when the owner header is blank
+- returns created or replayed chart profile
+
+`GET /api/v1/chart-profiles`:
+
+- requires owner header
+- returns `{ "chart_profiles": [...] }`
+
+`DELETE /api/v1/chart-profiles/{chart_profile_id}`:
+
+- requires owner header
+- validates chart profile ownership
+- soft-deletes the chart profile using Beanie `.delete()`
+- explicitly soft-deletes child sessions in the store
+- returns `204 No Content`
+
+`POST /api/v1/chart-profiles/{chart_profile_id}/sessions`:
+
+- requires owner header and idempotency key
+- validates profile ownership through the store
+- accepts optional title
+- returns created or replayed session
+
+`GET /api/v1/chart-profiles/{chart_profile_id}/sessions`:
+
+- requires owner header
+- validates profile ownership
+- returns `{ "sessions": [...] }`
+
+`GET /api/v1/sessions/{session_id}`:
+
+- requires owner header
+- loads session context through the store
+- returns session with embedded visible messages
+- triggers stale-pending cleanup before returning the session
+
+`DELETE /api/v1/sessions/{session_id}`:
+
+- requires owner header
+- validates owner access through the parent chart profile
+- soft-deletes the session using Beanie `.delete()`
+- does not physically remove embedded messages
+- does not cancel an active stream
+- returns `204 No Content`
+
+## Persisted Chat Stream
+
+Use `POST /api/v1/sessions/{session_id}/chat/stream` as the session-scoped
+streaming endpoint.
+
+Request body:
+
+- latest user message content
+
+Required headers:
+
+- `X-Anonymous-Owner-Id`
+- `Idempotency-Key`
+
+Flow:
+
+1. Load session context by owner id and session id.
+2. Recompute `LaSo` from `ChartProfile.birth_info`.
+3. Rebuild visible transcript context from `Session.messages[]`.
+4. Reserve the user message and pending assistant placeholder.
+5. Immediately stream an ids event with both message ids.
+6. Run the agent with recomputed `LaSo` and visible transcript context.
+7. Stream text/tool/debug events to the client as today.
+8. Accumulate assistant visible text in server memory.
+9. On success, finalize assistant message as confirmed with full content.
+10. On model/server failure, finalize as failed with partial content.
+11. On client disconnect/cancellation, finalize as cancelled with partial
+    content when detectable.
+
+Durable storage persists only visible user/assistant messages. Tool calls, tool
+results, and Pydantic AI native message parts remain transient stream/debug data
+for V1.
+
+SSE event requirements:
+
+- initial ids event:
+
+```json
+{
+  "type": "ids",
+  "user_message_id": "msg_user_123",
+  "assistant_message_id": "msg_asst_456"
+}
+```
+
+- text chunks use the existing `{"type": "text", "delta": "..."}` shape
+- successful terminal event:
+
+```json
+{ "type": "done", "status": "confirmed" }
+```
+
+- failed/cancelled terminal events:
+
+```json
+{ "type": "done", "status": "failed" }
+{ "type": "done", "status": "cancelled" }
+```
+
+Duplicate in-progress stream retry:
+
+```json
+{
+  "type": "duplicate_in_progress",
+  "user_message_id": "msg_user_123",
+  "assistant_message_id": "msg_asst_456",
+  "status": "pending"
+}
+```
+
+Then close with:
+
+```json
+{ "type": "done", "status": "duplicate_in_progress" }
+```
+
+Completed, failed, or cancelled stream retry with the same idempotency key:
+
+- emits the original ids
+- emits the stored terminal assistant content as a text event when non-empty
+- closes with the stored terminal status
+- does not invoke the agent again
+
+Do not persist assistant content token by token.
+
+Soft-delete interaction:
+
+- Deleting a session or chart profile does not cancel an already-active stream.
+- Normal session loads and new stream requests must reject soft-deleted sessions
+  or sessions whose parent chart profile is soft-deleted.
+- Stream finalization may include soft-deleted sessions so an already-reserved
+  assistant message can be finalized after deletion.
+- Finalization must not clear `deleted_at` or otherwise restore the session.
+
+## Agent Context Reconstruction
+
+The new persisted stream endpoint should not depend on process-global `LaSo`
+state.
+
+For each request:
+
+1. Convert `BirthInfo` to the current `LaSoPrior.from_solar_day(...)` input.
+2. Build `LaSo` from the prior.
+3. Create request-scoped `TuviAgentDeps` with the recomputed `LaSo` and existing
+   book root/agent setup.
+4. Convert confirmed visible transcript messages into the message history shape
+   expected by Pydantic AI.
+5. Run the agent with the latest user content and reconstructed context.
+
+Only confirmed prior messages should be used as historical context. Pending,
+failed, and cancelled assistant messages may be rendered to the user but should
+not be sent back to the agent as reliable prior assistant turns.
+
+If Pydantic AI message-history conversion is awkward, isolate it in a helper so
+the persistence layer remains independent from Pydantic AI internals.
+
+## Idempotency Behavior
+
+Create a request fingerprint from the operation payload and relevant route
+parameters. Reusing the same scoped key with a different fingerprint returns
+`409 Conflict`.
+
+Use resource-local idempotency metadata in V1. Do not create a separate
+`idempotency_records` collection.
+
+Operation scopes and storage:
+
+- create profile: owner id plus creation idempotency key; store key and
+  fingerprint on `ChartProfileDocument`
+- create session: chart profile id plus creation idempotency key; store key and
+  fingerprint on `ChatSessionDocument`
+- stream reservation: session id plus message operation idempotency key; store
+  key, fingerprint, message ids, and operation status in the session's
+  message operation registry
+
+Retry behavior:
+
+- completed create profile returns the original chart profile
+- completed create session returns the original session
+- completed stream returns existing message ids and terminal assistant
+  content/status without appending new messages
+- duplicate in-progress stream returns the structured SSE event described above
+
+Resource-local idempotency metadata does not expire in V1. It may remain with
+the chart profile, session, or session message operation for the lifetime of the
+resource.
+
+Do not require Mongo multi-document transactions for V1. Use resource-local
+idempotency metadata, unique indexes for top-level creation operations, careful
+operation ordering, and atomic single-document updates for embedded session
+messages.
+
+Create profile flow:
+
+1. Try to insert `ChartProfileDocument` with owner id, creation idempotency key,
+   and fingerprint.
+2. If insert succeeds, return the created profile.
+3. If the unique creation idempotency index conflicts, load the existing profile
+   by owner id plus key.
+4. If fingerprints match, return the existing profile.
+5. If fingerprints differ, return `409 Conflict`.
+
+Create session flow:
+
+1. Validate chart profile ownership.
+2. Try to insert `ChatSessionDocument` with chart profile id, creation
+   idempotency key, and fingerprint.
+3. If insert succeeds, return the created session.
+4. If the unique creation idempotency index conflicts, load the existing session
+   by chart profile id plus key.
+5. If fingerprints match, return the existing session.
+6. If fingerprints differ, return `409 Conflict`.
+
+Chat stream reservation flow:
+
+1. Load the session and check for an existing message operation with the same
+   idempotency key.
+2. If an operation exists and fingerprints differ, return `409 Conflict`.
+3. If an operation exists and fingerprints match, return duplicate-in-progress
+   or terminal replay based on the linked assistant message status.
+4. If no operation exists, reserve the user message, assistant placeholder, and
+   message operation entry with one atomic conditional update.
+5. The conditional update must also reject the reservation when another
+   assistant message is already `pending`.
+
+Single active stream guard:
+
+- Do not allow more than one pending assistant message in the same session.
+- The frontend should disable sending while a stream is active, but the backend
+  must enforce the rule too.
+- Reserve message pairs with an atomic conditional session update that appends
+  the user message, assistant placeholder, and message operation entry only if
+  the session has no pending assistant message and no existing operation with
+  the same idempotency key.
+- If the condition fails, return a conflict/stream error indicating that the
+  session already has an active generation.
+
+If idempotency behavior becomes more complex, resource-local metadata contributes
+to document-size pressure, MongoDB's 16MB document size limit becomes a concern,
+or another strong reason appears to separate idempotency from domain state,
+migrate idempotency to dedicated records. At that time, reconsider Mongo
+transactions for atomicity between idempotency records and domain writes.
+
+## Deletion Behavior
+
+Use Beanie `DocumentWithSoftDelete` for chart profiles and sessions. Do not add
+`status: active | deleted` to these resources in V1. Deletion is represented by
+`deleted_at`.
+
+Normal user-facing queries should use Beanie's normal query methods so
+soft-deleted documents are excluded. Store methods that need to support repeated
+delete or stream finalization after deletion may explicitly query including
+soft-deleted documents.
+
+Do not include `deleted_at` in normal storage-agnostic DTOs or HTTP response
+schemas. Soft-delete metadata is intentionally contained in the persistence
+adapter for V1.
+
+Session delete:
+
+1. Resolve the session including its parent chart profile.
+2. Validate the chart profile owner matches `X-Anonymous-Owner-Id`.
+3. Call `.delete()` on the session document.
+4. Return `204 No Content`.
+
+Chart profile delete:
+
+1. Resolve the chart profile for the owner.
+2. Call `.delete()` on the chart profile document.
+3. Find active child sessions for that chart profile.
+4. Call `.delete()` on each child session document.
+5. Return `204 No Content`.
+
+Do not implement cascade deletion through Beanie document hooks in V1. Keep it
+explicit in the store so owner checks, cascade policy, and streaming behavior
+remain visible and testable.
+
+Do not physically remove documents in request paths. Hard deletion or background
+purging is out of scope.
+
+## Tests
+
+Add focused tests for the store contract, Mongo adapter, and routes.
+
+Use a pyramid split by responsibility:
+
+- route/API behavior tests use a small fake/mock `ConversationHistoryStore`
+  unless the test is specifically about persistence correctness
+- Mongo adapter integration tests use `MongoConversationHistoryStore` against a
+  real MongoDB instance
+- pure mapper/DTO tests stay database-free
+
+Keep the initial Mongo integration fixture compatible with the local
+`docker-compose.yaml` service. Testcontainers is a valid later improvement for
+local development or CI if manually starting MongoDB becomes too noisy; adopting
+it should not change the `ConversationHistoryStore` protocol or production
+storage code.
+
+DTO/mapper tests:
+
+- `BirthInfo.day` is used consistently across API and domain models
+- Beanie documents convert to storage-agnostic DTOs without leaking Beanie types
+
+Mongo adapter tests:
+
+- create anonymous endpoint returns a generated owner id
+- create chart profile requires owner id
+- retrying create chart profile with the same idempotency key returns the same
+  profile
+- same idempotency key with different payload returns conflict
+- create/list sessions validates owner through chart profile
+- deleting a session hides it from normal list/load paths
+- deleting a chart profile hides it and cascades soft deletion to its sessions
+- deleting a chart profile with many sessions uses explicit store cascade logic
+- reserving a message pair appends one user message and one pending assistant
+  message
+- stale pending assistant placeholders are marked failed and do not block later
+  reservations
+- retrying stream reservation with same key does not append duplicates
+- finalizing assistant message handles confirmed, failed, and cancelled
+- stream finalization can update an already-reserved assistant message in a
+  soft-deleted session without restoring the session
+
+Route tests:
+
+- missing owner header is rejected except for `POST /api/v1/anonymous`
+- missing idempotency key is rejected on mutating endpoints
+- owner cannot access another owner profile/session
+- deleting a session returns `204 No Content`
+- deleting a chart profile returns `204 No Content` and removes it from lists
+- session-scoped stream emits ids before text
+- duplicate in-progress stream emits `duplicate_in_progress`
+- terminal stream replay returns stored assistant content/status without starting
+  generation again
+- stream cancellation finalizes the assistant message as `cancelled`
+- blank idempotency key is rejected on mutating endpoints
+- blank owner header on chart profile creation returns a client error
+
+Manual verification:
+
+1. Start MongoDB with `docker compose -f docker-compose.yaml up`.
+2. Run the API locally with MongoDB env vars.
+3. Create an anonymous owner with `POST /api/v1/anonymous` and store the
+   returned owner id.
+4. Create a chart profile with owner header.
+5. List profiles with owner header.
+6. Create and list sessions for the profile.
+7. Stream a chat message to the session.
+8. Reload the session and verify visible transcript persists.
+9. Retry create/session/stream requests with the same idempotency key and verify
+   no duplicate durable records are created.
+10. Delete the session and verify it disappears from session lists.
+11. Delete a chart profile and verify its sessions disappear with it.
+
+## Rollout Notes
+
+The first implementation pass adds new backend capability and wires the frontend
+entry form, session history drawer, and session-scoped streaming path to the new
+endpoints.
+
+Account linking, durable tool traces, summarization, message extraction, and a
+PostgreSQL implementation are out of scope for this pass.
+
+## Implementation Status
+
+Implemented in the current branch:
+
+- MongoDB runtime via `docker-compose.yaml`
+- Mongo-backed storage adapter using Beanie and `pymongo.AsyncMongoClient`
+- storage-agnostic DTOs and store contract
+- chart profile and session APIs
+- soft delete for sessions and chart profiles, including profile cascade
+- embedded visible transcript messages
+- session-scoped persisted chat streaming
+- stream cancellation and failure finalization
+- idempotent terminal stream replay without rerunning the agent
+- duplicate in-progress stream replay
+- blank idempotency-key validation on mutating endpoints
+- stale pending assistant cleanup before session load and stream reservation
+- frontend creation flow for anonymous owner, chart profile, and session
+- frontend session-scoped chat streaming without the legacy chat fallback
+- `api/main.py` cleanup so chat-history routes live in `api/chat/routes.py`
+- Mongo-backed integration tests for the conversation history API
+
+Still deferred:
+
+- account/auth migration
+- durable tool traces
+- summarization
+- message extraction if session documents approach MongoDB limits
+- PostgreSQL adapter
