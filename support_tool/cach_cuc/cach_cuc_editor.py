@@ -18,10 +18,6 @@ import streamlit as st
 import yaml
 from pydantic import ValidationError
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
 from support_tool.cach_cuc.condition_models import (
     Brightness,
     CachCuc,
@@ -32,6 +28,11 @@ from support_tool.cach_cuc.condition_models import (
     Scope,
     ThienCan,
 )
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 
 STARS_PATH = ROOT / "src/refactored/components/data/sao.json"
 DEFAULT_EXPORT_FILENAME = "cach_cuc_reviewed.yaml"
