@@ -554,12 +554,12 @@ cach_cuc:
           - tuan
           - triet
           stars_matching_logic: any
-    - not:
-        type: star_with_palace
-        palace: quan_loc
-        scope: dong_cung
-        group_name: luc_sat
-        at_least: 2
+      - not:
+          type: star_with_palace
+          palace: quan_loc
+          scope: dong_cung
+          group_name: luc_sat
+          at_least: 2
 - id: tu_phu_trieu_vien
   name: Tử Phủ Triều Viên
   page: 229
