@@ -11,7 +11,7 @@ from .tool import (
     get_tam_hop,
     get_xung_chieu,
     get_star_description,
-    get_star_role_interaction
+    get_star_role_interaction,
 )
 from .skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
 
@@ -63,6 +63,7 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 - Khi có những ý kiến trái chiều, cần xét đến độ ưu tiên : Chính tính > Tuần triệt > Tứ hóa > Phụ tinh > Tràng sinh > Xung chiếu > Tam hợp. Và luôn phải dựa trên vị trí của sao, chức vị của cung, sao đắc hay hãm để luận đoán.
 """
 
+
 def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
     return Agent(
         model=model,
@@ -80,10 +81,9 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_star_role_interaction,
             get_cung_analyze_skill,
             read_book_tuvi_tan_bien,
-            get_role_instruction
-        ]
+            get_role_instruction,
+        ],
     )
-
 
 
 async def run_tuvi_agent(
