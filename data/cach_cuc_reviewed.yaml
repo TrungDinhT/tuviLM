@@ -7016,12 +7016,14 @@ cach_cuc:
   evidence: Phủ, Tướng đồng lai hội Mệnh cung toàn gia thực lộc. Cung Mệnh có Phủ,
     tướng hội chiếu, nên rất sung túc, thừa cơm ăn áo mặc.
   conditions:
-    type: star_with_palace
-    palace: menh
-    scope: hoi_hop
-    stars:
-    - thien_phu
-    - thien_tuong
+    all:
+    - type: star_with_palace
+      palace: menh
+      scope: hoi_hop
+      stars:
+      - thien_phu
+      - thien_tuong
+      stars_matching_logic: all
 - id: thai_am_mieu_vuong_dac_thu_menh
   name: Thái Âm miếu vượng đắc địa tọa thủ Mệnh
   page: 78
