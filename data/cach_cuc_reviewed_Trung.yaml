@@ -84,9 +84,6 @@ cach_cuc:
             - tuat
         - type: star_with_palace
           palace: menh
-          scope:
-        - type: star_with_palace
-          palace: menh
           scope: hoi_hop
           stars:
             - van_xuong
@@ -1769,6 +1766,7 @@ cach_cuc:
       stars:
         - thien_phu
         - thien_tuong
+      stars_matching_logic: all
   # === Page 78: Đại cương (Thái Âm) ===
 
   - id: thai_am_mieu_vuong_dac_thu_menh

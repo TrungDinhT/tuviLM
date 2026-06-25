@@ -72,7 +72,7 @@ cach_cuc:
 - id: tam_am
   name: Tam ám hội hợp
   page: 41
-  priority: 1
+  priority: 2
   meaning: Bộ sao này thường che lấp ánh sáng của Nhật Nguyệt
   conditions:
     all:
@@ -527,7 +527,7 @@ cach_cuc:
 - id: binh_hinh_tuong_an
   name: Binh Hình Tướng Ấn
   page: 43
-  priority: 0
+  priority: 1
   meaning: 'người cầm quân có binh, có kiếm, có tướng quyền, có ấn lệnh. Vì vậy nó
     thường được luận là cách có quyền điều động, ra lệnh, quản lý, xử phạt hoặc nắm
     vai trò chỉ huy.
@@ -564,7 +564,7 @@ cach_cuc:
 - id: rieu_long_phuong
   name: Riêu gặp Long Phượng
   page: 43
-  priority: 0
+  priority: 3
   meaning: Tốt đẹp, vui vẻ; liên quan cưới hỏi sinh nở, công danh tài lộc hưng vượng
   conditions:
     all:
@@ -833,7 +833,7 @@ cach_cuc:
 - id: menh_khong_than_kiep
   name: Mệnh Không, Thân Kiếp
   page: 54
-  priority: 1
+  priority: 2
   meaning: Rất khôn ngoan sắc sảo, nhưng vui ít buồn nhiều, thành bại thất thường.
     chủ đời nhiều biến động, cực đoan, lên xuống mạnh, khó bình ổn; nhưng nếu đắc
     địa và được cát tinh nâng thì có thể thành người rất đặc biệt, có khả năng bứt
@@ -857,7 +857,7 @@ cach_cuc:
 - id: menh_kiep_than_khong
   name: Mệnh Kiếp, Thân Không
   page: 54
-  priority: 0
+  priority: 2
   meaning: 'Rất khôn ngoan sắc sảo, nhưng vui ít buồn nhiều, thành bại thất thường.
     chủ đời nhiều biến động, cực đoan, lên xuống mạnh, khó bình ổn; nhưng nếu đắc
     địa và được cát tinh nâng thì có thể thành người rất đặc biệt, có khả năng bứt
@@ -1013,7 +1013,7 @@ cach_cuc:
 - id: than_cu_tai_bach_song_hao_quyen_loc_kiep_hoa_hoi_hop
   name: Thân cư Tài Bạch, Song Hao, Quyền, Lộc, Kiếp, Hỏa hội hợp
   page: 0
-  priority: 0
+  priority: 2
   meaning: buôn bán mà trở nên giàu có.
   conditions:
     all:
@@ -1298,7 +1298,7 @@ cach_cuc:
 - id: luu_huyen_duc
   name: Lưu Huyền Đức thừa Hán nghiệp
   page: 57
-  priority: 0
+  priority: 3
   meaning: Rất quý hiển, hưởng giàu sang trọn đời, có thể kế nghiệp lớn
   conditions:
     all:
@@ -1392,7 +1392,7 @@ cach_cuc:
 - id: truong_tu_phong
   name: Trương Tử Phòng thao lược, đa mưu, do phùng Tử, Phù, Kỵ, Quyền
   page: 57
-  priority: 0
+  priority: 3
   meaning: có tài thao lược, lắm mưu cơ, phò tá Lưu Bang nên đế nghiệp. Sau Trương
     được phong là Lưu Hầu. Người nào có cách này cũng đa mưu túc trí, sau này cũng
     rất qúy hiền.
@@ -1744,7 +1744,7 @@ cach_cuc:
 - id: tu_vi_ty_ngo_khoa_quyen_loc
   name: Tử Vi cư Tý, Ngọ, Khoa, Quyền, Lộc
   page: 59
-  priority: 0
+  priority: 3
   meaning: Rất sáng sủa tốt đẹp, chắc chắn hưởng phú quý song toàn
   conditions:
     all:
@@ -2066,7 +2066,7 @@ cach_cuc:
 - id: liem_trinh_tu_sat
   name: Liêm Trinh, Tử Sát tạo hình lục
   page: 62
-  priority: 0
+  priority: 3
   meaning: Hay bị bắt bớ giam cầm, có thể bị ám sát
   conditions:
     all:
