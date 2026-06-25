@@ -77,10 +77,15 @@ class _CatalogLaSo:
         )
 
     def cung_at(self, dia_chi: DiaChi, layer_ids=(NATAL_LAYER_ID,)) -> Cung:
+        role_by_position = {
+            position: Role(role)
+            for role, position in self._role_positions.items()
+            if role != Role.CUNG_THAN.value
+        }
         return Cung(
             dia_chi=dia_chi,
             thien_can=ThienCan.GIAP,
-            natal_role=Role.MENH,
+            natal_role=role_by_position.get(dia_chi, Role.MENH),
             is_cung_than=dia_chi == self._role_positions[Role.CUNG_THAN.value],
             components=tuple(
                 LayeredComponent(layer_id=NATAL_LAYER_ID, component_id=component_id)
@@ -306,6 +311,37 @@ def test_star_at_chi_explicit_stars_always_require_all_even_if_any_is_authored()
     assert match_condition(condition, context) == MatchOutcome(False)
 
 
+def test_star_at_chi_infers_related_roles_from_matched_positions():
+    context = _context(
+        _CatalogLaSo(
+            star_positions={"a": DiaChi.TY, "b": DiaChi.NGO},
+            role_positions={
+                Role.MENH: DiaChi.TY,
+                Role.QUAN_LOC: DiaChi.NGO,
+                Role.THIEN_DI: DiaChi.MUI,
+                Role.CUNG_THAN: DiaChi.NGO,
+            },
+        )
+    )
+    condition = _data(
+        [
+            _entry(
+                "star_at_chi_roles",
+                {
+                    "type": "star_at_chi",
+                    "stars": ["a", "b"],
+                    "at_chi": ["ty", "ngo"],
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+
+    assert match_condition(condition, context) == MatchOutcome(
+        True,
+        (Role.MENH, Role.QUAN_LOC, Role.CUNG_THAN),
+    )
+
+
 def test_star_with_palace_respects_stars_matching_logic():
     context = _context(_CatalogLaSo(star_positions={"a": DiaChi.TY}))
     any_condition = _data(
@@ -337,7 +373,7 @@ def test_star_with_palace_respects_stars_matching_logic():
         ]
     ).cach_cuc[0].conditions
 
-    assert match_condition(any_condition, context) == MatchOutcome(True, Role.MENH)
+    assert match_condition(any_condition, context) == MatchOutcome(True, (Role.MENH,))
     assert match_condition(all_condition, context) == MatchOutcome(False)
 
 
@@ -393,7 +429,7 @@ def test_star_with_palace_requires_explicit_stars_and_group_when_both_authored()
         )
     )
 
-    assert match_condition(condition, both_pass) == MatchOutcome(True, Role.MENH)
+    assert match_condition(condition, both_pass) == MatchOutcome(True, (Role.MENH,))
     assert match_condition(condition, explicit_fails) == MatchOutcome(False)
     assert match_condition(condition, group_fails) == MatchOutcome(False)
 
@@ -483,6 +519,143 @@ def test_match_stars_meeting_accepts_any_star_as_anchor():
     assert _match_stars_meeting(condition, context) is True
 
 
+def test_stars_meeting_infers_related_roles_from_matched_anchor_positions():
+    context = _context(
+        _CatalogLaSo(
+            star_positions={
+                "a": DiaChi.TY,
+                "b": DiaChi.NGO,
+            },
+            role_positions={
+                Role.MENH: DiaChi.TY,
+                Role.CUNG_THAN: DiaChi.TY,
+                Role.THIEN_DI: DiaChi.NGO,
+            },
+        )
+    )
+    condition = _data(
+        [
+            _entry(
+                "meeting_roles",
+                {
+                    "type": "stars_meeting",
+                    "scope": "xung_chieu",
+                    "stars": ["a", "b"],
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+
+    assert match_condition(condition, context) == MatchOutcome(
+        True,
+        (Role.MENH, Role.CUNG_THAN, Role.THIEN_DI),
+    )
+
+
+def test_stars_meeting_uses_explicit_stars_as_group_anchors():
+    context = _context(
+        _CatalogLaSo(
+            star_positions={
+                "anchor": DiaChi.TY,
+                "dia_khong": DiaChi.THIN,
+                "dia_kiep": DiaChi.THAN,
+                "hoa_tinh": DiaChi.THIN,
+            },
+            role_positions={
+                Role.MENH: DiaChi.TY,
+                Role.CUNG_THAN: DiaChi.TY,
+                Role.QUAN_LOC: DiaChi.THIN,
+                Role.TAI_BACH: DiaChi.THAN,
+            },
+        )
+    )
+    condition = _data(
+        [
+            _entry(
+                "meeting_group_anchor",
+                {
+                    "type": "stars_meeting",
+                    "scope": "hoi_hop",
+                    "stars": ["anchor"],
+                    "group_name": "luc_sat",
+                    "at_least": 2,
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+
+    assert match_condition(condition, context) == MatchOutcome(
+        True,
+        (Role.MENH, Role.CUNG_THAN),
+    )
+
+
+def test_stars_meeting_rejects_group_cluster_away_from_explicit_anchor():
+    context = _context(
+        _CatalogLaSo(
+            star_positions={
+                "anchor": DiaChi.TY,
+                "dia_khong": DiaChi.MEO,
+                "dia_kiep": DiaChi.MUI,
+            },
+        )
+    )
+    condition = _data(
+        [
+            _entry(
+                "meeting_group_anchor",
+                {
+                    "type": "stars_meeting",
+                    "scope": "hoi_hop",
+                    "stars": ["anchor"],
+                    "group_name": "luc_sat",
+                    "at_least": 2,
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+
+    assert match_condition(condition, context) == MatchOutcome(False)
+
+
+def test_stars_meeting_group_any_requires_related_group_pair():
+    condition = _data(
+        [
+            _entry(
+                "group_any",
+                {
+                    "type": "stars_meeting",
+                    "scope": "dong_cung",
+                    "group_name": "luc_sat",
+                    "mode": "any",
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+    connected = _context(
+        _CatalogLaSo(
+            star_positions={
+                "dia_khong": DiaChi.TY,
+                "dia_kiep": DiaChi.TY,
+            }
+        )
+    )
+    disconnected = _context(
+        _CatalogLaSo(
+            star_positions={
+                "dia_khong": DiaChi.TY,
+                "dia_kiep": DiaChi.NGO,
+            }
+        )
+    )
+
+    assert match_condition(condition, connected) == MatchOutcome(
+        True,
+        (Role.MENH, Role.CUNG_THAN),
+    )
+    assert match_condition(condition, disconnected) == MatchOutcome(False)
+
+
 def test_match_stars_meeting_returns_false_when_fewer_than_two_stars_present():
     condition = StarsMeetingCondition.model_validate(
         {
@@ -566,7 +739,7 @@ def test_match_only_chinh_tinh_requires_exact_single_main_star():
         multiple_context,
     )
 
-    assert matched == MatchOutcome(True, Role.MENH)
+    assert matched == MatchOutcome(True, (Role.MENH,))
     assert not_matched == MatchOutcome(False)
 
 
@@ -635,7 +808,7 @@ def test_match_condition_covers_all_any_not_and_leaf_conditions():
         context,
     )
 
-    assert outcome == MatchOutcome(True, Role.MENH)
+    assert outcome == MatchOutcome(True, (Role.MENH, Role.CUNG_THAN, Role.THIEN_DI))
 
 
 def test_find_matching_cach_cuc_sorts_by_priority_and_filters_roles():
@@ -679,9 +852,83 @@ def test_find_matching_cach_cuc_sorts_by_priority_and_filters_roles():
     filtered = find_matching_cach_cuc(la_so, data=data, filtered_roles=[Role.MENH])
 
     assert [match.id for match in all_matches] == ["high", "general", "low"]
-    assert all_matches[0].related_to is Role.QUAN_LOC
-    assert all_matches[1].related_to is None
+    assert all_matches[0].related_roles == [Role.QUAN_LOC]
+    assert all_matches[1].related_roles == []
     assert [match.id for match in filtered] == ["general", "low"]
+
+
+def test_find_matching_cach_cuc_collects_all_matching_any_branch_roles():
+    la_so = _CatalogLaSo(
+        star_positions={"a": DiaChi.TY},
+        role_positions={Role.MENH: DiaChi.TY, Role.QUAN_LOC: DiaChi.TY},
+    )
+    data = _data(
+        [
+            _entry(
+                "multi_role",
+                {
+                    "any": [
+                        {
+                            "type": "star_with_palace",
+                            "palace": "menh",
+                            "scope": "dong_cung",
+                            "stars": ["a"],
+                        },
+                        {
+                            "type": "star_with_palace",
+                            "palace": "quan_loc",
+                            "scope": "dong_cung",
+                            "stars": ["a"],
+                        },
+                    ]
+                },
+            )
+        ]
+    )
+
+    all_matches = find_matching_cach_cuc(la_so, data=data)
+    filtered = find_matching_cach_cuc(
+        la_so,
+        data=data,
+        filtered_roles=[Role.QUAN_LOC],
+    )
+
+    assert all_matches[0].related_roles == [Role.MENH, Role.QUAN_LOC]
+    assert [match.id for match in filtered] == ["multi_role"]
+
+
+def test_find_matching_cach_cuc_filters_star_at_chi_by_inferred_role():
+    la_so = _CatalogLaSo(
+        star_positions={"a": DiaChi.THIN},
+        role_positions={Role.QUAN_LOC: DiaChi.THIN},
+    )
+    data = _data(
+        [
+            _entry(
+                "star_at_chi_role",
+                {
+                    "type": "star_at_chi",
+                    "stars": ["a"],
+                    "at_chi": ["thin"],
+                },
+            )
+        ]
+    )
+
+    matching_filter = find_matching_cach_cuc(
+        la_so,
+        data=data,
+        filtered_roles=[Role.QUAN_LOC],
+    )
+    non_matching_filter = find_matching_cach_cuc(
+        la_so,
+        data=data,
+        filtered_roles=[Role.MENH],
+    )
+
+    assert matching_filter[0].related_roles == [Role.QUAN_LOC]
+    assert [match.id for match in matching_filter] == ["star_at_chi_role"]
+    assert non_matching_filter == []
 
 
 def test_get_cach_cuc_tool_results_projects_without_conditions(monkeypatch):
@@ -697,7 +944,7 @@ def test_get_cach_cuc_tool_results_projects_without_conditions(monkeypatch):
                 },
             )
         ]
-    ).cach_cuc[0].model_copy(update={"related_to": Role.MENH})
+    ).cach_cuc[0].model_copy(update={"related_roles": [Role.MENH]})
 
     def fake_find_matching_cach_cuc(
         la_so,
@@ -721,5 +968,5 @@ def test_get_cach_cuc_tool_results_projects_without_conditions(monkeypatch):
     )
 
     assert results[0].id == "tool"
-    assert results[0].related_to is Role.MENH
+    assert results[0].related_roles == [Role.MENH]
     assert "conditions" not in results[0].model_dump()
