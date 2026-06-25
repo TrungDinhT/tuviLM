@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import pytest
+from pydantic import ValidationError
 from pydantic_ai import ModelRetry
 
 from src.agent.cach_cuc import matcher as matcher_module
@@ -359,25 +360,27 @@ def test_match_stars_meeting_explicit_stars_always_require_all():
             }
         )
     )
-    all_condition = StarsMeetingCondition.model_validate(
+    condition = StarsMeetingCondition.model_validate(
         {
             "type": "stars_meeting",
             "scope": "dong_cung",
             "stars": ["a", "b", "c"],
-            "stars_matching_logic": "all",
-        }
-    )
-    any_condition = StarsMeetingCondition.model_validate(
-        {
-            "type": "stars_meeting",
-            "scope": "dong_cung",
-            "stars": ["a", "b", "c"],
-            "stars_matching_logic": "any",
         }
     )
 
-    assert _match_stars_meeting(all_condition, context) is False
-    assert _match_stars_meeting(any_condition, context) is False
+    assert _match_stars_meeting(condition, context) is False
+
+
+def test_stars_meeting_rejects_stars_matching_logic():
+    with pytest.raises(ValidationError):
+        StarsMeetingCondition.model_validate(
+            {
+                "type": "stars_meeting",
+                "scope": "dong_cung",
+                "stars": ["a", "b"],
+                "stars_matching_logic": "any",
+            }
+        )
 
 
 def test_match_stars_meeting_rejects_disconnected_pairs():

@@ -308,13 +308,14 @@ at_least: integer
 
 ### `stars_meeting`
 
-Matches explicit stars, group members, or both meeting under a specified scope.
+Matches explicit stars or group members meeting under a specified scope. Explicit
+stars always use ALL logic: every listed star must belong to one valid meeting
+scope. There is no `stars_matching_logic` for this condition.
 
 ```yaml
 type: stars_meeting
 stars: [star_name]
 scope: scope_enum
-stars_matching_logic: [any, all]  # optional; default is any. Used only when group_name is not set.
 group_name: group_name  # optional
 mode: [any, all]  # provide mode or at_least; used only when group_name is set
 at_least: integer  # used only when group_name is set
