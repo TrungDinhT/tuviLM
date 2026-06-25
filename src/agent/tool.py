@@ -62,15 +62,15 @@ def get_list_cach_cuc(
     filtered_roles là danh sách role id như menh, quan_loc, tai_bach.
     Chỉ truyền filtered_roles khi muốn nhắm vào một hoặc vài cung cụ thể, ví dụ
     khi người dùng đang hỏi về Mệnh, Quan Lộc, Tài Bạch. Khi có filtered_roles,
-    tool trả về các cách cục có related_to thuộc các role đó, đồng thời vẫn giữ
-    các cách cục tổng quát có related_to = None. Nếu người dùng không nhắm vào
+    tool trả về các cách cục có related_roles giao với các role đó, đồng thời vẫn giữ
+    các cách cục tổng quát có related_roles rỗng. Nếu người dùng không nhắm vào
     một cung cụ thể, không truyền filtered_roles để lấy tất cả cách cục.
 
     Kết quả được sắp xếp theo priority giảm dần. Khi đọc kết quả, ưu tiên
     cách cục có priority cao hơn làm khung luận chính; cách cục priority thấp
     hơn dùng làm bổ trợ.
 
-    Kết quả chỉ gồm id, tên, ý nghĩa, trang, priority và related_to; không trả
+    Kết quả chỉ gồm id, tên, ý nghĩa, trang, priority và related_roles; không trả
     về điều kiện nội bộ.
     """
     _logger.info(

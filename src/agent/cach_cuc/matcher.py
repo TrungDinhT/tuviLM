@@ -5,9 +5,9 @@ agent tool concern: it evaluates a currently loaded ``LaSo`` and returns a compa
 list of applicable configurations for the model to consider.
 
 Maintenance notes for the error-prone parts:
-- ``related_to`` is not persisted in YAML. It is inferred from the first matched
-  role-bearing condition in YAML order.
-- ``not`` conditions never contribute ``related_to``. They only validate absence.
+- ``related_roles`` is not persisted in YAML. It is inferred from matched
+  positive role-bearing conditions in YAML order.
+- ``not`` conditions never contribute ``related_roles``. They only validate absence.
 - ``star_with_palace`` explicit star lists use ``stars_matching_logic`` and
   groups use ``mode``/``at_least``. When both explicit stars and ``group_name``
   are authored, both checks must match.
@@ -16,7 +16,9 @@ Maintenance notes for the error-prone parts:
   ``GroupSupportMixin``.
 - ``stars_meeting`` is anchor-based: any listed star can be the anchor, but one
   anchor scope must contain every required explicit star, or enough group stars
-  for the group ``mode``/``at_least`` rule.
+  for the group ``mode``/``at_least`` rule. When explicit stars and a group are
+  both authored, explicit stars are the anchor candidates and the group is
+  checked against those anchors.
 - ``tuan`` and ``triet`` are logical ids in cach_cuc data, but split marker ids in
   the chart. Keep the alias table in sync with catalog marker ids.
 """
@@ -97,10 +99,20 @@ STATUS_TO_BRIGHTNESS: dict[Status, str] = {
 
 @dataclass(frozen=True)
 class MatchOutcome:
-    """Boolean condition result plus the role inferred for filtering."""
+    """Boolean condition result plus roles inferred for filtering."""
 
     matched: bool
-    related_to: Role | None = None
+    related_roles: tuple[Role, ...] = ()
+
+
+def merge_related_roles(*role_groups: Iterable[Role]) -> tuple[Role, ...]:
+    """Merge role groups while preserving first-seen YAML order."""
+    roles: list[Role] = []
+    for role_group in role_groups:
+        for role in role_group:
+            if role not in roles:
+                roles.append(role)
+    return tuple(roles)
 
 
 @dataclass(frozen=True)
@@ -140,13 +152,21 @@ class CachCucMatchContext:
                 positions.append(position)
         return tuple(positions)
 
+    def roles_at_position(self, position: DiaChi) -> tuple[Role, ...]:
+        """Return natal and structural roles attached to one position."""
+        cung = self.la_so.cung_at(position)
+        roles = [cung.natal_role]
+        if cung.is_cung_than and Role.CUNG_THAN not in roles:
+            roles.append(Role.CUNG_THAN)
+        return tuple(roles)
+
 
 def find_matching_cach_cuc(
     la_so: LaSo,
     *,
     data: CachCucData | None = None,
     source_kind: SourceKind = SourceKind.TUVITANBIEN,
-    filtered_roles: Iterable[Role] | None = None,
+    filtered_roles: list[Role] | None = None,
 ) -> list[CachCuc]:
     """Evaluate every cach_cuc and return matches sorted by priority descending.
 
@@ -171,33 +191,35 @@ def find_matching_cach_cuc(
     for index, cach_cuc in enumerate(source_data.cach_cuc):
         outcome = match_condition(cach_cuc.conditions, context)
         _logger.debug(
-            "Checked cach_cuc[%d]: id=%s matched=%s related_to=%s",
+            "Checked cach_cuc[%d]: id=%s matched=%s related_roles=%s",
             index,
             cach_cuc.id,
             outcome.matched,
-            outcome.related_to.value if outcome.related_to is not None else None,
+            [role.value for role in outcome.related_roles],
         )
         if not outcome.matched:
             continue
         raw_match_count += 1
         if (
             role_filter is not None
-            and outcome.related_to is not None
-            and outcome.related_to not in role_filter
+            and outcome.related_roles
+            and role_filter.isdisjoint(outcome.related_roles)
         ):
             filtered_out_count += 1
             _logger.debug(
-                "Filtered matched cach_cuc[%d]: id=%s related_to=%s filtered_roles=%s",
+                "Filtered matched cach_cuc[%d]: id=%s related_roles=%s filtered_roles=%s",
                 index,
                 cach_cuc.id,
-                outcome.related_to.value,
+                [role.value for role in outcome.related_roles],
                 sorted(role.value for role in role_filter),
             )
             continue
         matches.append(
             (
                 index,
-                cach_cuc.model_copy(update={"related_to": outcome.related_to}),
+                cach_cuc.model_copy(
+                    update={"related_roles": list(outcome.related_roles)}
+                ),
             )
         )
 
@@ -222,7 +244,7 @@ def get_cach_cuc_tool_results(
     la_so: LaSo,
     *,
     source_kind: SourceKind = SourceKind.TUVITANBIEN,
-    filtered_roles: Iterable[Role] | None = None,
+    filtered_roles: list[Role] | None = None,
 ) -> list[CachCucToolResult]:
     """Return agent-facing cach_cuc summaries without exposing conditions."""
     results = [
@@ -243,26 +265,27 @@ def match_condition(
 ) -> MatchOutcome:
     """Evaluate one normalized condition node.
 
-    Logical nodes short-circuit in YAML order. This matters because ``any`` returns
-    the first matching branch and ``all`` uses the first non-null child
-    ``related_to``.
+    Logical nodes keep role order from YAML. ``any`` evaluates every child so all
+    matched branch roles can be returned instead of the first matching branch only.
     """
     if isinstance(condition, AllCondition):
-        related_to: Role | None = None
+        related_roles: tuple[Role, ...] = ()
         for child in condition.all_:
             outcome = match_condition(child, context)
             if not outcome.matched:
                 return MatchOutcome(False)
-            if related_to is None:
-                related_to = outcome.related_to
-        return MatchOutcome(True, related_to)
+            related_roles = merge_related_roles(related_roles, outcome.related_roles)
+        return MatchOutcome(True, related_roles)
 
     if isinstance(condition, AnyCondition):
+        related_roles: tuple[Role, ...] = ()
+        matched = False
         for child in condition.any_:
             outcome = match_condition(child, context)
             if outcome.matched:
-                return outcome
-        return MatchOutcome(False)
+                matched = True
+                related_roles = merge_related_roles(related_roles, outcome.related_roles)
+        return MatchOutcome(matched, related_roles if matched else ())
 
     if isinstance(condition, NotCondition):
         return MatchOutcome(not match_condition(condition.not_, context).matched)
@@ -279,13 +302,13 @@ def match_condition(
 
     if isinstance(condition, PalaceAtCondition):
         matched = context.position_of_role(condition.palace) in condition.chi
-        return MatchOutcome(matched, condition.palace if matched else None)
+        return MatchOutcome(matched, (condition.palace,) if matched else ())
 
     if isinstance(condition, CungThanAtPalaceCondition):
         matched = context.position_of_role(Role.CUNG_THAN) == context.position_of_role(
             condition.palace
         )
-        return MatchOutcome(matched, condition.palace if matched else None)
+        return MatchOutcome(matched, (condition.palace,) if matched else ())
 
     if isinstance(condition, OnlyChinhTinhCondition):
         return _match_only_chinh_tinh(condition, context)
@@ -294,14 +317,7 @@ def match_condition(
         return MatchOutcome(_match_star_brightness(condition, context))
 
     if isinstance(condition, StarAtChiCondition):
-        return MatchOutcome(
-            _match_supported_stars(
-                condition,
-                context,
-                lambda star_id: _star_at_any_chi(star_id, condition.at_chi, context),
-                explicit_mode="all",
-            )
-        )
+        return _match_star_at_chi(condition, context)
 
     if isinstance(condition, StarWithPalaceCondition):
         anchor = context.position_of_role(condition.palace)
@@ -312,10 +328,10 @@ def match_condition(
             lambda star_id: _star_at_any_chi(star_id, scope_positions, context),
             explicit_mode=condition.stars_matching_logic,
         )
-        return MatchOutcome(matched, condition.palace if matched else None)
+        return MatchOutcome(matched, (condition.palace,) if matched else ())
 
     if isinstance(condition, StarsMeetingCondition):
-        return MatchOutcome(_match_stars_meeting(condition, context))
+        return _match_stars_meeting_outcome(condition, context)
 
     raise TypeError(f"Unsupported cach_cuc condition: {condition!r}")
 
@@ -438,54 +454,193 @@ def _star_at_any_chi(
     return any(position in position_set for position in context.positions_of_star(star_id))
 
 
+def _star_positions_at_any_chi(
+    star_id: str,
+    positions: Iterable[DiaChi],
+    context: CachCucMatchContext,
+) -> tuple[DiaChi, ...]:
+    """Return alias-expanded star positions that are in the target set."""
+    position_set = set(positions)
+    return tuple(
+        position
+        for position in context.positions_of_star(star_id)
+        if position in position_set
+    )
+
+
+def _roles_for_positions(
+    positions: Iterable[DiaChi],
+    context: CachCucMatchContext,
+) -> tuple[Role, ...]:
+    """Return all roles attached to positions while preserving encounter order."""
+    return merge_related_roles(
+        *(context.roles_at_position(position) for position in positions)
+    )
+
+
+def _match_star_at_chi(
+    condition: StarAtChiCondition,
+    context: CachCucMatchContext,
+) -> MatchOutcome:
+    """Match stars at exact positions and infer roles from matched positions."""
+    matched_positions: list[DiaChi] = []
+    explicit_stars = list(condition.stars)
+    has_matchable_clause = False
+
+    if explicit_stars:
+        has_matchable_clause = True
+        explicit_matches = [
+            _star_positions_at_any_chi(star_id, condition.at_chi, context)
+            for star_id in explicit_stars
+        ]
+        if not _match_count(
+            sum(1 for positions in explicit_matches if positions),
+            len(explicit_stars),
+            mode="all",
+            at_least=None,
+        ):
+            return MatchOutcome(False)
+        for positions in explicit_matches:
+            matched_positions.extend(positions)
+
+    if condition.group_name is not None:
+        has_matchable_clause = True
+        group_stars = _resolve_group_stars(condition, context)
+        if not group_stars:
+            return MatchOutcome(False)
+        group_matches = [
+            _star_positions_at_any_chi(star_id, condition.at_chi, context)
+            for star_id in group_stars
+        ]
+        if not _match_count(
+            sum(1 for positions in group_matches if positions),
+            len(group_stars),
+            mode=condition.mode,
+            at_least=condition.at_least,
+        ):
+            return MatchOutcome(False)
+        for positions in group_matches:
+            matched_positions.extend(positions)
+
+    if not has_matchable_clause:
+        return MatchOutcome(False)
+    return MatchOutcome(True, _roles_for_positions(matched_positions, context))
+
+
 def _match_stars_meeting(
     condition: StarsMeetingCondition,
     context: CachCucMatchContext,
 ) -> bool:
-    """Evaluate star meeting by trying each listed star position as anchor.
+    """Evaluate star meeting by trying candidate star positions as anchors."""
+    return _match_stars_meeting_outcome(condition, context).matched
+
+
+def _match_stars_meeting_outcome(
+    condition: StarsMeetingCondition,
+    context: CachCucMatchContext,
+) -> MatchOutcome:
+    """Evaluate star meeting and infer roles from matched anchor positions.
 
     A meeting is not just disconnected pairwise contact. One candidate anchor
     must relate to every required explicit star, or to enough group members for
     the group condition. The anchor itself counts as present even for scopes like
     ``xung_chieu`` and ``giap`` whose related positions do not include the
-    anchor position.
+    anchor position. If explicit stars and a group are both present, explicit
+    stars are anchors and group members are the related stars to count.
     """
-    stars = _resolve_condition_stars(condition, context)
-    star_positions = {
+    explicit_stars = list(condition.stars)
+    group_stars = _resolve_group_stars(condition, context)
+    anchor_stars = explicit_stars or group_stars
+    if not anchor_stars:
+        return MatchOutcome(False)
+
+    explicit_positions = {
         star_id: positions
-        for star_id in stars
+        for star_id in explicit_stars
         if (positions := context.positions_of_star(star_id))
     }
-    if len(star_positions) < 2:
-        return False
+    group_positions = {
+        star_id: positions
+        for star_id in group_stars
+        if (positions := context.positions_of_star(star_id))
+    }
+    anchor_positions_by_star = {
+        star_id: positions
+        for star_id in anchor_stars
+        if (positions := context.positions_of_star(star_id))
+    }
 
-    for anchor_id, anchor_positions in star_positions.items():
+    if explicit_stars and condition.group_name is None and len(explicit_positions) < 2:
+        return MatchOutcome(False)
+    if not explicit_stars and len(group_positions) < 2:
+        return MatchOutcome(False)
+
+    matched_anchor_positions: list[DiaChi] = []
+    for anchor_id, anchor_positions in anchor_positions_by_star.items():
         for anchor_position in anchor_positions:
             scope_positions = positions_for_scope(anchor_position, condition.scope)
-            related_count = 1
-            for other_id, other_positions in star_positions.items():
-                if other_id == anchor_id:
-                    continue
-                if any(position in scope_positions for position in other_positions):
-                    related_count += 1
 
-            if condition.group_name is not None:
-                if _match_count(
-                    related_count,
-                    len(stars),
-                    mode=condition.mode,
-                    at_least=condition.at_least,
+            if explicit_stars:
+                explicit_related_count = _count_stars_related_to_anchor(
+                    explicit_positions,
+                    anchor_id=anchor_id,
+                    scope_positions=scope_positions,
+                    count_anchor_self=True,
+                )
+                if not _match_count(
+                    explicit_related_count,
+                    len(explicit_stars),
+                    mode="all",
+                    at_least=None,
                 ):
-                    return True
-            elif _match_count(
-                related_count,
-                len(stars),
-                mode="all",
-                at_least=None,
-            ):
-                return True
+                    continue
 
-    return False
+            if condition.group_name is None:
+                matched_anchor_positions.append(anchor_position)
+                continue
+
+            group_related_count = _count_stars_related_to_anchor(
+                group_positions,
+                anchor_id=anchor_id,
+                scope_positions=scope_positions,
+                count_anchor_self=not explicit_stars,
+            )
+            group_matched = _match_count(
+                group_related_count,
+                len(group_stars),
+                mode=condition.mode,
+                at_least=condition.at_least,
+            )
+            if (
+                not explicit_stars
+                and condition.at_least is None
+                and condition.mode == "any"
+            ):
+                group_matched = group_related_count >= 2
+            if group_matched:
+                matched_anchor_positions.append(anchor_position)
+
+    return MatchOutcome(
+        bool(matched_anchor_positions),
+        _roles_for_positions(matched_anchor_positions, context),
+    )
+
+
+def _count_stars_related_to_anchor(
+    star_positions: dict[str, tuple[DiaChi, ...]],
+    *,
+    anchor_id: str,
+    scope_positions: frozenset[DiaChi],
+    count_anchor_self: bool,
+) -> int:
+    """Count star ids that are represented in an anchor's meeting scope."""
+    related_count = 0
+    for star_id, positions in star_positions.items():
+        if count_anchor_self and star_id == anchor_id:
+            related_count += 1
+        elif any(position in scope_positions for position in positions):
+            related_count += 1
+    return related_count
 
 
 def _match_star_brightness(
@@ -523,4 +678,4 @@ def _match_only_chinh_tinh(
             chinh_tinh_ids.append(component_id)
 
     matched = chinh_tinh_ids == [condition.star]
-    return MatchOutcome(matched, condition.palace if matched else None)
+    return MatchOutcome(matched, (condition.palace,) if matched else ())
