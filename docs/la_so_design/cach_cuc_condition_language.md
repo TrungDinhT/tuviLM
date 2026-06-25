@@ -313,6 +313,12 @@ Matches explicit stars or group members meeting under a specified scope. Explici
 stars always use ALL logic: every listed star must belong to one valid meeting
 scope. There is no `stars_matching_logic` for this condition.
 
+The matcher infers related roles from the matched anchor star positions. When
+both `stars` and `group_name` are present, `stars` are the anchor candidates and
+the group must meet those anchors by `mode` or `at_least`. When only
+`group_name` is present, matching group members act as anchors; `mode: any`
+still requires a related pair, not just isolated group stars.
+
 ```yaml
 type: stars_meeting
 stars: [star_name]
