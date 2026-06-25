@@ -66,6 +66,10 @@ def get_list_cach_cuc(
     các cách cục tổng quát có related_to = None. Nếu người dùng không nhắm vào
     một cung cụ thể, không truyền filtered_roles để lấy tất cả cách cục.
 
+    Kết quả được sắp xếp theo priority giảm dần. Khi đọc kết quả, ưu tiên
+    cách cục có priority cao hơn làm khung luận chính; cách cục priority thấp
+    hơn dùng làm bổ trợ.
+
     Kết quả chỉ gồm id, tên, ý nghĩa, trang, priority và related_to; không trả
     về điều kiện nội bộ.
     """
