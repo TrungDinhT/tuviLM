@@ -5,7 +5,14 @@ from enum import StrEnum
 from typing import Annotated, Literal
 
 import annotated_types as at
-from pydantic import AliasChoices, BaseModel, Field, field_validator, model_validator
+from pydantic import (
+    AliasChoices,
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 from src.refactored.components.definitions.cung_role import Role
 from src.refactored.model.elementary import DiaChi, ThienCan
@@ -134,17 +141,16 @@ class StarAtChiCondition(BaseCondition, GroupSupportMixin):
 
 
 class StarsMeetingCondition(BaseCondition, GroupSupportMixin):
+    model_config = ConfigDict(extra="forbid")
+
     type: Literal["stars_meeting"] = "stars_meeting"
     scope: Scope
     stars: list[str] = Field(default_factory=list)
-    stars_matching_logic: Mode | None = "all"
 
     @model_validator(mode="after")
     def _validate_group_mode(self) -> StarsMeetingCondition:
         if not self.stars and self.group_name is None:
             raise ValueError("stars_meeting requires stars or group_name")
-        if self.group_name is not None:
-            self.stars_matching_logic = None
         return self
 
 

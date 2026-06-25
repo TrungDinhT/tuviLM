@@ -146,7 +146,11 @@ def find_matching_cach_cuc(
     source_kind: SourceKind = SourceKind.TUVITANBIEN,
     filtered_roles: Iterable[Role] | None = None,
 ) -> list[CachCuc]:
-    """Evaluate every cach_cuc and return matched records with runtime related role."""
+    """Evaluate every cach_cuc and return matches sorted by priority descending.
+
+    The YAML order is kept as the tie-breaker so equal-priority results remain
+    deterministic for the agent.
+    """
     source_data = data or load_cach_cuc_source(source_kind)
     context = CachCucMatchContext.from_la_so(la_so, source_data)
     role_filter = set(filtered_roles) if filtered_roles is not None else None
