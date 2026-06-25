@@ -4885,7 +4885,7 @@ cach_cuc:
         - thai_am
         at_chi:
         - mui
-      - not: null
+      - not:
         type: star_with_palace
         palace: menh
         scope: dong_cung
@@ -4908,7 +4908,7 @@ cach_cuc:
         - thai_am
         at_chi:
         - dau
-      - not: null
+      - not:
         type: star_with_palace
         palace: menh
         scope: dong_cung
@@ -4927,7 +4927,7 @@ cach_cuc:
         - thai_am
         at_chi:
         - suu
-      - not: null
+      - not:
         type: star_with_palace
         palace: menh
         scope: dong_cung
@@ -4950,7 +4950,7 @@ cach_cuc:
         - thai_am
         at_chi:
         - hoi
-      - not: null
+      - not:
         type: star_with_palace
         palace: menh
         scope: dong_cung
@@ -4984,7 +4984,7 @@ cach_cuc:
       - thai_am
       at_chi:
       - hoi
-    - not: null
+    - not:
       type: star_with_palace
       palace: menh
       scope: dong_cung
@@ -5018,7 +5018,7 @@ cach_cuc:
       - mieu
       - vuong
       - dac
-    - not: null
+    - not:
       type: star_with_palace
       palace: menh
       scope: dong_cung
@@ -5051,7 +5051,7 @@ cach_cuc:
       - thai_am
       at_chi:
       - dau
-    - not: null
+    - not:
       type: star_with_palace
       palace: menh
       scope: dong_cung
@@ -5084,7 +5084,7 @@ cach_cuc:
       - thai_am
       at_chi:
       - hoi
-    - not: null
+    - not:
       type: star_with_palace
       palace: menh
       scope: dong_cung
@@ -5113,7 +5113,7 @@ cach_cuc:
       - thai_am
       at_chi:
       - mui
-    - not: null
+    - not:
       type: star_with_palace
       palace: menh
       scope: dong_cung
@@ -10062,7 +10062,7 @@ cach_cuc:
       - mieu
       - vuong
       - dac
-    - not: null
+    - not:
       all:
       - type: star_with_palace
         palace: menh
