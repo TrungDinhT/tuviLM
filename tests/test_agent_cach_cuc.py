@@ -238,7 +238,7 @@ MORE_REVIEWED_CASES = [
             },
         },
         _MinimalLaSo({"thien_ma": DiaChi.TY, "loc_ton": DiaChi.NGO}),
-        Role.MENH,
+        [Role.MENH, Role.CUNG_THAN, Role.THIEN_DI],
         id="loc_ma_giao_tri",
     ),
     pytest.param(
@@ -445,7 +445,7 @@ MORE_REVIEWED_CASES = [
                 "thien_hu": DiaChi.TY,
             }
         ),
-        Role.MENH,
+        [Role.MENH, Role.CUNG_THAN],
         id="ma_khoc_khach",
     ),
     pytest.param(
@@ -533,7 +533,7 @@ MORE_REVIEWED_CASES = [
             },
         },
         _MinimalLaSo({"thien_ma": DiaChi.TY, "thien_hinh": DiaChi.TY}),
-        None,
+        [Role.MENH, Role.CUNG_THAN],
         id="phu_thi_ma",
     ),
     pytest.param(
@@ -568,7 +568,7 @@ MORE_REVIEWED_CASES = [
             },
         },
         _MinimalLaSo({"thien_ma": DiaChi.TY, "da_la": DiaChi.NGO}),
-        Role.MENH,
+        [Role.MENH, Role.CUNG_THAN, Role.THIEN_DI],
         id="chiet_tuc_ma",
     ),
     pytest.param(
@@ -614,7 +614,7 @@ MORE_REVIEWED_CASES = [
             },
         },
         _MinimalLaSo({"thien_ma": DiaChi.TY, "tuan_1": DiaChi.TY}),
-        Role.MENH,
+        [Role.MENH, Role.CUNG_THAN],
         id="tu_ma",
     ),
     pytest.param(
@@ -686,15 +686,15 @@ def test_matches_reviewed_cach_cuc_chosen_from_first_200_lines():
     )
 
     assert [match.id for match in matches] == ["tam_am", "ho_do_hom_sat"]
-    assert matches[0].related_to is None
-    assert matches[1].related_to is Role.MENH
+    assert matches[0].related_roles == [Role.MENH, Role.CUNG_THAN]
+    assert matches[1].related_roles == [Role.MENH, Role.CUNG_THAN]
 
 
-@pytest.mark.parametrize("entry,la_so,expected_related_to", MORE_REVIEWED_CASES)
+@pytest.mark.parametrize("entry,la_so,expected_related_roles", MORE_REVIEWED_CASES)
 def test_more_reviewed_cach_cuc_use_cases(
     entry: dict,
     la_so: _MinimalLaSo,
-    expected_related_to: Role | None,
+    expected_related_roles: Role | list[Role] | None,
 ):
     matches = find_matching_cach_cuc(
         la_so,
@@ -702,7 +702,9 @@ def test_more_reviewed_cach_cuc_use_cases(
     )
 
     assert [match.id for match in matches] == [entry["id"]]
-    assert matches[0].related_to is expected_related_to
+    if isinstance(expected_related_roles, Role):
+        expected_related_roles = [expected_related_roles]
+    assert matches[0].related_roles == (expected_related_roles or [])
 
 
 def test_filtered_roles_include_general_reviewed_cach_cuc():
@@ -713,8 +715,8 @@ def test_filtered_roles_include_general_reviewed_cach_cuc():
     )
 
     assert [match.id for match in matches] == ["tam_am", "ho_do_hom_sat"]
-    assert matches[0].related_to is None
-    assert matches[1].related_to is Role.MENH
+    assert matches[0].related_roles == [Role.MENH, Role.CUNG_THAN]
+    assert matches[1].related_roles == [Role.MENH, Role.CUNG_THAN]
 
 
 def test_tuan_triet_aliases_can_block_reviewed_cach_cuc():
@@ -747,5 +749,5 @@ def test_tool_result_projection_omits_conditions():
     result = CachCucToolResult.from_cach_cuc(matches[1])
 
     assert result.id == "ho_do_hom_sat"
-    assert result.related_to is Role.MENH
+    assert result.related_roles == [Role.MENH, Role.CUNG_THAN]
     assert "conditions" not in CachCucToolResult.model_fields

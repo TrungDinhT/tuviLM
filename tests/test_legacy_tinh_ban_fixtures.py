@@ -100,8 +100,7 @@ def _legacy_component_names(cung_data: dict[str, Any]) -> Counter[str]:
         names.append(_normalize_name(trang_sinh["name"]))
 
     names.extend(
-        _normalize_name(component["name"])
-        for component in cung_data.get("tuhoa") or ()
+        _normalize_name(component["name"]) for component in cung_data.get("tuhoa") or ()
     )
 
     if cung_data["is_tuan"]:
@@ -122,9 +121,7 @@ def _legacy_components_by_position(data: dict[str, Any]) -> dict[DiaChi, Counter
 def _refactored_components_by_position(la_so: LaSo) -> dict[DiaChi, Counter[str]]:
     return {
         dia_chi: Counter(
-            _normalize_name(
-                la_so.catalog.get(layered_component.component_id).name
-            )
+            _normalize_name(la_so.catalog.get(layered_component.component_id).name)
             for layered_component in la_so.cung_at(dia_chi).components
         )
         for dia_chi in DiaChi
@@ -157,10 +154,7 @@ def _refactored_dai_han_start_age_by_position(la_so: LaSo) -> dict[DiaChi, int]:
         la_so,
         study_year=la_so.prior.year + la_so.natal_context.cuc.number,
     )
-    return {
-        row.focus_position: row.start_age
-        for row in view.dai_han_focus_map
-    }
+    return {row.focus_position: row.start_age for row in view.dai_han_focus_map}
 
 
 @pytest.mark.parametrize("fixture_path", LEGACY_FIXTURES)
@@ -169,9 +163,8 @@ def test_legacy_fixture_natal_placement_parity(fixture_path: Path):
     la_so = _laso_from_legacy_fixture(data)
 
     assert _refactored_roles_by_position(la_so) == _legacy_roles_by_position(data)
-    assert (
-        _refactored_components_by_position(la_so)
-        == _legacy_components_by_position(data)
+    assert _refactored_components_by_position(la_so) == _legacy_components_by_position(
+        data
     )
     assert la_so.tinh_ban.than_position == _legacy_dia_chi(data["cung_than"])
 
@@ -188,9 +181,9 @@ def test_legacy_fixture_metadata_parity(fixture_path: Path):
         Gender.MALE if data["gender"] == "M" else Gender.FEMALE
     )
     assert la_so.tinh_ban.than_position == _legacy_dia_chi(data["cung_than"])
-    assert (
-        "Duong" if la_so.natal_context.am_duong.name == "DUONG" else "Am"
-    ) == data["am_duong"]
+    assert ("Duong" if la_so.natal_context.am_duong.name == "DUONG" else "Am") == data[
+        "am_duong"
+    ]
 
 
 @pytest.mark.parametrize("fixture_path", LEGACY_FIXTURES)
@@ -198,7 +191,6 @@ def test_legacy_fixture_dai_han_focus_parity(fixture_path: Path):
     data = _load_fixture(fixture_path)
     la_so = _laso_from_legacy_fixture(data)
 
-    assert (
-        _refactored_dai_han_start_age_by_position(la_so)
-        == _legacy_dai_han_start_age_by_position(data)
-    )
+    assert _refactored_dai_han_start_age_by_position(
+        la_so
+    ) == _legacy_dai_han_start_age_by_position(data)
