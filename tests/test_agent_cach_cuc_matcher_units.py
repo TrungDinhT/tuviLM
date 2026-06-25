@@ -341,6 +341,63 @@ def test_star_with_palace_respects_stars_matching_logic():
     assert match_condition(all_condition, context) == MatchOutcome(False)
 
 
+def test_star_with_palace_requires_explicit_stars_and_group_when_both_authored():
+    condition = _data(
+        [
+            _entry(
+                "explicit_and_group",
+                {
+                    "type": "star_with_palace",
+                    "palace": "menh",
+                    "scope": "hoi_hop",
+                    "stars": ["hoa_loc", "hoa_quyen"],
+                    "stars_matching_logic": "all",
+                    "group_name": "luc_sat",
+                    "mode": "all",
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+    assert isinstance(condition, StarWithPalaceCondition)
+    assert condition.stars_matching_logic == "all"
+
+    both_pass = _context(
+        _CatalogLaSo(
+            star_positions={
+                "hoa_loc": DiaChi.TY,
+                "hoa_quyen": DiaChi.NGO,
+                "dia_khong": DiaChi.TY,
+                "dia_kiep": DiaChi.THIN,
+                "hoa_tinh": DiaChi.THAN,
+            }
+        )
+    )
+    explicit_fails = _context(
+        _CatalogLaSo(
+            star_positions={
+                "hoa_loc": DiaChi.TY,
+                "dia_khong": DiaChi.TY,
+                "dia_kiep": DiaChi.THIN,
+                "hoa_tinh": DiaChi.THAN,
+            }
+        )
+    )
+    group_fails = _context(
+        _CatalogLaSo(
+            star_positions={
+                "hoa_loc": DiaChi.TY,
+                "hoa_quyen": DiaChi.NGO,
+                "dia_khong": DiaChi.TY,
+                "hoa_tinh": DiaChi.THAN,
+            }
+        )
+    )
+
+    assert match_condition(condition, both_pass) == MatchOutcome(True, Role.MENH)
+    assert match_condition(condition, explicit_fails) == MatchOutcome(False)
+    assert match_condition(condition, group_fails) == MatchOutcome(False)
+
+
 def test_star_at_any_chi_expands_alias_positions():
     context = _context(
         _CatalogLaSo(star_positions={"tuan_1": DiaChi.TY, "tuan_2": DiaChi.SUU})
