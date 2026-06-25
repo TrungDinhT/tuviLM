@@ -8,10 +8,12 @@ Maintenance notes for the error-prone parts:
 - ``related_to`` is not persisted in YAML. It is inferred from the first matched
   role-bearing condition in YAML order.
 - ``not`` conditions never contribute ``related_to``. They only validate absence.
-- ``star_with_palace`` explicit star lists use ``stars_matching_logic``. For
-  ``star_at_chi`` and ``stars_meeting``, explicit star lists always require all
-  listed stars to match. Group conditions use ``mode``/``at_least`` from
-  ``GroupSupportMixin``; do not mix the two.
+- ``star_with_palace`` explicit star lists use ``stars_matching_logic`` and
+  groups use ``mode``/``at_least``. When both explicit stars and ``group_name``
+  are authored, both checks must match.
+- For ``star_at_chi`` and ``stars_meeting``, explicit star lists always require
+  all listed stars to match. Group conditions use ``mode``/``at_least`` from
+  ``GroupSupportMixin``.
 - ``stars_meeting`` is anchor-based: any listed star can be the anchor, but one
   anchor scope must contain every required explicit star, or enough group stars
   for the group ``mode``/``at_least`` rule.
@@ -347,16 +349,32 @@ def _match_supported_stars(
     """Apply explicit-star or group matching rules to a star predicate.
 
     ``star_with_palace`` passes its authored ``stars_matching_logic`` here.
-    ``star_at_chi`` and ``stars_meeting`` pass ``all`` for explicit stars.
-    Group conditions use ``mode``/``at_least`` because a group is an open set
-    defined by the YAML source.
+    ``star_at_chi`` passes ``all`` for explicit stars. Group conditions use
+    ``mode``/``at_least`` because a group is an open set defined by the YAML
+    source. When a condition has both explicit stars and a group, both sides
+    must pass.
     """
-    stars = _resolve_condition_stars(condition, context)
-    if not stars:
-        return False
+    explicit_stars = list(getattr(condition, "stars", []))
+    has_matchable_clause = False
+    if explicit_stars:
+        has_matchable_clause = True
+        explicit_matched_count = sum(
+            1 for star_id in explicit_stars if predicate(star_id)
+        )
+        if not _match_count(
+            explicit_matched_count,
+            len(explicit_stars),
+            mode=explicit_mode or "any",
+            at_least=None,
+        ):
+            return False
 
-    matched_count = sum(1 for star_id in stars if predicate(star_id))
     if condition.group_name is not None:
+        has_matchable_clause = True
+        stars = _resolve_group_stars(condition, context)
+        if not stars:
+            return False
+        matched_count = sum(1 for star_id in stars if predicate(star_id))
         return _match_count(
             matched_count,
             len(stars),
@@ -364,12 +382,7 @@ def _match_supported_stars(
             at_least=condition.at_least,
         )
 
-    return _match_count(
-        matched_count,
-        len(stars),
-        mode=explicit_mode or "any",
-        at_least=None,
-    )
+    return has_matchable_clause
 
 
 def _resolve_condition_stars(
@@ -379,6 +392,19 @@ def _resolve_condition_stars(
     """Resolve a condition's explicit stars or named group into concrete ids."""
     if condition.group_name is None:
         return list(getattr(condition, "stars", []))
+    try:
+        return context.data.groups[condition.group_name].stars
+    except KeyError as exc:
+        raise ModelRetry(f"Khong tim thay nhom sao {condition.group_name}.") from exc
+
+
+def _resolve_group_stars(
+    condition: GroupSupportMixin,
+    context: CachCucMatchContext,
+) -> list[str]:
+    """Resolve only the named group stars for a grouped condition."""
+    if condition.group_name is None:
+        return []
     try:
         return context.data.groups[condition.group_name].stars
     except KeyError as exc:

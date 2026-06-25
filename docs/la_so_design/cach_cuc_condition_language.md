@@ -278,14 +278,15 @@ brightness: [star_brightness]
 ### `star_with_palace`
 
 Matches stars and an **anchor** palace whose positions are constrained by a meeting scope.
-Group would follow the mode.
+Explicit stars follow `stars_matching_logic`; groups follow `mode` / `at_least`.
+When both `stars` and `group_name` are present, both clauses must match.
 
 ```yaml
 type: star_with_palace
 palace: role_str
 scope: scope_enum  # required; same values as stars_meeting
 stars: [star_name]
-stars_matching_logic: [any, all]  # optional; default is any. Used only when group_name is not set.
+stars_matching_logic: [any, all]  # optional; default is any. Applies to explicit stars.
 group_name: group_name  # optional
 mode: [any, all]  # provide mode or at_least; used only when group_name is set
 at_least: integer  # used only when group_name is set

@@ -120,7 +120,7 @@ class StarWithPalaceCondition(BaseCondition, GroupSupportMixin):
     def _validate_group_mode(self) -> StarWithPalaceCondition:
         if not self.stars and self.group_name is None:
             raise ValueError("star_with_palace requires stars or group_name")
-        if self.group_name is not None:
+        if self.group_name is not None and not self.stars:
             self.stars_matching_logic = None
         return self
 
