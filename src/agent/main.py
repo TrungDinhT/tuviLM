@@ -6,6 +6,7 @@ from src.agent.deps import TuviAgentDeps
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
+    get_list_cach_cuc,
     get_role_instruction,
     get_tam_hop,
     get_xung_chieu,
@@ -42,10 +43,13 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 1. Chỉ sử dụng thông tin lấy từ các tool để kết luận.
 2. Nếu chưa đủ dữ liệu để kết luận, phải nói rõ phần nào còn thiếu.
 3. Không lấy toàn bộ tinh bàn nếu câu hỏi chỉ nhắm vào một chủ đề/cung cụ thể.
+4. "Tiên minh cách cục, thứ khán chúng tinh": luôn xác định cách cục trước, luận sao chi tiết sau. Dùng get_list_cach_cuc để lấy cách cục đã match sẵn (engine deterministic, không cần tự suy đoán tổ hợp sao).
+
 
 ## Phân tích cung
 - Phân tích một cung cũng là phân tích một khía cạnh của lá số / đời người
 - Luôn sử dụng get_cung_analyze_skill để biết quy trình khi phân tích một cung.
+- Trước khi luận sao chi tiết, gọi get_list_cach_cuc để lấy cách cục match. Tra nghĩa cách cục qua read_section, lấy làm khung luận chính.
 
 
 ## Công cụ tra cứu sách Tử Vi Tân Biên
@@ -69,6 +73,7 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
         tools=[
             get_cung_by_position,
             get_cung_by_role,
+            get_list_cach_cuc,
             get_tam_hop,
             get_xung_chieu,
             get_star_description,
