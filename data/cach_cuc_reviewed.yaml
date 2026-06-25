@@ -1940,7 +1940,7 @@ cach_cuc:
   priority: 2
   meaning: Hay cô liêu, tự tử hoặc chết thảm
   conditions:
-    any:
+    all:
     - type: star_with_palace
       palace: menh
       scope: dong_cung
