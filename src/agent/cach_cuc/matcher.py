@@ -24,9 +24,7 @@ import logging
 from src.agent.cach_cuc.evaluator import (
     CachCucMatchContext,
     MatchOutcome,
-    STAR_ALIASES,
     match_condition,
-    merge_related_roles,
 )
 from src.agent.cach_cuc.loader import load_cach_cuc_source
 from src.agent.cach_cuc.models import (
@@ -35,16 +33,6 @@ from src.agent.cach_cuc.models import (
     CachCucToolResult,
     Role,
     SourceKind,
-)
-from src.agent.cach_cuc.evaluator.scopes import NHI_HOP_PAIRS, positions_for_scope
-from src.agent.cach_cuc.evaluator.star_conditions import (
-    _match_count,
-    _match_only_chinh_tinh,
-    _match_star_brightness,
-    _match_stars_meeting,
-    _match_supported_stars,
-    _resolve_condition_stars,
-    _star_at_any_chi,
 )
 from src.refactored.la_so import LaSo
 
@@ -172,23 +160,3 @@ def get_cach_cuc_tool_results(
     ]
     _logger.info("Projected cach_cuc tool results: returned=%d", len(results))
     return results
-
-
-__all__ = [
-    "CachCucMatchContext",
-    "MatchOutcome",
-    "NHI_HOP_PAIRS",
-    "STAR_ALIASES",
-    "_match_count",
-    "_match_only_chinh_tinh",
-    "_match_star_brightness",
-    "_match_stars_meeting",
-    "_match_supported_stars",
-    "_resolve_condition_stars",
-    "_star_at_any_chi",
-    "find_matching_cach_cuc",
-    "get_cach_cuc_tool_results",
-    "match_condition",
-    "merge_related_roles",
-    "positions_for_scope",
-]
