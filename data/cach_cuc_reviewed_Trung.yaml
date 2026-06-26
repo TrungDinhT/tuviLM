@@ -1760,12 +1760,13 @@ cach_cuc:
     meaning: Mệnh có Phủ và Tướng hội chiếu, nên rất sung túc, thừa cơm ăn áo mặc
     evidence: Phủ, Tướng đồng lai hội Mệnh cung toàn gia thực lộc. Cung Mệnh có Phủ, tướng hội chiếu, nên rất sung túc, thừa cơm ăn áo mặc.
     conditions:
-      type: star_with_palace
+    all:
+    - type: star_with_palace
       palace: menh
       scope: hoi_hop
       stars:
-        - thien_phu
-        - thien_tuong
+      - thien_phu
+      - thien_tuong
       stars_matching_logic: all
   # === Page 78: Đại cương (Thái Âm) ===
 
