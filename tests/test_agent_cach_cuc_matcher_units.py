@@ -134,6 +134,38 @@ def _entry(
     }
 
 
+_GROUP_RULE_CASES = (
+    (
+        {"mode": "any"},
+        {"dia_khong": DiaChi.TY},
+        {},
+    ),
+    (
+        {"mode": "all"},
+        {
+            "dia_khong": DiaChi.TY,
+            "dia_kiep": DiaChi.TY,
+            "hoa_tinh": DiaChi.TY,
+        },
+        {"dia_khong": DiaChi.TY, "dia_kiep": DiaChi.TY},
+    ),
+    (
+        {"at_least": 2},
+        {"dia_khong": DiaChi.TY, "dia_kiep": DiaChi.TY},
+        {"dia_khong": DiaChi.TY},
+    ),
+)
+
+_STARS_MEETING_GROUP_ONLY_RULE_CASES = (
+    (
+        {"mode": "any"},
+        {"dia_khong": DiaChi.TY, "dia_kiep": DiaChi.TY},
+        {"dia_khong": DiaChi.TY},
+    ),
+    *_GROUP_RULE_CASES[1:],
+)
+
+
 def test_context_resolves_roles_and_alias_positions():
     context = _context(
         _CatalogLaSo(
@@ -438,6 +470,112 @@ def test_star_with_palace_requires_explicit_stars_and_group_when_both_authored()
     assert match_condition(condition, group_fails) == MatchOutcome(False)
 
 
+@pytest.mark.parametrize(
+    ("group_rule", "passing_group_stars", "failing_group_stars"),
+    _GROUP_RULE_CASES,
+    ids=["group-any", "group-all", "group-at-least"],
+)
+def test_star_with_palace_group_only_respects_group_rule(
+    group_rule: dict[str, str | int],
+    passing_group_stars: dict[str, DiaChi],
+    failing_group_stars: dict[str, DiaChi],
+):
+    condition = _data(
+        [
+            _entry(
+                "group_only",
+                {
+                    "type": "star_with_palace",
+                    "palace": "menh",
+                    "scope": "dong_cung",
+                    "group_name": "luc_sat",
+                    **group_rule,
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+
+    assert match_condition(
+        condition,
+        _context(_CatalogLaSo(star_positions=passing_group_stars)),
+    ).matched is True
+    assert match_condition(
+        condition,
+        _context(_CatalogLaSo(star_positions=failing_group_stars)),
+    ).matched is False
+
+
+@pytest.mark.parametrize(
+    ("group_rule", "passing_group_stars", "failing_group_stars"),
+    _GROUP_RULE_CASES,
+    ids=["group-any", "group-all", "group-at-least"],
+)
+def test_star_with_palace_explicit_stars_and_group_respect_group_rule(
+    group_rule: dict[str, str | int],
+    passing_group_stars: dict[str, DiaChi],
+    failing_group_stars: dict[str, DiaChi],
+):
+    condition = _data(
+        [
+            _entry(
+                "explicit_and_group",
+                {
+                    "type": "star_with_palace",
+                    "palace": "menh",
+                    "scope": "dong_cung",
+                    "stars": ["a", "b"],
+                    "stars_matching_logic": "all",
+                    "group_name": "luc_sat",
+                    **group_rule,
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+    explicit_stars = {"a": DiaChi.TY, "b": DiaChi.TY}
+
+    assert match_condition(
+        condition,
+        _context(_CatalogLaSo(star_positions=explicit_stars | passing_group_stars)),
+    ).matched is True
+    assert match_condition(
+        condition,
+        _context(_CatalogLaSo(star_positions=explicit_stars | failing_group_stars)),
+    ).matched is False
+
+
+@pytest.mark.parametrize(
+    ("stars_matching_logic", "expected"),
+    [("any", True), ("all", False)],
+)
+def test_star_with_palace_explicit_stars_and_group_keep_explicit_logic(
+    stars_matching_logic: str,
+    expected: bool,
+):
+    condition = _data(
+        [
+            _entry(
+                "explicit_logic_and_group",
+                {
+                    "type": "star_with_palace",
+                    "palace": "menh",
+                    "scope": "dong_cung",
+                    "stars": ["a", "b"],
+                    "stars_matching_logic": stars_matching_logic,
+                    "group_name": "luc_sat",
+                    "mode": "any",
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+    context = _context(
+        _CatalogLaSo(
+            star_positions={"a": DiaChi.TY, "dia_khong": DiaChi.TY}
+        )
+    )
+
+    assert match_condition(condition, context).matched is expected
+
+
 def test_star_at_any_chi_expands_alias_positions():
     context = _context(
         _CatalogLaSo(star_positions={"tuan_1": DiaChi.TY, "tuan_2": DiaChi.SUU})
@@ -658,6 +796,110 @@ def test_stars_meeting_group_any_requires_related_group_pair():
         (Role.MENH, Role.CUNG_THAN),
     )
     assert match_condition(condition, disconnected) == MatchOutcome(False)
+
+
+@pytest.mark.parametrize(
+    ("group_rule", "passing_group_stars", "failing_group_stars"),
+    _STARS_MEETING_GROUP_ONLY_RULE_CASES,
+    ids=["group-any", "group-all", "group-at-least"],
+)
+def test_stars_meeting_group_only_respects_group_rule(
+    group_rule: dict[str, str | int],
+    passing_group_stars: dict[str, DiaChi],
+    failing_group_stars: dict[str, DiaChi],
+):
+    condition = _data(
+        [
+            _entry(
+                "group_only",
+                {
+                    "type": "stars_meeting",
+                    "scope": "dong_cung",
+                    "group_name": "luc_sat",
+                    **group_rule,
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+
+    assert match_condition(
+        condition,
+        _context(_CatalogLaSo(star_positions=passing_group_stars)),
+    ).matched is True
+    assert match_condition(
+        condition,
+        _context(_CatalogLaSo(star_positions=failing_group_stars)),
+    ).matched is False
+
+
+@pytest.mark.parametrize(
+    ("group_rule", "passing_group_stars", "failing_group_stars"),
+    _GROUP_RULE_CASES,
+    ids=["group-any", "group-all", "group-at-least"],
+)
+def test_stars_meeting_explicit_anchor_and_group_respect_group_rule(
+    group_rule: dict[str, str | int],
+    passing_group_stars: dict[str, DiaChi],
+    failing_group_stars: dict[str, DiaChi],
+):
+    condition = _data(
+        [
+            _entry(
+                "explicit_anchor_and_group",
+                {
+                    "type": "stars_meeting",
+                    "scope": "dong_cung",
+                    "stars": ["anchor"],
+                    "group_name": "luc_sat",
+                    **group_rule,
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+    anchor_star = {"anchor": DiaChi.TY}
+
+    assert match_condition(
+        condition,
+        _context(_CatalogLaSo(star_positions=anchor_star | passing_group_stars)),
+    ).matched is True
+    assert match_condition(
+        condition,
+        _context(_CatalogLaSo(star_positions=anchor_star | failing_group_stars)),
+    ).matched is False
+
+
+def test_stars_meeting_explicit_anchor_and_group_require_all_explicit_stars():
+    condition = _data(
+        [
+            _entry(
+                "explicit_anchor_and_group",
+                {
+                    "type": "stars_meeting",
+                    "scope": "dong_cung",
+                    "stars": ["anchor", "required"],
+                    "group_name": "luc_sat",
+                    "mode": "any",
+                },
+            )
+        ]
+    ).cach_cuc[0].conditions
+    matching = _context(
+        _CatalogLaSo(
+            star_positions={
+                "anchor": DiaChi.TY,
+                "required": DiaChi.TY,
+                "dia_khong": DiaChi.TY,
+            }
+        )
+    )
+    missing_explicit_star = _context(
+        _CatalogLaSo(
+            star_positions={"anchor": DiaChi.TY, "dia_khong": DiaChi.TY}
+        )
+    )
+
+    assert match_condition(condition, matching).matched is True
+    assert match_condition(condition, missing_explicit_star).matched is False
 
 
 def test_match_stars_meeting_returns_false_when_fewer_than_two_stars_present():
