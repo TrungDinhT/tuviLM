@@ -3,7 +3,7 @@ from __future__ import annotations
 from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
-from src.agent.laso_foundation import get_laso_foundation
+from src.agent.tool.ban_menh.laso_foundation import get_laso_foundation
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
