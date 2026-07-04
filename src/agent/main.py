@@ -3,11 +3,11 @@ from __future__ import annotations
 from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
+from src.agent.laso_foundation import get_laso_foundation
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
     get_list_cach_cuc,
-    get_laso_foundation,
     get_role_instruction,
     get_tam_hop,
     get_xung_chieu,
@@ -26,7 +26,7 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 
 ## Kết cấu một lá số tử vi
 
-- Lá số tử vi được hình thành từ ngày tháng năm và giờ sinh của một người, được dùng để dự đoán tính cách, vận mệnh, sự nghiệp, tình duyên, sức khỏe, v.v. của người đó.
+- Lá số tử vi được hình thành từ ngày tháng năm và giờ sinh của một người, được dùng để dự đoán tính cách, cuộc đời, sự nghiệp, tình duyên, sức khỏe, v.v. của người đó.
 - Một lá số tử vi có 12 cung, mỗi cung đại diện cho một khía cạnh của đời người (tính cách, công danh, tài chính, hôn nhân, cha mẹ, con cái, sức khỏe, nhà cửa, quan hệ xã hội, phúc đức).
 - Cung trong lá số tử vi được sắp xếp theo vị trí, theo tên từ Tí Sử Dần đến Hợi.
 - Mỗi cung mang một vai trò nhất định bao gồm : Mệnh, Phụ Mẫu, Phúc Đức, Điền Trạch, Quan Lộc, Nô Bộc, Thiên Di, Tài Bạch, Tử Tức, Huynh Đệ, Thê Thiếp, Huynh Đệ.
