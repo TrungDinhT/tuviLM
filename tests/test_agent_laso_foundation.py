@@ -1,4 +1,5 @@
-from src.agent.tool import build_laso_foundation_payload
+from src.agent.ban_menh_meaning import BAN_MENH_MEANINGS
+from src.agent.laso_foundation import build_laso_foundation_payload
 from src.refactored.la_so import LaSo
 from src.refactored.model.elementary import DiaChi
 from src.refactored.model.prior import Gender, LaSoPrior
@@ -17,93 +18,79 @@ def test_laso_foundation_projects_root_chart_factors():
 
     foundation = build_laso_foundation_payload(la_so)
 
-    assert foundation["birth_year"] == 1996
-    assert foundation["lunar_year"] == "Bính Tý"
-    assert foundation["thien_can_year"]["name"] == "Bính"
-    assert foundation["thien_can_year"]["am_duong"] == "Dương"
-    assert foundation["thien_can_year"]["ngu_hanh"] == "Hỏa"
-    assert foundation["dia_chi_year"]["name"] == "Tý"
-    assert foundation["dia_chi_year"]["am_duong"] == "Dương"
-    assert foundation["dia_chi_year"]["ngu_hanh"] == "Thủy"
-    assert foundation["gender_polarity"] == "Dương Nam"
-    assert foundation["van_direction"] == "thuận"
-    assert foundation["menh_position"]["id"] == "dau"
-    assert foundation["menh_position"]["name"] == "Dậu"
-    assert foundation["menh_position"]["year_menh_polarity_relation"] == "nghịch lý"
+    assert set(foundation) == {
+        "am_duong_thuan_nghich",
+        "ban_menh",
+        "cuc",
+        "menh_cuc_relation",
+    }
+
+    am_duong_relation = foundation["am_duong_thuan_nghich"]
+    assert am_duong_relation["relation"] == "nghịch lý"
+    assert am_duong_relation["status"] == "Nghịch Lý"
+    assert "Lệch pha" in am_duong_relation["environment_alignment"]
+    assert "đa luồng" in am_duong_relation["thinking_consistency"]
+    assert "nền tảng" in am_duong_relation["scope_note"]
+    assert "Mệnh/Thân" in am_duong_relation["combination_note"]
+
     assert foundation["ban_menh"]["name"] == "Giản Hạ Thủy"
+    assert foundation["ban_menh"]["ngu_hanh"] == "Thủy"
+    assert foundation["ban_menh"]["meaning"]["symbol"] == "Nước khe suối"
+    assert "khó dò" in foundation["ban_menh"]["meaning"]["keywords"]
+    assert "sources" not in foundation["ban_menh"]["meaning"]
+
     assert foundation["cuc"]["name"] == "Hỏa Lục cục"
-    assert foundation["cuc"]["number"] == 6
-    assert foundation["menh_cuc_relation"]["label"] == "Mệnh khắc cục"
-    assert "giảm độ số" in foundation["menh_cuc_relation"]["interpretation"]
+    assert foundation["cuc"]["ngu_hanh"] == "Hỏa"
 
-    first_dai_han, second_dai_han = foundation["dai_han_ranges"][:2]
-    assert first_dai_han["start_age"] == 6
-    assert first_dai_han["end_age"] == 15
-    assert first_dai_han["focus_position_id"] == "dau"
-    assert second_dai_han["start_age"] == 16
-    assert second_dai_han["focus_position_id"] == "tuat"
+    menh_cuc_relation = foundation["menh_cuc_relation"]
+    assert menh_cuc_relation == {
+        "menh_element": "Thủy",
+        "cuc_element": "Hỏa",
+        "relation": "Mệnh khắc Cục",
+        "meaning": "Người có khả năng thay đổi, cải cách môi trường xung quanh mình.",
+    }
 
 
-def test_laso_foundation_reports_all_gender_polarity_directions():
-    female_duong = build_laso_foundation_payload(
-        LaSo.from_prior(
-            LaSoPrior(
-                hour=DiaChi.MEO,
-                date=10,
-                month=11,
-                year=1996,
-                gender=Gender.FEMALE,
-            )
-        )
-    )
-    female_am = build_laso_foundation_payload(
+def test_laso_foundation_reports_both_am_duong_polarity_relations():
+    thuan_ly = build_laso_foundation_payload(
         LaSo.from_prior(
             LaSoPrior(
                 hour=DiaChi.TY,
                 date=1,
                 month=1,
-                year=1985,
-                gender=Gender.FEMALE,
-            )
-        )
-    )
-    male_am = build_laso_foundation_payload(
-        LaSo.from_prior(
-            LaSoPrior(
-                hour=DiaChi.TY,
-                date=1,
-                month=1,
-                year=1985,
+                year=1984,
                 gender=Gender.MALE,
             )
         )
     )
 
-    assert female_duong["gender_polarity"] == "Dương Nữ"
-    assert female_duong["van_direction"] == "nghịch"
-    assert female_am["gender_polarity"] == "Âm Nữ"
-    assert female_am["van_direction"] == "thuận"
-    assert male_am["gender_polarity"] == "Âm Nam"
-    assert male_am["van_direction"] == "nghịch"
+    relation = thuan_ly["am_duong_thuan_nghich"]
+
+    assert relation["relation"] == "thuận lý"
+    assert relation["status"] == "Thuận Lý"
+    assert "Hòa hợp" in relation["environment_alignment"]
+    assert "một dòng mạch lạc" in relation["thinking_consistency"]
+    assert "nền tảng" in relation["scope_note"]
 
 
-def test_laso_foundation_keeps_source_notes_for_agent_citations():
+def test_laso_foundation_has_ban_menh_meanings_without_source_metadata():
+    assert len(BAN_MENH_MEANINGS) == 30
+
     foundation = build_laso_foundation_payload(
         LaSo.from_prior(
             LaSoPrior(
                 hour=DiaChi.MEO,
                 date=10,
                 month=11,
-                year=1996,
+                year=1998,
                 gender=Gender.MALE,
             )
         )
     )
 
-    source_ids = {source["id"] for source in foundation["source_notes"]}
+    ban_menh_meaning = foundation["ban_menh"]["meaning"]
 
-    assert "tuvitanbien_2_tim_ban_menh" in source_ids
-    assert "tuvitanbien_7_lap_cuc" in source_ids
-    assert "tuvitanbien_1_4_ban_menh_cuc" in source_ids
-    assert foundation["foundation_effects"]
-    assert foundation["interpretation_order"][0].startswith("Xác định can-chi")
+    assert foundation["ban_menh"]["name"] == "Thành Đầu Thổ"
+    assert "phòng thủ" in ban_menh_meaning["keywords"]
+    assert "sources" not in ban_menh_meaning
+    assert foundation["menh_cuc_relation"]["relation"] == "Cục khắc Mệnh"
