@@ -1,5 +1,5 @@
-from src.agent.ban_menh_meaning import BAN_MENH_MEANINGS
-from src.agent.laso_foundation import build_laso_foundation_payload
+from src.agent.tool.ban_menh.ban_menh_meaning import BAN_MENH_MEANINGS
+from src.agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
 from src.refactored.la_so import LaSo
 from src.refactored.model.elementary import DiaChi
 from src.refactored.model.prior import Gender, LaSoPrior
