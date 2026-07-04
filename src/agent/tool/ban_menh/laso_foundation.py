@@ -4,7 +4,7 @@ import logging
 
 from pydantic_ai import RunContext
 
-from src.agent.ban_menh_meaning import (
+from src.agent.tool.ban_menh.ban_menh_meaning import (
     build_ban_menh_meaning,
     build_menh_cuc_lens,
 )
