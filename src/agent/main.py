@@ -10,6 +10,7 @@ from .tool import (
     get_list_cach_cuc,
     get_role_instruction,
     get_tam_hop,
+    get_vong_thai_tue,
     read_catalog,
     get_xung_chieu,
     read_section,
@@ -48,6 +49,9 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 5. Trước khi luận tổng quan hoặc luận Cung Mệnh, luôn gọi get_laso_foundation
 để nắm gốc lá số: Can Chi năm sinh, Âm/Dương Nam/Nữ, Bản Mệnh, Cục,
 quan hệ Mệnh-Cục, chiều vận và Đại hạn.
+5. Khi luận tư cách, khí chất nhập thế, Cung Mệnh, hoặc khi người dùng hỏi
+về vòng Thái Tuế, phải gọi get_vong_thai_tue để xác định sao vòng Thái Tuế
+thủ Mệnh và nhóm tư cách tương ứng.
 
 
 ## Phân tích cung
@@ -77,6 +81,7 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
         retries=2,
         tools=[
             get_laso_foundation,
+            get_vong_thai_tue,
             get_cung_by_position,
             get_cung_by_role,
             get_list_cach_cuc,
