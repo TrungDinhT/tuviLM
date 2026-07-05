@@ -68,7 +68,7 @@ export function ChatScreen() {
       </div>
 
       {/* Desktop chart side panel */}
-      <aside className="hidden w-[420px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-border bg-background p-4 lg:flex">
+      <aside className="hidden w-[480px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-border bg-background p-4 lg:flex xl:w-[560px]">
         <Card size="sm">
           <CardHeader className="flex flex-row items-center justify-between gap-2">
             <CardTitle className="text-sm">Lá số</CardTitle>

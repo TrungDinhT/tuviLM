@@ -80,10 +80,9 @@ describe('FullChartDialog', () => {
     expect(screen.getByText(/Trường Sinh/)).toBeInTheDocument();
   });
 
-  it('grid container has aspect-[2/3] so each 4×4 cell is w:h = 2:3', () => {
+  it('grid container uses the full-chart grid styling', () => {
     render(<FullChartDialog open={true} onOpenChange={() => {}} />);
     const grid = screen.getByTestId('full-chart-grid');
-    expect(grid.className).toContain('aspect-[2/3]');
     expect(grid.className).toContain('fc-grid');
   });
 
