@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { buildLaso, createAnonymous, createChartProfile, createSession } from '../client';
+import {
+  buildLaso,
+  createAnonymous,
+  createChartProfile,
+  createSession,
+  streamSessionChat,
+} from '../client';
 import fixture from '../__fixtures__/build-laso.json';
 
 const REQ = { day: 14, month: 8, year: 1991, hour: 6, gender: 'F' as const };
@@ -12,6 +18,13 @@ function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+function sseResponse(events: Array<Record<string, unknown>>) {
+  return new Response(events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join(''), {
+    status: 200,
+    headers: { 'Content-Type': 'text/event-stream' },
   });
 }
 
@@ -139,5 +152,47 @@ describe('new conversation adapters', () => {
         'Idempotency-Key': 'session-key',
       },
     });
+  });
+
+  it('streams session chat and joins text deltas', async () => {
+    const onTextDelta = vi.fn();
+    const fetchMock = vi.fn<typeof fetch>(async () =>
+      sseResponse([
+        { type: 'ids', user_message_id: 'u1', assistant_message_id: 'a1' },
+        { type: 'text', delta: 'Career ' },
+        { type: 'text', delta: 'looks strong.' },
+        { type: 'done', status: 'confirmed' },
+      ]),
+    );
+    mockFetch(fetchMock);
+
+    await expect(
+      streamSessionChat(
+        'session_1',
+        { content: 'Career?' },
+        'anon_123',
+        'message-key',
+        onTextDelta,
+      ),
+    ).resolves.toEqual({ answer: 'Career looks strong.', tool_calls: [] });
+    expect(onTextDelta.mock.calls.map(([delta]) => delta)).toEqual(['Career ', 'looks strong.']);
+
+    expect(firstFetchCall(fetchMock)[0]).toContain('/api/v1/sessions/session_1/chat/stream');
+    expect(firstFetchCall(fetchMock)[1]).toMatchObject({
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Anonymous-Owner-Id': 'anon_123',
+        'Idempotency-Key': 'message-key',
+      },
+      body: JSON.stringify({ content: 'Career?' }),
+    });
+  });
+
+  it('turns stream error events into ApiError', async () => {
+    mockFetch(async () => sseResponse([{ type: 'error', message: 'upstream 429 rate limit' }]));
+
+    await expect(
+      streamSessionChat('session_1', { content: 'Career?' }, 'anon_123', 'message-key'),
+    ).rejects.toEqual({ kind: 'stream', message: 'upstream 429 rate limit' });
   });
 });

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { useChartStore } from '@/store/chart-store';
 import { useChat } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
-import { toApiRequest } from '@/features/birth-input/schema';
 import { INITIAL_GREETING, QUICK_PROMPTS, type ChatMessage } from '../data';
 import { MessageBubble } from './message-bubble';
 
@@ -20,8 +19,8 @@ function patchLastMessage(prev: ChatMessage[], update: Partial<ChatMessage>): Ch
 }
 
 export function ChatPanel() {
-  const lastInput = useChartStore((s) => s.lastInput);
-  const setCurrent = useChartStore((s) => s.setCurrent);
+  const ownerId = useChartStore((s) => s.ownerId);
+  const sessionId = useChartStore((s) => s.sessionId);
 
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_GREETING]);
   const [input, setInput] = useState('');
@@ -48,10 +47,16 @@ export function ChatPanel() {
     chat.mutate(
       {
         message,
-        lastInput: lastInput ? toApiRequest(lastInput) : null,
-        applyBuildResponse: (resp) => {
-          if (lastInput) setCurrent(lastInput, resp);
-        },
+        ownerId,
+        sessionId,
+        onTextDelta: (delta) =>
+          setMessages((prev) =>
+            patchLastMessage(prev, {
+              role: 'ai',
+              text: (prev.at(-1)?.text ?? '') + delta,
+              status: 'pending',
+            }),
+          ),
       },
       {
         onSuccess: (resp) =>
@@ -77,7 +82,6 @@ export function ChatPanel() {
             <MessageBubble
               key={i}
               message={m}
-              isResyncing={chat.isResyncing && m.status === 'pending'}
             />
           ))}
         </div>

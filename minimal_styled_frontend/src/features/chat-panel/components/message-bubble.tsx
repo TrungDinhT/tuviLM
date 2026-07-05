@@ -19,10 +19,9 @@ const MARKDOWN_CLASSES =
 
 interface MessageBubbleProps {
   message: ChatMessage;
-  isResyncing: boolean;
 }
 
-export function MessageBubble({ message, isResyncing }: MessageBubbleProps) {
+export function MessageBubble({ message }: MessageBubbleProps) {
   const isAi = message.role === 'ai';
   const isPending = message.status === 'pending';
   const isError = message.status === 'error';
@@ -51,15 +50,8 @@ export function MessageBubble({ message, isResyncing }: MessageBubbleProps) {
             : 'bg-primary text-primary-foreground whitespace-pre-line',
         )}
       >
-        {isPending ? (
-          <div className="flex flex-col gap-1">
-            <Spinner className="size-4" />
-            {isResyncing && (
-              <span className="text-xs text-muted-foreground">
-                (đang đồng bộ lại lá số…)
-              </span>
-            )}
-          </div>
+        {isPending && !message.text ? (
+          <Spinner className="size-4" />
         ) : isAi ? (
           <div className={MARKDOWN_CLASSES}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>

@@ -4,12 +4,13 @@ export type ApiError =
   | { kind: 'network' }
   | { kind: 'http'; status: number; body: unknown }
   | { kind: 'parse'; issues: ZodIssue[] }
-  | { kind: 'no-la-so'; requiresRebuild: boolean };
+  | { kind: 'no-session' }
+  | { kind: 'stream'; message: string };
 
 export function isApiError(value: unknown): value is ApiError {
   if (!value || typeof value !== 'object') return false;
   const kind = (value as { kind?: unknown }).kind;
-  return kind === 'network' || kind === 'http' || kind === 'parse' || kind === 'no-la-so';
+  return kind === 'network' || kind === 'http' || kind === 'parse' || kind === 'no-session' || kind === 'stream';
 }
 
 export function apiErrorMessage(err: ApiError): string {
@@ -22,9 +23,9 @@ export function apiErrorMessage(err: ApiError): string {
       return `Máy chủ trả về lỗi (${err.status}).`;
     case 'parse':
       return 'Phản hồi từ máy chủ không đúng định dạng.';
-    case 'no-la-so':
-      return err.requiresRebuild
-        ? 'Phiên đã hết — vui lòng quay lại trang nhập thông tin để tạo lại lá số.'
-        : 'Không khôi phục được phiên lá số. Vui lòng thử lại.';
+    case 'no-session':
+      return 'Phiên trò chuyện chưa sẵn sàng. Vui lòng tạo lại lá số.';
+    case 'stream':
+      return err.message;
   }
 }

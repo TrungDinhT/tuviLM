@@ -3,7 +3,6 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useChartStore, type BirthInput } from '@/store/chart-store';
 import type { BuildLasoResponse, Cung } from '@/lib/api/schemas';
-import { NO_LASO_SENTINEL } from '@/lib/api/schemas';
 import { ChatPanel } from '../chat-panel';
 
 const DIA_CHI = [
@@ -55,9 +54,19 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
   });
 }
 
+function sseResponse(events: Array<Record<string, unknown>>) {
+  return new Response(events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join(''), {
+    status: 200,
+    headers: { 'Content-Type': 'text/event-stream' },
+  });
+}
+
 beforeEach(() => {
   localStorage.clear();
   useChartStore.setState({
+    ownerId: 'anon_123',
+    chartProfileId: 'profile_1',
+    sessionId: 'session_1',
     lastInput: INPUT,
     current: RESPONSE,
     saoLuuOverlay: null,
@@ -80,10 +89,10 @@ describe('ChatPanel', () => {
     expect(screen.queryByText('Demo')).toBeNull();
   });
 
-  it('quick-prompt click submits via real /chat call and removes the quick-prompt row', async () => {
+  it('quick-prompt click submits via session stream and removes the quick-prompt row', async () => {
     const fetchMock = vi
       .spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(jsonResponse({ answer: 'Câu trả lời', tool_calls: [] }));
+      .mockResolvedValueOnce(sseResponse([{ type: 'text', delta: 'Câu trả lời' }]));
 
     renderPanel();
     fireEvent.click(screen.getByRole('button', { name: /Năm nay sự nghiệp/ }));
@@ -96,7 +105,7 @@ describe('ChatPanel', () => {
     expect(screen.queryByRole('button', { name: /Năm nay sự nghiệp/ })).toBeNull();
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0]![0]).toContain('/api/v1/chat');
+    expect(fetchMock.mock.calls[0]![0]).toContain('/api/v1/sessions/session_1/chat/stream');
   });
 
   it('manual send: textarea + Send disabled while pending, then answer replaces the pending bubble', async () => {
@@ -117,63 +126,39 @@ describe('ChatPanel', () => {
     });
 
     await act(async () => {
-      resolveChat!(jsonResponse({ answer: 'Reply', tool_calls: [] }));
+      resolveChat!(sseResponse([{ type: 'text', delta: 'Reply' }]));
     });
 
     await waitFor(() => {
       expect(screen.getByText('Reply')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Gửi' })).not.toBeDisabled();
+      expect(textarea).not.toBeDisabled();
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it('sentinel triggers /laso/build + retry /chat and shows resync caption', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      // First /chat returns the sentinel.
-      .mockResolvedValueOnce(jsonResponse({ answer: NO_LASO_SENTINEL, tool_calls: [] }))
-      // /laso/build succeeds.
-      .mockResolvedValueOnce(jsonResponse(RESPONSE))
-      // Second /chat returns the real answer.
-      .mockResolvedValueOnce(jsonResponse({ answer: 'After resync', tool_calls: [] }));
+  it('shows streamed text while the request is still pending', async () => {
+    let resolveChat: ((value: Response) => void) | undefined;
+    vi.spyOn(globalThis, 'fetch').mockImplementationOnce(
+      () =>
+        new Promise<Response>((res) => {
+          resolveChat = res;
+        }),
+    );
 
     renderPanel();
-    fireEvent.click(screen.getByRole('button', { name: /Năm nay sự nghiệp/ }));
-
-    // The resync caption appears between the first and second /chat calls.
-    await waitFor(() => {
-      expect(screen.getByText(/đang đồng bộ lại lá số/)).toBeInTheDocument();
-    });
+    const input = screen.getByPlaceholderText('Hỏi thầy điều gì...');
+    fireEvent.change(input, { target: { value: 'Hi' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Gửi' }));
 
     await waitFor(() => {
-      expect(screen.getByText('After resync')).toBeInTheDocument();
+      expect(resolveChat).toBeTypeOf('function');
+    });
+    await act(async () => {
+      resolveChat!(sseResponse([{ type: 'text', delta: 'Partial answer' }]));
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect(fetchMock.mock.calls[0]![0]).toContain('/api/v1/chat');
-    expect(fetchMock.mock.calls[1]![0]).toContain('/api/v1/laso/build');
-    expect(fetchMock.mock.calls[2]![0]).toContain('/api/v1/chat');
-  });
-
-  it('sentinel after resync renders an error bubble and does not loop', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(jsonResponse({ answer: NO_LASO_SENTINEL, tool_calls: [] }))
-      .mockResolvedValueOnce(jsonResponse(RESPONSE))
-      .mockResolvedValueOnce(jsonResponse({ answer: NO_LASO_SENTINEL, tool_calls: [] }));
-
-    renderPanel();
-    fireEvent.click(screen.getByRole('button', { name: /Năm nay sự nghiệp/ }));
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Không khôi phục được phiên lá số. Vui lòng thử lại.'),
-      ).toBeInTheDocument();
-    });
-
-    // No fourth call.
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(screen.getByText('Partial answer')).toBeInTheDocument();
   });
 
   it('network error renders an error bubble; conversation stays interactive', async () => {

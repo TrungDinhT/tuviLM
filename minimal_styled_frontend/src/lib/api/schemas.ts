@@ -115,10 +115,10 @@ export const CreateSessionResponseSchema = z.object({
 });
 export type CreateSessionResponse = z.infer<typeof CreateSessionResponseSchema>;
 
-export const ChatRequestSchema = z.object({
-  message: z.string(),
+export const SessionChatStreamRequestSchema = z.object({
+  content: z.string().min(1),
 });
-export type ChatRequest = z.infer<typeof ChatRequestSchema>;
+export type SessionChatStreamRequest = z.infer<typeof SessionChatStreamRequestSchema>;
 
 export const ChatToolCallSchema = z.object({
   id: z.string().nullable().optional(),
@@ -132,10 +132,3 @@ export const ChatResponseSchema = z.object({
   tool_calls: z.array(ChatToolCallSchema),
 });
 export type ChatResponse = z.infer<typeof ChatResponseSchema>;
-
-/**
- * Sentinel `answer` returned by `POST /api/v1/chat` when the backend
- * has no `la_so` in process state (see `api/main.py::chat_dummy`).
- * Match the backend string exactly; a schema-test asserts they agree.
- */
-export const NO_LASO_SENTINEL = 'TinhBan chưa được tạo trong state.';

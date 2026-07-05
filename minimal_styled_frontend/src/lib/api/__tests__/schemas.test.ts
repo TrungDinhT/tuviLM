@@ -4,7 +4,6 @@ import {
   BuildLasoResponseSchema,
   BuildSaoLuuRequestSchema,
   BuildSaoLuuResponseSchema,
-  ChatRequestSchema,
   ChatResponseSchema,
   CungSchema,
   CreateAnonymousResponseSchema,
@@ -12,7 +11,7 @@ import {
   CreateChartProfileResponseSchema,
   CreateSessionRequestSchema,
   CreateSessionResponseSchema,
-  NO_LASO_SENTINEL,
+  SessionChatStreamRequestSchema,
 } from '../schemas';
 import fixture from '../__fixtures__/build-laso.json';
 
@@ -95,16 +94,6 @@ describe('BuildSaoLuuResponseSchema', () => {
   });
 });
 
-describe('ChatRequestSchema', () => {
-  it('accepts a string message', () => {
-    expect(ChatRequestSchema.safeParse({ message: 'Hello' }).success).toBe(true);
-  });
-
-  it('rejects a missing message', () => {
-    expect(ChatRequestSchema.safeParse({}).success).toBe(false);
-  });
-});
-
 describe('new conversation schemas', () => {
   it('accepts an anonymous owner response', () => {
     expect(CreateAnonymousResponseSchema.safeParse({ owner_id: 'anon_123' }).success).toBe(true);
@@ -155,6 +144,11 @@ describe('new conversation schemas', () => {
       }).success,
     ).toBe(true);
   });
+
+  it('accepts a session chat stream request', () => {
+    expect(SessionChatStreamRequestSchema.safeParse({ content: 'Hello' }).success).toBe(true);
+    expect(SessionChatStreamRequestSchema.safeParse({ content: '' }).success).toBe(false);
+  });
 });
 
 describe('ChatResponseSchema', () => {
@@ -177,14 +171,6 @@ describe('ChatResponseSchema', () => {
 
   it('rejects a response missing answer', () => {
     expect(ChatResponseSchema.safeParse({ tool_calls: [] }).success).toBe(false);
-  });
-});
-
-describe('NO_LASO_SENTINEL', () => {
-  // Pin the exact string. If the backend wording in `api/main.py::chat_dummy`
-  // changes, this test fails — update both sides in lockstep.
-  it('matches the exact backend sentinel string', () => {
-    expect(NO_LASO_SENTINEL).toBe('TinhBan chưa được tạo trong state.');
   });
 });
 
