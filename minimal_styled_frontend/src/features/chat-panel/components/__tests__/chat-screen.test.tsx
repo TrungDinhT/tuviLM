@@ -45,11 +45,13 @@ const RESPONSE: BuildLasoResponse = {
 beforeEach(() => {
   localStorage.clear();
   useChartStore.setState({
+    ownerId: null,
+    chartProfileId: null,
+    sessionId: null,
     lastInput: null,
     current: null,
     saoLuuOverlay: null,
     selectedCungPosition: null,
-    history: [],
   });
 });
 
@@ -65,4 +67,5 @@ describe('ChatScreen full-chart trigger', () => {
     renderWithProviders(<ChatScreen />);
     expect(screen.queryByRole('button', { name: 'Xem chi tiết' })).toBeNull();
   });
+
 });

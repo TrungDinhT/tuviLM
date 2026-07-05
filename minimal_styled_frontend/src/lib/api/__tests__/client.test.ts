@@ -4,6 +4,11 @@ import {
   createAnonymous,
   createChartProfile,
   createSession,
+  deleteChartProfile,
+  deleteSession,
+  getSession,
+  listChartProfiles,
+  listSessions,
   streamSessionChat,
 } from '../client';
 import fixture from '../__fixtures__/build-laso.json';
@@ -151,6 +156,116 @@ describe('new conversation adapters', () => {
         'X-Anonymous-Owner-Id': 'anon_123',
         'Idempotency-Key': 'session-key',
       },
+    });
+  });
+
+  it('lists chart profiles for the anonymous owner', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () =>
+      jsonResponse({
+        chart_profiles: [
+          {
+            id: 'profile_1',
+            display_name: 'Linh',
+            birth_info: { calendar: 'solar', ...REQ },
+            created_at: '2026-07-05T00:00:00Z',
+            updated_at: '2026-07-05T00:00:00Z',
+          },
+        ],
+      }),
+    );
+    mockFetch(fetchMock);
+
+    const out = await listChartProfiles('anon_123');
+
+    expect(out.chart_profiles[0]?.id).toBe('profile_1');
+    expect(firstFetchCall(fetchMock)[0]).toContain('/api/v1/chart-profiles');
+    expect(firstFetchCall(fetchMock)[1]).toMatchObject({
+      headers: { 'X-Anonymous-Owner-Id': 'anon_123' },
+    });
+  });
+
+  it('lists sessions under a chart profile', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () =>
+      jsonResponse({
+        sessions: [
+          {
+            id: 'session_1',
+            chart_profile_id: 'profile_1',
+            title: 'Linh',
+            message_count: 2,
+            created_at: '2026-07-05T00:00:00Z',
+            updated_at: '2026-07-05T00:00:00Z',
+          },
+        ],
+      }),
+    );
+    mockFetch(fetchMock);
+
+    const out = await listSessions('profile_1', 'anon_123');
+
+    expect(out.sessions[0]?.id).toBe('session_1');
+    expect(firstFetchCall(fetchMock)[0]).toContain('/api/v1/chart-profiles/profile_1/sessions');
+    expect(firstFetchCall(fetchMock)[1]).toMatchObject({
+      headers: { 'X-Anonymous-Owner-Id': 'anon_123' },
+    });
+  });
+
+  it('loads a session with persisted messages', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () =>
+      jsonResponse({
+        session: {
+          id: 'session_1',
+          chart_profile_id: 'profile_1',
+          title: 'Linh',
+          messages: [
+            {
+              id: 'msg_1',
+              role: 'user',
+              content: 'Hi',
+              status: 'confirmed',
+              created_at: '2026-07-05T00:00:00Z',
+              updated_at: '2026-07-05T00:00:00Z',
+            },
+          ],
+          created_at: '2026-07-05T00:00:00Z',
+          updated_at: '2026-07-05T00:00:00Z',
+        },
+      }),
+    );
+    mockFetch(fetchMock);
+
+    const out = await getSession('session_1', 'anon_123');
+
+    expect(out.session.messages[0]?.content).toBe('Hi');
+    expect(firstFetchCall(fetchMock)[0]).toContain('/api/v1/sessions/session_1');
+    expect(firstFetchCall(fetchMock)[1]).toMatchObject({
+      headers: { 'X-Anonymous-Owner-Id': 'anon_123' },
+    });
+  });
+
+  it('deletes a chart profile for the anonymous owner', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(null, { status: 204 }));
+    mockFetch(fetchMock);
+
+    await expect(deleteChartProfile('profile_1', 'anon_123')).resolves.toBeUndefined();
+
+    expect(firstFetchCall(fetchMock)[0]).toContain('/api/v1/chart-profiles/profile_1');
+    expect(firstFetchCall(fetchMock)[1]).toMatchObject({
+      method: 'DELETE',
+      headers: { 'X-Anonymous-Owner-Id': 'anon_123' },
+    });
+  });
+
+  it('deletes a session for the anonymous owner', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(null, { status: 204 }));
+    mockFetch(fetchMock);
+
+    await expect(deleteSession('session_1', 'anon_123')).resolves.toBeUndefined();
+
+    expect(firstFetchCall(fetchMock)[0]).toContain('/api/v1/sessions/session_1');
+    expect(firstFetchCall(fetchMock)[1]).toMatchObject({
+      method: 'DELETE',
+      headers: { 'X-Anonymous-Owner-Id': 'anon_123' },
     });
   });
 

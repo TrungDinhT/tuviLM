@@ -49,7 +49,6 @@ beforeEach(() => {
     current: makeResponse(),
     saoLuuOverlay: null,
     selectedCungPosition: null,
-    history: [],
   });
 });
 
@@ -121,7 +120,6 @@ describe('CompactChart', () => {
       },
       saoLuuOverlay: null,
       selectedCungPosition: null,
-      history: [],
     });
     render(<CompactChart />);
     // Compact cell of Tý: chính tinh string visible.

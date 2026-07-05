@@ -54,10 +54,34 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
   });
 }
 
+function sessionResponse(messages: unknown[] = []) {
+  return jsonResponse({
+    session: {
+      id: 'session_1',
+      chart_profile_id: 'profile_1',
+      title: 'Linh',
+      messages,
+      created_at: '2026-07-05T00:00:00Z',
+      updated_at: '2026-07-05T00:00:00Z',
+    },
+  });
+}
+
 function sseResponse(events: Array<Record<string, unknown>>) {
   return new Response(events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join(''), {
     status: 200,
     headers: { 'Content-Type': 'text/event-stream' },
+  });
+}
+
+function mockChatFetch(chatImpl?: () => Response | Promise<Response>) {
+  return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+    const url = String(input);
+    if (url.includes('/chat/stream')) {
+      if (!chatImpl) throw new TypeError('unexpected chat request');
+      return chatImpl();
+    }
+    return sessionResponse();
   });
 }
 
@@ -71,7 +95,6 @@ beforeEach(() => {
     current: RESPONSE,
     saoLuuOverlay: null,
     selectedCungPosition: null,
-    history: [],
   });
 });
 
@@ -80,22 +103,53 @@ afterEach(() => {
 });
 
 describe('ChatPanel', () => {
-  it('mounts with the initial greeting and quick-prompt row visible', () => {
+  it('mounts with the initial greeting and quick-prompt row visible', async () => {
+    mockChatFetch();
     renderPanel();
     expect(screen.getByText(/Chào bạn\. Mình đã đọc lá số của bạn/)).toBeInTheDocument();
     // Quick prompts are present.
-    expect(screen.getByRole('button', { name: /Năm nay sự nghiệp/ })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /Năm nay sự nghiệp/ })).toBeInTheDocument();
     // Demo badge removed.
     expect(screen.queryByText('Demo')).toBeNull();
   });
 
-  it('quick-prompt click submits via session stream and removes the quick-prompt row', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(sseResponse([{ type: 'text', delta: 'Câu trả lời' }]));
+  it('hydrates persisted session messages', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      sessionResponse([
+        {
+          id: 'msg_1',
+          role: 'user',
+          content: 'Cũ không?',
+          status: 'confirmed',
+          created_at: '2026-07-05T00:00:00Z',
+          updated_at: '2026-07-05T00:00:00Z',
+        },
+        {
+          id: 'msg_2',
+          role: 'assistant',
+          content: 'Cũ đây.',
+          status: 'confirmed',
+          created_at: '2026-07-05T00:00:00Z',
+          updated_at: '2026-07-05T00:00:00Z',
+        },
+      ]),
+    );
 
     renderPanel();
-    fireEvent.click(screen.getByRole('button', { name: /Năm nay sự nghiệp/ }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Cũ không?')).toBeInTheDocument();
+      expect(screen.getByText('Cũ đây.')).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/Chào bạn\. Mình đã đọc lá số của bạn/)).toBeNull();
+  });
+
+  it('quick-prompt click submits via session stream and removes the quick-prompt row', async () => {
+    const fetchMock = mockChatFetch(() => sseResponse([{ type: 'text', delta: 'Câu trả lời' }]));
+
+    renderPanel();
+    const prompt = await screen.findByRole('button', { name: /Năm nay sự nghiệp/ });
+    fireEvent.click(prompt);
 
     await waitFor(() => {
       expect(screen.getByText('Câu trả lời')).toBeInTheDocument();
@@ -104,18 +158,23 @@ describe('ChatPanel', () => {
     // Quick-prompt buttons gone after first send.
     expect(screen.queryByRole('button', { name: /Năm nay sự nghiệp/ })).toBeNull();
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0]![0]).toContain('/api/v1/sessions/session_1/chat/stream');
+    const streamCalls = fetchMock.mock.calls.filter(([url]) => String(url).includes('/chat/stream'));
+    expect(streamCalls).toHaveLength(1);
+    expect(streamCalls[0]![0]).toContain('/api/v1/sessions/session_1/chat/stream');
   });
 
   it('manual send: textarea + Send disabled while pending, then answer replaces the pending bubble', async () => {
     let resolveChat: ((value: Response) => void) | undefined;
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementationOnce(
-      () => new Promise<Response>((res) => { resolveChat = res; }),
+    const fetchMock = mockChatFetch(
+      () =>
+        new Promise<Response>((res) => {
+          resolveChat = res;
+        }),
     );
 
     renderPanel();
-    const textarea = screen.getByPlaceholderText('Hỏi thầy điều gì...') as HTMLTextAreaElement;
+    const textarea = (await screen.findByPlaceholderText('Hỏi thầy điều gì...')) as HTMLTextAreaElement;
+    await waitFor(() => expect(textarea).not.toBeDisabled());
     fireEvent.change(textarea, { target: { value: 'Hi' } });
     fireEvent.click(screen.getByRole('button', { name: 'Gửi' }));
 
@@ -134,12 +193,12 @@ describe('ChatPanel', () => {
       expect(textarea).not.toBeDisabled();
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).includes('/chat/stream'))).toHaveLength(1);
   });
 
   it('shows streamed text while the request is still pending', async () => {
     let resolveChat: ((value: Response) => void) | undefined;
-    vi.spyOn(globalThis, 'fetch').mockImplementationOnce(
+    mockChatFetch(
       () =>
         new Promise<Response>((res) => {
           resolveChat = res;
@@ -147,7 +206,8 @@ describe('ChatPanel', () => {
     );
 
     renderPanel();
-    const input = screen.getByPlaceholderText('Hỏi thầy điều gì...');
+    const input = await screen.findByPlaceholderText('Hỏi thầy điều gì...');
+    await waitFor(() => expect(input).not.toBeDisabled());
     fireEvent.change(input, { target: { value: 'Hi' } });
     fireEvent.click(screen.getByRole('button', { name: 'Gửi' }));
 
@@ -162,10 +222,13 @@ describe('ChatPanel', () => {
   });
 
   it('network error renders an error bubble; conversation stays interactive', async () => {
-    vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new TypeError('network down'));
+    mockChatFetch(() => {
+      throw new TypeError('network down');
+    });
 
     renderPanel();
-    fireEvent.click(screen.getByRole('button', { name: /Năm nay sự nghiệp/ }));
+    const prompt = await screen.findByRole('button', { name: /Năm nay sự nghiệp/ });
+    fireEvent.click(prompt);
 
     await waitFor(() => {
       expect(

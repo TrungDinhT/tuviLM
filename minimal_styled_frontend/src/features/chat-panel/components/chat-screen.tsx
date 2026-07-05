@@ -19,6 +19,7 @@ import { CompactChart } from '@/features/laso-chart/components/compact-chart';
 import { FullChartDialog } from '@/features/laso-chart/components/full-chart-dialog';
 import { SaoLuuPicker } from '@/features/laso-chart/components/sao-luu-picker';
 import { ChatPanel } from './chat-panel';
+import { ConversationSwitcher } from './conversation-switcher';
 
 export function ChatScreen() {
   const current = useChartStore((s) => s.current);
@@ -108,6 +109,7 @@ export function ChatScreen() {
               <Maximize2 />
             </Button>
           </SheetHeader>
+          <ConversationSwitcher />
           <CompactChart />
           <SaoLuuPicker />
           <AspectBars />

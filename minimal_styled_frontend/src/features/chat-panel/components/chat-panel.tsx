@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Plus, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useChartStore } from '@/store/chart-store';
-import { useChat } from '@/lib/api/hooks';
+import { useChat, useSession } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
+import type { PersistedChatMessage } from '@/lib/api/schemas';
 import { INITIAL_GREETING, QUICK_PROMPTS, type ChatMessage } from '../data';
 import { MessageBubble } from './message-bubble';
 
@@ -18,14 +19,45 @@ function patchLastMessage(prev: ChatMessage[], update: Partial<ChatMessage>): Ch
   return next;
 }
 
+function fromPersistedMessages(messages: PersistedChatMessage[]): ChatMessage[] {
+  if (messages.length === 0) return [INITIAL_GREETING];
+  return messages.map((message) => ({
+    role: message.role === 'assistant' ? 'ai' : 'user',
+    text: message.content,
+    status:
+      message.status === 'confirmed'
+        ? 'ok'
+        : message.status === 'pending'
+          ? 'pending'
+          : 'error',
+  }));
+}
+
 export function ChatPanel() {
   const ownerId = useChartStore((s) => s.ownerId);
+  const chartProfileId = useChartStore((s) => s.chartProfileId);
   const sessionId = useChartStore((s) => s.sessionId);
 
-  const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_GREETING]);
-  const [input, setInput] = useState('');
+  const [localMessages, setLocalMessages] = useState<{
+    sessionId: string | null;
+    messages: ChatMessage[];
+  } | null>(null);
+  const [draft, setDraft] = useState<{ sessionId: string | null; value: string }>({
+    sessionId: null,
+    value: '',
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
+  const session = useSession(ownerId, sessionId);
   const chat = useChat();
+
+  const hydratedMessages = session.isError
+    ? [{ role: 'ai' as const, text: apiErrorMessage(session.error), status: 'error' as const }]
+    : session.data
+      ? fromPersistedMessages(session.data.session.messages)
+      : [INITIAL_GREETING];
+  const messages =
+    localMessages?.sessionId === sessionId ? localMessages.messages : hydratedMessages;
+  const input = draft.sessionId === sessionId ? draft.value : '';
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -34,42 +66,63 @@ export function ChatPanel() {
 
   const sendMessage = (text: string) => {
     const message = text.trim();
-    if (!message || chat.isPending) return;
+    if (!message || chat.isPending || session.isPending) return;
 
     // Optimistic: user bubble + pending AI bubble.
-    setMessages((prev) => [
-      ...prev,
-      { role: 'user', text: message, status: 'ok' },
-      { role: 'ai', text: '', status: 'pending' },
-    ]);
-    setInput('');
+    setLocalMessages({
+      sessionId,
+      messages: [
+        ...messages,
+        { role: 'user', text: message, status: 'ok' },
+        { role: 'ai', text: '', status: 'pending' },
+      ],
+    });
+    setDraft({ sessionId, value: '' });
 
     chat.mutate(
       {
         message,
         ownerId,
+        chartProfileId,
         sessionId,
         onTextDelta: (delta) =>
-          setMessages((prev) =>
-            patchLastMessage(prev, {
+          setLocalMessages((prev) => ({
+            sessionId,
+            messages: patchLastMessage(prev?.sessionId === sessionId ? prev.messages : messages, {
               role: 'ai',
-              text: (prev.at(-1)?.text ?? '') + delta,
+              text: ((prev?.sessionId === sessionId ? prev.messages.at(-1)?.text : messages.at(-1)?.text) ?? '') + delta,
               status: 'pending',
             }),
-          ),
+          })),
       },
       {
         onSuccess: (resp) =>
-          setMessages((prev) => patchLastMessage(prev, { role: 'ai', text: resp.answer, status: 'ok' })),
+          setLocalMessages((prev) => ({
+            sessionId,
+            messages: patchLastMessage(prev?.sessionId === sessionId ? prev.messages : messages, {
+              role: 'ai',
+              text: resp.answer,
+              status: 'ok',
+            }),
+          })),
         onError: (err) => {
           const text = isApiError(err) ? apiErrorMessage(err) : 'Đã có lỗi xảy ra.';
-          setMessages((prev) => patchLastMessage(prev, { role: 'ai', text, status: 'error' }));
+          setLocalMessages((prev) => ({
+            sessionId,
+            messages: patchLastMessage(prev?.sessionId === sessionId ? prev.messages : messages, {
+              role: 'ai',
+              text,
+              status: 'error',
+            }),
+          }));
         },
       },
     );
   };
 
-  const showQuickPrompts = messages.length === 1;
+  const isHydrating = Boolean(ownerId && sessionId) && session.isPending;
+  const isBusy = chat.isPending || isHydrating;
+  const showQuickPrompts = messages.length === 1 && !isHydrating;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -96,7 +149,7 @@ export function ChatPanel() {
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={chat.isPending}
+                disabled={isBusy}
                 onClick={() => sendMessage(p)}
               >
                 {p}
@@ -110,8 +163,8 @@ export function ChatPanel() {
             type="text"
             placeholder="Hỏi thầy điều gì..."
             value={input}
-            disabled={chat.isPending}
-            onChange={(e) => setInput(e.target.value)}
+            disabled={isBusy}
+            onChange={(e) => setDraft({ sessionId, value: e.target.value })}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -123,7 +176,7 @@ export function ChatPanel() {
           <button
             type="button"
             onClick={() => sendMessage(input)}
-            disabled={chat.isPending || !input.trim()}
+            disabled={isBusy || !input.trim()}
             aria-label="Gửi"
             className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-50"
           >

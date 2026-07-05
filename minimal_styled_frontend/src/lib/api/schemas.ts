@@ -85,6 +85,11 @@ export const CreateChartProfileResponseSchema = z.object({
 });
 export type CreateChartProfileResponse = z.infer<typeof CreateChartProfileResponseSchema>;
 
+export const ListChartProfilesResponseSchema = z.object({
+  chart_profiles: z.array(ChartProfileSchema),
+});
+export type ListChartProfilesResponse = z.infer<typeof ListChartProfilesResponseSchema>;
+
 export const ChatMessageSchema = z.object({
   id: z.string(),
   role: z.enum(['user', 'assistant']),
@@ -105,6 +110,11 @@ export const ChatSessionSchema = z.object({
 });
 export type ChatSession = z.infer<typeof ChatSessionSchema>;
 
+export const ChatSessionSummarySchema = ChatSessionSchema.omit({ messages: true }).extend({
+  message_count: z.number().int(),
+});
+export type ChatSessionSummary = z.infer<typeof ChatSessionSummarySchema>;
+
 export const CreateSessionRequestSchema = z.object({
   title: z.string().nullable(),
 });
@@ -114,6 +124,16 @@ export const CreateSessionResponseSchema = z.object({
   session: ChatSessionSchema,
 });
 export type CreateSessionResponse = z.infer<typeof CreateSessionResponseSchema>;
+
+export const GetSessionResponseSchema = z.object({
+  session: ChatSessionSchema,
+});
+export type GetSessionResponse = z.infer<typeof GetSessionResponseSchema>;
+
+export const ListSessionsResponseSchema = z.object({
+  sessions: z.array(ChatSessionSummarySchema),
+});
+export type ListSessionsResponse = z.infer<typeof ListSessionsResponseSchema>;
 
 export const SessionChatStreamRequestSchema = z.object({
   content: z.string().min(1),

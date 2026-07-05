@@ -10,6 +10,9 @@ import {
   CreateChartProfileResponseSchema,
   CreateSessionRequestSchema,
   CreateSessionResponseSchema,
+  GetSessionResponseSchema,
+  ListChartProfilesResponseSchema,
+  ListSessionsResponseSchema,
   SessionChatStreamRequestSchema,
   type BuildLasoRequest,
   type BuildLasoResponse,
@@ -21,6 +24,9 @@ import {
   type CreateChartProfileResponse,
   type CreateSessionRequest,
   type CreateSessionResponse,
+  type GetSessionResponse,
+  type ListChartProfilesResponse,
+  type ListSessionsResponse,
   type SessionChatStreamRequest,
 } from './schemas';
 
@@ -93,6 +99,49 @@ async function postWithoutBody<Res>(
   return result.data;
 }
 
+async function get<Res>(
+  path: string,
+  responseSchema: ZodType<Res>,
+  headers?: Record<string, string>,
+): Promise<Res> {
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, { headers });
+  } catch {
+    throw { kind: 'network' } satisfies ApiError;
+  }
+
+  if (!res.ok) {
+    throw { kind: 'http', status: res.status, body: await safeBody(res) } satisfies ApiError;
+  }
+
+  let raw: unknown;
+  try {
+    raw = await res.json();
+  } catch {
+    throw { kind: 'parse', issues: [] } satisfies ApiError;
+  }
+
+  const result = responseSchema.safeParse(raw);
+  if (!result.success) {
+    throw { kind: 'parse', issues: result.error.issues } satisfies ApiError;
+  }
+  return result.data;
+}
+
+async function remove(path: string, headers?: Record<string, string>): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, { method: 'DELETE', headers });
+  } catch {
+    throw { kind: 'network' } satisfies ApiError;
+  }
+
+  if (!res.ok) {
+    throw { kind: 'http', status: res.status, body: await safeBody(res) } satisfies ApiError;
+  }
+}
+
 async function safeBody(res: Response): Promise<unknown> {
   try {
     return await res.json();
@@ -139,6 +188,18 @@ export function createChartProfile(
   );
 }
 
+export function listChartProfiles(ownerId: string): Promise<ListChartProfilesResponse> {
+  return get('/api/v1/chart-profiles', ListChartProfilesResponseSchema, {
+    'X-Anonymous-Owner-Id': ownerId,
+  });
+}
+
+export function deleteChartProfile(chartProfileId: string, ownerId: string): Promise<void> {
+  return remove(`/api/v1/chart-profiles/${encodeURIComponent(chartProfileId)}`, {
+    'X-Anonymous-Owner-Id': ownerId,
+  });
+}
+
 export function createSession(
   chartProfileId: string,
   req: CreateSessionRequest,
@@ -155,6 +216,29 @@ export function createSession(
       'Idempotency-Key': idempotencyKey,
     },
   );
+}
+
+export function listSessions(
+  chartProfileId: string,
+  ownerId: string,
+): Promise<ListSessionsResponse> {
+  return get(
+    `/api/v1/chart-profiles/${encodeURIComponent(chartProfileId)}/sessions`,
+    ListSessionsResponseSchema,
+    { 'X-Anonymous-Owner-Id': ownerId },
+  );
+}
+
+export function getSession(sessionId: string, ownerId: string): Promise<GetSessionResponse> {
+  return get(`/api/v1/sessions/${encodeURIComponent(sessionId)}`, GetSessionResponseSchema, {
+    'X-Anonymous-Owner-Id': ownerId,
+  });
+}
+
+export function deleteSession(sessionId: string, ownerId: string): Promise<void> {
+  return remove(`/api/v1/sessions/${encodeURIComponent(sessionId)}`, {
+    'X-Anonymous-Owner-Id': ownerId,
+  });
 }
 
 export async function streamSessionChat(

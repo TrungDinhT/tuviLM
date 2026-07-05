@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Compass, History, Sparkles } from 'lucide-react';
+import { Compass, Plus, Sparkles } from 'lucide-react';
+import { ConversationSwitcher } from '@/features/chat-panel/components/conversation-switcher';
 import { cn } from '@/lib/utils';
 
 const NAV = [
   { href: '/chat', label: 'Đọc lá số', icon: Sparkles },
-  { href: '/history', label: 'Lịch sử', icon: History },
 ] as const;
 
 interface SidebarProps {
@@ -73,7 +73,18 @@ export function Sidebar({ collapsed }: SidebarProps) {
             </Link>
           );
         })}
+        {collapsed ? (
+          <Link
+            href="/"
+            title="Lá số mới"
+            className="flex items-center justify-center overflow-hidden rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+          >
+            <Plus className="size-4 shrink-0" />
+          </Link>
+        ) : null}
       </nav>
+
+      {!collapsed ? <ConversationSwitcher variant="sidebar" /> : null}
     </aside>
   );
 }

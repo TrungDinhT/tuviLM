@@ -19,7 +19,7 @@ import { HourSelect } from '@/components/shared/hour-select';
 import { MinuteSelect } from '@/components/shared/minute-select';
 import { useBuildLaso, useCreateChartSession } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
-import { useChartStore, type HistoryEntry } from '@/store/chart-store';
+import { useChartStore } from '@/store/chart-store';
 import type { BuildLasoResponse, Gender } from '@/lib/api/schemas';
 import { BirthFormSchema, toApiRequest, toBirthInput } from '../schema';
 
@@ -38,11 +38,9 @@ export function BirthForm() {
   const ownerId = useChartStore((s) => s.ownerId);
   const setConversationContext = useChartStore((s) => s.setConversationContext);
   const setCurrent = useChartStore((s) => s.setCurrent);
-  const addToHistory = useChartStore((s) => s.addToHistory);
 
   // Landing form always renders in default state — no prefill from the store,
-  // even when a previous chart exists. Submitting still writes to the store
-  // and to history; this is read-side only.
+  // even when a previous chart exists.
   const [values, setValues] = useState<DraftValues>(() => ({
     name: '',
     dateOf: undefined,
@@ -63,13 +61,6 @@ export function BirthForm() {
 
   const handleBuildSuccess = (input: ReturnType<typeof toBirthInput>, response: BuildLasoResponse) => {
     setCurrent(input, response);
-    const entry: HistoryEntry = {
-      id: response.id,
-      builtAt: Date.now(),
-      input,
-      response,
-    };
-    addToHistory(entry);
     router.push('/chat');
   };
 

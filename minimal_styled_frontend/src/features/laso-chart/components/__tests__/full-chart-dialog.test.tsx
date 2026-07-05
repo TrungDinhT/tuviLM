@@ -58,7 +58,6 @@ beforeEach(() => {
     current: makeResponse(true),
     saoLuuOverlay: null,
     selectedCungPosition: null,
-    history: [],
   });
 });
 

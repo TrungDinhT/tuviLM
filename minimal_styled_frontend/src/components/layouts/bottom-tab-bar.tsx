@@ -2,13 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { History, Sparkles, User } from 'lucide-react';
+import { Sparkles, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const TABS = [
   { href: '/chat', label: 'Đọc', icon: Sparkles },
-  { href: '/history', label: 'Lưu', icon: History },
-  { href: '/', label: 'Hồ sơ', icon: User },
+  { href: '/', label: 'Lá số', icon: User },
 ] as const;
 
 export function BottomTabBar() {
