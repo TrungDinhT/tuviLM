@@ -38,7 +38,7 @@ export function SaoLuuPicker() {
       mutate(
         {
           observation_time: {
-            date: 1,
+            day: 1,
             month: 1,
             year: parsedYear,
             hour: 0,

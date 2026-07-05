@@ -4,7 +4,7 @@ export const GenderSchema = z.enum(['M', 'F']);
 export type Gender = z.infer<typeof GenderSchema>;
 
 export const TuviTimeSchema = z.object({
-  date: z.number().int().min(1).max(31),
+  day: z.number().int().min(1).max(31),
   month: z.number().int().min(1).max(12),
   year: z.number().int().min(1900).max(2099),
   hour: z.number().int().min(0).max(23),
@@ -57,6 +57,63 @@ export const BuildSaoLuuResponseSchema = z.object({
   cung_by_position: z.record(z.string(), CungSchema),
 });
 export type BuildSaoLuuResponse = z.infer<typeof BuildSaoLuuResponseSchema>;
+
+export const CreateAnonymousResponseSchema = z.object({
+  owner_id: z.string(),
+});
+export type CreateAnonymousResponse = z.infer<typeof CreateAnonymousResponseSchema>;
+
+export const CreateChartProfileRequestSchema = z.object({
+  display_name: z.string(),
+  birth_info: TuviTimeSchema.extend({
+    calendar: z.literal('solar'),
+  }),
+});
+export type CreateChartProfileRequest = z.infer<typeof CreateChartProfileRequestSchema>;
+
+export const ChartProfileSchema = z.object({
+  id: z.string(),
+  display_name: z.string(),
+  birth_info: CreateChartProfileRequestSchema.shape.birth_info,
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export type ChartProfile = z.infer<typeof ChartProfileSchema>;
+
+export const CreateChartProfileResponseSchema = z.object({
+  chart_profile: ChartProfileSchema,
+});
+export type CreateChartProfileResponse = z.infer<typeof CreateChartProfileResponseSchema>;
+
+export const ChatMessageSchema = z.object({
+  id: z.string(),
+  role: z.enum(['user', 'assistant']),
+  content: z.string(),
+  status: z.enum(['pending', 'confirmed', 'failed', 'cancelled']),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export type PersistedChatMessage = z.infer<typeof ChatMessageSchema>;
+
+export const ChatSessionSchema = z.object({
+  id: z.string(),
+  chart_profile_id: z.string(),
+  title: z.string().nullable(),
+  messages: z.array(ChatMessageSchema),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export type ChatSession = z.infer<typeof ChatSessionSchema>;
+
+export const CreateSessionRequestSchema = z.object({
+  title: z.string().nullable(),
+});
+export type CreateSessionRequest = z.infer<typeof CreateSessionRequestSchema>;
+
+export const CreateSessionResponseSchema = z.object({
+  session: ChatSessionSchema,
+});
+export type CreateSessionResponse = z.infer<typeof CreateSessionResponseSchema>;
 
 export const ChatRequestSchema = z.object({
   message: z.string(),

@@ -52,7 +52,7 @@ export function toBirthInput(values: BirthFormValues): BirthInput {
 
 export function toApiRequest(input: BirthInput): BuildLasoRequest {
   return {
-    date: input.date,
+    day: input.date,
     month: input.month,
     year: input.year,
     hour: input.hour,

@@ -7,6 +7,11 @@ import {
   ChatRequestSchema,
   ChatResponseSchema,
   CungSchema,
+  CreateAnonymousResponseSchema,
+  CreateChartProfileRequestSchema,
+  CreateChartProfileResponseSchema,
+  CreateSessionRequestSchema,
+  CreateSessionResponseSchema,
   NO_LASO_SENTINEL,
 } from '../schemas';
 import fixture from '../__fixtures__/build-laso.json';
@@ -14,7 +19,7 @@ import fixture from '../__fixtures__/build-laso.json';
 describe('BuildLasoRequestSchema', () => {
   it('accepts a valid request', () => {
     const r = BuildLasoRequestSchema.safeParse({
-      date: 14,
+      day: 14,
       month: 8,
       year: 1991,
       hour: 6,
@@ -24,15 +29,15 @@ describe('BuildLasoRequestSchema', () => {
   });
 
   it.each([
-    { field: 'date', value: 0 },
-    { field: 'date', value: 32 },
+    { field: 'day', value: 0 },
+    { field: 'day', value: 32 },
     { field: 'month', value: 13 },
     { field: 'year', value: 1800 },
     { field: 'year', value: 2200 },
     { field: 'hour', value: 24 },
     { field: 'gender', value: 'X' },
   ])('rejects out-of-range $field=$value', ({ field, value }) => {
-    const base = { date: 14, month: 8, year: 1991, hour: 6, gender: 'F' as const };
+    const base = { day: 14, month: 8, year: 1991, hour: 6, gender: 'F' as const };
     const r = BuildLasoRequestSchema.safeParse({ ...base, [field]: value });
     expect(r.success).toBe(false);
   });
@@ -41,14 +46,14 @@ describe('BuildLasoRequestSchema', () => {
 describe('BuildSaoLuuRequestSchema', () => {
   it('accepts a valid wrapped observation_time', () => {
     const r = BuildSaoLuuRequestSchema.safeParse({
-      observation_time: { date: 1, month: 1, year: 2026, hour: 8, gender: 'M' },
+      observation_time: { day: 1, month: 1, year: 2026, hour: 8, gender: 'M' },
     });
     expect(r.success).toBe(true);
   });
 
   it('rejects an unwrapped time', () => {
     const r = BuildSaoLuuRequestSchema.safeParse({
-      date: 1, month: 1, year: 2026, hour: 8, gender: 'M',
+      day: 1, month: 1, year: 2026, hour: 8, gender: 'M',
     });
     expect(r.success).toBe(false);
   });
@@ -97,6 +102,58 @@ describe('ChatRequestSchema', () => {
 
   it('rejects a missing message', () => {
     expect(ChatRequestSchema.safeParse({}).success).toBe(false);
+  });
+});
+
+describe('new conversation schemas', () => {
+  it('accepts an anonymous owner response', () => {
+    expect(CreateAnonymousResponseSchema.safeParse({ owner_id: 'anon_123' }).success).toBe(true);
+  });
+
+  it('accepts a chart profile create request', () => {
+    const r = CreateChartProfileRequestSchema.safeParse({
+      display_name: 'Linh',
+      birth_info: {
+        calendar: 'solar',
+        day: 14,
+        month: 8,
+        year: 1991,
+        hour: 6,
+        gender: 'F',
+      },
+    });
+    expect(r.success).toBe(true);
+  });
+
+  it('accepts chart profile and session responses', () => {
+    const chartProfile = {
+      id: 'profile_1',
+      display_name: 'Linh',
+      birth_info: {
+        calendar: 'solar',
+        day: 14,
+        month: 8,
+        year: 1991,
+        hour: 6,
+        gender: 'F',
+      },
+      created_at: '2026-07-05T00:00:00Z',
+      updated_at: '2026-07-05T00:00:00Z',
+    };
+    expect(CreateChartProfileResponseSchema.safeParse({ chart_profile: chartProfile }).success).toBe(true);
+    expect(CreateSessionRequestSchema.safeParse({ title: 'Linh' }).success).toBe(true);
+    expect(
+      CreateSessionResponseSchema.safeParse({
+        session: {
+          id: 'session_1',
+          chart_profile_id: 'profile_1',
+          title: 'Linh',
+          messages: [],
+          created_at: '2026-07-05T00:00:00Z',
+          updated_at: '2026-07-05T00:00:00Z',
+        },
+      }).success,
+    ).toBe(true);
   });
 });
 

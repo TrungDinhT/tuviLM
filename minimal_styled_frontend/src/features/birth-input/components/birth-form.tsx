@@ -17,10 +17,10 @@ import { DateInput } from '@/components/shared/date-input';
 import { GenderControl } from '@/components/shared/gender-control';
 import { HourSelect } from '@/components/shared/hour-select';
 import { MinuteSelect } from '@/components/shared/minute-select';
-import { useBuildLaso } from '@/lib/api/hooks';
+import { useBuildLaso, useCreateChartSession } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
 import { useChartStore, type HistoryEntry } from '@/store/chart-store';
-import type { Gender } from '@/lib/api/schemas';
+import type { BuildLasoResponse, Gender } from '@/lib/api/schemas';
 import { BirthFormSchema, toApiRequest, toBirthInput } from '../schema';
 
 interface DraftValues {
@@ -35,6 +35,8 @@ type FieldErrors = Partial<Record<keyof DraftValues, string>>;
 
 export function BirthForm() {
   const router = useRouter();
+  const ownerId = useChartStore((s) => s.ownerId);
+  const setConversationContext = useChartStore((s) => s.setConversationContext);
   const setCurrent = useChartStore((s) => s.setCurrent);
   const addToHistory = useChartStore((s) => s.addToHistory);
 
@@ -52,10 +54,23 @@ export function BirthForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const mutation = useBuildLaso();
+  const sessionMutation = useCreateChartSession();
 
   const update = <K extends keyof DraftValues>(key: K, value: DraftValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
+  };
+
+  const handleBuildSuccess = (input: ReturnType<typeof toBirthInput>, response: BuildLasoResponse) => {
+    setCurrent(input, response);
+    const entry: HistoryEntry = {
+      id: response.id,
+      builtAt: Date.now(),
+      input,
+      response,
+    };
+    addToHistory(entry);
+    router.push('/chat');
   };
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
@@ -74,22 +89,25 @@ export function BirthForm() {
       return;
     }
     const input = toBirthInput(parsed.data);
-    mutation.mutate(toApiRequest(input), {
-      onSuccess: (response) => {
-        setCurrent(input, response);
-        const entry: HistoryEntry = {
-          id: response.id,
-          builtAt: Date.now(),
-          input,
-          response,
-        };
-        addToHistory(entry);
-        router.push('/chat');
+    const apiInput = toApiRequest(input);
+    const displayName = input.name ?? 'Không tên';
+    sessionMutation.mutate(
+      { ownerId, displayName, birthInfo: apiInput },
+      {
+        onSuccess: ({ ownerId, chartProfileId, sessionId }) => {
+          setConversationContext(ownerId, chartProfileId, sessionId);
+          mutation.mutate(apiInput, {
+            onSuccess: (response) => handleBuildSuccess(input, response),
+            onError: (err) => {
+              setSubmitError(isApiError(err) ? apiErrorMessage(err) : 'Đã có lỗi xảy ra.');
+            },
+          });
+        },
+        onError: (err) => {
+          setSubmitError(isApiError(err) ? apiErrorMessage(err) : 'Đã có lỗi xảy ra.');
+        },
       },
-      onError: (err) => {
-        setSubmitError(isApiError(err) ? apiErrorMessage(err) : 'Đã có lỗi xảy ra.');
-      },
-    });
+    );
   };
 
   return (
@@ -167,8 +185,12 @@ export function BirthForm() {
           <span className="text-xs text-muted-foreground">
             Thông tin chỉ dùng để an lá số cho bạn.
           </span>
-          <Button type="submit" size="lg" disabled={mutation.isPending}>
-            {mutation.isPending ? (
+          <Button
+            type="submit"
+            size="lg"
+            disabled={sessionMutation.isPending || mutation.isPending}
+          >
+            {sessionMutation.isPending || mutation.isPending ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
                 Đang an lá số…

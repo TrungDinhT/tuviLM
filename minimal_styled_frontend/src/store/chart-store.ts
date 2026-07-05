@@ -1,14 +1,19 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type {
-  BuildLasoRequest,
   BuildLasoResponse,
   BuildSaoLuuResponse,
+  Gender,
 } from '@/lib/api/schemas';
 
-export type BirthInput = BuildLasoRequest & {
+export interface BirthInput {
+  date: number;
+  month: number;
+  year: number;
+  hour: number;
+  gender: Gender;
   name?: string;
-};
+}
 
 export interface HistoryEntry {
   id: string;
@@ -18,12 +23,16 @@ export interface HistoryEntry {
 }
 
 interface ChartState {
+  ownerId: string | null;
+  chartProfileId: string | null;
+  sessionId: string | null;
   lastInput: BirthInput | null;
   current: BuildLasoResponse | null;
   saoLuuOverlay: BuildSaoLuuResponse | null;
   selectedCungPosition: string | null;
   history: HistoryEntry[];
 
+  setConversationContext: (ownerId: string, chartProfileId: string, sessionId: string) => void;
   setCurrent: (input: BirthInput, response: BuildLasoResponse) => void;
   setSaoLuuOverlay: (overlay: BuildSaoLuuResponse) => void;
   clearSaoLuu: () => void;
@@ -38,11 +47,17 @@ const HISTORY_CAP = 20;
 export const useChartStore = create<ChartState>()(
   persist(
     (set) => ({
+      ownerId: null,
+      chartProfileId: null,
+      sessionId: null,
       lastInput: null,
       current: null,
       saoLuuOverlay: null,
       selectedCungPosition: null,
       history: [],
+
+      setConversationContext: (ownerId, chartProfileId, sessionId) =>
+        set({ ownerId, chartProfileId, sessionId }),
 
       setCurrent: (input, response) =>
         set({
@@ -83,6 +98,9 @@ export const useChartStore = create<ChartState>()(
       name: 'tuvilm:store:v1',
       version: 1,
       partialize: (state) => ({
+        ownerId: state.ownerId,
+        chartProfileId: state.chartProfileId,
+        sessionId: state.sessionId,
         lastInput: state.lastInput,
         current: state.current,
         history: state.history,

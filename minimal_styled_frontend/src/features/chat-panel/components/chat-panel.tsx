@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useChartStore } from '@/store/chart-store';
 import { useChat } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
+import { toApiRequest } from '@/features/birth-input/schema';
 import { INITIAL_GREETING, QUICK_PROMPTS, type ChatMessage } from '../data';
 import { MessageBubble } from './message-bubble';
 
@@ -47,7 +48,7 @@ export function ChatPanel() {
     chat.mutate(
       {
         message,
-        lastInput,
+        lastInput: lastInput ? toApiRequest(lastInput) : null,
         applyBuildResponse: (resp) => {
           if (lastInput) setCurrent(lastInput, resp);
         },

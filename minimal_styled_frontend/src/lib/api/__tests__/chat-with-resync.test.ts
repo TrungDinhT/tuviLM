@@ -5,7 +5,7 @@ import type { BuildLasoRequest, BuildLasoResponse, ChatResponse } from '../schem
 import { isApiError } from '@/lib/http/errors';
 
 const INPUT: BuildLasoRequest = {
-  date: 14,
+  day: 14,
   month: 8,
   year: 1991,
   hour: 6,

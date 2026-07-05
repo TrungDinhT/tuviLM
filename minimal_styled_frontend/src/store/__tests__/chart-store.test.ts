@@ -17,6 +17,9 @@ function makeEntry(id: string, builtAt = Date.now()): HistoryEntry {
 beforeEach(() => {
   localStorage.clear();
   useChartStore.setState({
+    ownerId: null,
+    chartProfileId: null,
+    sessionId: null,
     lastInput: null,
     current: null,
     saoLuuOverlay: null,
@@ -26,6 +29,15 @@ beforeEach(() => {
 });
 
 describe('useChartStore', () => {
+  it('setConversationContext writes owner/profile/session ids', () => {
+    useChartStore.getState().setConversationContext('anon_1', 'profile_1', 'session_1');
+    expect(useChartStore.getState()).toMatchObject({
+      ownerId: 'anon_1',
+      chartProfileId: 'profile_1',
+      sessionId: 'session_1',
+    });
+  });
+
   it('setCurrent writes input + response and clears overlay/selection', () => {
     useChartStore.setState({
       saoLuuOverlay: { cung_by_position: {} },
@@ -88,10 +100,21 @@ describe('useChartStore', () => {
   });
 
   it('persists across rehydrate via localStorage', () => {
+    useChartStore.getState().setConversationContext('anon_1', 'profile_1', 'session_1');
     useChartStore.getState().setCurrent(INPUT, fixture as BuildLasoResponse);
     const raw = localStorage.getItem('tuvilm:store:v1');
     expect(raw).not.toBeNull();
-    const parsed = JSON.parse(raw!) as { state: { current: BuildLasoResponse | null } };
+    const parsed = JSON.parse(raw!) as {
+      state: {
+        ownerId: string | null;
+        chartProfileId: string | null;
+        sessionId: string | null;
+        current: BuildLasoResponse | null;
+      };
+    };
+    expect(parsed.state.ownerId).toBe('anon_1');
+    expect(parsed.state.chartProfileId).toBe('profile_1');
+    expect(parsed.state.sessionId).toBe('session_1');
     expect(parsed.state.current?.ban_menh_name).toBe(fixture.ban_menh_name);
   });
 });
