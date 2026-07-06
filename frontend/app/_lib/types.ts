@@ -35,6 +35,7 @@ export interface BuildLasoRequest {
 }
 
 export interface BuildSaoLuuRequest {
+  birth_info: BuildLasoRequest;
   observation_time: BuildLasoRequest;
 }
 

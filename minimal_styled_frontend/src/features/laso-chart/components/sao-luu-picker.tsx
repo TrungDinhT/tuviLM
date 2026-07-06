@@ -34,15 +34,25 @@ export function SaoLuuPicker() {
       return;
     }
     const handle = setTimeout(() => {
+      if (!lastInput) {
+        return;
+      }
       setApiError(null);
       mutate(
         {
+          birth_info: {
+            day: lastInput.date,
+            month: lastInput.month,
+            year: lastInput.year,
+            hour: lastInput.hour,
+            gender: lastInput.gender,
+          },
           observation_time: {
             day: 1,
             month: 1,
             year: parsedYear,
             hour: 0,
-            gender: lastInput?.gender ?? 'M',
+            gender: lastInput.gender,
           },
         },
         {
@@ -53,7 +63,7 @@ export function SaoLuuPicker() {
       );
     }, 300);
     return () => clearTimeout(handle);
-  }, [year, lastInput?.gender, mutate, setOverlay]);
+  }, [year, lastInput, mutate, setOverlay]);
 
   return (
     <div className="flex flex-col gap-3">

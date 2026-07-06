@@ -54,15 +54,23 @@ curl -X POST http://localhost:8000/api/v1/laso/build \
   }'
 ```
 
-## Build sao lưu from server state
+## Build sao lưu
 
 `/api/v1/laso/build_sao_luu` takes:
+- `birth_info`: same shape as build time (`day/month/year/hour/gender`)
 - `observation_time`: same shape as build time (`day/month/year/hour/gender`)
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/laso/build_sao_luu \
   -H "Content-Type: application/json" \
   -d '{
+    "birth_info": {
+      "day": 4,
+      "month": 4,
+      "year": 1998,
+      "hour": 8,
+      "gender": "M"
+    },
     "observation_time": {
       "day": 8,
       "month": 3,

@@ -41,6 +41,7 @@ export type LasoData = {
 };
 
 export type BuildSaoLuuInput = {
+  birthInfo: TuviTimeInput;
   observationTime: TuviTimeInput;
 };
 

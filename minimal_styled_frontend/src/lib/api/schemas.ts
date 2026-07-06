@@ -16,6 +16,7 @@ export const BuildLasoRequestSchema = TuviTimeSchema;
 export type BuildLasoRequest = z.infer<typeof BuildLasoRequestSchema>;
 
 export const BuildSaoLuuRequestSchema = z.object({
+  birth_info: TuviTimeSchema,
   observation_time: TuviTimeSchema,
 });
 export type BuildSaoLuuRequest = z.infer<typeof BuildSaoLuuRequestSchema>;

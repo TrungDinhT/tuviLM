@@ -16,7 +16,7 @@ import { clearStash, loadStash, saveStash } from "../_lib/session-store";
 import { SUGGESTED_CHIPS } from "../_data/chat-suggestions";
 import { useStreamChat } from "@/services/api/v1/chat/send";
 import { getChatSession, type ChatMessagePayload } from "@/services/api/v1/conversation-history";
-import { buildLaso, buildSaoLuu } from "@/services/api/v1/laso/build";
+import { buildSaoLuu } from "@/services/api/v1/laso/build";
 import { StickToBottom } from "use-stick-to-bottom";
 import { getSaoDetail } from "../_data/mock-stars";
 import { Chart } from "./Chart";
@@ -235,8 +235,8 @@ export function MobileChartView() {
       setSaoLuuError(null);
       try {
         const birthInfo = buildRequestFromProfile(stash.profile);
-        await buildLaso(birthInfo);
         const overlay = await buildSaoLuu({
+          birth_info: birthInfo,
           observation_time: {
             day: 1,
             month: 1,

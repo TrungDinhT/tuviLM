@@ -43,8 +43,9 @@ describe('BuildLasoRequestSchema', () => {
 });
 
 describe('BuildSaoLuuRequestSchema', () => {
-  it('accepts a valid wrapped observation_time', () => {
+  it('accepts valid birth_info and observation_time', () => {
     const r = BuildSaoLuuRequestSchema.safeParse({
+      birth_info: { day: 1, month: 1, year: 1990, hour: 8, gender: 'M' },
       observation_time: { day: 1, month: 1, year: 2026, hour: 8, gender: 'M' },
     });
     expect(r.success).toBe(true);

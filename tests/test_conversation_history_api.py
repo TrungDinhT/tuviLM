@@ -149,6 +149,33 @@ async def test_build_laso_accepts_birth_info_day_field(api_client) -> None:
     assert response.json()["summary"] == "Sinh dương lịch: 15/04/1996 10:00"
 
 
+async def test_build_sao_luu_uses_birth_info_without_server_state(api_client) -> None:
+    response = await api_client.post(
+        "/api/v1/laso/build_sao_luu",
+        json={
+            "birth_info": {
+                "year": 1996,
+                "month": 4,
+                "day": 15,
+                "hour": 10,
+                "gender": "M",
+            },
+            "observation_time": {
+                "year": 2026,
+                "month": 1,
+                "day": 1,
+                "hour": 0,
+                "gender": "M",
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    cung_by_position = response.json()["cung_by_position"]
+    assert len(cung_by_position) == 12
+    assert any(cung["saoLuu"] for cung in cung_by_position.values())
+
+
 async def test_create_anonymous_owner_returns_owner_id(api_client) -> None:
     response = await api_client.post("/api/v1/anonymous")
 

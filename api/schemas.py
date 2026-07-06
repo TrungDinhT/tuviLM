@@ -12,6 +12,7 @@ class BuildLasoRequest(BirthInfo):
 
 
 class BuildSaoLuuRequest(BaseModel):
+    birth_info: BirthInfo
     observation_time: BirthInfo
 
 
