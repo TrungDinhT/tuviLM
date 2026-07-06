@@ -1,72 +1,170 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Eyebrow } from "./Eyebrow";
-import { Btn, Chip } from "./Buttons";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import type { BuildLasoRequest, SessionStash, UserProfile } from "../_lib/types";
+import { buildLaso } from "@/services/api/v1/laso/build";
 import {
   createChatSession,
+  deleteChartProfile,
+  deleteChatSession,
+  listChartProfiles,
   listChatSessions,
+  type ChartProfilePayload,
   type ChatSessionSummaryPayload,
 } from "@/services/api/v1/conversation-history";
+import { Eyebrow } from "./Eyebrow";
+import { Btn } from "./Buttons";
 
 interface LichSuDrawerProps {
-  ownerId?: string;
-  chartProfileId?: string;
-  currentSessionId?: string;
-  onSessionChange: (sessionId: string) => void;
+  stash: SessionStash;
+  onSessionChange: (stash: SessionStash) => void;
+  onCurrentDeleted: () => void;
   onClose: () => void;
 }
 
 export function LichSuDrawer({
-  ownerId,
-  chartProfileId,
-  currentSessionId,
+  stash,
   onSessionChange,
+  onCurrentDeleted,
   onClose,
 }: LichSuDrawerProps) {
-  const [sessions, setSessions] = useState<ChatSessionSummaryPayload[]>([]);
+  const router = useRouter();
+  const ownerId = stash.ownerId;
+  const [profiles, setProfiles] = useState<ChartProfilePayload[] | null>(null);
+  const [sessionsByProfile, setSessionsByProfile] = useState<Record<string, ChatSessionSummaryPayload[]>>({});
+  const [expandedProfileId, setExpandedProfileId] = useState<string | null>(stash.chartProfileId ?? null);
+  const [profileReload, setProfileReload] = useState(0);
+  const [sessionReload, setSessionReload] = useState(0);
+  const [mutating, setMutating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    if (!ownerId || !chartProfileId) return;
+    if (!ownerId) return;
 
     let cancelled = false;
-    void listChatSessions({ ownerId, chartProfileId })
+    void listChartProfiles({ ownerId })
       .then((items) => {
         if (cancelled) return;
+        const sorted = sortProfiles(items);
+        setProfiles(sorted);
         setError(null);
-        setSessions(items);
+        setExpandedProfileId((current) => {
+          if (current && sorted.some((p) => p.id === current)) return current;
+          if (stash.chartProfileId && sorted.some((p) => p.id === stash.chartProfileId)) {
+            return stash.chartProfileId;
+          }
+          return sorted[0]?.id ?? null;
+        });
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Không tải được lịch sử");
+        if (!cancelled) setError(errorMessage(err, "Không tải được hồ sơ lá số"));
       });
 
     return () => {
       cancelled = true;
     };
-  }, [ownerId, chartProfileId]);
+  }, [ownerId, stash.chartProfileId, profileReload]);
 
-  const grouped = useMemo(() => groupSessions(sessions), [sessions]);
-  const messageCount = sessions.reduce((acc, item) => acc + item.message_count, 0);
+  useEffect(() => {
+    if (!ownerId || !expandedProfileId) return;
 
-  async function startNewSession() {
-    if (!ownerId || !chartProfileId || creating) return;
-
-    setCreating(true);
-    try {
-      const sessionId = await createChatSession({
-        ownerId,
-        chartProfileId,
-        idempotencyKey: clientOperationId(),
-        title: "Phiên mới",
+    let cancelled = false;
+    void listChatSessions({ ownerId, chartProfileId: expandedProfileId })
+      .then((items) => {
+        if (cancelled) return;
+        setError(null);
+        setSessionsByProfile((current) => ({
+          ...current,
+          [expandedProfileId]: sortSessions(items),
+        }));
+      })
+      .catch((err) => {
+        if (!cancelled) setError(errorMessage(err, "Không tải được phiên trò chuyện"));
       });
-      onSessionChange(sessionId);
+    return () => {
+      cancelled = true;
+    };
+  }, [ownerId, expandedProfileId, sessionReload]);
+
+  async function openSession(profile: ChartProfilePayload, sessionId: string | null) {
+    if (!ownerId || mutating) return;
+
+    setMutating(true);
+    setError(null);
+    try {
+      const openedSessionId =
+        sessionId ??
+        (await createChatSession({
+          ownerId,
+          chartProfileId: profile.id,
+          idempotencyKey: clientOperationId(),
+          title: displayName(profile),
+        }));
+      const laso = await buildLaso(toBuildLasoRequest(profile.birth_info));
+      onSessionChange({
+        laso,
+        profile: toUserProfile(profile, stash),
+        ownerId,
+        chartProfileId: profile.id,
+        sessionId: openedSessionId,
+        fetchedAt: new Date().toISOString(),
+      });
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Không tạo được phiên mới");
+      setError(errorMessage(err, "Không mở được phiên trò chuyện"));
     } finally {
-      setCreating(false);
+      setMutating(false);
+    }
+  }
+
+  async function removeProfile(profile: ChartProfilePayload) {
+    if (!ownerId || mutating) return;
+    if (!window.confirm(`Xóa toàn bộ hồ sơ "${displayName(profile)}" và các phiên trò chuyện?`)) return;
+
+    setMutating(true);
+    setError(null);
+    try {
+      await deleteChartProfile({ ownerId, chartProfileId: profile.id });
+      setProfiles((items) => (items ?? []).filter((item) => item.id !== profile.id));
+      setSessionsByProfile((items) => {
+        const next = { ...items };
+        delete next[profile.id];
+        return next;
+      });
+      if (stash.chartProfileId === profile.id) {
+        onCurrentDeleted();
+        return;
+      }
+      setProfileReload((value) => value + 1);
+    } catch (err) {
+      setError(errorMessage(err, "Không xoá được hồ sơ lá số"));
+    } finally {
+      setMutating(false);
+    }
+  }
+
+  async function removeSession(profileId: string, sessionId: string) {
+    if (!ownerId || mutating) return;
+    if (!window.confirm("Xóa phiên trò chuyện này?")) return;
+
+    setMutating(true);
+    setError(null);
+    try {
+      await deleteChatSession({ ownerId, sessionId });
+      setSessionsByProfile((items) => ({
+        ...items,
+        [profileId]: (items[profileId] ?? []).filter((item) => item.id !== sessionId),
+      }));
+      if (stash.sessionId === sessionId) {
+        onCurrentDeleted();
+        return;
+      }
+      setSessionReload((value) => value + 1);
+    } catch (err) {
+      setError(errorMessage(err, "Không xoá được phiên trò chuyện"));
+    } finally {
+      setMutating(false);
     }
   }
 
@@ -80,16 +178,15 @@ export function LichSuDrawer({
         className="absolute top-0 left-0 bottom-0 w-[560px] max-w-[90vw] bg-[rgba(255,252,245,0.99)] border-r-[1.5px] border-[var(--color-ink)] flex flex-col anim-slide-left"
         style={{ boxShadow: "24px 0 64px rgba(26,22,17,0.18)" }}
       >
-        {/* Header */}
         <div className="px-8 pt-6 pb-4 border-b border-[rgba(26,22,17,0.14)]">
-          <div className="flex justify-between items-start">
+          <div className="flex justify-between items-start gap-4">
             <div>
-              <Eyebrow>Phiên đã hỏi</Eyebrow>
+              <Eyebrow>Hồ sơ đã lưu</Eyebrow>
               <h2 id="lichsu-title" className="font-serif text-[32px] font-medium mt-1 tracking-[-0.3px]">
                 Sổ tay trò chuyện
               </h2>
               <div className="text-[12px] text-[var(--color-ink-3)] mt-1">
-                {sessions.length} phiên · {messageCount} tin đã lưu
+                {profiles?.length ?? 0} lá số backend
               </div>
             </div>
             <Btn variant="ghost" className="text-[16px]" onClick={onClose} aria-label="Đóng">✕</Btn>
@@ -97,105 +194,209 @@ export function LichSuDrawer({
 
           <div className="flex items-center gap-3 mt-4">
             <span className="text-[11px] text-[var(--color-ink-3)] uppercase tracking-[1px]">Lá số</span>
-            <div className="px-3.5 py-1.5 border border-[rgba(26,22,17,0.32)] bg-[var(--color-paper)] font-serif text-[16px] flex items-center gap-2 cursor-pointer">
-              Vũ Duy Khanh <span className="text-[var(--color-ink-3)] text-[11px]">▾</span>
-            </div>
-            <Btn variant="ghost" className="text-[12px]">＋ thêm lá số</Btn>
-          </div>
-
-          <div className="mt-3.5">
-            <div
-              className="flex-1 px-3.5 py-2 border border-[rgba(26,22,17,0.14)] flex items-center gap-2 font-serif italic text-[15px] text-[var(--color-ink-3)]"
-              style={{ background: "rgba(255,252,245,0.6)" }}
+            <Btn
+              type="button"
+              variant="ghost"
+              className="text-[12px]"
+              onClick={() => {
+                onClose();
+                router.push("/");
+              }}
             >
-              <span className="text-[12px]" aria-hidden="true">🔍</span>
-              <span>Tìm câu hỏi, cung, sao…</span>
-            </div>
-          </div>
-          <div className="flex gap-1.5 mt-2.5 flex-wrap">
-            <Chip variant="active" className="text-[11px]">Tất cả</Chip>
-            <Chip className="text-[11px]">Sự nghiệp</Chip>
-            <Chip className="text-[11px]">Tình duyên</Chip>
-            <Chip className="text-[11px]">Sức khoẻ</Chip>
-            <Chip className="text-[11px]">★ Đã lưu</Chip>
+              ＋ thêm lá số
+            </Btn>
           </div>
         </div>
 
-        {/* Session list */}
         <div className="flex-1 py-2 overflow-auto">
+          {!ownerId && (
+            <div className="px-8 py-4 font-serif italic text-[14px] text-[var(--color-ink-3)]">
+              An lại lá số để tạo hồ sơ backend.
+            </div>
+          )}
           {error && (
-            <div className="px-8 py-4 font-serif italic text-[14px] text-[var(--color-crimson)]">
+            <div className="px-8 py-4 font-serif italic text-[14px] text-[var(--color-crimson)]" role="alert">
               {error}
             </div>
           )}
-          {!error && grouped.length === 0 && (
+          {ownerId && profiles === null && (
             <div className="px-8 py-4 font-serif italic text-[14px] text-[var(--color-ink-3)]">
-              Chưa có phiên trò chuyện nào.
+              Đang tải hồ sơ...
             </div>
           )}
-          {grouped.map((s) => (
-            <div key={`day-${s.date}`}>
-              <div className="px-8 pt-3.5 pb-1.5 text-[10px] text-[var(--color-ink-3)] font-semibold tracking-[1.5px] uppercase flex items-baseline gap-3">
-                <span>{s.date}</span>
-                <span className="flex-1 h-px bg-[var(--color-paper-3)]" />
-              </div>
-              {s.items.map((it) => (
-                <button
-                  key={it.id}
-                  type="button"
-                  onClick={() => {
-                    onSessionChange(it.id);
-                    onClose();
-                  }}
-                  className="w-full text-left px-8 py-3 cursor-pointer transition-colors"
-                  style={{
-                    borderLeft: it.id === currentSessionId ? "3px solid var(--color-crimson)" : "3px solid transparent",
-                    background: it.id === currentSessionId ? "rgba(139,42,31,0.06)" : "transparent",
-                  }}
-                >
-                  <div className="flex justify-between items-baseline gap-3">
-                    <div className="flex-1">
-                      <div className="font-serif text-[17px] leading-[1.3] text-[var(--color-ink)]">
-                        {it.starred && <span className="text-[var(--color-gold)] mr-1.5">★</span>}
-                        {it.title}
-                      </div>
-                    </div>
-                    <span className="text-[11px] text-[var(--color-ink-3)] font-serif">{it.time}</span>
-                  </div>
-                  <div className="flex gap-2 mt-1.5 items-center text-[11.5px] text-[var(--color-ink-3)]">
-                    <span
-                      className="px-2 py-px border border-[rgba(26,22,17,0.14)] text-[10px] tracking-[0.3px] text-[var(--color-crimson)]"
-                      style={{ background: "rgba(255,252,245,0.8)" }}
-                    >
-                      {it.label}
-                    </span>
-                    <span className="font-serif italic text-[12px]">{it.updated}</span>
-                    <span className="ml-auto">{it.messageCount} tin</span>
-                  </div>
-                </button>
-              ))}
+          {ownerId && profiles?.length === 0 && (
+            <div className="px-8 py-4 font-serif italic text-[14px] text-[var(--color-ink-3)]">
+              Chưa có hồ sơ lá số nào.
             </div>
-          ))}
-        </div>
+          )}
 
-        {/* Footer */}
-        <div
-          className="px-8 py-4 border-t border-[rgba(26,22,17,0.14)] flex gap-2.5"
-          style={{ background: "var(--color-paper-2)" }}
-        >
-          <Btn
-            variant="crimson"
-            className="flex-1 justify-center text-[13px]"
-            onClick={startNewSession}
-            disabled={creating || !ownerId || !chartProfileId}
-          >
-            {creating ? "Đang tạo…" : "＋ Bắt đầu phiên mới"}
-          </Btn>
-          <Btn variant="ghost" className="text-[16px]" aria-label="Mở liên kết">↗</Btn>
+          {(profiles ?? []).map((profile) => {
+            const expanded = profile.id === expandedProfileId;
+            const currentProfile = profile.id === stash.chartProfileId;
+            const sessions = sessionsByProfile[profile.id];
+            const loadingSessions = sessions == null;
+            const sessionItems = sessions ?? [];
+
+            return (
+              <section key={profile.id} className="border-b border-[rgba(26,22,17,0.08)]">
+                <div className="flex items-stretch gap-1 px-6 py-2">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedProfileId(expanded ? null : profile.id)}
+                    className="min-w-0 flex-1 text-left px-2 py-2 cursor-pointer transition-colors hover:bg-[rgba(139,42,31,0.06)]"
+                  >
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[12px] text-[var(--color-ink-3)]">{expanded ? "▾" : "▸"}</span>
+                      <span className="min-w-0 flex-1 font-serif text-[18px] text-[var(--color-ink)] truncate">
+                        {displayName(profile)}
+                      </span>
+                      {currentProfile && (
+                        <span className="text-[10px] uppercase tracking-[1px] text-[var(--color-crimson)]">
+                          đang xem
+                        </span>
+                      )}
+                    </div>
+                    <div className="pl-5 text-[11px] text-[var(--color-ink-3)]">
+                      {formatBirth(profile)} · {formatDateTime(profile.updated_at)}
+                    </div>
+                  </button>
+                  <Btn
+                    type="button"
+                    variant="ghost"
+                    className="px-2 text-[15px]"
+                    aria-label={`Xóa hồ sơ ${displayName(profile)}`}
+                    disabled={mutating}
+                    onClick={() => void removeProfile(profile)}
+                  >
+                    ×
+                  </Btn>
+                </div>
+
+                {expanded && (
+                  <div className="ml-12 mr-6 mb-3 border-l border-[rgba(26,22,17,0.14)] pl-3">
+                    <Btn
+                      type="button"
+                      variant="default"
+                      className="w-full justify-center text-[12px] mb-2"
+                      disabled={mutating}
+                      onClick={() => void openSession(profile, null)}
+                    >
+                      ＋ Phiên mới
+                    </Btn>
+
+                    {loadingSessions && (
+                      <div className="py-2 text-[12px] text-[var(--color-ink-3)] font-serif italic">
+                        Đang tải phiên...
+                      </div>
+                    )}
+                    {!loadingSessions && sessionItems.length === 0 && (
+                      <div className="py-2 text-[12px] text-[var(--color-ink-3)] font-serif italic">
+                        Chưa có phiên.
+                      </div>
+                    )}
+                    {sessionItems.map((session) => {
+                      const active = session.id === stash.sessionId;
+                      return (
+                        <div key={session.id} className="flex items-stretch gap-1">
+                          <button
+                            type="button"
+                            disabled={mutating}
+                            onClick={() => void openSession(profile, session.id)}
+                            className="min-w-0 flex-1 text-left px-3 py-2 cursor-pointer disabled:opacity-50"
+                            style={{
+                              borderLeft: active ? "3px solid var(--color-crimson)" : "3px solid transparent",
+                              background: active ? "rgba(139,42,31,0.06)" : "transparent",
+                            }}
+                          >
+                            <div className="flex justify-between gap-3">
+                              <span className="min-w-0 flex-1 truncate font-serif text-[15px]">
+                                {session.title?.trim() || "Phiên trò chuyện"}
+                              </span>
+                              <span className="shrink-0 text-[11px] text-[var(--color-ink-3)]">
+                                {formatTime(session.updated_at)}
+                              </span>
+                            </div>
+                            <div className="mt-1 text-[11px] text-[var(--color-ink-3)]">
+                              {formatDateTime(session.updated_at)} · {session.message_count} tin
+                            </div>
+                          </button>
+                          <Btn
+                            type="button"
+                            variant="ghost"
+                            className="px-2 text-[14px]"
+                            aria-label="Xóa phiên trò chuyện"
+                            disabled={mutating}
+                            onClick={() => void removeSession(profile.id, session.id)}
+                          >
+                            ×
+                          </Btn>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+            );
+          })}
         </div>
       </div>
     </div>
   );
+}
+
+function sortProfiles(profiles: ChartProfilePayload[]): ChartProfilePayload[] {
+  return [...profiles].sort((a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at));
+}
+
+function sortSessions(sessions: ChatSessionSummaryPayload[]): ChatSessionSummaryPayload[] {
+  return [...sessions].sort((a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at));
+}
+
+function toBuildLasoRequest(birthInfo: ChartProfilePayload["birth_info"]): BuildLasoRequest {
+  const { day, month, year, hour, gender } = birthInfo;
+  return { day, month, year, hour, gender };
+}
+
+function toUserProfile(profile: ChartProfilePayload, current: SessionStash): UserProfile {
+  const cached = current.chartProfileId === profile.id ? current.profile : null;
+  return {
+    name: displayName(profile),
+    gender: profile.birth_info.gender,
+    calendar: cached?.calendar ?? "duong",
+    day: profile.birth_info.day,
+    month: profile.birth_info.month,
+    year: profile.birth_info.year,
+    hour: profile.birth_info.hour,
+    minute: cached?.minute ?? 0,
+  };
+}
+
+function displayName(profile: ChartProfilePayload): string {
+  return profile.display_name.trim() || "Không tên";
+}
+
+function formatBirth(profile: ChartProfilePayload): string {
+  const { day, month, year } = profile.birth_info;
+  return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+}
+
+function formatDateTime(raw: string): string {
+  const value = new Date(raw);
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(value);
+}
+
+function formatTime(raw: string): string {
+  const value = new Date(raw);
+  return new Intl.DateTimeFormat("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(value);
 }
 
 function clientOperationId(): string {
@@ -205,54 +406,6 @@ function clientOperationId(): string {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-interface GroupedSession {
-  date: string;
-  items: Array<{
-    id: string;
-    title: string;
-    time: string;
-    updated: string;
-    label: string;
-    messageCount: number;
-    starred: boolean;
-  }>;
-}
-
-function groupSessions(sessions: ChatSessionSummaryPayload[]): GroupedSession[] {
-  const groups = new Map<string, GroupedSession["items"]>();
-  const ordered = [...sessions].sort(
-    (a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at),
-  );
-
-  for (const session of ordered) {
-    const updatedAt = new Date(session.updated_at);
-    const key = formatDate(updatedAt);
-    const item = {
-      id: session.id,
-      title: session.title || "Phiên chưa đặt tên",
-      time: formatTime(updatedAt),
-      updated: "Cập nhật gần nhất",
-      label: "Phiên",
-      messageCount: session.message_count,
-      starred: false,
-    };
-    groups.set(key, [...(groups.get(key) ?? []), item]);
-  }
-
-  return [...groups.entries()].map(([date, items]) => ({ date, items }));
-}
-
-function formatDate(value: Date): string {
-  return new Intl.DateTimeFormat("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(value);
-}
-
-function formatTime(value: Date): string {
-  return new Intl.DateTimeFormat("vi-VN", {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(value);
+function errorMessage(err: unknown, fallback: string): string {
+  return err instanceof Error ? err.message : fallback;
 }

@@ -56,7 +56,6 @@ export function EntryForm() {
         saveAnonymousOwnerId(ownerId);
       }
 
-      const laso = await buildLaso.mutateAsync(apiPayload);
       const chartProfileId = await createChartProfile({
         ownerId,
         idempotencyKey: clientOperationId(),
@@ -69,6 +68,7 @@ export function EntryForm() {
         idempotencyKey: clientOperationId(),
         title: name || "Lá số mới",
       });
+      const laso = await buildLaso.mutateAsync(apiPayload);
       const profile: UserProfile = { name, gender, calendar, day, month, year, hour, minute };
       saveStash({
         laso,

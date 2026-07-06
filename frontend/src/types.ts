@@ -10,26 +10,25 @@ export type BirthInput = {
 
 export type TuviTimeInput = BirthInput;
 
+export type StarData = {
+  name: string;
+  display: string;
+  element: string;
+  sao_type?: string[];
+};
+
 export type CungData = {
   position: string;
   role: string;
   chinhTinh: string[];
-  phuTinh: Array<{
-    name: string;
-    display: string;
-    element: string;
-  }>;
-  tuhoa: string[];
+  phuTinh: StarData[];
+  tuhoa: StarData[];
   trangSinh: string | null;
   isTuan: boolean;
   isTriet: boolean;
   isCungThan: boolean;
   ageDaiVan: number | null;
-  saoLuu: Array<{
-    name: string;
-    display: string;
-    element: string;
-  }>;
+  saoLuu: StarData[];
 };
 
 export type LasoData = {

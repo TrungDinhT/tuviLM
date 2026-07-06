@@ -1,4 +1,5 @@
 import type { BuildLasoResponse, UserProfile } from "../_lib/types";
+import { formatChartYearLabel, VIEW_YEAR_MAX, VIEW_YEAR_MIN } from "../_lib/sao-luu-overlay";
 import { Chart } from "./Chart";
 import { Btn } from "./Buttons";
 import { Eyebrow } from "./Eyebrow";
@@ -8,8 +9,13 @@ interface LeftRailProps {
   profile: UserProfile;
   highlightedRole: string | null;
   tieuVanPosition: string | null;
+  viewYear: number;
+  viewYearLabel: string;
+  yearChangePending: boolean;
   onCungClick: (role: string) => void;
   onOpenDaiVan: () => void;
+  onPreviousYear: () => void;
+  onNextYear: () => void;
   mentions?: string[];
   size?: number;
 }
@@ -19,8 +25,13 @@ export function LeftRail({
   profile,
   highlightedRole,
   tieuVanPosition,
+  viewYear,
+  viewYearLabel,
+  yearChangePending,
   onCungClick,
   onOpenDaiVan,
+  onPreviousYear,
+  onNextYear,
   mentions = [],
   size = 690,
 }: LeftRailProps) {
@@ -32,17 +43,35 @@ export function LeftRail({
         size={size}
         highlightedRole={highlightedRole}
         tieuVanPosition={tieuVanPosition}
+        tieuVanYear={viewYear}
+        viewYearLabel={formatChartYearLabel(viewYear)}
         onCungClick={onCungClick}
       />
       <div className="flex items-center justify-between">
         <div>
           <Eyebrow style={{ fontSize: 10, marginBottom: 2 }}>năm xem</Eyebrow>
-          <div className="font-serif text-[22px] text-[var(--color-crimson)] leading-none">Bính Ngọ · 2026</div>
+          <div className="font-serif text-[22px] text-[var(--color-crimson)] leading-none">{viewYearLabel}</div>
         </div>
         <div className="flex gap-1.5">
-          <Btn variant="ghost" className="px-1.5 py-1.5 text-[14px]" disabled title="Sắp ra mắt">◂</Btn>
+          <Btn
+            variant="ghost"
+            className="px-1.5 py-1.5 text-[14px]"
+            disabled={yearChangePending || viewYear <= VIEW_YEAR_MIN}
+            onClick={onPreviousYear}
+            aria-label="Xem năm trước"
+          >
+            ◂
+          </Btn>
           <Btn className="text-[12px]" onClick={onOpenDaiVan}>↧ đổi đại vận</Btn>
-          <Btn variant="ghost" className="px-1.5 py-1.5 text-[14px]" disabled title="Sắp ra mắt">▸</Btn>
+          <Btn
+            variant="ghost"
+            className="px-1.5 py-1.5 text-[14px]"
+            disabled={yearChangePending || viewYear >= VIEW_YEAR_MAX}
+            onClick={onNextYear}
+            aria-label="Xem năm sau"
+          >
+            ▸
+          </Btn>
         </div>
       </div>
       {mentions.length > 0 && (

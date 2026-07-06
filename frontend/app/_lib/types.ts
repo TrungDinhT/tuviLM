@@ -3,6 +3,7 @@ export interface StarPayload {
   name: string;
   display: string;
   element: string;
+  sao_type?: string[];
 }
 
 export interface CungPayload {
@@ -10,7 +11,7 @@ export interface CungPayload {
   role: string | null;
   chinh_tinh: string[];
   phu_tinh: StarPayload[];
-  tuhoa: string[];
+  tuhoa: StarPayload[];
   trang_sinh: string | null;
   is_tuan: boolean;
   is_triet: boolean;
@@ -31,6 +32,14 @@ export interface BuildLasoRequest {
   year: number;
   hour: number;
   gender: "M" | "F";
+}
+
+export interface BuildSaoLuuRequest {
+  observation_time: BuildLasoRequest;
+}
+
+export interface BuildSaoLuuResponse {
+  cung_by_position: Record<string, CungPayload>;
 }
 
 export type Calendar = "duong" | "am";

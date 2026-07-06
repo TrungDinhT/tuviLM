@@ -124,7 +124,7 @@ export default function LasoBoard({ laso, selectedPosition, onSelectPosition }: 
 
                     <div className="tuhoa-col">
                       {cung.tuhoa.map((item) => (
-                        <p key={item} className="star-tuhoa">{item}</p>
+                        <p key={item.name} className="star-tuhoa">{item.display}</p>
                       ))}
                     </div>
                   </div>

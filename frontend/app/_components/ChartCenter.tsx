@@ -4,9 +4,10 @@ interface ChartCenterProps {
   laso: BuildLasoResponse;
   profile: UserProfile;
   cellSize: number;
+  viewYearLabel: string;
 }
 
-export function ChartCenter({ laso, profile, cellSize }: ChartCenterProps) {
+export function ChartCenter({ laso, profile, cellSize, viewYearLabel }: ChartCenterProps) {
   const tight = cellSize < 100;
   const veryTight = cellSize < 85;
   const padding = veryTight ? "px-2 py-2.5" : tight ? "px-3 py-3.5" : "px-4 py-[18px]";
@@ -36,7 +37,7 @@ export function ChartCenter({ laso, profile, cellSize }: ChartCenterProps) {
         </div>
       )}
       <div className={`flex justify-between mt-auto border-t border-[rgba(26,22,17,0.14)] ${veryTight ? "text-[9px] pt-1" : tight ? "text-[7.5px] pt-1.5" : "text-[9.5px] pt-2"}`}>
-        <div><span className="text-[var(--color-ink-3)] mr-1.5">Năm</span><span className="text-[var(--color-crimson)] font-semibold">2026 Bính Ngọ</span></div>
+        <div><span className="text-[var(--color-ink-3)] mr-1.5">Năm</span><span className="text-[var(--color-crimson)] font-semibold">{viewYearLabel}</span></div>
         <div className="text-[var(--color-gold)]">{veryTight ? "24–33" : "Đại vận 24–33 ▾"}</div>
       </div>
     </div>

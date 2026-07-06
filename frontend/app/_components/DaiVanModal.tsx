@@ -3,14 +3,27 @@
 import { Eyebrow } from "./Eyebrow";
 import { Btn } from "./Buttons";
 import { MOCK_DAIVAN, MOCK_TIEUVAN } from "../_data/mock-daivan";
+import { canChiForYear } from "../_lib/sao-luu-overlay";
 
 interface DaiVanModalProps {
+  selectedYear: number;
+  pendingYear?: number | null;
+  error?: string | null;
+  onSelectYear: (year: number) => void;
   onClose: () => void;
 }
 
-export function DaiVanModal({ onClose }: DaiVanModalProps) {
+export function DaiVanModal({
+  selectedYear,
+  pendingYear,
+  error,
+  onSelectYear,
+  onClose,
+}: DaiVanModalProps) {
   const daiVan = MOCK_DAIVAN;
   const tieuVan = MOCK_TIEUVAN;
+  const activeYear = tieuVan.find((t) => t.y === selectedYear);
+  const activeYearLabel = activeYear?.can ?? canChiForYear(selectedYear);
   return (
     <div className="fixed inset-0 z-50">
       <div
@@ -104,24 +117,35 @@ export function DaiVanModal({ onClose }: DaiVanModalProps) {
           </div>
           <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
             {tieuVan.map((t) => (
-              <div
+              <button
                 key={`tv-${t.y}`}
+                type="button"
+                disabled={pendingYear != null}
+                onClick={() => onSelectYear(t.y)}
                 className="min-w-[64px] flex-shrink-0 py-2 px-2 text-center cursor-pointer transition-all hover:opacity-100 hover:border-[var(--color-ink)]"
                 style={{
-                  border: t.current ? "1.5px solid var(--color-crimson)" : "1px solid rgba(26,22,17,0.14)",
-                  background: t.current ? "var(--color-crimson)" : t.past ? "transparent" : "rgba(255,252,245,0.6)",
-                  color: t.current ? "#f9efe0" : "var(--color-ink)",
+                  border: selectedYear === t.y ? "1.5px solid var(--color-crimson)" : "1px solid rgba(26,22,17,0.14)",
+                  background: selectedYear === t.y ? "var(--color-crimson)" : t.past ? "transparent" : "rgba(255,252,245,0.6)",
+                  color: selectedYear === t.y ? "#f9efe0" : "var(--color-ink)",
                   opacity: t.past ? 0.75 : 1,
                 }}
               >
-                <div className="text-[14px] font-semibold">{t.y}</div>
-                <div className={`font-serif italic text-[11px] mt-px ${t.current ? "text-[rgba(249,239,224,0.85)]" : "text-[var(--color-ink-3)]"}`}>{t.can}</div>
-              </div>
+                <div className="text-[14px] font-semibold">{pendingYear === t.y ? "…" : t.y}</div>
+                <div className={`font-serif italic text-[11px] mt-px ${selectedYear === t.y ? "text-[rgba(249,239,224,0.85)]" : "text-[var(--color-ink-3)]"}`}>{t.can}</div>
+              </button>
             ))}
           </div>
+          {error && <div className="mt-3 text-[12px] text-[var(--color-crimson)]">{error}</div>}
           <div className="flex flex-col-reverse md:flex-row md:justify-end gap-2 mt-4">
             <Btn variant="ghost" onClick={onClose} className="justify-center">Huỷ</Btn>
-            <Btn variant="primary" onClick={onClose} className="justify-center">Xem lá số Bính Ngọ 2026</Btn>
+            <Btn
+              variant="primary"
+              disabled={pendingYear != null}
+              onClick={() => onSelectYear(selectedYear)}
+              className="justify-center"
+            >
+              {pendingYear != null ? "Đang đổi năm…" : `Xem lá số ${activeYearLabel} ${selectedYear}`}
+            </Btn>
           </div>
         </div>
       </div>

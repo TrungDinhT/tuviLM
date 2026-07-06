@@ -9,6 +9,8 @@ interface ChartProps {
   size?: number;
   highlightedRole?: string | null;
   tieuVanPosition?: string | null;
+  tieuVanYear?: number;
+  viewYearLabel: string;
   onCungClick?: (role: string) => void;
 }
 
@@ -51,6 +53,8 @@ export function Chart({
   size = 690,
   highlightedRole,
   tieuVanPosition,
+  tieuVanYear,
+  viewYearLabel,
   onCungClick,
 }: ChartProps) {
   const cellW = size / 4;
@@ -85,7 +89,7 @@ export function Chart({
         );
       })}
       <div style={{ gridColumn: "2 / span 2", gridRow: "2 / span 2", minWidth: 0, minHeight: 0, overflow: "hidden" }}>
-        <ChartCenter laso={laso} profile={profile} cellSize={cellW} />
+        <ChartCenter laso={laso} profile={profile} cellSize={cellW} viewYearLabel={viewYearLabel} />
       </div>
       {TUAN_TRIET_PAIRS.map((pair) => {
         const c1 = laso.cung_by_position[pair.ids[0]];
@@ -128,7 +132,7 @@ export function Chart({
               boxShadow: "0 2px 6px rgba(168,133,74,0.4)",
             }}
           >
-            2026
+            {tieuVanYear ?? new Date().getFullYear()}
           </div>
         );
       })()}
