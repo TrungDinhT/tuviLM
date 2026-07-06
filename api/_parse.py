@@ -79,13 +79,13 @@ def to_cung_payload(cung_view: CungView) -> CungPayload:
         saoLuu=[
             to_sao_payload(comp.component, cung_view)
             for comp in cung_view.components
-            if isinstance(comp.component, ChinhPhuTinh)
+            if isinstance(comp.component, (ChinhPhuTinh, TuHoa))
             and comp.layer_kind == "tieu_han"
         ],
     )
 
 
-def to_sao_payload(component: ChinhPhuTinh, cung_view: CungView) -> StarPayload:
+def to_sao_payload(component: ChinhPhuTinh | TuHoa, cung_view: CungView) -> StarPayload:
     status = _get_sao_status(component.id, cung_view.dia_chi_entity.value)
     sao_str = f"{component.name} ({status})" if status else component.name
     return StarPayload(
