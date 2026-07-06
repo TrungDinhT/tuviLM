@@ -155,6 +155,7 @@ describe('ChatResponseSchema', () => {
   it('round-trips a minimal response with empty tool_calls', () => {
     const r = ChatResponseSchema.safeParse({ answer: 'Xin chào.', tool_calls: [] });
     expect(r.success).toBe(true);
+    expect(r.data?.debug_events).toEqual([]);
   });
 
   it('requires tool_calls (backend always emits the field)', () => {
@@ -165,6 +166,10 @@ describe('ChatResponseSchema', () => {
     const r = ChatResponseSchema.safeParse({
       answer: 'See cung Mệnh',
       tool_calls: [{ id: 'c1', name: 'get_cung_by_position', arguments: { position: 'Tý' } }],
+      debug_events: [
+        { type: 'tool_call', id: 'c1', name: 'get_cung_by_position', arguments: { position: 'Tý' } },
+        { type: 'tool_result', id: 'c1', name: 'get_cung_by_position', content: { role: 'Mệnh' } },
+      ],
     });
     expect(r.success).toBe(true);
   });

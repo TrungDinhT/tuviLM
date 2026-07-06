@@ -147,8 +147,19 @@ export const ChatToolCallSchema = z.object({
 });
 export type ChatToolCall = z.infer<typeof ChatToolCallSchema>;
 
+export const ChatDebugEventSchema = z.object({
+  type: z.enum(['tool_call', 'tool_result', 'result']),
+  id: z.string().nullable().optional(),
+  name: z.string().nullable().optional(),
+  arguments: z.unknown().optional(),
+  content: z.unknown().optional(),
+  output: z.unknown().optional(),
+});
+export type ChatDebugEvent = z.infer<typeof ChatDebugEventSchema>;
+
 export const ChatResponseSchema = z.object({
   answer: z.string(),
   tool_calls: z.array(ChatToolCallSchema),
+  debug_events: z.array(ChatDebugEventSchema).default([]),
 });
 export type ChatResponse = z.infer<typeof ChatResponseSchema>;

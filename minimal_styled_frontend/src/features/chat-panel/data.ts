@@ -1,7 +1,10 @@
+import type { ChatDebugEvent } from '@/lib/api/schemas';
+
 export interface ChatMessage {
   role: 'ai' | 'user';
   text: string;
   status?: 'ok' | 'pending' | 'error';
+  debugEvents?: ChatDebugEvent[];
 }
 
 export const INITIAL_GREETING: ChatMessage = {

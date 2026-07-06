@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Send } from 'lucide-react';
+import { Bug, Plus, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useChartStore } from '@/store/chart-store';
 import { useChat, useSession } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
-import type { PersistedChatMessage } from '@/lib/api/schemas';
+import type { ChatDebugEvent, PersistedChatMessage } from '@/lib/api/schemas';
 import { INITIAL_GREETING, QUICK_PROMPTS, type ChatMessage } from '../data';
 import { MessageBubble } from './message-bubble';
 
@@ -17,6 +17,13 @@ function patchLastMessage(prev: ChatMessage[], update: Partial<ChatMessage>): Ch
     next[next.length - 1] = { ...last, ...update };
   }
   return next;
+}
+
+function appendDebugEvent(messages: ChatMessage[], event: ChatDebugEvent): ChatMessage[] {
+  const last = messages.at(-1);
+  return patchLastMessage(messages, {
+    debugEvents: [...(last?.debugEvents ?? []), event],
+  });
 }
 
 function fromPersistedMessages(messages: PersistedChatMessage[]): ChatMessage[] {
@@ -46,6 +53,7 @@ export function ChatPanel() {
     sessionId: null,
     value: '',
   });
+  const [developerMode, setDeveloperMode] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const session = useSession(ownerId, sessionId);
   const chat = useChat();
@@ -94,6 +102,11 @@ export function ChatPanel() {
               status: 'pending',
             }),
           })),
+        onDebugEvent: (event) =>
+          setLocalMessages((prev) => ({
+            sessionId,
+            messages: appendDebugEvent(prev?.sessionId === sessionId ? prev.messages : messages, event),
+          })),
       },
       {
         onSuccess: (resp) =>
@@ -103,6 +116,7 @@ export function ChatPanel() {
               role: 'ai',
               text: resp.answer,
               status: 'ok',
+              debugEvents: resp.debug_events,
             }),
           })),
         onError: (err) => {
@@ -135,28 +149,43 @@ export function ChatPanel() {
             <MessageBubble
               key={i}
               message={m}
+              showDebug={developerMode}
             />
           ))}
         </div>
       </div>
 
       <div className="mx-auto w-full max-w-[900px] px-4 py-3 lg:px-6">
-        {showQuickPrompts && (
-          <div className="mb-2 flex flex-wrap gap-1.5">
-            {QUICK_PROMPTS.map((p) => (
-              <Button
-                key={p}
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={isBusy}
-                onClick={() => sendMessage(p)}
-              >
-                {p}
-              </Button>
-            ))}
-          </div>
-        )}
+        <div className="mb-2 flex items-center justify-between gap-2">
+          {showQuickPrompts ? (
+            <div className="flex flex-wrap gap-1.5">
+              {QUICK_PROMPTS.map((p) => (
+                <Button
+                  key={p}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isBusy}
+                  onClick={() => sendMessage(p)}
+                >
+                  {p}
+                </Button>
+              ))}
+            </div>
+          ) : (
+            <span />
+          )}
+          <Button
+            type="button"
+            variant={developerMode ? 'secondary' : 'outline'}
+            size="sm"
+            aria-pressed={developerMode}
+            onClick={() => setDeveloperMode((value) => !value)}
+          >
+            <Bug className="size-3.5" />
+            Dev
+          </Button>
+        </div>
         <div className="flex items-center gap-2 rounded-full border border-input bg-background px-4 py-2.5 shadow-sm">
           <Plus className="size-4 shrink-0 text-muted-foreground" />
           <input

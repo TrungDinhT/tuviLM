@@ -18,7 +18,9 @@ import {
   type BuildLasoResponse,
   type BuildSaoLuuRequest,
   type BuildSaoLuuResponse,
+  type ChatDebugEvent,
   type ChatResponse,
+  type ChatToolCall,
   type CreateAnonymousResponse,
   type CreateChartProfileRequest,
   type CreateChartProfileResponse,
@@ -247,6 +249,7 @@ export async function streamSessionChat(
   ownerId: string,
   idempotencyKey: string,
   onTextDelta?: (delta: string) => void,
+  onDebugEvent?: (event: ChatDebugEvent) => void,
 ): Promise<ChatResponse> {
   const body = SessionChatStreamRequestSchema.parse(req);
   let res: Response;
@@ -268,18 +271,38 @@ export async function streamSessionChat(
     throw { kind: 'http', status: res.status, body: await safeBody(res) } satisfies ApiError;
   }
 
-  return { answer: await readSessionChatStream(res, onTextDelta), tool_calls: [] };
+  const stream = await readSessionChatStream(res, onTextDelta, onDebugEvent);
+  return {
+    answer: stream.answer,
+    tool_calls: stream.toolCalls,
+    debug_events: stream.debugEvents,
+  };
 }
 
 async function readSessionChatStream(
   res: Response,
   onTextDelta?: (delta: string) => void,
-): Promise<string> {
+  onDebugEvent?: (event: ChatDebugEvent) => void,
+): Promise<{ answer: string; toolCalls: ChatToolCall[]; debugEvents: ChatDebugEvent[] }> {
   let answer = '';
+  const toolCalls: ChatToolCall[] = [];
+  const debugEvents: ChatDebugEvent[] = [];
   const onEvent = (event: SessionChatEvent) => {
     if (event.type === 'text' && typeof event.delta === 'string') {
       answer += event.delta;
       onTextDelta?.(event.delta);
+    }
+    const debugEvent = toDebugEvent(event);
+    if (debugEvent) {
+      debugEvents.push(debugEvent);
+      onDebugEvent?.(debugEvent);
+      if (debugEvent.type === 'tool_call' && typeof debugEvent.name === 'string') {
+        toolCalls.push({
+          id: typeof debugEvent.id === 'string' || debugEvent.id === null ? debugEvent.id : undefined,
+          name: debugEvent.name,
+          arguments: debugEvent.arguments,
+        });
+      }
     }
     if (event.type === 'error') {
       throw { kind: 'stream', message: String(event.message || 'Luồng trò chuyện gặp lỗi.') } satisfies ApiError;
@@ -288,7 +311,7 @@ async function readSessionChatStream(
 
   if (!res.body) {
     parseSseEvents(await res.text(), onEvent);
-    return answer;
+    return { answer, toolCalls, debugEvents };
   }
 
   const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
@@ -302,13 +325,41 @@ async function readSessionChatStream(
     for (const part of parts) parseSseEvents(part, onEvent);
   }
   if (buffer.trim()) parseSseEvents(buffer, onEvent);
-  return answer;
+  return { answer, toolCalls, debugEvents };
 }
 
 interface SessionChatEvent {
   type?: unknown;
   delta?: unknown;
   message?: unknown;
+  id?: unknown;
+  name?: unknown;
+  arguments?: unknown;
+  content?: unknown;
+  output?: unknown;
+}
+
+function toDebugEvent(event: SessionChatEvent): ChatDebugEvent | null {
+  if (event.type === 'tool_call') {
+    return {
+      type: 'tool_call',
+      id: typeof event.id === 'string' || event.id === null ? event.id : undefined,
+      name: typeof event.name === 'string' || event.name === null ? event.name : undefined,
+      arguments: event.arguments,
+    };
+  }
+  if (event.type === 'tool_result') {
+    return {
+      type: 'tool_result',
+      id: typeof event.id === 'string' || event.id === null ? event.id : undefined,
+      name: typeof event.name === 'string' || event.name === null ? event.name : undefined,
+      content: event.content,
+    };
+  }
+  if (event.type === 'result') {
+    return { type: 'result', output: event.output };
+  }
+  return null;
 }
 
 function parseSseEvents(raw: string, onEvent: (event: SessionChatEvent) => void): void {

@@ -163,6 +163,26 @@ describe('ChatPanel', () => {
     expect(streamCalls[0]![0]).toContain('/api/v1/sessions/session_1/chat/stream');
   });
 
+  it('shows live tool debug events when Dev mode is enabled', async () => {
+    mockChatFetch(() =>
+      sseResponse([
+        { type: 'tool_call', id: 'call_1', name: 'get_cung_by_position', arguments: { position: 'Mệnh' } },
+        { type: 'tool_result', id: 'call_1', name: 'get_cung_by_position', content: { role: 'Mệnh' } },
+        { type: 'text', delta: 'Câu trả lời' },
+      ]),
+    );
+
+    renderPanel();
+    fireEvent.click(await screen.findByRole('button', { name: 'Dev' }));
+    fireEvent.click(await screen.findByRole('button', { name: /Năm nay sự nghiệp/ }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Debug events (2)')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Debug events (2)'));
+    expect(screen.getAllByText(/get_cung_by_position/)).toHaveLength(2);
+  });
+
   it('manual send: textarea + Send disabled while pending, then answer replaces the pending bubble', async () => {
     let resolveChat: ((value: Response) => void) | undefined;
     const fetchMock = mockChatFetch(

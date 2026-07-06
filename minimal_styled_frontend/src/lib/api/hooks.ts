@@ -21,6 +21,7 @@ import {
   type BuildSaoLuuRequest,
   type BuildSaoLuuResponse,
   type ChartProfile,
+  type ChatDebugEvent,
   type ChatResponse,
   type GetSessionResponse,
   type ListChartProfilesResponse,
@@ -216,12 +217,13 @@ export interface ChatMutateArgs {
   chartProfileId: string | null;
   sessionId: string | null;
   onTextDelta?: (delta: string) => void;
+  onDebugEvent?: (event: ChatDebugEvent) => void;
 }
 
 export function useChat() {
   const queryClient = useQueryClient();
   return useMutation<ChatResponse, ApiError, ChatMutateArgs>({
-    mutationFn: ({ message, ownerId, sessionId, onTextDelta }) => {
+    mutationFn: ({ message, ownerId, sessionId, onTextDelta, onDebugEvent }) => {
       if (!ownerId || !sessionId) throw { kind: 'no-session' } satisfies ApiError;
       return streamSessionChat(
         sessionId,
@@ -229,6 +231,7 @@ export function useChat() {
         ownerId,
         idempotencyKey('message'),
         onTextDelta,
+        onDebugEvent,
       );
     },
     onSuccess: (_data, vars) => {

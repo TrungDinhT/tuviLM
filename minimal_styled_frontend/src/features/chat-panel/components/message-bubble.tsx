@@ -19,12 +19,14 @@ const MARKDOWN_CLASSES =
 
 interface MessageBubbleProps {
   message: ChatMessage;
+  showDebug?: boolean;
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export function MessageBubble({ message, showDebug = false }: MessageBubbleProps) {
   const isAi = message.role === 'ai';
   const isPending = message.status === 'pending';
   const isError = message.status === 'error';
+  const debugEvents = message.debugEvents ?? [];
 
   return (
     <div
@@ -50,15 +52,34 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             : 'bg-primary text-primary-foreground whitespace-pre-line',
         )}
       >
-        {isPending && !message.text ? (
-          <Spinner className="size-4" />
-        ) : isAi ? (
-          <div className={MARKDOWN_CLASSES}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>
-          </div>
-        ) : (
-          message.text
-        )}
+        <div>
+          {isPending && !message.text ? (
+            <Spinner className="size-4" />
+          ) : isAi ? (
+            <div className={MARKDOWN_CLASSES}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>
+            </div>
+          ) : (
+            message.text
+          )}
+          {showDebug && isAi && debugEvents.length > 0 ? (
+            <details className="mt-2 border-t border-border/70 pt-2 text-xs">
+              <summary className="cursor-pointer select-none text-muted-foreground">
+                Debug events ({debugEvents.length})
+              </summary>
+              <div className="mt-2 flex flex-col gap-2">
+                {debugEvents.map((event, index) => (
+                  <pre
+                    key={index}
+                    className="max-h-48 overflow-auto rounded-md bg-background p-2 text-[11px] leading-snug text-foreground"
+                  >
+                    {JSON.stringify(event, null, 2)}
+                  </pre>
+                ))}
+              </div>
+            </details>
+          ) : null}
+        </div>
       </div>
     </div>
   );

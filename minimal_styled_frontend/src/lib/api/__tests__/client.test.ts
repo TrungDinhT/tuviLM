@@ -271,10 +271,23 @@ describe('new conversation adapters', () => {
 
   it('streams session chat and joins text deltas', async () => {
     const onTextDelta = vi.fn();
+    const onDebugEvent = vi.fn();
     const fetchMock = vi.fn<typeof fetch>(async () =>
       sseResponse([
         { type: 'ids', user_message_id: 'u1', assistant_message_id: 'a1' },
         { type: 'text', delta: 'Career ' },
+        {
+          type: 'tool_call',
+          id: 'call_1',
+          name: 'get_cung_by_position',
+          arguments: { position: 'Mệnh' },
+        },
+        {
+          type: 'tool_result',
+          id: 'call_1',
+          name: 'get_cung_by_position',
+          content: { role: 'Mệnh' },
+        },
         { type: 'text', delta: 'looks strong.' },
         { type: 'done', status: 'confirmed' },
       ]),
@@ -288,9 +301,28 @@ describe('new conversation adapters', () => {
         'anon_123',
         'message-key',
         onTextDelta,
+        onDebugEvent,
       ),
-    ).resolves.toEqual({ answer: 'Career looks strong.', tool_calls: [] });
+    ).resolves.toEqual({
+      answer: 'Career looks strong.',
+      tool_calls: [{ id: 'call_1', name: 'get_cung_by_position', arguments: { position: 'Mệnh' } }],
+      debug_events: [
+        {
+          type: 'tool_call',
+          id: 'call_1',
+          name: 'get_cung_by_position',
+          arguments: { position: 'Mệnh' },
+        },
+        {
+          type: 'tool_result',
+          id: 'call_1',
+          name: 'get_cung_by_position',
+          content: { role: 'Mệnh' },
+        },
+      ],
+    });
     expect(onTextDelta.mock.calls.map(([delta]) => delta)).toEqual(['Career ', 'looks strong.']);
+    expect(onDebugEvent).toHaveBeenCalledTimes(2);
 
     expect(firstFetchCall(fetchMock)[0]).toContain('/api/v1/sessions/session_1/chat/stream');
     expect(firstFetchCall(fetchMock)[1]).toMatchObject({
