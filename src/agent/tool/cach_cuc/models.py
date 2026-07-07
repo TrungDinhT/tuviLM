@@ -219,7 +219,6 @@ class CachCucData(BaseModel):
 class CachCucToolResult(BaseModel):
     id: str
     name: str
-    page: int
     priority: int = 0
     meaning: str
     related_roles: list[Role] = Field(default_factory=list)
@@ -229,7 +228,6 @@ class CachCucToolResult(BaseModel):
         return cls(
             id=cach_cuc.id,
             name=cach_cuc.name,
-            page=cach_cuc.page,
             priority=cach_cuc.priority,
             meaning=cach_cuc.meaning,
             related_roles=list(cach_cuc.related_roles),

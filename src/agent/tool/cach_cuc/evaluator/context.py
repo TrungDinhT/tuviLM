@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from pydantic_ai import ModelRetry
 
-from src.agent.cach_cuc.models import CachCucData, Role
+from src.agent.tool.cach_cuc.models import CachCucData, Role
 from src.refactored.la_so import LaSo
 from src.refactored.model.elementary import DiaChi
 from src.refactored.model.layer import NATAL_LAYER_ID

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from src.agent.cach_cuc.evaluator.context import CachCucMatchContext
-from src.agent.cach_cuc.models import StarBrightnessCondition
+from src.agent.tool.cach_cuc.evaluator.context import CachCucMatchContext
+from src.agent.tool.cach_cuc.models import StarBrightnessCondition
 from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
 from src.refactored.components.definitions.sao import Status
 

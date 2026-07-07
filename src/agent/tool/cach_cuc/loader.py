@@ -6,14 +6,14 @@ from pathlib import Path
 
 import yaml
 
-from src.agent.cach_cuc.models import CachCucData, SourceKind
+from src.agent.tool.cach_cuc.models import CachCucData, SourceKind
 
 
 _logger = logging.getLogger(__name__)
 
 
 DEFAULT_TUVITANBIEN_CACH_CUC_PATH = (
-    Path(__file__).resolve().parents[3] / "data" / "cach_cuc_reviewed.yaml"
+    Path(__file__).resolve().parents[4] / "data" / "cach_cuc_reviewed.yaml"
 )
 
 
