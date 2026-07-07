@@ -4,9 +4,9 @@ from dataclasses import dataclass
 
 import pytest
 
-from src.agent.cach_cuc.loader import load_cach_cuc_source
-from src.agent.cach_cuc.matcher import find_matching_cach_cuc
-from src.agent.cach_cuc.models import (
+from src.agent.tool.cach_cuc.loader import load_cach_cuc_source
+from src.agent.tool.cach_cuc.matcher import find_matching_cach_cuc
+from src.agent.tool.cach_cuc.models import (
     CachCucData,
     CachCucToolResult,
     Role,

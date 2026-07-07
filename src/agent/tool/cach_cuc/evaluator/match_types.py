@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable
 
-from src.agent.cach_cuc.models import Role
+from src.agent.tool.cach_cuc.models import Role
 
 
 @dataclass(frozen=True)

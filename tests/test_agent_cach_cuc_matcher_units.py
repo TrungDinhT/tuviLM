@@ -6,27 +6,27 @@ import pytest
 from pydantic import ValidationError
 from pydantic_ai import ModelRetry
 
-from src.agent.cach_cuc import matcher as matcher_module
-from src.agent.cach_cuc.evaluator import (
+from src.agent.tool.cach_cuc import matcher as matcher_module
+from src.agent.tool.cach_cuc.evaluator import (
     CachCucMatchContext,
     MatchOutcome,
     match_condition,
 )
-from src.agent.cach_cuc.evaluator.palace_content import _match_only_chinh_tinh
-from src.agent.cach_cuc.evaluator.scopes import positions_for_scope
-from src.agent.cach_cuc.evaluator.star_brightness import _match_star_brightness
-from src.agent.cach_cuc.evaluator.star_utils import (
+from src.agent.tool.cach_cuc.evaluator.palace_content import _match_only_chinh_tinh
+from src.agent.tool.cach_cuc.evaluator.scopes import positions_for_scope
+from src.agent.tool.cach_cuc.evaluator.star_brightness import _match_star_brightness
+from src.agent.tool.cach_cuc.evaluator.star_utils import (
     _match_count,
     _match_supported_stars,
     _resolve_condition_stars,
     _star_at_any_chi,
 )
-from src.agent.cach_cuc.evaluator.stars_meeting import _match_stars_meeting
-from src.agent.cach_cuc.matcher import (
+from src.agent.tool.cach_cuc.evaluator.stars_meeting import _match_stars_meeting
+from src.agent.tool.cach_cuc.matcher import (
     find_matching_cach_cuc,
     get_cach_cuc_tool_results,
 )
-from src.agent.cach_cuc.models import (
+from src.agent.tool.cach_cuc.models import (
     CachCucData,
     Role,
     StarBrightnessCondition,
@@ -203,9 +203,7 @@ def test_positions_for_scope_covers_all_scopes():
     assert positions_for_scope(DiaChi.TY, "hoi_hop") == frozenset(
         {DiaChi.TY, DiaChi.THIN, DiaChi.THAN, DiaChi.NGO}
     )
-    assert positions_for_scope(DiaChi.TY, "giap") == frozenset(
-        {DiaChi.HOI, DiaChi.SUU}
-    )
+    assert positions_for_scope(DiaChi.TY, "giap") == frozenset({DiaChi.HOI, DiaChi.SUU})
     assert positions_for_scope(DiaChi.TY, "nhi_hop") == frozenset({DiaChi.SUU})
 
 
@@ -330,19 +328,23 @@ def test_match_supported_stars_uses_explicit_logic_and_group_threshold():
 
 def test_star_at_chi_explicit_stars_always_require_all_even_if_any_is_authored():
     context = _context(_CatalogLaSo(star_positions={"a": DiaChi.TY}))
-    condition = _data(
-        [
-            _entry(
-                "star_at_chi",
-                {
-                    "type": "star_at_chi",
-                    "stars": ["a", "b"],
-                    "stars_matching_logic": "any",
-                    "at_chi": ["ty"],
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "star_at_chi",
+                    {
+                        "type": "star_at_chi",
+                        "stars": ["a", "b"],
+                        "stars_matching_logic": "any",
+                        "at_chi": ["ty"],
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
 
     assert match_condition(condition, context) == MatchOutcome(False)
 
@@ -359,18 +361,22 @@ def test_star_at_chi_infers_related_roles_from_matched_positions():
             },
         )
     )
-    condition = _data(
-        [
-            _entry(
-                "star_at_chi_roles",
-                {
-                    "type": "star_at_chi",
-                    "stars": ["a", "b"],
-                    "at_chi": ["ty", "ngo"],
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "star_at_chi_roles",
+                    {
+                        "type": "star_at_chi",
+                        "stars": ["a", "b"],
+                        "at_chi": ["ty", "ngo"],
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
 
     assert match_condition(condition, context) == MatchOutcome(
         True,
@@ -380,56 +386,68 @@ def test_star_at_chi_infers_related_roles_from_matched_positions():
 
 def test_star_with_palace_respects_stars_matching_logic():
     context = _context(_CatalogLaSo(star_positions={"a": DiaChi.TY}))
-    any_condition = _data(
-        [
-            _entry(
-                "star_with_palace_any",
-                {
-                    "type": "star_with_palace",
-                    "palace": "menh",
-                    "scope": "dong_cung",
-                    "stars": ["a", "b"],
-                    "stars_matching_logic": "any",
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
-    all_condition = _data(
-        [
-            _entry(
-                "star_with_palace_all",
-                {
-                    "type": "star_with_palace",
-                    "palace": "menh",
-                    "scope": "dong_cung",
-                    "stars": ["a", "b"],
-                    "stars_matching_logic": "all",
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    any_condition = (
+        _data(
+            [
+                _entry(
+                    "star_with_palace_any",
+                    {
+                        "type": "star_with_palace",
+                        "palace": "menh",
+                        "scope": "dong_cung",
+                        "stars": ["a", "b"],
+                        "stars_matching_logic": "any",
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
+    all_condition = (
+        _data(
+            [
+                _entry(
+                    "star_with_palace_all",
+                    {
+                        "type": "star_with_palace",
+                        "palace": "menh",
+                        "scope": "dong_cung",
+                        "stars": ["a", "b"],
+                        "stars_matching_logic": "all",
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
 
     assert match_condition(any_condition, context) == MatchOutcome(True, (Role.MENH,))
     assert match_condition(all_condition, context) == MatchOutcome(False)
 
 
 def test_star_with_palace_requires_explicit_stars_and_group_when_both_authored():
-    condition = _data(
-        [
-            _entry(
-                "explicit_and_group",
-                {
-                    "type": "star_with_palace",
-                    "palace": "menh",
-                    "scope": "hoi_hop",
-                    "stars": ["hoa_loc", "hoa_quyen"],
-                    "stars_matching_logic": "all",
-                    "group_name": "luc_sat",
-                    "mode": "all",
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "explicit_and_group",
+                    {
+                        "type": "star_with_palace",
+                        "palace": "menh",
+                        "scope": "hoi_hop",
+                        "stars": ["hoa_loc", "hoa_quyen"],
+                        "stars_matching_logic": "all",
+                        "group_name": "luc_sat",
+                        "mode": "all",
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
     assert isinstance(condition, StarWithPalaceCondition)
     assert condition.stars_matching_logic == "all"
 
@@ -480,29 +498,39 @@ def test_star_with_palace_group_only_respects_group_rule(
     passing_group_stars: dict[str, DiaChi],
     failing_group_stars: dict[str, DiaChi],
 ):
-    condition = _data(
-        [
-            _entry(
-                "group_only",
-                {
-                    "type": "star_with_palace",
-                    "palace": "menh",
-                    "scope": "dong_cung",
-                    "group_name": "luc_sat",
-                    **group_rule,
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "group_only",
+                    {
+                        "type": "star_with_palace",
+                        "palace": "menh",
+                        "scope": "dong_cung",
+                        "group_name": "luc_sat",
+                        **group_rule,
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
 
-    assert match_condition(
-        condition,
-        _context(_CatalogLaSo(star_positions=passing_group_stars)),
-    ).matched is True
-    assert match_condition(
-        condition,
-        _context(_CatalogLaSo(star_positions=failing_group_stars)),
-    ).matched is False
+    assert (
+        match_condition(
+            condition,
+            _context(_CatalogLaSo(star_positions=passing_group_stars)),
+        ).matched
+        is True
+    )
+    assert (
+        match_condition(
+            condition,
+            _context(_CatalogLaSo(star_positions=failing_group_stars)),
+        ).matched
+        is False
+    )
 
 
 @pytest.mark.parametrize(
@@ -515,32 +543,42 @@ def test_star_with_palace_explicit_stars_and_group_respect_group_rule(
     passing_group_stars: dict[str, DiaChi],
     failing_group_stars: dict[str, DiaChi],
 ):
-    condition = _data(
-        [
-            _entry(
-                "explicit_and_group",
-                {
-                    "type": "star_with_palace",
-                    "palace": "menh",
-                    "scope": "dong_cung",
-                    "stars": ["a", "b"],
-                    "stars_matching_logic": "all",
-                    "group_name": "luc_sat",
-                    **group_rule,
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "explicit_and_group",
+                    {
+                        "type": "star_with_palace",
+                        "palace": "menh",
+                        "scope": "dong_cung",
+                        "stars": ["a", "b"],
+                        "stars_matching_logic": "all",
+                        "group_name": "luc_sat",
+                        **group_rule,
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
     explicit_stars = {"a": DiaChi.TY, "b": DiaChi.TY}
 
-    assert match_condition(
-        condition,
-        _context(_CatalogLaSo(star_positions=explicit_stars | passing_group_stars)),
-    ).matched is True
-    assert match_condition(
-        condition,
-        _context(_CatalogLaSo(star_positions=explicit_stars | failing_group_stars)),
-    ).matched is False
+    assert (
+        match_condition(
+            condition,
+            _context(_CatalogLaSo(star_positions=explicit_stars | passing_group_stars)),
+        ).matched
+        is True
+    )
+    assert (
+        match_condition(
+            condition,
+            _context(_CatalogLaSo(star_positions=explicit_stars | failing_group_stars)),
+        ).matched
+        is False
+    )
 
 
 @pytest.mark.parametrize(
@@ -551,26 +589,28 @@ def test_star_with_palace_explicit_stars_and_group_keep_explicit_logic(
     stars_matching_logic: str,
     expected: bool,
 ):
-    condition = _data(
-        [
-            _entry(
-                "explicit_logic_and_group",
-                {
-                    "type": "star_with_palace",
-                    "palace": "menh",
-                    "scope": "dong_cung",
-                    "stars": ["a", "b"],
-                    "stars_matching_logic": stars_matching_logic,
-                    "group_name": "luc_sat",
-                    "mode": "any",
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
-    context = _context(
-        _CatalogLaSo(
-            star_positions={"a": DiaChi.TY, "dia_khong": DiaChi.TY}
+    condition = (
+        _data(
+            [
+                _entry(
+                    "explicit_logic_and_group",
+                    {
+                        "type": "star_with_palace",
+                        "palace": "menh",
+                        "scope": "dong_cung",
+                        "stars": ["a", "b"],
+                        "stars_matching_logic": stars_matching_logic,
+                        "group_name": "luc_sat",
+                        "mode": "any",
+                    },
+                )
+            ]
         )
+        .cach_cuc[0]
+        .conditions
+    )
+    context = _context(
+        _CatalogLaSo(star_positions={"a": DiaChi.TY, "dia_khong": DiaChi.TY})
     )
 
     assert match_condition(condition, context).matched is expected
@@ -675,18 +715,22 @@ def test_stars_meeting_infers_related_roles_from_matched_anchor_positions():
             },
         )
     )
-    condition = _data(
-        [
-            _entry(
-                "meeting_roles",
-                {
-                    "type": "stars_meeting",
-                    "scope": "xung_chieu",
-                    "stars": ["a", "b"],
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "meeting_roles",
+                    {
+                        "type": "stars_meeting",
+                        "scope": "xung_chieu",
+                        "stars": ["a", "b"],
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
 
     assert match_condition(condition, context) == MatchOutcome(
         True,
@@ -711,20 +755,24 @@ def test_stars_meeting_uses_explicit_stars_as_group_anchors():
             },
         )
     )
-    condition = _data(
-        [
-            _entry(
-                "meeting_group_anchor",
-                {
-                    "type": "stars_meeting",
-                    "scope": "hoi_hop",
-                    "stars": ["anchor"],
-                    "group_name": "luc_sat",
-                    "at_least": 2,
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "meeting_group_anchor",
+                    {
+                        "type": "stars_meeting",
+                        "scope": "hoi_hop",
+                        "stars": ["anchor"],
+                        "group_name": "luc_sat",
+                        "at_least": 2,
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
 
     assert match_condition(condition, context) == MatchOutcome(
         True,
@@ -742,38 +790,46 @@ def test_stars_meeting_rejects_group_cluster_away_from_explicit_anchor():
             },
         )
     )
-    condition = _data(
-        [
-            _entry(
-                "meeting_group_anchor",
-                {
-                    "type": "stars_meeting",
-                    "scope": "hoi_hop",
-                    "stars": ["anchor"],
-                    "group_name": "luc_sat",
-                    "at_least": 2,
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "meeting_group_anchor",
+                    {
+                        "type": "stars_meeting",
+                        "scope": "hoi_hop",
+                        "stars": ["anchor"],
+                        "group_name": "luc_sat",
+                        "at_least": 2,
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
 
     assert match_condition(condition, context) == MatchOutcome(False)
 
 
 def test_stars_meeting_group_any_requires_related_group_pair():
-    condition = _data(
-        [
-            _entry(
-                "group_any",
-                {
-                    "type": "stars_meeting",
-                    "scope": "dong_cung",
-                    "group_name": "luc_sat",
-                    "mode": "any",
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "group_any",
+                    {
+                        "type": "stars_meeting",
+                        "scope": "dong_cung",
+                        "group_name": "luc_sat",
+                        "mode": "any",
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
     connected = _context(
         _CatalogLaSo(
             star_positions={
@@ -808,28 +864,38 @@ def test_stars_meeting_group_only_respects_group_rule(
     passing_group_stars: dict[str, DiaChi],
     failing_group_stars: dict[str, DiaChi],
 ):
-    condition = _data(
-        [
-            _entry(
-                "group_only",
-                {
-                    "type": "stars_meeting",
-                    "scope": "dong_cung",
-                    "group_name": "luc_sat",
-                    **group_rule,
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "group_only",
+                    {
+                        "type": "stars_meeting",
+                        "scope": "dong_cung",
+                        "group_name": "luc_sat",
+                        **group_rule,
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
 
-    assert match_condition(
-        condition,
-        _context(_CatalogLaSo(star_positions=passing_group_stars)),
-    ).matched is True
-    assert match_condition(
-        condition,
-        _context(_CatalogLaSo(star_positions=failing_group_stars)),
-    ).matched is False
+    assert (
+        match_condition(
+            condition,
+            _context(_CatalogLaSo(star_positions=passing_group_stars)),
+        ).matched
+        is True
+    )
+    assert (
+        match_condition(
+            condition,
+            _context(_CatalogLaSo(star_positions=failing_group_stars)),
+        ).matched
+        is False
+    )
 
 
 @pytest.mark.parametrize(
@@ -842,47 +908,61 @@ def test_stars_meeting_explicit_anchor_and_group_respect_group_rule(
     passing_group_stars: dict[str, DiaChi],
     failing_group_stars: dict[str, DiaChi],
 ):
-    condition = _data(
-        [
-            _entry(
-                "explicit_anchor_and_group",
-                {
-                    "type": "stars_meeting",
-                    "scope": "dong_cung",
-                    "stars": ["anchor"],
-                    "group_name": "luc_sat",
-                    **group_rule,
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "explicit_anchor_and_group",
+                    {
+                        "type": "stars_meeting",
+                        "scope": "dong_cung",
+                        "stars": ["anchor"],
+                        "group_name": "luc_sat",
+                        **group_rule,
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
     anchor_star = {"anchor": DiaChi.TY}
 
-    assert match_condition(
-        condition,
-        _context(_CatalogLaSo(star_positions=anchor_star | passing_group_stars)),
-    ).matched is True
-    assert match_condition(
-        condition,
-        _context(_CatalogLaSo(star_positions=anchor_star | failing_group_stars)),
-    ).matched is False
+    assert (
+        match_condition(
+            condition,
+            _context(_CatalogLaSo(star_positions=anchor_star | passing_group_stars)),
+        ).matched
+        is True
+    )
+    assert (
+        match_condition(
+            condition,
+            _context(_CatalogLaSo(star_positions=anchor_star | failing_group_stars)),
+        ).matched
+        is False
+    )
 
 
 def test_stars_meeting_explicit_anchor_and_group_require_all_explicit_stars():
-    condition = _data(
-        [
-            _entry(
-                "explicit_anchor_and_group",
-                {
-                    "type": "stars_meeting",
-                    "scope": "dong_cung",
-                    "stars": ["anchor", "required"],
-                    "group_name": "luc_sat",
-                    "mode": "any",
-                },
-            )
-        ]
-    ).cach_cuc[0].conditions
+    condition = (
+        _data(
+            [
+                _entry(
+                    "explicit_anchor_and_group",
+                    {
+                        "type": "stars_meeting",
+                        "scope": "dong_cung",
+                        "stars": ["anchor", "required"],
+                        "group_name": "luc_sat",
+                        "mode": "any",
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .conditions
+    )
     matching = _context(
         _CatalogLaSo(
             star_positions={
@@ -893,9 +973,7 @@ def test_stars_meeting_explicit_anchor_and_group_require_all_explicit_stars():
         )
     )
     missing_explicit_star = _context(
-        _CatalogLaSo(
-            star_positions={"anchor": DiaChi.TY, "dia_khong": DiaChi.TY}
-        )
+        _CatalogLaSo(star_positions={"anchor": DiaChi.TY, "dia_khong": DiaChi.TY})
     )
 
     assert match_condition(condition, matching).matched is True
@@ -1178,19 +1256,23 @@ def test_find_matching_cach_cuc_filters_star_at_chi_by_inferred_role():
 
 
 def test_get_cach_cuc_tool_results_projects_without_conditions(monkeypatch):
-    matched = _data(
-        [
-            _entry(
-                "tool",
-                {
-                    "type": "star_with_palace",
-                    "palace": "menh",
-                    "scope": "dong_cung",
-                    "stars": ["a"],
-                },
-            )
-        ]
-    ).cach_cuc[0].model_copy(update={"related_roles": [Role.MENH]})
+    matched = (
+        _data(
+            [
+                _entry(
+                    "tool",
+                    {
+                        "type": "star_with_palace",
+                        "palace": "menh",
+                        "scope": "dong_cung",
+                        "stars": ["a"],
+                    },
+                )
+            ]
+        )
+        .cach_cuc[0]
+        .model_copy(update={"related_roles": [Role.MENH]})
+    )
 
     def fake_find_matching_cach_cuc(
         la_so,

@@ -21,13 +21,13 @@ from __future__ import annotations
 
 import logging
 
-from src.agent.cach_cuc.evaluator import (
+from src.agent.tool.cach_cuc.evaluator import (
     CachCucMatchContext,
     MatchOutcome,
     match_condition,
 )
-from src.agent.cach_cuc.loader import load_cach_cuc_source
-from src.agent.cach_cuc.models import (
+from src.agent.tool.cach_cuc.loader import load_cach_cuc_source
+from src.agent.tool.cach_cuc.models import (
     CachCuc,
     CachCucData,
     CachCucToolResult,
