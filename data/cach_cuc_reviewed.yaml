@@ -587,7 +587,7 @@ cach_cuc:
 - id: rieu_long_phuong
   name: Riêu gặp Long Phượng
   page: 43
-  priority: 3
+  priority: 1
   meaning: Tốt đẹp, vui vẻ; liên quan cưới hỏi sinh nở, công danh tài lộc hưng vượng
   conditions:
     all:
