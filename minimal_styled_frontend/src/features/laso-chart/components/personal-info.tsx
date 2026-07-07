@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import type { BuildLasoResponse } from '@/lib/api/schemas';
 import type { BirthInput } from '@/store/chart-store';
+import { diaChiHourLabel } from '@/features/birth-input/schema';
 
 interface Props {
   response: BuildLasoResponse;
@@ -13,8 +14,12 @@ function formatBirth(input: BirthInput | null): string | null {
   if (!input) return null;
   const dd = input.date.toString().padStart(2, '0');
   const mm = input.month.toString().padStart(2, '0');
-  const hh = input.hour.toString().padStart(2, '0');
-  return `${dd}.${mm}.${input.year} · ${hh}:00`;
+  if (input.calendar === 'lunar') {
+    const leap = input.is_leap_month ? ' nhuận' : '';
+    return `${dd}.${mm}${leap}.${input.year} âm · giờ ${diaChiHourLabel(input.hour_in_dia_chi)}`;
+  }
+  const hh = (input.hour ?? 0).toString().padStart(2, '0');
+  return `${dd}.${mm}.${input.year} dương · ${hh}:00`;
 }
 
 export function PersonalInfo({ response, input, className, variant = 'compact' }: Props) {

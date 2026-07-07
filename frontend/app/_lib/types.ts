@@ -26,11 +26,29 @@ export interface BuildLasoResponse {
   cung_by_position: Record<string, CungPayload>;
 }
 
+export type BirthCalendar = "solar" | "lunar";
+export type DiaChiId =
+  | "ty"
+  | "suu"
+  | "dan"
+  | "meo"
+  | "thin"
+  | "ti"
+  | "ngo"
+  | "mui"
+  | "than"
+  | "dau"
+  | "tuat"
+  | "hoi";
+
 export interface BuildLasoRequest {
+  calendar?: BirthCalendar;
   day: number;
   month: number;
   year: number;
-  hour: number;
+  hour?: number;
+  hour_in_dia_chi?: DiaChiId;
+  is_leap_month?: boolean;
   gender: "M" | "F";
 }
 
@@ -52,8 +70,10 @@ export interface UserProfile {
   day: number;
   month: number;
   year: number;
-  hour: number;
-  minute: number;
+  hour?: number;
+  minute?: number;
+  hour_in_dia_chi?: DiaChiId;
+  is_leap_month?: boolean;
 }
 
 export interface SessionStash {

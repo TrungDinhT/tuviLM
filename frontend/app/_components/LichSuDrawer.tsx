@@ -353,21 +353,35 @@ function sortSessions(sessions: ChatSessionSummaryPayload[]): ChatSessionSummary
 }
 
 function toBuildLasoRequest(birthInfo: ChartProfilePayload["birth_info"]): BuildLasoRequest {
-  const { day, month, year, hour, gender } = birthInfo;
-  return { day, month, year, hour, gender };
+  const { day, month, year, gender } = birthInfo;
+  if (birthInfo.calendar === "lunar") {
+    return {
+      calendar: "lunar",
+      day,
+      month,
+      year,
+      hour_in_dia_chi: birthInfo.hour_in_dia_chi,
+      is_leap_month: birthInfo.is_leap_month ?? false,
+      gender,
+    };
+  }
+  return { calendar: "solar", day, month, year, hour: birthInfo.hour ?? 0, gender };
 }
 
 function toUserProfile(profile: ChartProfilePayload, current: SessionStash): UserProfile {
   const cached = current.chartProfileId === profile.id ? current.profile : null;
+  const calendar = profile.birth_info.calendar === "lunar" ? "am" : cached?.calendar ?? "duong";
   return {
     name: displayName(profile),
     gender: profile.birth_info.gender,
-    calendar: cached?.calendar ?? "duong",
+    calendar,
     day: profile.birth_info.day,
     month: profile.birth_info.month,
     year: profile.birth_info.year,
-    hour: profile.birth_info.hour,
+    hour: profile.birth_info.hour ?? cached?.hour ?? 0,
     minute: cached?.minute ?? 0,
+    hour_in_dia_chi: profile.birth_info.hour_in_dia_chi ?? cached?.hour_in_dia_chi,
+    is_leap_month: profile.birth_info.is_leap_month ?? cached?.is_leap_month,
   };
 }
 
@@ -377,7 +391,9 @@ function displayName(profile: ChartProfilePayload): string {
 
 function formatBirth(profile: ChartProfilePayload): string {
   const { day, month, year } = profile.birth_info;
-  return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+  const calendar = profile.birth_info.calendar === "lunar" ? "Âm" : "Dương";
+  const leap = profile.birth_info.is_leap_month ? " nhuận" : "";
+  return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}${leap}/${year} ${calendar}`;
 }
 
 function formatDateTime(raw: string): string {

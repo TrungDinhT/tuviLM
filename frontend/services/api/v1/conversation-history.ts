@@ -6,7 +6,7 @@ export interface CreateAnonymousResponse {
 }
 
 export interface BirthInfoPayload extends BuildLasoRequest {
-  calendar?: "solar";
+  calendar?: "solar" | "lunar";
 }
 
 export interface ChartProfilePayload {

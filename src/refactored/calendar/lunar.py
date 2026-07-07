@@ -119,6 +119,20 @@ def get_year_info(year: int) -> list[LunarDate]:
     return decode_lunar_year(year, _lunar_year_info(year))
 
 
+def lunar_month_length(year: int, month: int, is_leap_month: bool = False) -> int:
+    months = get_year_info(year)
+    for index, start in enumerate(months):
+        if start.month != month or start.is_leap_month != is_leap_month:
+            continue
+        next_start = (
+            months[index + 1] if index + 1 < len(months) else get_year_info(year + 1)[0]
+        )
+        return next_start.julian_day_number - start.julian_day_number
+
+    leap_label = " nhuận" if is_leap_month else ""
+    raise ValueError(f"Âm lịch năm {year} không có tháng {month}{leap_label}")
+
+
 def find_lunar_date(jd: int, ly: list[LunarDate]) -> LunarDate:
     i = len(ly) - 1
     while jd < ly[i].julian_day_number:

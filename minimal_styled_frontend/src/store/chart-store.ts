@@ -3,14 +3,18 @@ import { persist } from 'zustand/middleware';
 import type {
   BuildLasoResponse,
   BuildSaoLuuResponse,
+  DiaChiId,
   Gender,
 } from '@/lib/api/schemas';
 
 export interface BirthInput {
+  calendar?: 'solar' | 'lunar';
   date: number;
   month: number;
   year: number;
-  hour: number;
+  hour?: number;
+  hour_in_dia_chi?: DiaChiId;
+  is_leap_month?: boolean;
   gender: Gender;
   name?: string;
 }

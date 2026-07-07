@@ -27,6 +27,18 @@ describe('BuildLasoRequestSchema', () => {
     expect(r.success).toBe(true);
   });
 
+  it('accepts a valid lunar request', () => {
+    const r = BuildLasoRequestSchema.safeParse({
+      calendar: 'lunar',
+      day: 27,
+      month: 12,
+      year: 1989,
+      hour_in_dia_chi: 'ti',
+      gender: 'F',
+    });
+    expect(r.success).toBe(true);
+  });
+
   it.each([
     { field: 'day', value: 0 },
     { field: 'day', value: 32 },

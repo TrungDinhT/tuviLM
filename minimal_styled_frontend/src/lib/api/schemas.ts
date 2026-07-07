@@ -3,13 +3,41 @@ import { z } from 'zod';
 export const GenderSchema = z.enum(['M', 'F']);
 export type Gender = z.infer<typeof GenderSchema>;
 
-export const TuviTimeSchema = z.object({
+export const DiaChiSchema = z.enum([
+  'ty',
+  'suu',
+  'dan',
+  'meo',
+  'thin',
+  'ti',
+  'ngo',
+  'mui',
+  'than',
+  'dau',
+  'tuat',
+  'hoi',
+]);
+export type DiaChiId = z.infer<typeof DiaChiSchema>;
+
+const BaseTuviTimeSchema = z.object({
   day: z.number().int().min(1).max(31),
   month: z.number().int().min(1).max(12),
   year: z.number().int().min(1900).max(2099),
-  hour: z.number().int().min(0).max(23),
   gender: GenderSchema,
 });
+
+export const SolarTuviTimeSchema = BaseTuviTimeSchema.extend({
+  calendar: z.literal('solar').optional(),
+  hour: z.number().int().min(0).max(23),
+});
+
+export const LunarTuviTimeSchema = BaseTuviTimeSchema.extend({
+  calendar: z.literal('lunar'),
+  hour_in_dia_chi: DiaChiSchema,
+  is_leap_month: z.boolean().optional(),
+});
+
+export const TuviTimeSchema = z.union([SolarTuviTimeSchema, LunarTuviTimeSchema]);
 export type TuviTime = z.infer<typeof TuviTimeSchema>;
 
 export const BuildLasoRequestSchema = TuviTimeSchema;
@@ -17,7 +45,7 @@ export type BuildLasoRequest = z.infer<typeof BuildLasoRequestSchema>;
 
 export const BuildSaoLuuRequestSchema = z.object({
   birth_info: TuviTimeSchema,
-  observation_time: TuviTimeSchema,
+  observation_time: SolarTuviTimeSchema,
 });
 export type BuildSaoLuuRequest = z.infer<typeof BuildSaoLuuRequestSchema>;
 
@@ -66,9 +94,7 @@ export type CreateAnonymousResponse = z.infer<typeof CreateAnonymousResponseSche
 
 export const CreateChartProfileRequestSchema = z.object({
   display_name: z.string(),
-  birth_info: TuviTimeSchema.extend({
-    calendar: z.literal('solar'),
-  }),
+  birth_info: TuviTimeSchema,
 });
 export type CreateChartProfileRequest = z.infer<typeof CreateChartProfileRequestSchema>;
 

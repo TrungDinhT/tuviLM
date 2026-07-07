@@ -2,13 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Calendar, UserProfile } from "../_lib/types";
+import type { BuildLasoRequest, Calendar, DiaChiId, UserProfile } from "../_lib/types";
 import {
   loadAnonymousOwnerId,
   saveAnonymousOwnerId,
   saveStash,
 } from "../_lib/session-store";
-import { EntryFormSchema } from "../_lib/schemas";
+import { EntryFormSchema, type EntryFormParsed } from "../_lib/schemas";
+import {
+  canChiForYear,
+  DIA_CHI_HOURS,
+} from "../_lib/sao-luu-overlay";
 import { useBuildLaso } from "@/services/api/v1/laso/build";
 import {
   createAnonymousOwner,
@@ -29,11 +33,23 @@ export function EntryForm() {
   const [year, setYear] = useState(1999);
   const [hour, setHour] = useState(12);
   const [minute, setMinute] = useState(30);
+  const [hourInDiaChi, setHourBranch] = useState<DiaChiId>("ngo");
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
   async function submitForm() {
-    const parsed = EntryFormSchema.safeParse({ day, month, year, hour, minute, gender });
+    const parsed = EntryFormSchema.safeParse({
+      calendar,
+      day,
+      month,
+      year,
+      hour,
+      minute,
+      hour_in_dia_chi: hourInDiaChi,
+      is_leap_month: isLeapMonth,
+      gender,
+    });
     if (!parsed.success) {
       const errs: Record<string, string> = {};
       for (const issue of parsed.error.issues) {
@@ -45,8 +61,7 @@ export function EntryForm() {
     }
     setFieldErrors({});
 
-    const { minute: _m, ...apiPayload } = parsed.data;
-    void _m;
+    const apiPayload = toBuildLasoRequest(parsed.data);
 
     setSubmitting(true);
     try {
@@ -69,7 +84,18 @@ export function EntryForm() {
         title: name || "Lá số mới",
       });
       const laso = await buildLaso.mutateAsync(apiPayload);
-      const profile: UserProfile = { name, gender, calendar, day, month, year, hour, minute };
+      const profile: UserProfile = {
+        name,
+        gender,
+        calendar,
+        day,
+        month,
+        year,
+        hour: calendar === "am" ? undefined : hour,
+        minute: calendar === "am" ? undefined : minute,
+        hour_in_dia_chi: calendar === "am" ? hourInDiaChi : undefined,
+        is_leap_month: calendar === "am" ? isLeapMonth : undefined,
+      };
       saveStash({
         laso,
         profile,
@@ -125,25 +151,51 @@ export function EntryForm() {
               <Btn type="button" variant={calendar === "duong" ? "primary" : "default"} className="flex-1 justify-center" onClick={() => setCalendar("duong")}>Dương</Btn>
               <Btn type="button" variant={calendar === "am" ? "primary" : "default"} className="flex-1 justify-center" onClick={() => setCalendar("am")}>Âm</Btn>
             </div>
+            {calendar === "am" && <LunarInfo />}
           </Group>
         </div>
 
-        <Group label="Ngày sinh">
+        <Group label={calendar === "am" ? "Ngày sinh âm lịch" : "Ngày sinh dương lịch"}>
           <div className="flex gap-1.5">
             <NumInput label="Ngày" value={day} min={1} max={31} onChange={setDay} flex={1} />
             <NumInput label="Tháng" value={month} min={1} max={12} onChange={setMonth} flex={1} />
-            <NumInput label="Năm" value={year} min={1900} max={2099} onChange={setYear} flex={1.6} />
+            <NumInput
+              label={calendar === "am" ? "Năm âm lịch" : "Năm"}
+              value={year}
+              min={1900}
+              max={2099}
+              onChange={setYear}
+              flex={1.6}
+            />
           </div>
+          {calendar === "am" && (
+            <div className="mt-1.5 flex items-center justify-between gap-3 text-[11px] text-[var(--color-ink-3)]">
+              <span>Năm âm: <strong className="text-[var(--color-ink)]">{canChiForYear(year)}</strong></span>
+              <label className="flex items-center gap-1.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isLeapMonth}
+                  onChange={(e) => setIsLeapMonth(e.target.checked)}
+                />
+                Tháng nhuận
+              </label>
+            </div>
+          )}
           {fieldErrors.day && <div className="text-[11px] text-[var(--color-crimson)] mt-1">{fieldErrors.day}</div>}
         </Group>
 
         <Group label="Giờ sinh">
-          <div className="flex gap-1.5 items-center">
-            <NumInput label="Giờ (0-23)" value={hour} min={0} max={23} onChange={setHour} flex={1} />
-            <span className="text-[var(--color-ink-3)] font-serif text-[18px]">:</span>
-            <NumInput label="Phút (0-59)" value={minute} min={0} max={59} onChange={setMinute} flex={1} />
-          </div>
+          {calendar === "am" ? (
+            <DiaChiSelect value={hourInDiaChi} onChange={setHourBranch} />
+          ) : (
+            <div className="flex gap-1.5 items-center">
+              <NumInput label="Giờ (0-23)" value={hour} min={0} max={23} onChange={setHour} flex={1} />
+              <span className="text-[var(--color-ink-3)] font-serif text-[18px]">:</span>
+              <NumInput label="Phút (0-59)" value={minute} min={0} max={59} onChange={setMinute} flex={1} />
+            </div>
+          )}
           {fieldErrors.hour && <div className="text-[11px] text-[var(--color-crimson)] mt-1">{fieldErrors.hour}</div>}
+          {fieldErrors.hour_in_dia_chi && <div className="text-[11px] text-[var(--color-crimson)] mt-1">{fieldErrors.hour_in_dia_chi}</div>}
           {fieldErrors.minute && <div className="text-[11px] text-[var(--color-crimson)] mt-1">{fieldErrors.minute}</div>}
         </Group>
 
@@ -171,6 +223,62 @@ function clientOperationId(): string {
     return crypto.randomUUID();
   }
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function toBuildLasoRequest(values: EntryFormParsed): BuildLasoRequest {
+  if (values.calendar === "am") {
+    return {
+      calendar: "lunar",
+      day: values.day,
+      month: values.month,
+      year: values.year,
+      hour_in_dia_chi: values.hour_in_dia_chi,
+      is_leap_month: values.is_leap_month,
+      gender: values.gender,
+    };
+  }
+  return {
+    calendar: "solar",
+    day: values.day,
+    month: values.month,
+    year: values.year,
+    hour: values.hour,
+    gender: values.gender,
+  };
+}
+
+function LunarInfo() {
+  return (
+    <details className="relative mt-1 text-[11px] text-[var(--color-ink-3)]">
+      <summary className="cursor-pointer text-[var(--color-crimson)]">Vì sao năm âm có thể khác năm dương?</summary>
+      <div className="absolute z-20 mt-1 w-[270px] border border-[rgba(26,22,17,0.22)] bg-[var(--color-paper)] p-2 leading-relaxed shadow-sm">
+        Chế độ Âm lịch cần đúng năm âm. Ví dụ sinh 01/01/1990 dương lịch có
+        thể vẫn là tháng 12 năm Kỷ Tị 1989 âm lịch.
+      </div>
+    </details>
+  );
+}
+
+function DiaChiSelect({
+  value,
+  onChange,
+}: {
+  value: DiaChiId;
+  onChange: (value: DiaChiId) => void;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value as DiaChiId)}
+      className="w-full px-3.5 py-2.5 border border-[rgba(26,22,17,0.32)] bg-[var(--color-paper)] font-serif text-[17px] outline-none focus:border-[var(--color-crimson)]"
+    >
+      {DIA_CHI_HOURS.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label} ({option.range})
+        </option>
+      ))}
+    </select>
+  );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

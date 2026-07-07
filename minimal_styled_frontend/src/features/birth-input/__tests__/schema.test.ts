@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BirthFormSchema, toBirthInput, fromBirthInput } from '../schema';
+import { BirthFormSchema, toApiRequest, toBirthInput, fromBirthInput } from '../schema';
 
 const VALID = {
   name: 'Linh',
@@ -85,5 +85,28 @@ describe('toBirthInput / fromBirthInput', () => {
   it('drops an empty name', () => {
     const input = toBirthInput(BirthFormSchema.parse({ ...VALID, name: '   ' }));
     expect(input.name).toBeUndefined();
+  });
+
+  it('maps lunar mode to hour_in_dia_chi API input', () => {
+    const input = toBirthInput(
+      BirthFormSchema.parse({
+        ...VALID,
+        calendar: 'lunar',
+        lunarDay: 27,
+        lunarMonth: 12,
+        lunarYear: 1989,
+        hourInDiaChi: 'ti',
+      }),
+    );
+
+    expect(input.hour).toBeUndefined();
+    expect(toApiRequest(input)).toMatchObject({
+      calendar: 'lunar',
+      day: 27,
+      month: 12,
+      year: 1989,
+      hour_in_dia_chi: 'ti',
+      gender: 'F',
+    });
   });
 });

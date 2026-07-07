@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { toApiRequest } from '@/features/birth-input/schema';
 import { useBuildSaoLuu } from '@/lib/api/hooks';
 import { apiErrorMessage, isApiError } from '@/lib/http/errors';
 import { useChartStore } from '@/store/chart-store';
@@ -40,14 +41,9 @@ export function SaoLuuPicker() {
       setApiError(null);
       mutate(
         {
-          birth_info: {
-            day: lastInput.date,
-            month: lastInput.month,
-            year: lastInput.year,
-            hour: lastInput.hour,
-            gender: lastInput.gender,
-          },
+          birth_info: toApiRequest(lastInput),
           observation_time: {
+            calendar: 'solar',
             day: 1,
             month: 1,
             year: parsedYear,

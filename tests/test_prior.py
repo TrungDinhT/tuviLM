@@ -87,6 +87,45 @@ def test_from_solar_day_keeps_23h_rollover_behavior(
     assert prior.hour == DiaChi.TY
 
 
+def test_from_lunar_day_builds_prior_directly():
+    prior = LaSoPrior.from_lunar_day(
+        year=1989,
+        month=12,
+        day=27,
+        hour=DiaChi.TI,
+        gender=Gender.MALE,
+    )
+
+    assert (prior.date, prior.month, prior.year) == (27, 12, 1989)
+    assert prior.hour == DiaChi.TI
+    assert prior.thien_can == ThienCan.KY
+    assert prior.dia_chi == DiaChi.TI
+
+
+def test_from_lunar_day_rejects_missing_lunar_day():
+    with pytest.raises(ValueError, match="chỉ có 29 ngày"):
+        LaSoPrior.from_lunar_day(
+            year=1990,
+            month=1,
+            day=30,
+            hour=DiaChi.TY,
+            gender=Gender.MALE,
+        )
+
+
+def test_from_lunar_day_preserves_leap_month_choice():
+    prior = LaSoPrior.from_lunar_day(
+        year=1990,
+        month=5,
+        day=1,
+        hour=DiaChi.TY,
+        gender=Gender.MALE,
+        is_leap_month=True,
+    )
+
+    assert prior.is_leap_month is True
+
+
 def test_natal_context_from_prior_derives_menh_position_and_cuc():
     prior = LaSoPrior(
         hour=DiaChi.MEO,

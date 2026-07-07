@@ -65,7 +65,7 @@ export function useCreateChartSession() {
       const profile = await createChartProfile(
         {
           display_name: displayName,
-          birth_info: { calendar: 'solar', ...birthInfo },
+          birth_info: birthInfo.calendar ? birthInfo : { calendar: 'solar', ...birthInfo },
         },
         owner,
         idempotencyKey('profile'),
@@ -136,21 +136,16 @@ export function useOpenChartSession() {
             idempotencyKey('session'),
           )
         ).session.id;
-      const { day, month, year, hour, gender } = profile.birth_info;
-      const response = await buildLaso({ day, month, year, hour, gender });
+      const birthInfo = profile.birth_info.calendar
+        ? profile.birth_info
+        : { calendar: 'solar' as const, ...profile.birth_info };
+      const response = await buildLaso(birthInfo);
 
       return {
         ownerId,
         chartProfileId: profile.id,
         sessionId: openedSessionId,
-        input: {
-          date: day,
-          month,
-          year,
-          hour,
-          gender,
-          name: profile.display_name,
-        },
+        input: birthInputFromProfile(profile),
         response,
       };
     },
@@ -160,6 +155,31 @@ export function useOpenChartSession() {
       });
     },
   });
+}
+
+function birthInputFromProfile(profile: ChartProfile): BirthInput {
+  const birthInfo = profile.birth_info;
+  if (birthInfo.calendar === 'lunar') {
+    return {
+      calendar: 'lunar',
+      date: birthInfo.day,
+      month: birthInfo.month,
+      year: birthInfo.year,
+      hour_in_dia_chi: birthInfo.hour_in_dia_chi,
+      is_leap_month: birthInfo.is_leap_month ?? false,
+      gender: birthInfo.gender,
+      name: profile.display_name,
+    };
+  }
+  return {
+    calendar: 'solar',
+    date: birthInfo.day,
+    month: birthInfo.month,
+    year: birthInfo.year,
+    hour: birthInfo.hour,
+    gender: birthInfo.gender,
+    name: profile.display_name,
+  };
 }
 
 export interface DeleteChartProfileArgs {

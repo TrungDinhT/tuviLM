@@ -1,0 +1,6032 @@
+groups:
+  tu_sat:
+    stars:
+    - khinh_duong
+    - da_la
+    - hoa_tinh
+    - linh_tinh
+  luc_sat:
+    stars:
+    - khinh_duong
+    - da_la
+    - hoa_tinh
+    - linh_tinh
+    - dia_kiep
+    - dia_khong
+  sat_tinh:
+    categories:
+    - luc_sat
+  cat_tinh:
+    categories:
+    - cat_tinh
+    - luc_cat
+  chinh_dieu:
+    categories:
+    - chinh_tinh
+  tu_hoa:
+    stars:
+    - hoa_loc
+    - hoa_quyen
+    - hoa_khoa
+    - hoa_ky
+  tam_hoa:
+    stars:
+    - hoa_khoa
+    - hoa_quyen
+    - hoa_loc
+cach_cuc:
+- id: tam_am
+  name: Tam ám hội hợp
+  page: 41
+  meaning: Bộ sao này thường che lấp ánh sáng của Nhật Nguyệt
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - da_la
+      - thien_rieu
+      - hoa_ky
+      scope: hoi_hop
+  applicable_palaces: null
+- id: ho_do_hom_sat
+  name: Hổ đội hòm sắt
+  page: 41
+  meaning: Có lợi cho việc học hành, thi cử, cầu công danh; chủ chức vị, quyền thế
+  conditions:
+    any:
+    - type: stars_together
+      stars:
+      - bach_ho
+      - tau_thu
+  applicable_palaces: null
+- id: ho_moc_canh
+  name: Hổ mọc cánh
+  page: 41
+  meaning: Vui vẻ, nhanh nhẹn, có lợi cho việc thi cử, cầu công danh
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - bach_ho
+      - phi_liem
+- id: dich_ma
+  name: Dịch Mã
+  page: 42
+  meaning: Người đa tài
+  conditions:
+    any:
+    - type: star_in_palace
+      stars:
+      - thien_ma
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - thien_ma
+      palace: Than
+- id: phu_du_ma
+  name: Phù Du Mã
+  page: 42
+  meaning: Tài giỏi, thao lược, uy quyền hiển hách, giàu sang, phúc thọ song toàn
+  conditions:
+    all:
+    - type: star_at_chi
+      stars:
+      - thien_ma
+      at_chi:
+      - Dan
+      - Than
+    - type: stars_together
+      stars:
+      - thien_ma
+      - tu_vi
+      - thien_phu
+- id: thu_hung_ma
+  name: Thư Hùng Mã
+  page: 42
+  meaning: Đa tài, giàu sang, vinh hiển
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - thien_ma
+      - thai_duong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_ma
+      - thai_am
+      scope: hoi_hop
+    - type: star_brightness
+      star: thai_duong
+      brightness:
+      - mieu
+      - vuong
+      - dac
+    - type: star_brightness
+      star: thai_am
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: chiet_tien_ma
+  name: Chiết Tiễn Mã
+  page: 42
+  meaning: Mọi sự chóng thành tựu, công danh tài lộc đều hưng vượng
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_ma
+      - loc_ton
+- id: loc_ma_giao_tri
+  name: Lộc, Mã giao trì
+  page: 42
+  meaning: May mắn, vui vẻ, mọi sự hanh thông, tài quan song mỹ
+  conditions:
+    all:
+    - type: stars_opposite
+      stars:
+      - thien_ma
+      - loc_ton
+- id: chien_ma_hoa
+  name: Chiến Mã (Hỏa)
+  page: 42
+  meaning: Dũng mãnh. Chủ quân sự, binh quyền
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_ma
+      - hoa_tinh
+- id: chien_ma_linh
+  name: Chiến Mã (Linh)
+  page: 42
+  meaning: Dũng mãnh. Chủ quân sự, binh quyền
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_ma
+      - linh_tinh
+- id: tuan_ma
+  name: Tuấn Mã
+  page: 42
+  meaning: Dũng mãnh thao lược. Chuyên về quân sự, chinh chiến
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - thien_ma
+      - thien_khoc
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_ma
+      - dieu_khach
+      scope: hoi_hop
+- id: phu_thi_ma
+  name: Phù Thi Mã
+  page: 42
+  meaning: Gây tai họa khủng khiếp, chết chóc thê thảm
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_ma
+      - thien_hinh
+- id: chiet_tuc_ma_dong
+  name: Chiết Túc Mã (đồng cung)
+  page: 42
+  meaning: Suy bại, ngăn trở mọi công việc, gây tai họa
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_ma
+      - da_la
+- id: chiet_tuc_ma_xung
+  name: Chiết Túc Mã (xung chiếu)
+  page: 42
+  meaning: Suy bại, ngăn trở mọi công việc, gây tai họa
+  conditions:
+    all:
+    - type: stars_opposite
+      stars:
+      - thien_ma
+      - da_la
+- id: cung_do_ma
+  name: Cùng Đồ Mã
+  page: 42
+  meaning: Bất tác, thất bại
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_ma
+      palace: Hoi
+    - type: star_in_palace
+      stars:
+      - tuyet
+      palace: Hoi
+- id: tu_ma_tuan
+  name: Tử Mã (Tuần)
+  page: 42
+  meaning: Gây tai họa, bại hoại, chết chóc
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_ma
+      - tuan_trung
+- id: tu_ma_triet
+  name: Tử Mã (Triệt)
+  page: 42
+  meaning: Gây tai họa, bại hoại, chết chóc
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_ma
+      - triet_lo
+- id: ho_ham_kiem
+  name: Hổ hàm kiếm
+  page: 43
+  meaning: Dũng mãnh tài giỏi, biết điều khiển ba quân, hiển đạt về võ nghiệp
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+    - type: star_in_palace
+      stars:
+      - thien_hinh
+      palace: Menh
+- id: ho_ham_kiem_vo
+  name: Hổ hàm kiếm (võ)
+  page: 43
+  meaning: Uy dũng kiêm nhiệm văn võ
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+    - type: star_in_palace
+      stars:
+      - thien_hinh
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_hinh
+      - tuong_quan
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_hinh
+      - quoc_an
+      scope: hoi_hop
+- id: ho_ham_kiem_sat
+  name: Hổ hàm kiếm (hung)
+  page: 43
+  meaning: Gặp Sát tinh thì hung
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+    - type: star_in_palace
+      stars:
+      - thien_hinh
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_hinh
+      group: sat_tinh
+      scope: hoi_hop
+- id: rieu_dac_dia
+  name: Riêu đắc địa
+  page: 43
+  meaning: Dìm vào tửu sắc cũng không bị nhơ nhuốc, ví như sen mọc trong bùn
+  conditions:
+    all:
+    - type: star_at_chi
+      stars:
+      - thien_rieu
+      at_chi:
+      - Dan
+      - Mao
+      - Dau
+      - Tuat
+- id: rieu_long_phuong
+  name: Riêu gặp Long Phượng
+  page: 43
+  meaning: Tốt đẹp, vui vẻ; liên quan cưới hỏi sinh nở, công danh tài lộc hưng vượng
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - thien_rieu
+      - long_tri
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_rieu
+      - phuong_cac
+      scope: hoi_hop
+- id: tu_linh
+  name: Tứ Linh
+  page: 45
+  meaning: Chủ công danh, chức vị, uy quyền
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - bach_ho
+      - long_tri
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - bach_ho
+      - phuong_cac
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - bach_ho
+      - hoa_cai
+      scope: hoi_hop
+- id: toan_quan_luong_pha
+  name: Toán quân lưỡng phá
+  page: 46
+  meaning: Dũng mãnh, hiển đạt về võ nghiệp, uy danh lừng lẫy
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - pha_toai
+      palace: Menh
+    - type: stars_together
+      stars:
+      - pha_toai
+      - pha_quan
+- id: tai_nhat_sang
+  name: Tài, Nhật đồng cung (sáng)
+  page: 46
+  meaning: Thiên Tài che lấp ánh sáng Nhật
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_tai
+      - thai_duong
+    - type: star_brightness
+      star: thai_duong
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: tai_nguyet_sang
+  name: Tài, Nguyệt đồng cung (sáng)
+  page: 46
+  meaning: Thiên Tài che lấp ánh sáng Nguyệt
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_tai
+      - thai_am
+    - type: star_brightness
+      star: thai_am
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: tai_nhat_mo
+  name: Tài, Nhật đồng cung (mờ)
+  page: 46
+  meaning: Làm cho Nhật sáng tỏ
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_tai
+      - thai_duong
+    - type: star_brightness
+      star: thai_duong
+      brightness:
+      - ham
+- id: tai_nguyet_mo
+  name: Tài, Nguyệt đồng cung (mờ)
+  page: 46
+  meaning: Làm cho Nguyệt sáng tỏ
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_tai
+      - thai_am
+    - type: star_brightness
+      star: thai_am
+      brightness:
+      - ham
+- id: tai_nhat_nguyet_dong_cung
+  name: Tài, Nhật, Nguyệt đồng cung
+  page: 46
+  meaning: Làm cho Nhật Nguyệt thêm rỡ ràng tốt đẹp
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_tai
+      - thai_duong
+      - thai_am
+    - type: star_at_chi
+      stars:
+      - thai_duong
+      at_chi:
+      - Suu
+      - Mui
+- id: cuu_khon_pho_nguy_duong
+  name: Cứu khổn phò nguy (Dương)
+  page: 47
+  meaning: Gia tăng phúc thọ, giải trừ bệnh tật, tai họa
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - thieu_duong
+      - hoa_khoa
+      scope: dong_hoac_xung
+- id: cuu_khon_pho_nguy_am
+  name: Cứu khổn phò nguy (Âm)
+  page: 47
+  meaning: Gia tăng phúc thọ, giải trừ bệnh tật, tai họa
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - thieu_am
+      - hoa_khoa
+      scope: dong_hoac_xung
+- id: tuyet_xu_phung_sinh
+  name: Tuyệt xứ phùng sinh
+  page: 52
+  meaning: Cảnh tuyệt mà gặp sinh, không đáng lo ngại nhiều
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tuyet
+      palace: Menh
+    - type: star_in_palace
+      group: chinh_dieu
+      palace: Menh
+- id: menh_tuan_than_triet
+  name: Mệnh Tuần, Thân Triệt
+  page: 54
+  meaning: Suốt đời mới được xứng ý toại lòng; nhất là về già mới có danh giá và an nhàn
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tuan_trung
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - triet_lo
+      palace: Than
+- id: menh_triet_than_tuan
+  name: Mệnh Triệt, Thân Tuần
+  page: 54
+  meaning: Suốt đời mới được xứng ý toại lòng, tăng tuổi thọ, về già sung sướng
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - triet_lo
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - tuan_trung
+      palace: Than
+- id: menh_khong_than_kiep
+  name: Mệnh Không, Thân Kiếp
+  page: 54
+  meaning: Rất khôn ngoan sắc sảo, nhưng vui ít buồn nhiều, thành bại thất thường
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - dia_khong
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - dia_kiep
+      palace: Than
+- id: menh_kiep_than_khong
+  name: Mệnh Kiếp, Thân Không
+  page: 54
+  meaning: Rất khôn ngoan sắc sảo, nhưng vui ít buồn nhiều, thành bại bất thường
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - dia_kiep
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - dia_khong
+      palace: Than
+- id: tu_vi_trung_hau
+  name: Tử Vi trung hậu
+  page: 56
+  meaning: Người trung hậu
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: star_brightness
+      star: tu_vi
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+      - binh
+- id: tu_vi_nam_hai_nu_dan
+  name: Tử Vi nam Hợi, nữ Dần, Nhâm Giáp phú quý đồng
+  page: 57
+  meaning: Được hưởng phú quý trọn đời, giàu sang
+  conditions:
+    any:
+    - all:
+      - type: gender_match
+        gender: male
+      - type: can_match
+        can:
+        - Nham
+        - Giap
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Hoi
+      - type: star_in_palace
+        stars:
+        - tu_vi
+        palace: Menh
+    - all:
+      - type: gender_match
+        gender: female
+      - type: can_match
+        can:
+        - Nham
+        - Giap
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Dan
+      - type: star_in_palace
+        stars:
+        - tu_vi
+        palace: Menh
+- id: tu_phu_dong_cung_vo_sat
+  name: Tử Phủ đồng cung vô Sát
+  page: 57
+  meaning: Rỡ ràng tốt đẹp, phú quý song toàn, hưởng phúc trọn đời
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+      - Than
+    - type: stars_together
+      stars:
+      - tu_vi
+      - thien_phu
+    - type: no_stars
+      group: sat_tinh
+      in_palace: Menh
+- id: tu_vi_phu_bat
+  name: Tử Vi, Thiên Phủ toàn y, Phụ, Bật
+  page: 57
+  meaning: Được hưởng phú quý trọn đời
+  conditions:
+    all:
+    - any:
+      - type: star_in_palace
+        stars:
+        - tu_vi
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - thien_phu
+        palace: Menh
+      - type: stars_together
+        stars:
+        - tu_vi
+        - thien_phu
+    - type: stars_meeting
+      stars:
+      - ta_phu
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - huu_bat
+      scope: hoi_hop
+- id: tu_phu_kinh_duong
+  name: Tử Phủ, Kình Dương tại cư thương
+  page: 57
+  meaning: Người buôn bán lớn, rất giàu
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: stars_together
+      stars:
+      - tu_vi
+      - khinh_duong
+- id: tu_phu_kinh_duong_phu
+  name: Tử Phủ, Kình Dương (Phụ)
+  page: 57
+  meaning: Người buôn bán lớn, rất giàu
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_together
+      stars:
+      - thien_phu
+      - khinh_duong
+- id: quan_than_khanh_hoi
+  name: Quan thần khánh hội
+  page: 57
+  meaning: Rất rỡ ràng, vua tôi khánh hội, phú quý đến cực độ, uy danh lừng lẫy
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - thien_phu
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - vu_khuc
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - thien_tuong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - ta_phu
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - huu_bat
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - long_tri
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - phuong_cac
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - hoa_quyen
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - hoa_loc
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - quoc_an
+      scope: hoi_hop
+- id: luu_huyen_duc
+  name: Lưu Huyền Đức thừa Hán nghiệp
+  page: 57
+  meaning: Rất quý hiển, hưởng giàu sang trọn đời, có thể kế nghiệp lớn
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hoa_khoa
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hoa_quyen
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - thien_hinh
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - quoc_an
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hong_loan
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - thien_khoi
+      scope: hoi_hop
+- id: truong_tu_phong
+  name: Trương Tử Phòng thao lược
+  page: 57
+  meaning: Đa mưu túc trí, có tài thao lược, sau này rất quý hiển
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+    - type: stars_together
+      stars:
+      - tu_vi
+      - thien_phu
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hoa_ky
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hoa_quyen
+      scope: hoi_hop
+- id: tu_vi_that_sat_khong_vong
+  name: Tử Vi, Thất Sát gia Không Vong
+  page: 58
+  meaning: Hư danh, thư ốm; suốt đời lao khổ, chỉ có hư danh bên ngoài
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty_Snake
+      - Hoi
+    - type: stars_together
+      stars:
+      - tu_vi
+      - that_sat
+    - type: stars_meeting
+      stars:
+      - tuan_trung
+      - triet_lo
+      scope: dong_cung
+      mode: any
+- id: tu_vi_that_sat_hoa_quyen
+  name: Tử Vi, Thất Sát, Hóa Quyền phản tác trinh tường
+  page: 58
+  meaning: Rất rỡ ràng tốt đẹp, quý hiển, uy danh lừng lẫy
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty_Snake
+      - Hoi
+    - type: stars_together
+      stars:
+      - tu_vi
+      - that_sat
+      - hoa_quyen
+- id: tu_vi_vu_pha_duong_da
+  name: Tử Vi, Vũ Khúc, Phá Quân hội Dương Đà
+  page: 58
+  meaning: Không thích công danh mà thích buôn bán, khá giả
+  conditions:
+    all:
+    - any:
+      - type: star_in_palace
+        stars:
+        - tu_vi
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - vu_khuc
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - pha_quan
+        palace: Menh
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - da_la
+      scope: hoi_hop
+- id: tu_vi_vu_sat
+  name: Tử Vi, Vũ Khúc, Sát diệu
+  page: 58
+  meaning: Thường là thầy tu hay quan lại nhỏ, thích được tiếng anh hùng
+  conditions:
+    all:
+    - any:
+      - type: star_in_palace
+        stars:
+        - tu_vi
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - vu_khuc
+        palace: Menh
+    - type: stars_meeting
+      group: sat_tinh
+      scope: hoi_hop
+      mode: any
+- id: tu_pha_tu_muo
+  name: Tử, Phá tại Mộ cung
+  page: 58
+  meaning: Bất trung, bất hiếu, gian quyệt
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - any:
+      - type: star_in_palace
+        stars:
+        - tu_vi
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - pha_quan
+        palace: Menh
+- id: tu_pha_tu_meo_cat
+  name: Tử, Phá lâm ư Thìn, Tuất, Sửu, Mùi
+  page: 58
+  meaning: Phú quý đến tột bậc, uy quyền hiển hách, danh tiếng lừng lẫy
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - any:
+      - type: star_in_palace
+        stars:
+        - tu_vi
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - pha_quan
+        palace: Menh
+    - type: stars_meeting
+      group: cat_tinh
+      scope: hoi_hop
+      mode: any
+- id: tu_pha_vo_ta_huu
+  name: Tử Vi, Phá Quân vô Tả Hữu, vô cát diệu
+  page: 58
+  meaning: Hung ác, hôn lại, chí đố; tham nhũng và dốt nát
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+    - type: stars_together
+      stars:
+      - tu_vi
+      - pha_quan
+    - type: no_stars
+      stars:
+      - ta_phu
+      - huu_bat
+      in_palace: Menh
+- id: tu_vi_mao_dau_kiep_khong
+  name: Tử Vi cư Mão, Dậu, Kiếp, Không
+  page: 58
+  meaning: Đã phần thoát tục chí tăng
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Mao
+      - Dau
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - kiep_sat
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - dia_khong
+      scope: hoi_hop
+- id: tu_vi_kiep_khong_hong_dao
+  name: Tử Vi mạc phùng Kiếp, Không, Hồng, Đào giảm thọ
+  page: 59
+  meaning: Tuổi thọ bị chiết giảm
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - any:
+      - type: stars_together
+        stars:
+        - tu_vi
+        - dia_kiep
+      - type: stars_together
+        stars:
+        - tu_vi
+        - dia_khong
+      - type: stars_together
+        stars:
+        - tu_vi
+        - hong_loan
+      - type: stars_together
+        stars:
+        - tu_vi
+        - dao_hoa
+- id: tu_vi_xuong_khuc
+  name: Tử Vi, Xương, Khúc phú quý khả kỷ
+  page: 59
+  meaning: Được hưởng giàu sang
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - van_xuong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - van_khuc
+      scope: hoi_hop
+- id: tu_vi_phu_bat_dong_cung
+  name: Tử Vi, Phụ, Bật đồng cung nhất hô bá nặc
+  page: 59
+  meaning: Phú quý, uy quyền hiển hách, nói một lời muôn người nghe theo
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - tu_vi
+      - ta_phu
+      - huu_bat
+- id: tu_vi_tu_sat
+  name: Tử Vi phùng Tử Sát, phong bãi hà hoa
+  page: 59
+  meaning: Gặp Tứ Sát thì bị phá cách, như cành hoa bị mưa gió vùi dập
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - khinh_duong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - da_la
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - dia_khong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - dia_kiep
+      scope: hoi_hop
+- id: tu_vi_ty_ngo_khoa_quyen_loc
+  name: Tử Vi cư Tý, Ngọ, Khoa, Quyền, Lộc
+  page: 59
+  meaning: Rất sáng sủa tốt đẹp, chắc chắn hưởng phú quý song toàn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Ngo
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hoa_khoa
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hoa_quyen
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hoa_loc
+      scope: hoi_hop
+- id: tu_vi_quyen_loc_duong_da
+  name: Tử Vi, Quyền, Lộc ngộ Dương Đà vô đạo
+  page: 59
+  meaning: Giàu sang nhưng vô đạo và bất chính
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hoa_quyen
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - hoa_loc
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - khinh_duong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - da_la
+      scope: hoi_hop
+- id: tu_loc_phu_bat
+  name: Tử, Lộc đồng cung Phụ, Bật chiếu quý bất khả ngôn
+  page: 59
+  meaning: Quý hiển đến tột bậc
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - tu_vi
+      - loc_ton
+    - type: stars_meeting
+      stars:
+      - ta_phu
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - huu_bat
+      scope: hoi_hop
+- id: tu_phu_giap_menh
+  name: Tử, Phù giáp Mệnh vi quý cách
+  page: 59
+  meaning: Rất quý hiển
+  conditions:
+    all:
+    - type: stars_giap
+      stars:
+      - tu_vi
+      - thien_phu
+- id: tu_phu_trieu_vien
+  name: Tử, Phủ triều viên, thực lộc vạn chung
+  page: 59
+  meaning: Người rất giàu, suốt đời sung túc và no ấm
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - thien_phu
+      scope: hoi_hop
+    - type: no_stars
+      stars:
+      - tu_vi
+      - thien_phu
+      in_palace: Menh
+- id: liem_trinh_thanh_bach
+  name: Liêm Trinh thanh bạch
+  page: 61
+  meaning: Người thẳng thắn, cao khiết
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - liem_trinh
+      palace: Menh
+    - type: star_brightness
+      star: liem_trinh
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: liem_trinh_ha_tien
+  name: Liêm Trinh chủ hạ tiện
+  page: 61
+  meaning: Người nghèo hèn, suốt đời lao khổ
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - liem_trinh
+      palace: Menh
+    - type: star_brightness
+      star: liem_trinh
+      palace: Menh
+      brightness:
+      - ham
+- id: liem_trinh_than_mui_vo_sat
+  name: Liêm Trinh Thân, Mùi cung vô Sát
+  page: 61
+  meaning: Tất được phú quý đến tột bậc
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Than
+      - Mui
+    - type: star_in_palace
+      stars:
+      - liem_trinh
+      palace: Menh
+    - type: no_stars
+      group: sat_tinh
+      in_palace: Menh
+- id: liem_trinh_pha_quan_hoa_tinh_ham
+  name: Liêm Trinh, Phá Quân, Hỏa Tinh cư hãm
+  page: 61
+  meaning: Hay cô liêu, tự tử hoặc chết thảm
+  conditions:
+    any:
+    - all:
+      - type: star_in_palace
+        stars:
+        - liem_trinh
+        palace: Menh
+      - type: star_brightness
+        star: liem_trinh
+        palace: Menh
+        brightness:
+        - ham
+      - type: stars_together
+        stars:
+        - liem_trinh
+        - hoa_tinh
+    - type: stars_together
+      stars:
+      - liem_trinh
+      - pha_quan
+- id: liem_trinh_pha_hoa_ham
+  name: Liêm Trinh, Phá Quân, Hỏa Tinh cư hãm (Phá)
+  page: 61
+  meaning: Hay cô liêu, tự tử hoặc chết thảm
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - pha_quan
+      palace: Menh
+    - type: star_brightness
+      star: pha_quan
+      palace: Menh
+      brightness:
+      - ham
+    - type: stars_together
+      stars:
+      - pha_quan
+      - hoa_tinh
+- id: liem_trinh_phung_van_que
+  name: Liêm Trinh phùng Văn Khúc cán bôn ba
+  page: 61
+  meaning: Suốt đời phải bôn ba, nay đây mai đó
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - liem_trinh
+      - van_khuc
+- id: liem_trinh_mao_dau_sat
+  name: Liêm Trinh Mão Dậu gia Sát
+  page: 61
+  meaning: Không thể mưu cầu công danh, thường chuyên về kỹ nghệ hay doanh thương
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Mao
+      - Dau
+    - type: star_in_palace
+      stars:
+      - liem_trinh
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      group: sat_tinh
+      scope: hoi_hop
+- id: liem_trinh_sat_ti_hoi
+  name: Liêm Trinh, Sát tinh cư Tý, Hợi
+  page: 62
+  meaning: Suốt đời phải lang thang phiêu bạt
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Hoi
+    - type: star_in_palace
+      stars:
+      - liem_trinh
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      group: sat_tinh
+      scope: hoi_hop
+- id: liem_trinh_tu_sat
+  name: Liêm Trinh, Tử Sát tạo hình lục
+  page: 62
+  meaning: Hay bị bắt bớ giam cầm, có thể bị ám sát
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - liem_trinh
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      - khinh_duong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      - da_la
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      - hoa_tinh
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      - linh_tinh
+      scope: hoi_hop
+- id: tu_ngu_tu_sat
+  name: Tử ngộ Kình, Đà, Hỏa, Linh hữu già tỏa
+  page: 62
+  meaning: Hay bị mắc tù tội và thường bị đói khát khổ sở
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - liem_trinh
+      palace: Menh
+    - type: star_brightness
+      star: liem_trinh
+      palace: Menh
+      brightness:
+      - ham
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      - khinh_duong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      - da_la
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      - hoa_tinh
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      - linh_tinh
+      scope: hoi_hop
+- id: liem_trinh_bach_ho
+  name: Liêm Trinh, Bạch Hổ, hình ngục nan đào
+  page: 62
+  meaning: Khó tránh thoát được xiềng xích gông cùm
+  conditions:
+    any:
+    - type: stars_together
+      stars:
+      - liem_trinh
+      - bach_ho
+    - type: stars_opposite
+      stars:
+      - liem_trinh
+      - bach_ho
+- id: liem_trinh_tuong_quan
+  name: Liêm Trinh nhập Miếu hội Tướng Quân
+  page: 62
+  meaning: Người rất dũng mãnh như ông Trọng Do
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - liem_trinh
+      palace: Menh
+    - type: star_brightness
+      star: liem_trinh
+      palace: Menh
+      brightness:
+      - mieu
+    - type: stars_meeting
+      stars:
+      - tuong_quan
+      scope: dong_hoac_xung
+- id: thien_dong_nhap_menh
+  name: Thiên Đồng nhập Mệnh
+  page: 63
+  meaning: Người có tính chất hoán cải vô thường, thay đổi thất thường
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_dong
+      palace: Menh
+- id: thien_dong_hoi_cat_tho
+  name: Thiên Đồng hội cát thọ nguyên thời
+  page: 64
+  meaning: Chắc chắn sống lâu
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_dong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_dong
+      group: cat_tinh
+      scope: hoi_hop
+- id: thien_dong_tuat_dinh
+  name: Thiên Đồng Tuất cung vi phản bội (Đinh)
+  page: 64
+  meaning: Tuổi Đinh mà Mệnh an tại Tuất có Đồng tọa thủ thì rất quý hiển
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Tuat
+    - type: star_in_palace
+      stars:
+      - thien_dong
+      palace: Menh
+    - type: can_match
+      can:
+      - Dinh
+- id: dong_luong_dan_than
+  name: Dần, Thân tối hỷ Đồng Lương hội
+  page: 64
+  meaning: Rất sáng sủa tốt đẹp, phú quý tột bậc, phúc thọ song toàn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+      - Than
+    - type: stars_together
+      stars:
+      - thien_dong
+      - thien_luong
+- id: dong_luong_khoi_quyen_linh_ky
+  name: Đồng, Lương viên ngộ Khôi, Quyền, Linh Kỵ
+  page: 64
+  meaning: Dễ phát phú bằng đường kinh doanh, buôn bán, làm giàu nhanh chóng
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_dong
+      - thien_luong
+    - type: stars_meeting
+      stars:
+      - thien_dong
+      - thien_khoi
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_dong
+      - hoa_quyen
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_dong
+      - linh_tinh
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_dong
+      - hoa_ky
+      scope: hoi_hop
+- id: dong_nguyet_ngo_sat
+  name: Đồng, Nguyệt hãm cung gia Sát
+  page: 64
+  meaning: Người chuyên về kỹ nghệ, hoặc kinh doanh buôn bán
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ngo
+    - type: stars_together
+      stars:
+      - thien_dong
+      - thai_am
+    - type: stars_meeting
+      stars:
+      - thien_dong
+      group: sat_tinh
+      scope: hoi_hop
+- id: dong_nguyet_dung_ngo_binh_mau
+  name: Đồng, Nguyệt, Dương cư Ngọ, Bính Mậu trấn ngự
+  page: 64
+  meaning: Là võ tướng, trấn giữ nơi biên cương
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ngo
+    - type: stars_together
+      stars:
+      - thien_dong
+      - thai_am
+      - khinh_duong
+    - type: can_match
+      can:
+      - Binh
+      - Mau
+- id: phuc_dieu_phung_viet_dieu
+  name: Phúc Diệu phùng Việt diệu
+  page: 64
+  meaning: Người đẹp đẽ, có vẻ mặt uy nghi
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_dong
+      - thien_viet
+- id: thien_dong_tuat_hoa_ky_dinh
+  name: Thiên Đồng Tuất cung Hóa Kỵ (Đinh)
+  page: 64
+  meaning: Tuổi Đinh mà Mệnh Tuất có Đồng, Kỵ đồng cung thì hưởng phú quý
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Tuat
+    - type: stars_together
+      stars:
+      - thien_dong
+      - hoa_ky
+    - type: can_match
+      can:
+      - Dinh
+- id: vu_khuc_qua_tu
+  name: Vũ Khúc vi Quả Tú
+  page: 66
+  meaning: Hay cách biệt người thân; khắc cha mẹ, anh em, vợ/chồng hoặc con
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+- id: vu_khuc_mieu_uy_danh
+  name: Vũ Khúc, Miếu viên, uy danh bách hiến
+  page: 66
+  meaning: Được phú quý đến tột bậc, uy quyền hiển hách
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: star_brightness
+      star: vu_khuc
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: vu_khuc_ham_thu_nghe
+  name: Vũ Khúc nhàn cung đa thủ nghệ
+  page: 66
+  meaning: Nên chuyên về thủ công hay làm thợ
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: star_brightness
+      star: vu_khuc
+      palace: Menh
+      brightness:
+      - ham
+- id: vu_pha_ti_hoi
+  name: Vũ phùng Phá diệu tại Tý Hợi
+  page: 67
+  meaning: Không thể gìn giữ của cải, thường phải phá tán
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Hoi
+    - type: stars_together
+      stars:
+      - vu_khuc
+      - pha_quan
+- id: vu_pha_pha_gia_lao_luc
+  name: Vũ Khúc, Phá Quân, phá gia lao lực
+  page: 67
+  meaning: Phải bỏ nhà đi kiếm ăn ở phương xa, suốt đời vất vả
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - vu_khuc
+      - pha_quan
+- id: vu_pha_xuong_khuc
+  name: Vũ, Phá tương ngộ Xương, Khúc
+  page: 67
+  meaning: Thông minh, khéo tay, chuyên về kỹ nghệ máy móc
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - vu_khuc
+      - pha_quan
+      - van_xuong
+      - van_khuc
+- id: vu_khuc_hai_thuong_am
+  name: Vũ Khúc cư Hợi thương (Hải)
+  page: 67
+  meaning: Rất mờ ám xấu xa; suốt đời vất vả
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Hoi
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: stars_together
+      stars:
+      - vu_khuc
+      - pha_quan
+    - type: stars_meeting
+      stars:
+      - thai_am
+      scope: nhi_hop
+    - type: stars_meeting
+      stars:
+      - tham_lang
+      scope: xung_chieu
+- id: vu_tham_tien_ban_hau_phu
+  name: Tiền bần hậu phú, Vũ, Tham đồng Mệnh Thân
+  page: 67
+  meaning: Trước nghèo sau giàu
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+      - Mui
+    - type: stars_together
+      stars:
+      - vu_khuc
+      - tham_lang
+- id: vu_tham_tien_phu_hau_ban
+  name: Tiền phú hậu bần, Vũ, Tham phùng Kiếp Sát
+  page: 67
+  meaning: Trước giàu sau nghèo
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+      - Mui
+    - type: stars_together
+      stars:
+      - vu_khuc
+      - tham_lang
+    - type: stars_together
+      stars:
+      - vu_khuc
+      - dia_kiep
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      group: sat_tinh
+      scope: hoi_hop
+- id: mao_vu_sat_pha_liem
+  name: Mão cư Vũ, Sát, Phá, Liêm
+  page: 67
+  meaning: Đề phòng tai nạn về điện, lửa, sấm sét và bệnh thần kinh
+  conditions:
+    any:
+    - all:
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Mao
+      - type: stars_together
+        stars:
+        - vu_khuc
+        - that_sat
+    - all:
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Mao
+      - type: stars_together
+        stars:
+        - pha_quan
+        - liem_trinh
+- id: vu_khuc_duong_da_qua_tu
+  name: Vũ Khúc, Dương, Đà kiêm Quả Tú
+  page: 67
+  meaning: Vì tiền mà nguy khốn đến thân
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: star_brightness
+      star: vu_khuc
+      palace: Menh
+      brightness:
+      - ham
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      - khinh_duong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      - da_la
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      - qua_tu
+      scope: hoi_hop
+- id: vu_khuc_van_khuc
+  name: Vũ Khúc, Văn Khúc đa học đa năng
+  page: 67
+  meaning: Thông minh, học rộng, có tài năng
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: star_brightness
+      star: vu_khuc
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+    - type: stars_together
+      stars:
+      - vu_khuc
+      - van_khuc
+- id: vu_khuc_khoi_viet
+  name: Vũ Khúc, Khôi, Việt cư Miếu Vượng
+  page: 67
+  meaning: Có quan chức về tài chính, thường giữ kho tàng
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: star_brightness
+      star: vu_khuc
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+    - type: star_in_palace
+      stars:
+      - thien_khoi
+      - thien_viet
+      palace: Menh
+- id: vu_khuc_loc_ma
+  name: Vũ Khúc, Lộc, Mã giao trì
+  page: 68
+  meaning: Lập nghiệp ở xa quê hương, rất khá giả
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: star_brightness
+      star: vu_khuc
+      palace: Menh
+      brightness:
+      - mieu
+      - dac
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      - hoa_loc
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      - thien_ma
+      scope: hoi_hop
+- id: vu_khuc_dan_than_loc_quyen
+  name: Vũ Khúc, Dần Thân nhị ngộ Lộc Quyền
+  page: 68
+  meaning: Người rất giàu, phú quý sánh ngang Vương Khải
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+      - Than
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      - hoa_loc
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      - hoa_quyen
+      scope: hoi_hop
+- id: vu_khuc_kiep_sat_kinh
+  name: Vũ Khúc, Kiếp Sát hội Kình Dương sát nhân
+  page: 68
+  meaning: Rất gian ác bất lương, có thể giết người
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: star_brightness
+      star: vu_khuc
+      palace: Menh
+      brightness:
+      - ham
+    - type: stars_together
+      stars:
+      - vu_khuc
+      - kiep_sat
+    - type: stars_opposite
+      stars:
+      - vu_khuc
+      - khinh_duong
+- id: nhat_xuat_loi_mon
+  name: Nhật xuất Lôi môn
+  page: 70
+  meaning: Chủ được hưởng phú quý và rất vinh hiển
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Mao
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+- id: thai_duong_ngo
+  name: Thái Dương cư Ngọ, Nhật lệ trung thiên
+  page: 70
+  meaning: Sáng sủa tốt đẹp, giàu sang cao hiển
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ngo
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+- id: thai_duong_ngo_canh_tan_dinh_ky
+  name: Thái Dương cư Ngọ, Canh, Tân, Đinh, Kỷ phú quý song toàn
+  page: 70
+  meaning: Được hưởng phú quý song toàn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ngo
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+    - type: can_match
+      can:
+      - Canh
+      - Tan
+      - Dinh
+      - Ky
+- id: thai_duong_ty_binh_dinh
+  name: Thái Dương cư Tý, Bính Đinh phú quý trung lương
+  page: 70
+  meaning: Được giàu sang, người trung chính lương thiện
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+    - type: can_match
+      can:
+      - Binh
+      - Dinh
+- id: nu_menh_loan_chinh_thai_duong
+  name: Nữ Mệnh đoan chính Thái Dương tinh tao ngộ hiền phu tín khả bằng
+  page: 70
+  meaning: Đoan chính, sớm lấy chồng hiền có tài thao lược
+  conditions:
+    all:
+    - type: gender_match
+      gender: female
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+    - type: star_brightness
+      star: thai_duong
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: nhat_nguyet_tinh_minh_tac_cuu_trung_kim_dien
+  name: Nhật, Nguyệt tinh minh, tá cửu trùng kim điện
+  page: 71
+  meaning: Có tài kinh bang tế thế, được hưởng giàu sang, thường phò tá nguyên thủ
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+    - type: star_at_chi
+      stars:
+      - thai_duong
+      at_chi:
+      - Mao
+    - type: star_at_chi
+      stars:
+      - thai_am
+      at_chi:
+      - Hoi
+- id: tam_hop_minh_chau_sinh_vung_dia_an_bo_thiem_cung
+  name: Tam hợp Minh Châu sinh Vượng địa, ẩn bộ Thiềm cung
+  page: 71
+  meaning: Rất quý hiển, nhẹ bước công danh
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - thai_am
+      palace: Menh
+    - type: star_brightness
+      star: thai_duong
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+    - type: star_brightness
+      star: thai_am
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: nhat_nguyet_vu_minh_hoi_hop
+  name: Nhật, Nguyệt vô Chính diệu nhưng hợp chiếu sáng sủa
+  page: 71
+  meaning: Thông minh, học một biết mười
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+    - type: no_stars
+      group: chinh_dieu
+      in_palace: Menh
+    - type: star_at_chi
+      stars:
+      - thai_duong
+      at_chi:
+      - Mao
+    - type: star_at_chi
+      stars:
+      - thai_am
+      at_chi:
+      - Hoi
+- id: nhat_ty_nguyet_suu_cung_menh_bo_thiem_cung
+  name: Nhật, Tỵ, Nguyệt, Sửu cung Mệnh, bộ Thiềm cung
+  page: 71
+  meaning: Rất quý hiển, đào gót cung Thiềm
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+    - type: star_at_chi
+      stars:
+      - thai_duong
+      at_chi:
+      - Ty
+    - type: star_at_chi
+      stars:
+      - thai_am
+      at_chi:
+      - Dau
+- id: nhat_mao_nguyet_hoi_mui_cung_menh_da_chiết_quế
+  name: Nhật, Mão, Nguyệt, Hợi, Mùi cung, Mệnh đa chiết quế
+  page: 71
+  meaning: Đi thi đỗ cao
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Mui
+    - type: star_at_chi
+      stars:
+      - thai_duong
+      at_chi:
+      - Mao
+    - type: star_at_chi
+      stars:
+      - thai_am
+      at_chi:
+      - Hoi
+- id: nguyet_nhat_dong_mui_menh_an_suu_hau_ba_chi_tai
+  name: Nguyệt, Nhật đồng Mùi, Mệnh an Sửu, hầu bá chi tài
+  page: 71
+  meaning: Tài giỏi, quyền cao, chức trọng
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+    - type: star_at_fixed_chi
+      star: thai_duong
+      chi:
+      - Mui
+    - type: star_at_fixed_chi
+      star: thai_am
+      chi:
+      - Mui
+- id: nhat_nguyet_menh_than_cu_suu_mui_tam_phuong_vo_cat
+  name: Nhật, Nguyệt Mệnh, Thân cư Sửu, Mùi tam phương vô cát, phản vi hung
+  page: 71
+  meaning: Mờ ám xấu xa, tự no cơm ấm áo trọn đời nhưng không thể quý hiển
+  conditions:
+    any:
+    - all:
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Suu
+      - type: stars_together
+        stars:
+        - thai_duong
+        - thai_am
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Mui
+    - all:
+      - type: palace_at
+        palace: Than
+        chi:
+        - Suu
+      - type: stars_together
+        stars:
+        - thai_duong
+        - thai_am
+      - type: palace_at
+        palace: Than
+        chi:
+        - Mui
+- id: nhat_nguyet_khoa_loc_suu_cung_dinh_thi_cong_khanh
+  name: Nhật Nguyệt, Khoa, Lộc, Sửu cung, đinh thị công khanh
+  page: 72
+  meaning: Người có chức vị lớn trong chính quyền
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+    - type: stars_together
+      stars:
+      - thai_duong
+      - thai_am
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      - hoa_loc
+      scope: hoi_hop
+- id: nhat_nguyet_tinh_tranh_quang_quyen_loc_phi_tan
+  name: Nhật Nguyệt tịnh tranh quang, quyền lộc phi tàn
+  page: 72
+  meaning: Rất rực rỡ tốt đẹp; suốt đời hưởng giàu sang, giữ được quyền thế và tài lộc
+  conditions:
+    any:
+    - all:
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Thin
+      - type: star_at_chi
+        stars:
+        - thai_duong
+        at_chi:
+        - Thin
+      - type: star_at_fixed_chi
+        star: thai_am
+        chi:
+        - Tuat
+    - all:
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Tuat
+      - type: star_at_chi
+        stars:
+        - thai_duong
+        at_chi:
+        - Tuat
+      - type: star_at_fixed_chi
+        star: thai_am
+        chi:
+        - Thin
+- id: nhat_nguyet_bach_cung_nhuoc_vu_minh_khong_dieu_tu_can_song_dac_giao_huy
+  name: Nhật, Nguyệt, bách cung nhược vô minh, không diệu tu cần song đắc giao huy, nhi phùng Xương, Tuế, Lộc, Quyền, Phụ, Cáo, Tả, Hữu nhất cử thành danh
+  page: 72
+  meaning: Sớm được nhẹ bước thang mây, thành danh dễ dàng, có uy quyền hiển hách, được nhiều người tôn phục
+  conditions:
+    any:
+    - type: stars_meeting
+      stars:
+      - van_xuong
+      - thai_tue
+      - hoa_loc
+      - hoa_quyen
+      - ta_phu
+      - quoc_an
+      - thien_giai
+      - thien_duc
+      scope: hoi_hop
+- id: nhat_nguyet_sat_hoi_nam_da_gian_dao_nu_da_dam
+  name: Nhật, Nguyệt, Sát hội, nam đa gian đạo, nữ đa dâm
+  page: 72
+  meaning: Rất xấu; đàn ông dễ là quân trộm cướp, đàn bà là hạng dâm đãng
+  conditions:
+    any:
+    - all:
+      - type: star_in_palace
+        stars:
+        - thai_duong
+        palace: Menh
+      - type: star_brightness
+        star: thai_duong
+        palace: Menh
+        brightness:
+        - ham
+      - type: stars_meeting
+        stars:
+        - thai_duong
+        group: sat_tinh
+        scope: hoi_hop
+    - all:
+      - type: star_in_palace
+        stars:
+        - thai_am
+        palace: Menh
+      - type: star_brightness
+        star: thai_am
+        palace: Menh
+        brightness:
+        - ham
+      - type: stars_meeting
+        stars:
+        - thai_am
+        group: sat_tinh
+        scope: hoi_hop
+- id: nhat_nguyet_vo_minh_phung_rieu_da_ky_kiep_kinh
+  name: Nhật, Nguyệt vô minh, nhi phùng Riêu, Đà, Kỵ, Kiếp, Kình ư Mệnh, tật nguyền lưỡng mục
+  page: 72
+  meaning: Bị mù lòa hai mắt
+  conditions:
+    any:
+    - all:
+      - type: star_in_palace
+        stars:
+        - thai_duong
+        palace: Menh
+      - type: star_brightness
+        star: thai_duong
+        palace: Menh
+        brightness:
+        - ham
+      - type: stars_meeting
+        stars:
+        - thai_duong
+        - thien_rieu
+        - da_la
+        - hoa_ky
+        - kiep_sat
+        - khinh_duong
+        scope: hoi_hop
+    - all:
+      - type: star_in_palace
+        stars:
+        - thai_am
+        palace: Menh
+      - type: star_brightness
+        star: thai_am
+        palace: Menh
+        brightness:
+        - ham
+      - type: stars_meeting
+        stars:
+        - thai_am
+        - thien_rieu
+        - da_la
+        - hoa_ky
+        - kiep_sat
+        - khinh_duong
+        scope: hoi_hop
+- id: nhat_nguyet_giap_menh_bat_quyen_tat_phu
+  name: Nhật, Nguyệt giáp Mệnh, bất quyền tắc phú
+  page: 72
+  meaning: Không quyền thì giàu
+  conditions:
+    any:
+    - all:
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Suu
+      - type: star_at_chi
+        stars:
+        - thai_duong
+        at_chi:
+        - Dan
+      - type: star_at_chi
+        stars:
+        - thai_am
+        at_chi:
+        - Ty
+    - all:
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Mui
+      - type: star_at_chi
+        stars:
+        - thai_duong
+        at_chi:
+        - Ngo
+      - type: star_at_chi
+        stars:
+        - thai_am
+        at_chi:
+        - Than
+- id: cu_tai_hoi_cung_nhat_menh_ty_thuc_loc_tri_danh
+  name: Cự tại Hợi cung, Nhật Mệnh Tỵ thực lộc tri danh
+  page: 73
+  meaning: Suốt đời được hưởng lộc dồi dào, công danh bền vững
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+    - type: star_at_chi
+      stars:
+      - cu_mon
+      at_chi:
+      - Hoi
+- id: cu_tai_ty_cung_nhat_menh_hoiphan_vi_bat_gia
+  name: Cự tại Tỵ cung, Nhật Mệnh Hợi, phản vi bất gia
+  page: 73
+  meaning: Công danh trắc trở, tiền tài khó kiếm, về già mới khá khá
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Hoi
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+    - type: star_at_chi
+      stars:
+      - cu_mon
+      at_chi:
+      - Ty
+- id: nhat_my_huy_thien
+  name: Nhật mỹ huy thiên
+  page: 73
+  meaning: Mệnh sáng sủa, dễ phát giàu có lớn hoặc lập sự nghiệp võ đa nghệp
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+    any:
+    - all:
+      - type: stars_meeting
+        stars:
+        - thai_duong
+        - hoa_loc
+        - thien_ma
+        - trang_sinh
+        - ta_phu
+        - huu_bat
+        scope: hoi_hop
+    - all:
+      - type: stars_meeting
+        stars:
+        - thai_duong
+        - thien_tuong
+        - thien_co
+        - thien_hinh
+        scope: hoi_hop
+- id: nhat_tram_thuy_de
+  name: Nhật trầm thủy đề
+  page: 73
+  meaning: Mệnh Nhật ở Hợi không sáng, nhưng gặp cát tinh có thể lập công danh, sự nghiệp
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Hoi
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+    - type: star_brightness
+      star: thai_duong
+      palace: Menh
+      brightness:
+      - ham
+    any:
+    - all:
+      - type: stars_meeting
+        stars:
+        - thai_duong
+        - hoa_khoa
+        - hoa_quyen
+        scope: hoi_hop
+      - type: stars_meeting
+        stars:
+        - thai_duong
+        - ta_phu
+        - huu_bat
+        - hong_loan
+        scope: hoi_hop
+    - all:
+      - type: stars_meeting
+        stars:
+        - thai_duong
+        - phuong_cac
+        - long_tri
+        - hoa_cai
+        - bach_ho
+        scope: hoi_hop
+- id: nhat_ham_xung_phung_ac_sat_lao_luc_bon_ba
+  name: Nhật hãm, xung phùng ác Sát, lao lục bôn ba
+  page: 73
+  meaning: Suốt đời lao khổ, thường phải bôn ba nay đây mai đó
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thai_duong
+      palace: Menh
+    - type: star_brightness
+      star: thai_duong
+      palace: Menh
+      brightness:
+      - ham
+    - type: stars_meeting
+      stars:
+      - thai_duong
+      group: sat_tinh
+      scope: hoi_hop
+- id: thai_duong_hoa_ky_huu_muc_hoan_thuong
+  name: Thái Dương, Hóa Kỵ, hữu mục hoàn thương
+  page: 73
+  meaning: Hay đau mắt, mắt có tật
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thai_duong
+      - hoa_ky
+- id: co_vien_phu_tinh_tu_tam
+  name: Cơ Viên phú tính từ tâm
+  page: 75
+  meaning: Người có lòng từ thiện
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_co
+      palace: Menh
+    - type: star_brightness
+      star: thien_co
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: thien_am_trieu_cuong
+  name: Thiên Ấm triều cương
+  page: 75
+  meaning: Rất nhân từ, được hưởng phúc thọ song toàn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+    - type: stars_together
+      stars:
+      - thien_co
+      - thien_luong
+    any:
+    - type: stars_together
+      stars:
+      - tuan_trung
+    - type: stars_together
+      stars:
+      - triet_lo
+    - type: stars_meeting
+      stars:
+      - thien_co
+      - thien_luong
+      group: sat_tinh
+      scope: hoi_hop
+- id: co_luong_hoi_hop
+  name: Cơ Lương hội hợp
+  page: 75
+  meaning: Người học rộng tài cao, hay bàn xét về chính lược, chiến lược
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+    - type: stars_together
+      stars:
+      - thien_co
+      - thien_luong
+- id: co_luong_thu_menh_gia_cat_dieu
+  name: Cơ Lương thủ Mệnh gia Cát diệu
+  page: 75
+  meaning: Được hưởng giàu sang trọn đời, phú quý song toàn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+    - type: stars_together
+      stars:
+      - thien_co
+      - thien_luong
+    - type: stars_meeting
+      stars:
+      - thien_co
+      - thien_luong
+      group: cat_tinh
+      scope: hoi_hop
+- id: co_luong_tu_sat_tuong_quan_xung
+  name: Cơ Lương Tứ Sát Tướng Quân xung
+  page: 75
+  meaning: Là hạng võ sĩ giang hoặc thầy tu
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+    - type: stars_together
+      stars:
+      - thien_co
+      - thien_luong
+    - type: stars_meeting
+      stars:
+      - thien_co
+      - thien_luong
+      - khinh_duong
+      - da_la
+      - hoa_tinh
+      - linh_tinh
+      scope: hoi_hop
+    - type: stars_opposite
+      stars:
+      - thien_co
+      - tuong_quan
+- id: co_nguyet_dong_luong
+  name: Cơ Nguyệt Đồng Lương
+  page: 76
+  meaning: Hay làm thơ văn; nếu đủ Cơ, Nguyệt, Đồng Lương hội hợp thì thường là công khanh
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - thien_co
+      - thai_am
+      - thien_dong
+      - thien_luong
+- id: co_luong_dong_chieu_menh_than_khong
+  name: Cơ, Lương đồng chiếu Mệnh Thân Không
+  page: 76
+  meaning: Vì tăng đạo, tức có duyên đi theo cửa thiền/đạo
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+    - type: palace_at
+      palace: Than
+      chi:
+      - Suu
+    - type: stars_together
+      stars:
+      - thien_co
+      - thien_luong
+    any:
+    - type: stars_together
+      stars:
+      - tuan_trung
+    - type: stars_together
+      stars:
+      - triet_lo
+    - type: stars_together
+      stars:
+      - dia_khong
+- id: thien_phu_thu_menh
+  name: Thiên Phủ thủ Mệnh
+  page: 76
+  meaning: Thân hình đầy đặn, da trắng, mặt thanh tú, tính khoan hồng nhân hậu, ưa làm việc thiện
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: star_brightness
+      star: thien_phu
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: phu_gap_nhieu_sat_tinh_hoi_hop
+  name: Phủ gặp nhiều Sát tinh hội hợp
+  page: 76
+  meaning: Là người gian trá, hay đánh lừa, nói dối
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      group: sat_tinh
+      scope: hoi_hop
+- id: phu_gap_tu_vi_tuong_xuong_khuc_khoi_viet_ta_huu_hoi_hop_cung_khoa_quyen_loc
+  name: Phủ gặp Tử Vi, Tướng, Xương, Khúc, Khôi, Việt, Tả, Hữu hội hợp cùng với Khoa, Quyền, Lộc
+  page: 76
+  meaning: Được hưởng phú quý song toàn và sống lâu
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      - tu_vi
+      - thien_tuong
+      - van_xuong
+      - van_khuc
+      - thien_khoi
+      - thien_viet
+      - ta_phu
+      - huu_bat
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+      scope: hoi_hop
+    - type: no_stars
+      stars:
+      - tuan_trung
+      - triet_lo
+      - thien_khong
+      - dia_kiep
+      in_palace: Menh
+- id: phu_thu_menh_gap_nhieu_sao_sang_sua_tot_dep
+  name: Phủ thủ Mệnh gặp nhiều sao sáng sủa tốt đẹp
+  page: 76
+  meaning: Tất được hưởng phú quý song toàn và sống lâu
+  conditions:
+    all:
+    - type: gender_match
+      gender: male
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      - tu_vi
+      - thien_tuong
+      - van_xuong
+      - van_khuc
+      - thien_khoi
+      - thien_viet
+      - ta_phu
+      - huu_bat
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+      scope: hoi_hop
+- id: thien_phu_on_luong
+  name: Thiên Phủ ôn lương
+  page: 77
+  meaning: Người khoan hòa, nhân hậu, có lòng từ thiện
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: star_brightness
+      star: thien_phu
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: nam_thien_phu_giao_long_vang_uuyen
+  name: Nam Thiên Phủ, giao long vãng uyên
+  page: 77
+  meaning: Người cẩn thận, chín chắn, biết suy nghĩ sâu xa
+  conditions:
+    all:
+    - type: gender_match
+      gender: male
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+- id: thien_phu_lam_tuat_huu_tinh_phu_phu_quy_song_toan
+  name: Thiên Phủ lâm Tuất hữu tinh phù, phú quý song toàn
+  page: 77
+  meaning: Được hưởng giàu sang trọn đời
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Tuat
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      group: cat_tinh
+      scope: hoi_hop
+- id: thien_phu_tuat_cung_vo_sat_tau_giap_ky_nhan_hoanh_phat_danh_tai
+  name: Thiên Phủ Tuất cung vô Sát tấu, Giáp, Kỷ nhân hoạnh phát danh tài
+  page: 77
+  meaning: Tuổi Giáp, Kỷ có cách này thì hoành phát công danh, hưởng phú quý đến tột bậc
+    bực
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Tuat
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: no_stars
+      group: sat_tinh
+      in_palace: Menh
+    - type: can_match
+      can:
+      - Giap
+      - Ky
+- id: dan_moc_phu_vu_huu_hoi_tam_ky_kinh_bat_cu_lai_an_ngu_menh_xuat_vo_do_van
+  name: Dần Mộc, Phủ, Vi hữu hội Tam Kỳ, Kình, Bật, cư lai án ngữ Mệnh xuất vô do văn, uy quyền qui phụ chung nhân, mạc phùng Không, Kiếp, hư vô
+  page: 77
+  meaning: Có văn chức, nhưng gặp thời loạn nên kiêm nhập cả quân sự, có uy quyền hiển hách
+    lon, khiến moi nguoi phai phuc tu, kinh nể; gap sat pha thi khong ke nua
+  conditions:
+    any:
+    - type: stars_together
+      stars:
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+    - type: stars_together
+      stars:
+      - khinh_duong
+    - type: stars_together
+      stars:
+      - ta_phu
+- id: phu_vu_ty_cung_giap_dinh_nhan_toa_phuc_vuong_danh_ba_hung_lai_tuan_triet
+  name: Phủ, Vũ, Tý cung, Giáp, Đinh nhân tọa, phúc vượng danh ba hung lai Tuần, Triệt, danh sú nhân khi ư Canh Nhâm tuế, tài phúc trường hành
+  page: 77
+  meaning: Được hưởng phúc giàu sang và có danh tiếng xấu; công danh trắc trở, tài lộc khó kiếm
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+    - type: stars_together
+      stars:
+      - thien_phu
+      - vu_khuc
+    - type: can_match
+      can:
+      - Giap
+      - Dinh
+    any:
+    - type: stars_together
+      stars:
+      - tuan_trung
+    - type: stars_together
+      stars:
+      - triet_lo
+- id: thien_phu_cu_ngo_tuat_thien_tuong_lai_trieu_giap_nhan_nhat_pham_chi_quy
+  name: Thiên Phủ cư Ngọ, Tuất, Thiên Tướng lai triều, Giáp nhân nhất phẩm chi quý
+  page: 77
+  meaning: Có quan chức và được hưởng giàu sang; riêng tuổi Giáp rất quý hiển
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ngo
+      - Tuat
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      - thien_tuong
+      scope: hoi_hop
+    - type: can_match
+      can:
+      - Giap
+- id: thien_phu_thien_tuong_thien_luong_dong_quan_than_khanh_hoi
+  name: Thiên Phủ, Thiên Tướng, Thiên Lương đồng, quân thần khánh hội
+  page: 77
+  meaning: Rất rực rỡ tốt đẹp, ví như vua tôi khánh hội ở chốn triều đình; chắc chắn phú quý
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      - thien_tuong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      - thien_luong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - thien_tuong
+      - thien_luong
+      scope: hoi_hop
+- id: thien_phu_xuong_khuc_ta_huu
+  name: Thiên Phủ, Xương, Khúc, Tả, Hữu
+  page: 78
+  meaning: Được vinh hiển, có danh giá hơn người
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      - van_xuong
+      - van_khuc
+      - ta_phu
+      - huu_bat
+      scope: hoi_hop
+- id: thien_phu_xuong_khuc_loc_ton
+  name: Thiên Phủ, Xương, Khúc, Lộc Tồn
+  page: 78
+  meaning: Rất giàu có
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      - van_xuong
+      - van_khuc
+      - loc_ton
+      scope: hoi_hop
+- id: phu_tuong_dong_lai_hoi_menh_cung
+  name: Phủ, Tướng đồng lai hội Mệnh cung
+  page: 78
+  meaning: Rất sung túc, thừa cơm ăn áo mặc
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_phu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_phu
+      - thien_tuong
+      scope: hoi_hop
+- id: nguyet_lang_thien_mon
+  name: Nguyệt lãng Thiên môn
+  page: 80
+  meaning: Rực rỡ tốt đẹp, phú quý đến tột bậc, nắm quyền hành lớn, thường ở địa vị cao
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Hoi
+    - type: star_in_palace
+      stars:
+      - thai_am
+      palace: Menh
+    - type: star_brightness
+      star: thai_am
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: thuy_dang_quê_ngac
+  name: Thủy đăng quế ngạc
+  page: 80
+  meaning: Rất sáng sủa tốt đẹp, quý hiển, có tài can gián người trên
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+    - type: star_in_palace
+      stars:
+      - thai_am
+      palace: Menh
+    - type: star_brightness
+      star: thai_am
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: tham_vu_tien_ban_nhi_hau_phu
+  name: Tham, Vũ tiền bần nhi hậu phú
+  page: 82
+  meaning: Ban đầu nghèo khổ, về sau giàu có
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+      - Mui
+    - type: stars_together
+      stars:
+      - tham_lang
+      - vu_khuc
+- id: tham_vu_dong_hanh
+  name: Tham, Vũ đồng hành
+  page: 83
+  meaning: Về già có uy quyền, thần phục
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+      - Mui
+    - type: stars_together
+      stars:
+      - tham_lang
+      - vu_khuc
+- id: tham_vu_mo_trung_cu_tam_thap_tong_phat_phuc
+  name: Tham, Vũ, Mộ trung cư tam thập tổng phát phúc
+  page: 83
+  meaning: Ngoài 30 tuổi mới phát phúc, được hưởng giàu sang
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+      - Mui
+- id: tham_vu_than_cung_vi_ha_cach
+  name: Tham, Vũ, Thân cung vi hạ cách
+  page: 83
+  meaning: Là hạ cách, suốt đời vất vả, không thể quý hiển được
+  conditions:
+    all:
+    - type: palace_at
+      palace: Than
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - type: stars_together
+      stars:
+      - tham_lang
+      - vu_khuc
+- id: tham_lang_vu_khuc_dong_thu
+  name: Tham Lang, Vũ Khúc đồng thủ
+  page: 83
+  meaning: Rất mờ ám xấu xa, lao khổ trọn đời
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+      - Mui
+    - type: stars_together
+      stars:
+      - tham_lang
+      - vu_khuc
+    - type: star_brightness
+      star: tham_lang
+      palace: Menh
+      brightness:
+      - ham
+- id: tham_vu_pha_quan
+  name: Tham, Vũ, Phá, Quân
+  page: 83
+  meaning: Hay say mê rượu nước gái mà hại đến thân
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tham_lang
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: stars_together
+      stars:
+      - tham_lang
+      - vu_khuc
+    - type: stars_meeting
+      stars:
+      - tham_lang
+      - vu_khuc
+      - pha_quan
+      scope: hoi_hop
+    - type: no_stars
+      group: cat_tinh
+      in_palace: Menh
+- id: tham_vu_tu_sinh_tu_mo_cung_pha_quan_ky_sat_tinh_bach_cong_thong
+  name: Tham, Vũ, Tử, Sinh, Tử, Mộ cung Phá Quân, Kỵ, Sát tinh bách công thông
+  page: 83
+  meaning: Là người khéo tay, biết nhiều nghề, thường chuyên về kỹ nghệ, thủ công
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - type: star_in_palace
+      stars:
+      - vu_khuc
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      - pha_quan
+      - hoa_ky
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      group: sat_tinh
+      scope: hoi_hop
+- id: tham_lang_liem_trinh_dong_dong
+  name: Tham Lang, Liêm Trinh đồng độ
+  page: 83
+  meaning: Rất mờ ám xấu xa; đàn ông hay chơi bời lang thang nay đây mai đó, đàn bà dâm đãng
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - tham_lang
+      - liem_trinh
+- id: dan_than_nhi_hoi_tham_liem_ngu_van_xuong
+  name: Dần, Thân nhi hội Tham, Liêm ngộ Văn Xương
+  page: 83
+  meaning: Chắc chắn trong đời có phen bị giam cầm khổ sở như ông Quản Trọng đời Chiến Quốc
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+      - Than
+    - type: star_in_palace
+      stars:
+      - liem_trinh
+      palace: Menh
+    - type: stars_together
+      stars:
+      - liem_trinh
+      - van_xuong
+- id: tham_lang_hoi_sat_vo_cat_dieu
+  name: Tham Lang hội Sát vô cát diệu
+  page: 84
+  meaning: Tất phải làm nghề đồ tể, hàng thịt
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tham_lang
+      palace: Menh
+    - type: star_brightness
+      star: tham_lang
+      palace: Menh
+      brightness:
+      - ham
+    - type: stars_meeting
+      stars:
+      - tham_lang
+      group: sat_tinh
+      scope: hoi_hop
+    - type: no_stars
+      group: cat_tinh
+      in_palace: Menh
+- id: tham_ngu_duong_da_cu_hoi_ty_danh_vi_phiem_thuy_dao_hoa
+  name: Tham ngộ Dương, Đà, cư Hợi, Tý, danh vi phiếm thủy đào hoa
+  page: 84
+  meaning: Người chơi bời, hoang đãng, thường lang thang nay đây mai đó
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Hoi
+      - Ty
+    - type: star_in_palace
+      stars:
+      - tham_lang
+      palace: Menh
+    any:
+    - type: stars_together
+      stars:
+      - tham_lang
+      - khinh_duong
+    - type: stars_together
+      stars:
+      - tham_lang
+      - da_la
+- id: tham_lang_da_la_tai_dan_cung_phong_luu_thai_trong
+  name: Tham Lang Đà La, tại Dần cung, phong lưu thái trọng
+  page: 84
+  meaning: Người chơi bời bia bãi, đến nỗi bị đánh đập, mang họa vào thân
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+    - type: stars_together
+      stars:
+      - tham_lang
+      - da_la
+- id: tham_lang_ngu_hoa_linh_tu_mo_cung_hao_phu_gia_tu_hau_ba_chi_quy
+  name: Tham Lang ngộ Hỏa, Linh, Tứ Mộ cung hào phú gia tư, hầu bá chi qúy
+  page: 84
+  meaning: Người rất giàu và có quyền cao chức trọng
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - type: star_in_palace
+      stars:
+      - tham_lang
+      palace: Menh
+    any:
+    - type: stars_together
+      stars:
+      - tham_lang
+      - hoa_tinh
+    - type: stars_together
+      stars:
+      - tham_lang
+      - linh_tinh
+    - type: stars_together
+      stars:
+      - hoa_tinh
+      - linh_tinh
+- id: tham_lang_hoa_tinh_cu_mieu_vuong_danh_tran_chu_bang
+  name: Tham Lang, Hỏa Tinh cư Miếu, Vượng, danh trấn chư bang
+  page: 84
+  meaning: Được hưởng phú quý đến tột bậc và có uy danh lừng lẫy
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tham_lang
+      palace: Menh
+    - type: star_brightness
+      star: tham_lang
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+    - type: stars_together
+      stars:
+      - tham_lang
+      - hoa_tinh
+- id: tham_linh_tinh_thu_tuong_tuong_chi_danh
+  name: Tham, Linh tịnh thủ, tướng tướng chi danh
+  page: 84
+  meaning: 'Có tài thao lược, hiển đạt về võ nghiệp, hưởng giàu sang, xuất tướng nhập tướng và uy quyền hiển hách. Mậu/Kỷ: phú quý tột bậc'
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tham_lang
+      palace: Menh
+    - type: star_brightness
+      star: tham_lang
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+    - type: stars_together
+      stars:
+      - tham_lang
+      - linh_tinh
+- id: cu_nhat_dong_cung
+  name: Cự, Nhật, đồng cung
+  page: 88
+  meaning: Quan phong tam đại, tuổi ông đời cha đã vinh hiển và liên tục ba đời đều hiển đạt
+    co danh gia; neu tai Dan thi thực lộc trì danh, tai Than thi cung khá gia nhung
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thai_duong
+- id: cu_nhat_menh_cung_dan_vi
+  name: Cự, Nhật Mệnh cung, Dần vị
+  page: 88
+  meaning: Được hưởng giàu sang trọn vẹn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thai_duong
+- id: cu_nhat_menh_lap_than_cung
+  name: Cự, Nhật, Mệnh, lập Thân cung
+  page: 88
+  meaning: Khá giả, danh tài đủ, không toàn mỹ
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Than
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thai_duong
+- id: cu_nhat_dan_cung_lap_menh_than
+  name: Cự, Nhật, Dần cung, lập Mệnh Thân
+  page: 88
+  meaning: Quý hiển trước, giàu sau
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Than
+    - type: star_at_chi
+      stars:
+      - cu_mon
+      at_chi:
+      - Dan
+    - type: star_at_chi
+      stars:
+      - thai_duong
+      at_chi:
+      - Dan
+- id: cu_nhat_than_cung_lap_menh_dan
+  name: Cự, Nhật, Thân, lập Mệnh Dần
+  page: 88
+  meaning: Được hưởng giàu sang
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+    - type: star_at_chi
+      stars:
+      - cu_mon
+      at_chi:
+      - Than
+    - type: star_at_chi
+      stars:
+      - thai_duong
+      at_chi:
+      - Than
+- id: cu_nhat_dan_than_thien_mon
+  name: Cự, Nhật, Dần, Thân thiên môn
+  page: 88
+  meaning: Tốt đẹp, có thể phú quý song toàn khi gặp Quyền, Phụng; gặp Lộc Tồn thì giàu
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+      - Than
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thai_duong
+      - loc_ton
+    - type: star_brightness
+      star: thai_duong
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+    - type: stars_meeting
+      stars:
+      - hoa_quyen
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - phuong_cac
+      scope: hoi_hop
+- id: cu_hinh_cung_chieu
+  name: Cự, Hình củng chiếu
+  page: 88
+  meaning: Được hưởng giàu sang trọn đời
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thien_hinh
+- id: cu_tu_thien_co
+  name: Cự Tú, Thiện Cơ
+  page: 88
+  meaning: Thông minh, học rộng nhưng thích chơi bời, ăn tiêu hoang phí
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thien_co
+- id: cu_co_dong_cung
+  name: Cự, Cơ đồng cung
+  page: 88
+  meaning: Chắc chắn có quan chức lớn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thien_co
+- id: cu_co_dau_thuong
+  name: Cự, Cơ Dậu thượng
+  page: 89
+  meaning: Dễ hóa cát, nếu hội cát tinh thì có tài quan nhưng không được bền trọn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dau
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thien_co
+    - type: stars_meeting
+      stars:
+      - van_xuong
+      - van_khuc
+      - thien_khoi
+      - thien_viet
+      - ta_phu
+      - huu_bat
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+      scope: hoi_hop
+      mode: any
+- id: mao_dau_cu_co
+  name: Mão, Dậu, Cự, Cơ
+  page: 89
+  meaning: Rất vượng phu ích tử; nếu không bị Tuần Triệt thì là người tài giỏi đảm đang
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Mao
+      - Dau
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thien_co
+    any:
+    - type: can_match
+      can:
+      - At
+      - Tan
+      - Ky
+      - Binh
+    - type: no_stars
+      stars:
+      - tuan_trung
+      - triet_lo
+      in_palace: Menh
+- id: cu_co_nhi_ngu_loc_ton
+  name: Cự, Cơ nhi ngộ Lộc Tồn
+  page: 89
+  meaning: Ăn nói không chín chắn, cẩn thận
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - cu_mon
+      - loc_ton
+- id: cu_co_chinh_huong
+  name: Cự, Cơ chính hưởng
+  page: 89
+  meaning: Có uy quyền hiển hách, danh tiếng lừng lẫy
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Mao
+      - Dau
+    - type: stars_together
+      stars:
+      - cu_mon
+      - thien_co
+    - type: stars_meeting
+      stars:
+      - cu_mon
+      - thien_co
+      - tuong_quan
+      scope: hoi_hop
+- id: cu_dong_nhap_mo
+  name: Cự, Đồng nhập Mộ
+  page: 89
+  meaning: Khó đề phòng tai nạn sông nước. Trừ tuổi Bính/Tân
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - any:
+      - type: star_in_palace
+        stars:
+        - cu_mon
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - thien_dong
+        palace: Menh
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - hoa_ky
+      scope: hoi_hop
+    - type: can_exclude
+      can:
+      - Binh
+      - Tan
+- id: cu_dong_nhi_phung_la_vong
+  name: Cự, Đồng nhi phùng La, Võng
+  page: 89
+  meaning: Là người có tài du thuyết như Lịch Sinh đời Hán
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+    - any:
+      - type: star_in_palace
+        stars:
+        - cu_mon
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - thien_dong
+        palace: Menh
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      scope: dong_hoac_xung
+- id: tan_nhan_toi_ai_cu_mon
+  name: Tân nhân tối ái Cự Môn
+  page: 89
+  meaning: Khá giả; có bộ sao cứu Mệnh, giải trừ nhiều bệnh tật và tai họa trong đời
+  conditions:
+    all:
+    - type: can_match
+      can:
+      - Tan
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - type: star_in_palace
+      stars:
+      - cu_mon
+      palace: Menh
+    any:
+    - type: stars_meeting
+      stars:
+      - cu_mon
+      - ta_phu
+      - huu_bat
+      scope: hoi_hop
+- id: cu_mon_tu_sat_ham
+  name: Cự Môn, Tứ Sát hãm
+  page: 89
+  meaning: Rất mờ ám, hung
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - cu_mon
+      palace: Menh
+    - type: star_brightness
+      star: cu_mon
+      palace: Menh
+      brightness:
+      - ham
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - da_la
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - hoa_tinh
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - linh_tinh
+      scope: hoi_hop
+- id: cu_mon_da_la_tat_sinh_di_chi
+  name: Cự Môn, Đà La tất sinh dị chí
+  page: 90
+  meaning: Người yếu đuối, mắc nhiều bệnh tật, suốt đời khổ sở; nếu khỏe mạnh thì yểu
+    co the la hang trom cap, đang điem, an tan pha hai
+  conditions:
+    any:
+    - all:
+      - type: star_in_palace
+        stars:
+        - cu_mon
+        palace: Menh
+      - type: star_brightness
+        star: cu_mon
+        palace: Menh
+        brightness:
+        - ham
+    - all:
+      - type: star_in_palace
+        stars:
+        - cu_mon
+        palace: Menh
+      - type: stars_together
+        stars:
+        - cu_mon
+        - khinh_duong
+    - all:
+      - type: star_in_palace
+        stars:
+        - cu_mon
+        palace: Menh
+      - type: stars_together
+        stars:
+        - cu_mon
+        - da_la
+- id: cu_hoa_linh_phung_ac_han_tu_thuat_ngoai_dao
+  name: Cự, Hỏa, Linh phùng ác hạn, tử thuật ngoại đạo
+  page: 90
+  meaning: Rất mờ ám xấu xa; gặp hạn xấu thì chết giữa đường xa, ngoài nơi đường sá
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - cu_mon
+      palace: Menh
+    - type: stars_together
+      stars:
+      - cu_mon
+      - hoa_tinh
+    - type: stars_together
+      stars:
+      - cu_mon
+      - linh_tinh
+- id: cu_hoa_kinh_duong_da_la_phung_ac_dieu_ai_tu_dau_ha
+  name: Cự, Hỏa, Kình, Dương, Đà La phùng ác diệu, ải tử đầu hà
+  page: 90
+  meaning: Tất thắt cổ hoặc đâm đầu xuống sông mà chết
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - cu_mon
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - cu_mon
+      - hoa_tinh
+      - khinh_duong
+      - da_la
+      scope: hoi_hop
+- id: cu_mon_hoi_ty_ky_ngu_loc_ton_nhi_phung_quyen_loc
+  name: Cự Môn Hợi Tý, kỵ ngộ Lộc Tồn nhi phùng Quyền, Lộc, kiếm xạ Đẩu Ngưu
+  page: 90
+  meaning: Người nhiều cao vọng nhưng không thể hiển được, ví như ném kiếm lên sao
+    Đẩu, sao Ngưu
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Hoi
+      - Ty
+    - type: star_in_palace
+      stars:
+      - cu_mon
+      palace: Menh
+    - type: stars_together
+      stars:
+      - cu_mon
+      - loc_ton
+    any:
+    - type: stars_meeting
+      stars:
+      - cu_mon
+      - hoa_quyen
+      - hoa_loc
+      scope: hoi_hop
+- id: cu_mon_ty_ngo_khoa_quyen_loc_thach_trung_cam_ngoc_phuc_hanh_long
+  name: Cự Môn Tý, Ngọ, Khoa, Quyền Lộc, thạch trung cẩn ngọc, phúc hưng long
+  page: 90
+  meaning: Người học rộng tài cao, có đức độ, ví như ngọc báu ẩn trong đá; được hưởng giàu sang
+    phu quy tột bac, phuc tho song toan
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Ngo
+    - type: star_in_palace
+      stars:
+      - cu_mon
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - cu_mon
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+      scope: hoi_hop
+- id: cu_mon_thin_cung_hoa_ky_tan_nhan_menh_ngu_phan_vi_giai
+  name: Cự Môn, Thìn cung Hóa Kỵ, Tân nhân Mệnh ngộ phản vi giai
+  page: 90
+  meaning: Tuy vốn mờ ám xấu xa nhưng riêng tuổi Tân lại sáng sủa tốt đẹp, được giàu sang
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+    - type: stars_together
+      stars:
+      - cu_mon
+      - hoa_ky
+    - type: can_match
+      can:
+      - Tan
+- id: thien_tuong_thin_tuat_khoi_thi_cong_danh
+  name: Thiên Tướng Thìn, Tuất, khởi thị công danh
+  page: 92
+  meaning: Rất quý hiển, khởi đầu bằng công danh
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+    - type: star_in_palace
+      stars:
+      - thien_tuong
+      palace: Menh
+    - type: star_brightness
+      star: thien_tuong
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: nu_tuong_tinh_tuong_cận_nhu_manh_hung
+  name: Nữ tướng tinh, tương cận như mãnh hùng
+  page: 92
+  meaning: Người nữ can đảm, dũng mãnh, bạo tợn
+  conditions:
+    all:
+    - type: gender_match
+      gender: female
+    - type: star_in_palace
+      stars:
+      - thien_tuong
+      palace: Menh
+- id: thien_tuong_chi_tinh_nu_menh_trieu_tat_duong_tu_quy_cap_phu_hien
+  name: Thiên Tướng chi tinh Nữ Mệnh triều, tất dương tử qúy cập phu hiền
+  page: 92
+  meaning: Lấy được chồng hiền, tài giỏi và sinh con quý
+  conditions:
+    all:
+    - type: gender_match
+      gender: female
+    - type: star_in_palace
+      stars:
+      - thien_tuong
+      palace: Menh
+    - type: star_brightness
+      star: thien_tuong
+      palace: Menh
+      brightness:
+      - mieu
+      - vuong
+      - dac
+- id: thien_tuong_liem_trinh_kinh_duong_giap_hinh_truong_nan_dao
+  name: Thiên Tướng, Liêm Trinh, Kình Dương giáp hình trượng nan đào
+  page: 92
+  meaning: Khó tránh thoát được tù tội
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Ngo
+    - type: stars_together
+      stars:
+      - liem_trinh
+      - thien_tuong
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      - thien_tuong
+      - khinh_duong
+      scope: hoi_hop
+- id: tuong_hong_nu_menh_quy_nhan_hao_poi
+  name: Tướng Hồng nữ Mệnh, qúy nhân hảo phối
+  page: 92
+  meaning: Lấy được chồng giàu sang
+  conditions:
+    all:
+    - type: gender_match
+      gender: female
+    - type: stars_together
+      stars:
+      - thien_tuong
+      - hong_loan
+- id: tuong_ngu_khuc_moc_cai_dao_thuan_tuoc_dam_phong
+  name: Tướng ngộ Khúc, Mộc, Cái, Đào, thuần tước dâm phong
+  page: 92
+  meaning: Rất xinh đẹp nhưng có tính dâm đãng
+  conditions:
+    all:
+    - type: gender_match
+      gender: female
+    - type: star_in_palace
+      stars:
+      - thien_tuong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_tuong
+      - van_khuc
+      - moc_duc
+      - hoa_cai
+      - bach_ho
+      - dao_hoa
+      scope: hoi_hop
+- id: thien_luong_cu_ngo_vi
+  name: Thiên Lương cư Ngọ vị
+  page: 94
+  meaning: Rất rực rỡ tốt đẹp; tuổi Đinh, Kỷ, Quý thì phú quý tột bậc, thêm uy quyền
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ngo
+    - type: star_in_palace
+      stars:
+      - thien_luong
+      palace: Menh
+- id: luong_nhat_mao_cung
+  name: Lương, Nhật, mão cung
+  page: 94
+  meaning: Rực rỡ tốt đẹp như mặt trời mới mọc; mặt vuông vắn, đầy đặn, tươi nhuận
+    huong phu quy tột bac, suot doi an nhàn sung suong
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Mao
+    - type: stars_together
+      stars:
+      - thien_luong
+      - thai_duong
+- id: thien_luong_thai_duong_xuong_loc_hoi_lo_truyen_dệ_nhat_danh
+  name: Thiên Lương, Thái Dương, Xương, Lộc hội lộ truyền đệ nhất danh
+  page: 94
+  meaning: Rất thông minh, đi thi đỗ cao, sớm hiển đạt, giàu sang trọn đời và có uy quyền
+  conditions:
+    any:
+    - all:
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Ty
+      - type: star_in_palace
+        stars:
+        - thien_luong
+        palace: Menh
+      - type: star_at_chi
+        stars:
+        - thai_duong
+        at_chi:
+        - Ngo
+      - type: stars_meeting
+        stars:
+        - thien_luong
+        - van_xuong
+        - hoa_loc
+        scope: hoi_hop
+    - all:
+      - type: palace_at
+        palace: Menh
+        chi:
+        - Ngo
+      - type: star_in_palace
+        stars:
+        - thai_duong
+        palace: Menh
+      - type: star_at_chi
+        stars:
+        - thien_luong
+        at_chi:
+        - Ty
+      - type: stars_meeting
+        stars:
+        - thai_duong
+        - van_xuong
+        - hoa_loc
+        scope: hoi_hop
+- id: luong_tu_am_linh
+  name: Lương Tú, Âm, Linh
+  page: 94
+  meaning: Nhiều tai nạn và dĩ nhiên là quý hiển
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - suu
+      - dan
+      - mao
+      - thin
+      - ty
+      - ngo
+    - type: star_in_palace
+      stars:
+      - thien_luong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thai_am
+      - linh_tinh
+      scope: hoi_hop
+- id: luong_dong_co_nguyet_dan_thien_vi_nhat_sinh_loi_nghiep_thong_minh
+  name: Lương, Đồng, Cơ, Nguyệt, Dần, Thân vị nhất sinh lợi nghiệp thông minh
+  page: 94
+  meaning: Rất thông minh và được hưởng giàu sang trọn đời
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - dan
+      - than
+    - type: stars_together
+      stars:
+      - thien_luong
+      - thien_dong
+    - type: stars_meeting
+      stars:
+      - thien_co
+      - nguyet_duc
+      scope: hoi_hop
+- id: thien_luong_van_xuong
+  name: Thiên Lương, Văn Xương
+  page: 95
+  meaning: Rất quý hiển, chủ công khanh
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_luong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - van_xuong
+      scope: dong_cung
+- id: luong_phung_hao_sat
+  name: Lương phùng Hao Sát
+  page: 95
+  meaning: Dễ gặp tai họa về đao thương hay súng đạn, khó tránh hình thương
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+    - type: star_in_palace
+      stars:
+      - thien_luong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - dai_hao
+      - tieu_hao
+      scope: hoi_hop
+      mode: any
+    - type: stars_meeting
+      group: sat_tinh
+      scope: hoi_hop
+      mode: any
+- id: thien_luong_thien_ma
+  name: Thiên Lương, Thiên Mã
+  page: 95
+  meaning: Người phiêu đãng, thích chơi bời, ngao du, nay đây mai đấy, hay thay đổi
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - hoi
+    - type: star_in_palace
+      stars:
+      - thien_luong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_ma
+      scope: dong_cung
+- id: thien_luong_ngu_ma
+  name: Thiên Lương ngộ Mã
+  page: 95
+  meaning: Người hà tiện và dâm đãng
+  conditions:
+    all:
+    - type: gender_match
+      gender: female
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - hoi
+    - type: star_in_palace
+      stars:
+      - thien_luong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_ma
+      scope: dong_cung
+- id: that_sat_trieu_dau
+  name: Thất Sát triều đẩu
+  page: 96
+  meaning: Được hưởng phú quý đến tột bậc
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - dan
+      - than
+    - type: star_in_palace
+      stars:
+      - that_sat
+      palace: Menh
+- id: that_sat_nguong_dau
+  name: Thất Sát ngưỡng đẩu
+  page: 96
+  meaning: Được hưởng phú quý đến tột bậc
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - ngo
+    - type: star_in_palace
+      stars:
+      - that_sat
+      palace: Menh
+- id: sat_tu_dong_cung
+  name: Sát, Tử đồng cung
+  page: 96
+  meaning: Được hưởng phú quý đến tột bậc, có uy quyền hiển hách, ví như đức vua mang ấn
+  conditions:
+    all:
+    # UNRESOLVABLE: original "Tỵ Tốn cung" (quẻ Tốn = Tỵ trigram) — needs trigram extension
+    - type: palace_at
+      palace: Menh
+      chi: []
+    - type: stars_together
+      stars:
+      - that_sat
+      - tu_vi
+- id: lo_thuong_mai_thi
+  name: lộ thượng mai thi
+  page: 97
+  meaning: Dễ chết ở nơi giữa đường sá, hoặc vì tai nạn xe cộ, dao súng
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - suu
+      - mui
+    - type: stars_together
+      stars:
+      - that_sat
+      - liem_trinh
+- id: anh_hung_tri_dung
+  name: anh hùng trí dũng
+  page: 97
+  meaning: Là bậc anh hùng trí dũng hơn người
+  conditions:
+    all:
+    - type: gender_match
+      gender: male
+    - type: can_match
+      can:
+      - At
+      - Ky
+    - type: palace_at
+      palace: Menh
+      chi:
+      - suu
+      - mui
+    - type: stars_together
+      stars:
+      - that_sat
+      - liem_trinh
+- id: nghi_xuat_ngoai_chu_ban_thu_nghie_bat_nang_tinh
+  name: nghi xuất ngoại, chư ban thủ nghệ bất năng tinh
+  page: 97
+  meaning: Phải lìa bỏ gia đình, đi làm ăn phương xa; biết nhiều nghề nhưng không thành
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - that_sat
+      palace: Menh
+    - type: star_brightness
+      star: that_sat
+      palace: Menh
+      brightness:
+      - ham
+- id: suong_phu_chi_nhan
+  name: sương phụ chi nhân
+  page: 97
+  meaning: Người góa bụa, suốt đời cô đơn, buồn khổ; thường phải muộn lập gia đình
+  conditions:
+    all:
+    - type: can_match
+      can:
+      - Tan
+      - Dinh
+    - type: star_in_palace
+      stars:
+      - that_sat
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - pha_quan
+      - tham_lang
+      scope: hoi_hop
+- id: that_sat_trung_phung_tu_sat
+  name: Thất Sát trung phùng Tứ sát
+  page: 97
+  meaning: Tất bị gù lưng hay có tật ở lưng; nếu ra trận thì chắc chắn mang vong
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - that_sat
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      - da_la
+      - hoa_tinh
+      - linh_tinh
+      scope: hoi_hop
+- id: ma_dau_doi_kien_p97
+  name: mã đầu đới kiếm
+  page: 97
+  meaning: Hay mắc tai họa khủng khiếp, nhất là về xe cộ, dao súng; có thể chết rất thê thảm
+    the tham, than the khong toan ven, nhung tuoi Giáp Kỷ thi lai la bac cai the anh
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ngo
+    - type: stars_together
+      stars:
+      - that_sat
+      - khinh_duong
+    - type: stars_meeting
+      stars:
+      - that_sat
+      scope: hoi_hop
+- id: sat_lam_tuyet_dia_hoi_duong_da
+  name: Sát lâm Tuyệt địa hội Dương, Đà
+  page: 97
+  meaning: Tất phải yểu tử như Nhan Hồi, chết sớm
+  conditions:
+    all:
+    # UNRESOLVABLE: "Tuyệt địa" (vòng Tràng Sinh segment) — needs trang_sinh extension
+    - type: palace_at
+      palace: Menh
+      chi: []
+    - type: star_in_palace
+      stars:
+      - that_sat
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      - da_la
+      scope: hoi_hop
+- id: that_sat_hoa_duong
+  name: Thất Sát, Hỏa, Dương
+  page: 97
+  meaning: Là người nghèo hèn, thường làm đồ tể, hàng thịt
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - that_sat
+      palace: Menh
+    - type: star_brightness
+      star: that_sat
+      palace: Menh
+      brightness:
+      - ham
+    - type: stars_meeting
+      stars:
+      - hoa_tinh
+      - khinh_duong
+      scope: hoi_hop
+- id: pha_quan_nhat_dieu_tinh_nan_minh
+  name: Phá Quân nhất diệu, tính nan minh
+  page: 100
+  meaning: Người không sát suốt, hay nghe nịnh hót
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Ngo
+      - Thin
+      - Tuat
+      - Dan
+      - Than
+    - type: only_chinh_tinh
+      star: pha_quan
+      palace: Menh
+- id: pha_quan_ty_ngo_gia_quan_tien_loc
+  name: Phá Quân, tý, Ngọ, gia quan tiến lộc
+  page: 100
+  meaning: Được hưởng phú quý song toàn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - ngo
+    - type: star_in_palace
+      stars:
+      - pha_quan
+      palace: Menh
+- id: pha_quan_kham_ly_co_than_doc_anh
+  name: Phá Quân Khảm, Ly, Cô thân độc ảnh
+  page: 100
+  meaning: Phải sớm xa cách cha mẹ anh em, nếu không cũng khắc vợ/chồng hay hiếm con
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - ngo
+    - type: star_in_palace
+      stars:
+      - pha_quan
+      palace: Menh
+- id: pha_quan_tham_lang_phung_loc_ma
+  name: Phá Quân, Tham Lang, phùng lộc, Mã
+  page: 100
+  meaning: Đàn ông hay chơi bời hoang đãng, thích ngao du; đàn bà rất dâm đãng
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - pha_quan
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - loc_ton
+      - thien_ma
+      scope: hoi_hop
+- id: pha_sat_khung_phung_hoa_hao
+  name: Phá, Sát khủng phùng hỏa, Hao
+  page: 100
+  meaning: Khó tránh thoát những tai nạn khủng khiếp; gặp thêm Việt, Hình thì hậu họa
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - pha_quan
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - hoa_tinh
+      - tieu_hao
+      scope: hoi_hop
+- id: pha_kinh_mao_dau_nhi_phung_phu_bat
+  name: Phá, Kình, Mão, Dậu, Nhi phùng Phụ, Bật
+  page: 100
+  meaning: Người độc ác, đa sát, làm loạn thiên hạ như Hoàng Sào
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - mao
+      - dau
+    - type: stars_together
+      stars:
+      - pha_quan
+      - khinh_duong
+    - type: stars_meeting
+      stars:
+      - ta_phu
+      - huu_bat
+      scope: hoi_hop
+- id: pha_quan_hoa_linh_bon_ba_lao_toai
+  name: Phá Quân, Hỏa, Linh, bôn ba lao khổ
+  page: 100
+  meaning: Suốt đời phải bôn ba lao khổ
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - pha_quan
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - hoa_tinh
+      - linh_tinh
+      scope: hoi_hop
+- id: dan_than_pha_hoa_viet_lam_tan_dinh_tue_co_xao_tai_hanh
+  name: Dần, Thân, Phá, Hỏa, Việt lâm ư, Tân, Đinh, Tuế cơ xảo tài hành
+  page: 100
+  meaning: Giỏi về máy móc, thường chuyên về kỹ nghệ; các tuổi khác cũng rất khéo
+  conditions:
+    all:
+    - type: can_match
+      can:
+      - Tan
+      - Dinh
+    - type: palace_at
+      palace: Menh
+      chi:
+      - dan
+      - than
+    - type: star_in_palace
+      stars:
+      - pha_quan
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - hoa_tinh
+      - thien_viet
+      scope: hoi_hop
+- id: pha_quan_thin_tuat_nhi_ngu_khoa_tuan
+  name: Phá Quân Thìn, Tuất nhi ngộ Khoa, Tuần
+  page: 100
+  meaning: Cải ất vi lương, hợp với người tuổi Mậu, Quý; đa hoạnh đắc tài
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - thin
+      - tuat
+    - type: star_in_palace
+      stars:
+      - pha_quan
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      - tuan_trung
+      scope: hoi_hop
+- id: khoa_quyen_loc_hoi
+  name: Khoa Quyền Lộc hội
+  page: 101
+  meaning: Đi thi đỗ cao, sớm hiển đạt, hưởng phú quý, uy danh lừng lẫy và sống lâu
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      - van_khuc
+      palace: Menh
+    - type: star_brightness
+      star: van_xuong
+      palace: Menh
+      brightness:
+      - dac
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - phuong_cac
+      - thien_khoi
+      - thien_viet
+      - ta_phu
+      - huu_bat
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+      scope: hoi_hop
+- id: van_que_van_hoa
+  name: Văn Quế Văn Hoa
+  page: 102
+  meaning: Rất quý hiển; chủ người thông minh, học rộng, có văn tài, hưởng giàu sang
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      - van_khuc
+      palace: Menh
+    - type: star_brightness
+      star: van_xuong
+      palace: Menh
+      brightness:
+      - dac
+    - type: stars_meeting
+      stars:
+      - phu_tinh
+      scope: hoi_hop
+- id: van_xuong_van_khuc_vi_nhan_da_hoc_da_nang
+  name: Văn Xương, Văn Khúc vi nhân đa học đa năng
+  page: 102
+  meaning: Là người thông minh, học rộng, có nhiều tài năng
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      - van_khuc
+      palace: Menh
+    - type: star_brightness
+      star: van_xuong
+      palace: Menh
+      brightness:
+      - dac
+- id: duong_phi_hao_sac_thi_khuc_xuong
+  name: Dương Phi hảo sắc thị Khúc, Xương
+  page: 102
+  meaning: Chỉ nhan sắc rất đẹp, như chim sa cá lặn, được vua yêu mến
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_khuc
+      - van_xuong
+      palace: Menh
+- id: ty_hoi_toa_que_hoa
+  name: Tỵ, Hợi tọa Quế, Hoa
+  page: 103
+  meaning: Người rất rực rỡ; nếu không quý hiển thì cũng là triệu phú
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - hoi
+    - type: stars_together
+      stars:
+      - van_xuong
+      - van_khuc
+    - type: stars_meeting
+      stars:
+      - phu_tinh
+      scope: hoi_hop
+- id: xuong_khuc_liem_trinh_o_ty_hoi
+  name: Xương, Khúc Liêm Trinh ư Tỵ, Hợi
+  page: 103
+  meaning: Người gian dối, hay khoe khoang, suốt đời chậm mức khi được xứng ý toại lòng
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - hoi
+    - type: stars_together
+      stars:
+      - van_xuong
+      - van_khuc
+    - type: stars_meeting
+      stars:
+      - liem_trinh
+      scope: dong_cung
+- id: xuong_khuc_pha_quan_phung
+  name: Xương, Khúc Phá Quân phùng
+  page: 103
+  meaning: Suốt đời phải tạo tâm khổ tứ và hay bị bắt bớ giam cầm
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      - van_khuc
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - pha_quan
+      scope: dong_cung
+- id: xuong_khuc_pha_quan_lam_ho_thu_sat_duong_xung_pha_bon_ba
+  name: Xương, Khúc, Phá Quân lâm Hổ, Thỏ, Sát, Dương xung phá bôn ba
+  page: 103
+  meaning: Suốt đời lao khổ, thường phải lìa bỏ gia đình, bôn tẩu ở phương xa
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - dan
+      - mao
+    - type: stars_together
+      stars:
+      - van_xuong
+      - van_khuc
+    - type: stars_meeting
+      stars:
+      - pha_quan
+      scope: dong_cung
+    - type: stars_meeting
+      stars:
+      - that_sat
+      scope: hoi_hop
+- id: xuong_khuc_luong_tinh_vi_chi_thai_cuong
+  name: Xương, Khúc, Lương tinh vị chí thai cương
+  page: 103
+  meaning: Rất quý hiển, có uy danh lừng lẫy
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      - van_khuc
+      palace: Menh
+    - type: star_brightness
+      star: van_xuong
+      palace: Menh
+      brightness:
+      - dac
+    - type: stars_meeting
+      stars:
+      - thien_luong
+      scope: dong_cung
+- id: xuong_khuc_co_loc_than_tu_xao
+  name: Xương, Khúc, Cơ Lộc thanh tú, xảo
+  page: 103
+  meaning: Là người xinh đẹp và khéo léo
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      - van_khuc
+      palace: Menh
+    - type: star_brightness
+      star: van_xuong
+      palace: Menh
+      brightness:
+      - dac
+    - type: stars_meeting
+      stars:
+      - thien_co
+      - loc_ton
+      scope: hoi_hop
+- id: xuong_khuc_ta_huu_hoi_duong_da_duong_sinh_di_chi
+  name: Xương, Khúc, Tả, Hữu, hội Dương, Đà đương sinh dị chí
+  page: 103
+  meaning: Trong mình có nốt ruồi kín và có nhiều tướng lạ
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      - van_khuc
+      palace: Menh
+    - type: stars_together
+      stars:
+      - ta_phu
+      - huu_bat
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      - da_la
+      scope: hoi_hop
+- id: xuong_khuc_loc_ton_do_vi_ky_thi
+  name: Xương, Khúc Lộc Tồn do vi kỳ thị
+  page: 103
+  meaning: Là người có tài năng xuất chúng
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      - van_khuc
+      palace: Menh
+    - type: star_brightness
+      star: van_xuong
+      palace: Menh
+      brightness:
+      - dac
+    - type: stars_meeting
+      stars:
+      - loc_ton
+      scope: dong_cung
+- id: xuong_khuc_suu_mui_giap_nhan_duong_nu_kieng_phung_hong_loc_hien_phu_chi_nhan
+  name: Xương, Khúc, Sửu, Mùi, Giáp nhân Dương nữ, kiêm phùng Hồng, Lộc hiền phụ chi nhân
+  page: 103
+  meaning: Hiền phụ chí nhân
+  conditions:
+    all:
+    - type: gender_match
+      gender: female
+    - type: can_match
+      can:
+      - Giap
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Suu
+      - Mui
+    - type: stars_together
+      stars:
+      - van_xuong
+      - van_khuc
+- id: van_xuong_hoi_liem_trinh
+  name: Văn Xương hội Liêm Trinh
+  page: 104
+  meaning: Không thể sống lâu được
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - suu
+      - mui
+      - ty
+      - hoi
+      - mao
+      - dau
+    - type: stars_together
+      stars:
+      - van_xuong
+      - liem_trinh
+- id: van_xuong_vu_khuc_o_menh_than
+  name: Văn Xương, Vũ Khúc ư Mệnh Thân
+  page: 104
+  meaning: Người có tài kiêm văn võ, có uy danh lừng lẫy và được hưởng giàu sang trọn đời
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - than
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      palace: Menh
+    - type: star_brightness
+      star: van_xuong
+      palace: Menh
+      brightness:
+      - dac
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      scope: dong_cung
+- id: van_xuong_ta_phu_vi_chi_tam_thai
+  name: Văn Xương, Tả Phụ vị chí tam thai
+  page: 104
+  meaning: Rất quý hiển
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      palace: Menh
+    - type: star_brightness
+      star: van_xuong
+      palace: Menh
+      brightness:
+      - dac
+    - type: stars_meeting
+      stars:
+      - ta_phu
+      scope: dong_cung
+- id: nhi_khuc_vuong_cung
+  name: Nhị Khúc vượng cung
+  page: 104
+  meaning: Người có tài kiêm văn võ và có uy quyền hiển hách
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_khuc
+      palace: Menh
+    - type: star_brightness
+      star: van_khuc
+      palace: Menh
+      brightness:
+      - dac
+    - type: stars_meeting
+      stars:
+      - vu_khuc
+      scope: dong_cung
+- id: xuong_khuc_giap_menh
+  name: Xương, Khúc giáp Mệnh
+  page: 104
+  meaning: Rất thông minh và được nhiều người kính trọng, quý mến; nếu Mệnh có Nhật Nguyệt
+  conditions:
+    all:
+    - type: stars_giap
+      stars:
+      - van_xuong
+      - van_khuc
+- id: van_tinh_cung_chieu
+  name: Văn tinh củng chiếu
+  page: 104
+  meaning: Thông minh, học rộng, đỗ đạt rất sớm
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - van_xuong
+      - van_khuc
+      - thien_khoi
+      - thien_viet
+      palace: Menh
+- id: nhi_khuc_trieu_vien_phung
+  name: Nhị Khúc triều viên phùng
+  page: 104
+  meaning: Người có tài kiêm văn võ, hiển đạt về võ nghiệp và được hưởng phú quý song toàn
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - van_khuc
+      - vu_khuc
+      scope: dong_hoac_xung
+    - type: no_stars
+      stars:
+      - van_khuc
+      - vu_khuc
+      in_palace: Menh
+    - type: stars_meeting
+      stars:
+      - ta_phu
+      - huu_bat
+      scope: hoi_hop
+- id: khoi_viet_tai_menh_than_vi_truong_tu
+  name: Khôi Việt tại Mệnh, Thân vì trưởng tử
+  page: 105
+  meaning: Tất là con trưởng, nếu không thì sau cùng đoạt trưởng
+  conditions:
+    any:
+    - all:
+      - type: star_in_palace
+        stars:
+        - thien_khoi
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - thien_viet
+        palace: Menh
+    - all:
+      - type: star_in_palace
+        stars:
+        - thien_khoi
+        palace: Than
+      - type: star_in_palace
+        stars:
+        - thien_viet
+        palace: Than
+- id: thien_khoi_thien_viet_tai_the_van_chuong
+  name: Thiên Khôi, Thiên Việt, tái thế văn chương
+  page: 105
+  meaning: Người có văn tài lỗi lạc, và sớm nhẹ bước thang mây
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_khoi
+      - thien_viet
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - van_xuong
+      - van_khuc
+      - hoa_khoa
+      - thai_tue
+      - tau_thu
+      scope: hoi_hop
+- id: khoi_viet_phu_tinh_vi_phuc_tho
+  name: Khôi, Việt phụ tinh, vi phúc thọ
+  page: 105
+  meaning: Nên được hưởng phúc và sống lâu
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_khoi
+      - thien_viet
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - phu_tinh
+      scope: hoi_hop
+- id: khoi_tinh_lam_menh
+  name: Khôi tinh lâm Mệnh
+  page: 106
+  meaning: Rất quý hiển; nếu ở Ngọ lại có Tử đồng cung thì uy danh lừng lẫy, giàu sang
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ngo
+    - type: star_in_palace
+      stars:
+      - thien_khoi
+      palace: Menh
+- id: khoi_tinh_giap_menh
+  name: Khôi tinh giáp Mệnh
+  page: 106
+  meaning: Thông minh, sớm hiển đạt, được nhiều người kính trọng yêu mến, ra ngoài
+  conditions:
+    all:
+    - type: stars_giap
+      stars:
+      - thien_khoi
+      - thien_viet
+- id: giap_quy_giap_loc
+  name: Giáp Qúy, Giáp Lộc
+  page: 106
+  meaning: Rất quý hiển và giàu có, ít người sánh kịp
+  conditions:
+    all:
+    - type: stars_giap
+      stars:
+      - thien_khoi
+      - thien_viet
+      - loc_ton
+- id: loc_ton_hau_trong_da_y_thuc
+  name: Lộc Tồn hậu trọng đa y thực
+  page: 107
+  meaning: Suốt đời được hưởng giàu sang, ăn miếng ngon mặc đồ tốt
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - loc_ton
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - phu_tinh
+      scope: hoi_hop
+- id: loc_tai_vien_chi_tu_to_nghiep
+  name: Lộc tại viên, chi tứ tổ nghiệp
+  page: 107
+  meaning: Có của cải do tiền nhân để lại
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - loc_ton
+      palace: Menh
+- id: loc_trieu_vien_than_vinh_quy_hien
+  name: Lộc triều viên, thân vinh quý hiển
+  page: 107
+  meaning: Rất quý hiển
+  conditions:
+    all:
+    - type: bright_chinh_tinh
+    - type: stars_meeting
+      stars:
+      - loc_ton
+      scope: dong_hoac_xung
+    - type: no_stars
+      stars:
+      - loc_ton
+      in_palace: Menh
+- id: loc_ton_ty_ngo_vi_menh_than_thien_di_phung_chi_loi_loc_nghi
+  name: Lộc Tồn Tý, Ngọ vị, Mệnh, Thân, Thiên Di phùng chi, lợi lộc nghi
+  page: 107
+  meaning: Rất giàu sang, tiền của chất đống lên trong kho lẫm
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - ngo
+    - type: star_in_palace
+      stars:
+      - loc_ton
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - phu_tinh
+      scope: hoi_hop
+- id: loc_phung_xung_pha_cat_da_thanh_hung
+  name: Lộc phùng xung Phá, cát dã thành hung
+  page: 107
+  meaning: Tiền tài thiếu thốn, suốt đời lo lắng vì sinh kế, hay mắc tai họa
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - loc_ton
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - pha_quan
+      scope: xung_chieu
+- id: song_loc_thu_menh_laa_hau_chuyen_quyen
+  name: Song Lộc thủ Mệnh, Lã Hậu chuyên quyền
+  page: 107
+  meaning: Người độc đoán, có óc lãnh tụ và thích chuyên quyền
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - loc_ton
+      - hoa_loc
+    - type: stars_meeting
+      stars:
+      - phu_tinh
+      scope: hoi_hop
+- id: song_loc_trung_phung_chung_thian_phu_quy
+  name: Song Lộc trùng phùng, chung thân phú quý
+  page: 107
+  meaning: Chung thân phú quý
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - loc_ton
+      - hoa_loc
+- id: minh_loc_am_loc
+  name: Minh Lộc, Ám Lộc
+  page: 108
+  meaning: Vị chí công khanh, rực rỡ như gấm thêu hoa; được hưởng giàu sang, có quan chức
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - loc_ton
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - hoa_loc
+      palace: Menh
+- id: uyen_uong_loc_hoi
+  name: Uyên Ương Lộc Hội
+  page: 108
+  meaning: Cũng là cách rực rỡ, chắc chắn được hưởng giàu sang, có quan chức lớn
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - loc_ton
+      - hoa_loc
+- id: loc_ma_toi_hu_giao_tri
+  name: Lộc, Mã tối hỷ giao tri
+  page: 108
+  meaning: Rực rỡ tốt đẹp, tất được hưởng giàu sang, dễ kiếm tiền và được nhiều người mến
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - loc_ton
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_ma
+      scope: xung_chieu
+- id: loc_dao_ma_dao_ky_kiep_khong_tue
+  name: Lộc đáo, Mã đáo kỵ Kiếp, Không, Tuế
+  page: 108
+  meaning: Mờ ám xấu xa; suốt đời ít khi được xứng ý toại lòng, công danh trắc trở
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - loc_ton
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_ma
+      scope: xung_chieu
+    - type: stars_meeting
+      stars:
+      - dia_kiep
+      - dia_khong
+      - thai_tue
+      scope: hoi_hop
+- id: ta_huu_dong_cung_phi_la_y_tu
+  name: Tả, Hữu đồng cung, phi la y tử
+  page: 109
+  meaning: Tất được hưởng phú quý song toàn, ví như người mặc áo gấm tía
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - suu
+      - mui
+    - type: stars_together
+      stars:
+      - ta_phu
+      - huu_bat
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+      scope: hoi_hop
+- id: mo_phung_ta_huu_ton_cu_bat_toa_chi_quy
+  name: Mộ phùng Tả, Hữu tôn cư bát tọa chi quý
+  page: 109
+  meaning: Rất quý hiển
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - type: star_in_palace
+      stars:
+      - ta_phu
+      - huu_bat
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - phu_tinh
+      scope: hoi_hop
+- id: phu_bat_ai_nhap_mo_cung_neu_phung_de_vuong_van_doan_vo_cach
+  name: Phụ, Bật ái nhập mộ cung, nhược phùng đế vương, văn đoàn, võ cách
+  page: 109
+  meaning: Hoành phát công danh và được hưởng giàu sang trọn đời
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - type: star_in_palace
+      stars:
+      - ta_phu
+      - huu_bat
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - thien_co
+      - nguyet_duc
+      - thien_dong
+      - thien_luong
+      scope: hoi_hop
+- id: ta_huu_kinh_duong_tao_hinh_luc
+  name: Tả, Hữu, Kình Dương, tao hình lục
+  page: 109
+  meaning: Hay mặc tự ti và suốt đời chậm mức khi được xứng ý toại lòng
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - ta_phu
+      - huu_bat
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      scope: hoi_hop
+- id: ta_huu_khoi_viet_o_phuc_tho
+  name: Tả, Hữu, Khôi, Việt ư phúc thọ
+  page: 109
+  meaning: Được hưởng phúc và sống lâu
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - ta_phu
+      - huu_bat
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_khoi
+      - thien_viet
+      scope: hoi_hop
+- id: ta_phu_dong_cung_ton_cu_van_thua
+  name: Tả, Phủ đồng cung, tôn cư vạn thừa
+  page: 109
+  meaning: Được hưởng giàu sang sung sướng, phú quý đến tột bậc
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - tuat
+    - type: stars_together
+      stars:
+      - ta_phu
+      - huu_bat
+- id: huu_bat_thien_tuong_phuc_lai_lam
+  name: Hữu Bật, Thiên Tướng phúc lai lâm
+  page: 110
+  meaning: Được hưởng phúc, sống lâu; nếu Mệnh an tại Tỵ, Hợi thì được phú quý nhưng không bền
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - huu_bat
+      - thien_tuong
+- id: ta_huu_giap_menh_vi_quy_cach
+  name: Tả, Hữu giáp Mệnh vi quý cách
+  page: 110
+  meaning: Rất quý hiển, có danh tiếng lừng lẫy, được nhiều người kính phục
+  conditions:
+    all:
+    - type: stars_giap
+      stars:
+      - ta_phu
+      - huu_bat
+    - type: stars_meeting
+      group: cat_tinh
+      scope: hoi_hop
+      mode: any
+- id: phu_bat_giap_de_phuc_lai_lam
+  name: Phụ, Bật giáp Đế phúc lai lâm
+  page: 110
+  meaning: Được hưởng phúc, có danh giá uy quyền
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - tu_vi
+      palace: Menh
+    - type: stars_giap
+      stars:
+      - ta_phu
+      - huu_bat
+- id: ta_huu_don_thu_chieu_menh_ly_tong_thu_xuat
+  name: Tả, Hữu, đơn thủ chiếu Mệnh, ly tông thứ xuất
+  page: 110
+  meaning: Phải sớm lìa bỏ gia đình, lập nghiệp ở phương xa; nếu Mệnh có nhiều sao xấu
+  conditions:
+    all:
+    - type: stars_xor
+      stars:
+      - ta_phu
+      - huu_bat
+      scope: dong_hoac_xung
+    - type: no_stars
+      stars:
+      - ta_phu
+      - huu_bat
+      in_palace: Menh
+- id: ma_dau_doi_kiem_p111
+  name: Mã đầu đới kiếm
+  page: 111
+  meaning: Hiển đạt về võ nghiệp, có uy quyền lớn, trông trấn chốt chặn biên thùy yên ổn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ngo
+    - type: star_in_palace
+      stars:
+      - khinh_duong
+      palace: Menh
+    - type: no_stars
+      stars:
+      - that_sat
+      - thien_hinh
+      in_palace: Menh
+    - type: stars_meeting
+      stars:
+      - loc_ton
+      - thien_ma
+      - thien_khoi
+      - hoa_quyen
+      scope: hoi_hop
+- id: kinh_duong_ty_ngo_mao_dau_phi_yeu_chiet_nhi_hinh_thuong
+  name: Kình Dương Tý, Ngọ, Mão, Dậu phi yểu chiết nhi hình thương
+  page: 111
+  meaning: Tất phải chết non; nếu sống lâu thì mang tàn tật, khó được xứng ý toại lòng
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - ngo
+      - mao
+      - dau
+    - type: star_in_palace
+      stars:
+      - khinh_duong
+      palace: Menh
+- id: kinh_duong_nhap_mieu_phu_quy_thanh_duong
+  name: Kình, Dương nhập Miếu, phú quý thanh dương
+  page: 111
+  meaning: Được hưởng phú quý và có danh tiếng lừng lẫy, càng quý hiển
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - type: star_in_palace
+      stars:
+      - khinh_duong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - phu_tinh
+      scope: hoi_hop
+- id: kinh_duong_dong_am_nhi_phung_phuong_giai_nhat_the_uy_danh
+  name: Kình Dương, Đồng, Âm, nhi phùng, Phượng, Giải, nhất thế uy danh
+  page: 111
+  meaning: Hiển đạt về võ nghiệp, lập chiến công, có uy quyền hiển hách, danh tiếng lừng lẫy
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ngo
+    - type: stars_together
+      stars:
+      - khinh_duong
+      - thien_dong
+      - thai_am
+    - type: stars_meeting
+      stars:
+      - phuong_cac
+      - giai_than
+      scope: hoi_hop
+- id: kinh_duong_hoa_tuong
+  name: Kình Dương, Hỏa Tướng
+  page: 112
+  meaning: Có uy quyền hiển hách; nếu lại gặp thêm Tham, Vũ đồng cung thì thành bậc tướng
+    anh hung, danh tieng lung lay, khiến quan giặc o bien cuong khep so
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+    - type: stars_together
+      stars:
+      - khinh_duong
+      - hoa_tinh
+- id: kinh_da_linh_hoa_thu_menh_than
+  name: Kình, Đà, Linh, Hỏa thủ Thân, Mệnh
+  page: 112
+  meaning: Người gù lưng hay có tật ở lưng; nếu hãm địa thì suốt đời cùng khổ cô đơn
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - than
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      - da_la
+      - linh_tinh
+      - hoa_tinh
+      scope: hoi_hop
+- id: duong_da_hoa_linh_phung_phat_tai
+  name: Dương, Đà, Hỏa, Linh phùng phát tài
+  page: 112
+  meaning: Có tài lực nếu hội thêm cát tinh; nếu gặp thêm hung tinh/xấu thì suốt đời lao khổ
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      - da_la
+      - hoa_tinh
+      - linh_tinh
+      scope: hoi_hop
+- id: menh_duong_da_gia_kiep
+  name: Mệnh, Dương, Đà gia Kiếp
+  page: 112
+  meaning: Giảm thọ
+  conditions:
+    all:
+    - any:
+      - type: star_in_palace
+        stars:
+        - khinh_duong
+        palace: Menh
+      - type: star_in_palace
+        stars:
+        - da_la
+        palace: Menh
+    - type: stars_meeting
+      stars:
+      - dia_kiep
+      scope: dong_cung
+- id: giap_duong_giap_da_vi_khat_dieu
+  name: Giáp Dương, giáp Đà vi khất điếu
+  page: 112
+  meaning: Suốt đời cùng khổ, lang thang phiêu bạt, đôi khi phải đi ăn xin
+  conditions:
+    all:
+    - type: stars_giap
+      stars:
+      - khinh_duong
+      - da_la
+- id: duong_da_giap_ky_vi_bai_cuc
+  name: Dương, Đà giáp Kỵ vi bại cục
+  page: 112
+  meaning: Suốt đời nghèo túng, khổ sở, hay mắc tai họa; nếu sớm xa gia đình may ra
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - hoa_ky
+      palace: Menh
+    - type: stars_giap
+      stars:
+      - khinh_duong
+      - da_la
+- id: kinh_hu_tue_khach_gia_lam
+  name: Kình, Hư, Tuế, Khách gia lâm
+  page: 112
+  meaning: Suốt đời sầu khổ, trai sát vợ, gái khắc chồng; nếu không thì sớm xa cách
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - khinh_duong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_hu
+      - thai_tue
+      - dieu_khach
+      scope: hoi_hop
+- id: ly_quang_suc_dich_van_chung
+  name: Lý Quảng sức dịch vạn chứng
+  page: 112
+  meaning: Thân thể lực lưỡng, có sức khỏe địch được muôn người như Lý Quảng đời Hán
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - khinh_duong
+      - luc_sy
+- id: kinh_duong_phung_luc_sy_ly_quang_nan_phong
+  name: Kình Dương phùng Lực Sỹ, Lý Quảng nan phong
+  page: 112
+  meaning: Là người tài giỏi, lập được nhiều công tranh nhưng không được phong thưởng
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - khinh_duong
+      - luc_sy
+- id: hoa_linh_tuong_ngot_da_tran_chu_bang
+  name: Hỏa, Linh tương ngột đa trấn chư bang
+  page: 114
+  meaning: Người có tài ba xuất chúng, thường hiển đạt về võ nghiệp và có uy quyền
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - hoa_tinh
+      palace: Menh
+    - type: star_brightness
+      star: hoa_tinh
+      palace: Menh
+      brightness:
+      - dac
+    - type: stars_meeting
+      stars:
+      - linh_tinh
+      scope: hoi_hop
+- id: hoa_linh_kha_ty_suu_mui_viet_tham_vu_ung_ngu_lai_phung_kiep_dieu
+  name: Hỏa, Linh khả Tỵ, Sửu, Mùi, Việt, Tham, Vũ ưng ngộ lai phùng Kiếp diệu
+  page: 114
+  meaning: Người xuất tướng nhân tướng, hiển đạt về võ nghiệp, có uy quyền và được hưởng giàu sang
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - suu
+      - mui
+    - type: stars_together
+      stars:
+      - hoa_tinh
+      - linh_tinh
+    - type: stars_meeting
+      stars:
+      - thien_viet
+      - tham_lang
+      - vu_khuc
+      scope: dong_cung
+- id: hoa_linh_kinh_duong_vi_ha_cach
+  name: Hỏa, Linh, Kình Dương vi hạ cách
+  page: 114
+  meaning: Công danh trắc trở, tài lực không phong túc và hay mắc tai nạn
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - hoa_tinh
+      - linh_tinh
+      - khinh_duong
+      scope: hoi_hop
+- id: hoa_linh_giap_menh_vi_bai_cuc
+  name: Hỏa, Linh giáp Mệnh vi bại cục
+  page: 114
+  meaning: Suốt đời chậm mức khi được xứng ý toại lòng, thường phải lang thang bôn ba
+  conditions:
+    all:
+    - type: stars_giap
+      stars:
+      - hoa_tinh
+      - linh_tinh
+- id: hoa_dieu_phung_tuyet_tai_hoi_cung_nhi_ngu_tham_hinh_uy_danh_quan_the
+  name: Hỏa diệu phùng Tuyệt tại Hợi cung, nhi ngộ Tham, Hình, uy danh quán thế
+  page: 114
+  meaning: Uy danh lớn khắp thiên hạ
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - hoi
+    - type: stars_together
+      stars:
+      - hoa_tinh
+      - tuyet
+    - type: stars_meeting
+      stars:
+      - tham_lang
+      - thien_hinh
+      scope: hoi_hop
+- id: kiep_khong_ty_hoi_dong_vi_tao_dat_cong_danh
+  name: Kiếp, Không, Tỵ, Hợi, đồng vị, tảo đạt công danh
+  page: 116
+  meaning: Công danh sớm đạt, nhưng chậm được lâu bền
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - ty
+      - hoi
+    - type: stars_together
+      stars:
+      - dia_kiep
+      - dia_khong
+- id: sinh_su_kiep_khong_nhu_ban_thien_chiet_si
+  name: Sinh sử Kiếp, Không do như bán thiên chiết sí
+  page: 116
+  meaning: Không thể sống lâu, ví như con chim đang bay bị gãy cánh ở lưng chừng trời
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+      - Than
+      - Ty_Snake
+      - Hoi
+    - type: stars_together
+      stars:
+      - dia_kiep
+      - dia_khong
+- id: dan_than_kiep_khong_nhi_ngu_quy_tinh_thang_tram_vo_doi
+  name: Dần, Thân, Kiếp, Không nhi ngộ Qúy tinh thăng trầm vô độ
+  page: 116
+  meaning: Trên đường đời gặp nhiều bước thăng trầm, công danh tiền tài từ từ tan
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - dan
+      - than
+    - type: star_in_palace
+      stars:
+      - dia_kiep
+      - dia_khong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - quoc_an
+      scope: hoi_hop
+- id: kiep_khong_gap_menh_vi_bai_cuoc
+  name: Kiếp, Không giáp Mệnh vi bại cục, chủ bần tiện
+  page: 116
+  meaning: Người nghèo hèn, suốt đời vất vả, thường phải sớm lìa bỏ gia đình, lang thang
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty_Snake
+      - Hoi
+    - type: stars_giap
+      stars:
+      - dia_kiep
+      - dia_khong
+- id: kiep_co_nghi_hoa_tai
+  name: Kiếp, Cơ ngộ Hỏa, tất ngộ hỏa tai
+  page: 116
+  meaning: Hay gặp hỏa tai như cháy nhà, phỏng lửa
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - dia_kiep
+      - thien_co
+    - type: stars_meeting
+      stars:
+      - hoa_tinh
+      scope: dong_cung
+- id: menh_trung_ngop_kiep_tham
+  name: Mệnh trung ngộ Kiếp, Tham do như lãng lý hành thuyền
+  page: 116
+  meaning: Suốt đời lao khổ, lang thang phiêu bạt, hay mắc tai nạn sông nước
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - dia_kiep
+      - tham_lang
+- id: kiep_khong_tuong_ma_dong_cu_hoi_khoa
+  name: Kiếp, Không hà hiềm Tỵ, Hợi, Tướng, Mã đồng cư chi hội Khoa tinh loạn thế phùng quân nhi cách
+  page: 116
+  meaning: Người tài giỏi, tìm được chân chúa trong thời loạn và lập nên sự nghiệp
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Hoi
+    - type: stars_together
+      stars:
+      - dia_kiep
+      - dia_khong
+      - thien_tuong
+      - thien_ma
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      scope: dong_cung
+- id: nhan_hoi_yen_tu_kiep_khong_dao_hong_da_linh
+  name: Nhan Hồi yếu tử do hữu Kiếp, Không, Đào, Hồng Đà, Linh thủ Mệnh
+  page: 117
+  meaning: Người có cung Mệnh như vậy thì chết non, không thể sống lâu
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - dia_kiep
+      - dia_khong
+      - dao_hoa
+      - hong_loan
+      - da_la
+      - linh_tinh
+- id: hoa_loc_hoan_vi_hao_huong_mo_trung_tang
+  name: Hóa Lộc hoàn vi hảo, hưu hướng Mộ trung tàng
+  page: 118
+  meaning: Lộc và sao tốt nhưng đóng ở Tứ Mộ thì kém tốt, như bị chôn vùi; gặp Tham Lang
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - hoa_loc
+      palace: Menh
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Thin
+      - Tuat
+      - Suu
+      - Mui
+- id: hoa_loc_dac_dia_dan_mao_cu_thu_tham_tai
+  name: Hóa Lộc đắc địa Dần Mão, cố thủ tham tài
+  page: 118
+  meaning: Người giàu có, khéo giữ của
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Dan
+      - Mao
+    - type: star_in_palace
+      stars:
+      - hoa_loc
+      palace: Menh
+- id: hoa_loc_ty_ngo_phu_tu_van_chuong_quan_the
+  name: Hóa Lộc Tý Ngọ, Phu Tử văn chương quán thế
+  page: 118
+  meaning: Bậc vĩ nhân có văn tài xuất chúng, sự nghiệp lớn lao, danh tiếng lừng lẫy
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Ngo
+    - type: star_in_palace
+      stars:
+      - hoa_loc
+      palace: Menh
+- id: hoa_loc_cung_loc_dinh_vi_van_vo_toan_tai
+  name: Hóa Lộc, củng Lộc, định vi văn võ toàn tài
+  page: 119
+  meaning: Người có tài kiêm văn võ, được hưởng giàu sang trọn đời
+  conditions:
+    any:
+    - all:
+      - type: stars_meeting
+        stars:
+        - hoa_loc
+        scope: hoi_hop
+      - type: stars_meeting
+        stars:
+        - loc_ton
+        scope: xung_chieu
+    - all:
+      - type: stars_meeting
+        stars:
+        - liem_trinh
+        scope: hoi_hop
+      - type: stars_meeting
+        stars:
+        - hoa_loc
+        scope: xung_chieu
+- id: luong_loc_ngo_dan_nhi_phu_tu_vu_dinh_ky_am_nam_phu_da_danh_tho
+  name: Lưỡng Lộc Ngọ Dần nhi phùng Tử, Vũ, Đinh, Kỷ, âm nam phú đa danh thọ
+  page: 119
+  meaning: Được hưởng phú quý và sống lâu; riêng tuổi Đinh, Kỷ càng nổi bật
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Ngo
+    - type: star_in_palace
+      stars:
+      - hoa_loc
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - tu_vi
+      - vu_khuc
+      scope: hoi_hop
+- id: song_loc_nhi_ngop_co_luong_phu_gia_dich_quoc
+  name: Song Lộc cư nhị ngộ Cơ, Lương phú gia địch quốc
+  page: 119
+  meaning: Rất giàu, có thể triệu phú
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - hoa_loc
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - thien_co
+      - thien_luong
+      scope: hoi_hop
+- id: menh_vo_chinh_dieu_hoan_ngop_tam_khong_huu_song_loc
+  name: Mệnh vô Chính diệu, hoan ngộ Tam Không, hựu Song Lộc, phú qúy khả kỳ
+  page: 119
+  meaning: Được hưởng giàu sang, nhưng không bền lâu
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - dia_khong
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - loc_ton
+      - hoa_loc
+      scope: hoi_hop
+- id: quyen_loc_menh_phung_kiem_hop_cat_uy_danh_lung_lay
+  name: Quyền, Lộc Mệnh phùng, kiêm hợp cát, uy danh lừng lẫy quyền áp chúng
+  page: 119
+  meaning: Uy quyền hiển hách, kinh người
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - hoa_quyen
+      - hoa_loc
+    - type: stars_meeting
+      stars:
+      - hoa_quyen
+      group: cat_tinh
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - hoa_loc
+      group: cat_tinh
+      scope: hoi_hop
+- id: quyen_loc_trung_phung_sat_thau_hu_du_chi_long
+  name: Quyền Lộc, trùng phùng Sát thấu, hư dụ chi long
+  page: 119
+  meaning: Chỉ có hư danh bề ngoài
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - hoa_quyen
+      - hoa_loc
+    - type: stars_meeting
+      stars:
+      - hoa_quyen
+      group: sat_tinh
+      scope: hoi_hop
+- id: quyen_khoc_dong_cung_minh_danh_vu_the
+  name: Quyền, Khốc đồng cung, minh danh vụ thế
+  page: 119
+  meaning: Có uy danh lừng lẫy, được hưởng giàu sang và có quyền thế
+  conditions:
+    all:
+    - type: stars_together
+      stars:
+      - hoa_quyen
+      - thien_khoc
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Ngo
+- id: khoa_loc_tuan_phung_chu_bot_than_nhien_nhap_tuong
+  name: Khoa, Lộc tuần phùng, Chu Bột thản nhiên nhập tướng
+  page: 119
+  meaning: Chưa thấy phần luận giải đầy đủ trong trích trích
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - hoa_loc
+      scope: hoi_hop
+- id: khoa_minh_loc_am_liet_vi_tam_thai
+  name: Khoa mình, Lộc ám, liệt vị tam thai
+  page: 120
+  meaning: Rất quý hiển
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - hoa_khoa
+      palace: Menh
+    - type: star_in_palace
+      stars:
+      - hoa_loc
+      palace: Than
+- id: khoa_loc_giap_vi_quy_cach
+  name: Khoa, Lộc, giáp vi quý cách
+  page: 120
+  meaning: Người có danh giá
+  conditions:
+    all:
+    - type: stars_giap
+      stars:
+      - hoa_khoa
+      - hoa_loc
+- id: khoa_menh_quyen_trieu_dang_chung_giap_de
+  name: Khoa Mệnh Quyền triều, đăng chung giáp đệ
+  page: 120
+  meaning: Thi đỗ cao và có quan chức lớn
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - hoa_khoa
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - hoa_quyen
+      scope: hoi_hop
+- id: khoa_quyen_loc_hop_phu_quy_song_toan
+  name: Khoa, Quyền, Lộc hợp, phủ quý song toàn
+  page: 120
+  meaning: Được hưởng giàu sang trọn đời
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+      scope: hoi_hop
+- id: khoa_quyen_loc_vong_danh_du_chiieu_truong
+  name: Khoa, Quyền, Lộc vọng danh dự chiêu trương
+  page: 120
+  meaning: Sớm hiển đạt, được hưởng phú quý song toàn và có danh tiếng lừng lẫy
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+      scope: xung_chieu
+- id: tam_ky_giao_hoi_mac_ngop_ky_kinh_giang_luc_thanh_van
+  name: Tam Kỳ giao hội, mạc ngộ Kỵ, Kình giáng lộ thanh vân
+  page: 120
+  meaning: Đường đời nhiều thăng trầm, không hưởng giàu sang lâu bền; công danh tiền tài
+  conditions:
+    all:
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      - hoa_quyen
+      - hoa_loc
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - hoa_ky
+      - khinh_duong
+      scope: hoi_hop
+- id: khoa_danh_hem_u_hung_than_mieu_nhi_bat_tu
+  name: Khoa danh hãm ư hung thần, miêu nhi bất tú
+  page: 120
+  meaning: Công danh trắc trở, tiền tài khó kiếm, suốt đời ít khi xứng ý toại lòng
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - hoa_khoa
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      group: sat_tinh
+      scope: hoi_hop
+- id: hoa_ky_van_nhan_bu_nai
+  name: Hóa Kỵ, văn nhân bất nại
+  page: 120
+  meaning: Người thông minh, có văn tài, nhưng trắc trở về đường công danh, không thành
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - hoa_ky
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - van_xuong
+      - van_khuc
+      - thien_khoi
+      - thien_viet
+      scope: hoi_hop
+- id: ky_ngop_khoa_tinh_cu_hoi_ty
+  name: Kỵ ngộ Khoa tinh cư Hợi, Tý
+  page: 120
+  meaning: Khôn ngoan, cẩn thận, biết tri thủ; lời nói việc làm đúng mức, được mọi người kính
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Hoi
+      - Ty
+    - type: star_in_palace
+      stars:
+      - hoa_ky
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      scope: dong_cung
+- id: hoa_ky_ty_cung_khoa_luong_phu_chieu_dac_quan_dan_sung_ai
+  name: Hóa Kỵ Tý cung, Khoa, Lương phụ chiếu, đắc quân dân sủng ái
+  page: 120
+  meaning: Được quan dân sủng ái
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+    - type: star_in_palace
+      stars:
+      - hoa_ky
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - hoa_khoa
+      - thien_luong
+      scope: hoi_hop
+- id: luc_bai
+  name: Lục Bại
+  page: 121
+  meaning: Người dễ hao tán, thích vui chơi, tiêu xài không tiết, thường túng thiếu
+    thi xao quyet va keo kiệt
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - dai_hao
+      - tieu_hao
+      palace: Menh
+- id: nam_nhan_tang_ho_huu_tai_yuyen_bac
+  name: Nam nhân Tang, Hổ, hữu tài yên bác
+  page: 122
+  meaning: Có tài thao lược, học rộng biết nhiều
+  conditions:
+    all:
+    - type: gender_match
+      gender: male
+    - type: star_in_palace
+      stars:
+      - tang_mon
+      - bach_ho
+      palace: Menh
+- id: nu_menh_ho_rieu_da_su_qu_au
+  name: Nữ mệnh Hổ Riêu, đa sự quả ưu
+  page: 122
+  meaning: Hôn phối thường bị trắc trở, suốt đời ưu phiền sầu khổ vì chồng con
+  conditions:
+    all:
+    - type: gender_match
+      gender: female
+    - type: stars_together
+      stars:
+      - bach_ho
+      - thien_rieu
+- id: song_hao_mao_dau
+  name: Song Hao Mão, Dậu
+  page: 123
+  meaning: Rất rực rỡ tốt đẹp; nếu Hảo, Cự, Cơ đồng cung thì được phú quý tột bậc
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Mao
+      - Dau
+    - type: star_in_palace
+      stars:
+      - dai_hao
+      - tieu_hao
+      palace: Menh
+- id: khoc_hu_ty_ngo_tien_ban_hau_phu
+  name: Khốc, Hư, Tý, Ngọ, tiền bần hậu phú
+  page: 123
+  meaning: Thuở thiếu thời nghèo túng, từ ngoài 30 tuổi trở đi mới khá giả, về già sung sướng
+  conditions:
+    all:
+    - type: palace_at
+      palace: Menh
+      chi:
+      - Ty
+      - Ngo
+    - type: stars_together
+      stars:
+      - thien_khoc
+      - thien_hu
+- id: khoc_khach_kiep_phu_mac_ngo_cuc_duong_chung_than_da_le
+  name: Khốc, Khách, Kiếp, Phủ mạc ngọ Cự, Dương, chung thân đa lệ
+  page: 123
+  meaning: Suốt đời phải than khóc, tiếc thương, mắt lúc nào cũng đẫm lệ
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_khoc
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - dieu_khach
+      - dia_kiep
+      - thien_phu
+      scope: hoi_hop
+    - type: stars_meeting
+      stars:
+      - cu_mon
+      - thai_duong
+      scope: hoi_hop
+- id: hu_kinh_tue_khach_gia_lam_man_the_da_phung_tang_su
+  name: Hư, Kình, Tuế, Khách gia lãm, mãn thế đa phùng tang sự
+  page: 123
+  meaning: Tất có tang tóc liên miên, từ lúc lọt lòng mẹ cho đến khi mãn chiếu xếp
+  conditions:
+    all:
+    - type: star_in_palace
+      stars:
+      - thien_hu
+      palace: Menh
+    - type: stars_meeting
+      stars:
+      - khinh_duong
+      - thai_tue
+      - dieu_khach
+      scope: hoi_hop
