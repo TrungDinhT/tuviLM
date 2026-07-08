@@ -107,6 +107,7 @@ cach_cuc:
           stars:
             - van_khuc
             - van_xuong
+          stars_matching_logic: all
         - all:
             - not:
                 type: star_with_palace
@@ -115,6 +116,7 @@ cach_cuc:
                 stars:
                   - tuan
                   - triet
+                stars_matching_logic: any
             - not:
                 type: star_with_palace
                 palace: menh
@@ -198,12 +200,14 @@ cach_cuc:
               stars:
                 - van_xuong
                 - pha_quan
+              stars_matching_logic: all
             - type: star_with_palace
               palace: menh
               scope: dong_cung
               stars:
                 - pha_quan
                 - van_khuc
+              stars_matching_logic: all
   - id: xuong_khuc_pha_quan_lam_ho_thu_sat_duong_xung_pha_bon_ba
     name: Xương, Khúc, Phá Quân lâm Hổ, Thỏ, Sát, Dương xung phá bôn ba
     page: 103
@@ -223,12 +227,14 @@ cach_cuc:
               stars:
                 - van_xuong
                 - pha_quan
+              stars_matching_logic: all
             - type: star_with_palace
               palace: menh
               scope: dong_cung
               stars:
                 - pha_quan
                 - van_khuc
+              stars_matching_logic: all
         - any:
             - type: star_with_palace
               palace: menh
@@ -287,6 +293,7 @@ cach_cuc:
             - van_xuong
             - van_khuc
             - thien_co
+          stars_matching_logic: all
         - type: star_brightness
           stars:
             - van_xuong
@@ -326,6 +333,7 @@ cach_cuc:
             - van_khuc
             - ta_phu
             - huu_bat
+          stars_matching_logic: all
         - type: star_with_palace
           palace: menh
           scope: hoi_hop
@@ -358,17 +366,16 @@ cach_cuc:
           stars:
             - van_xuong
             - van_khuc
+            - loc_ton
+          stars_matching_logic: all
         - type: star_brightness
           stars:
             - van_xuong
             - van_khuc
+            - loc_ton
+          stars_matching_logic: all
           brightness:
             - dac
-        - type: star_with_palace
-          palace: menh
-          scope: dong_cung
-          stars:
-            - loc_ton
         - not:
             type: star_with_palace
             palace: menh
@@ -407,12 +414,14 @@ cach_cuc:
           stars:
             - van_xuong
             - van_khuc
+          stars_matching_logic: all
         - type: star_with_palace
           palace: menh
           scope: hoi_hop
           stars:
             - hong_loan
             - hoa_loc
+          stars_matching_logic: all
         - not:
             type: star_with_palace
             palace: menh
@@ -466,6 +475,7 @@ cach_cuc:
                   stars:
                     - van_xuong
                     - vu_khuc
+                  stars_matching_logic: all
                 - type: star_brightness
                   stars:
                     - van_xuong
@@ -478,6 +488,7 @@ cach_cuc:
                   stars:
                     - van_xuong
                     - vu_khuc
+                  stars_matching_logic: all
                 - type: star_brightness
                   stars:
                     - van_xuong
@@ -509,6 +520,7 @@ cach_cuc:
           stars:
             - van_xuong
             - ta_phu
+          stars_matching_logic: all
         - type: star_brightness
           stars:
             - van_xuong
@@ -527,6 +539,7 @@ cach_cuc:
           stars:
             - van_khuc
             - vu_khuc
+          stars_matching_logic: all
         - type: star_brightness
           stars:
             - van_khuc
@@ -613,6 +626,7 @@ cach_cuc:
             - van_khuc
             - thien_khoi
             - thien_viet
+          stars_matching_logic: all
         - not:
             type: star_with_palace
             palace: menh
