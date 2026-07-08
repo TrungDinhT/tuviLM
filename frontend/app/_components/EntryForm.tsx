@@ -27,7 +27,7 @@ export function EntryForm() {
   const buildLaso = useBuildLaso();
   const [name, setName] = useState("");
   const [gender, setGender] = useState<"M" | "F">("M");
-  const [calendar, setCalendar] = useState<Calendar>("am");
+  const [calendar, setCalendar] = useState<Calendar>("duong");
   const [day, setDay] = useState(1);
   const [month, setMonth] = useState(1);
   const [year, setYear] = useState(1999);

@@ -33,7 +33,7 @@ export function LichSuDrawer({
   const ownerId = stash.ownerId;
   const [profiles, setProfiles] = useState<ChartProfilePayload[] | null>(null);
   const [sessionsByProfile, setSessionsByProfile] = useState<Record<string, ChatSessionSummaryPayload[]>>({});
-  const [expandedProfileId, setExpandedProfileId] = useState<string | null>(stash.chartProfileId ?? null);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(stash.chartProfileId ?? null);
   const [profileReload, setProfileReload] = useState(0);
   const [sessionReload, setSessionReload] = useState(0);
   const [mutating, setMutating] = useState(false);
@@ -49,7 +49,7 @@ export function LichSuDrawer({
         const sorted = sortProfiles(items);
         setProfiles(sorted);
         setError(null);
-        setExpandedProfileId((current) => {
+        setSelectedProfileId((current) => {
           if (current && sorted.some((p) => p.id === current)) return current;
           if (stash.chartProfileId && sorted.some((p) => p.id === stash.chartProfileId)) {
             return stash.chartProfileId;
@@ -67,16 +67,16 @@ export function LichSuDrawer({
   }, [ownerId, stash.chartProfileId, profileReload]);
 
   useEffect(() => {
-    if (!ownerId || !expandedProfileId) return;
+    if (!ownerId || !selectedProfileId) return;
 
     let cancelled = false;
-    void listChatSessions({ ownerId, chartProfileId: expandedProfileId })
+    void listChatSessions({ ownerId, chartProfileId: selectedProfileId })
       .then((items) => {
         if (cancelled) return;
         setError(null);
         setSessionsByProfile((current) => ({
           ...current,
-          [expandedProfileId]: sortSessions(items),
+          [selectedProfileId]: sortSessions(items),
         }));
       })
       .catch((err) => {
@@ -85,7 +85,7 @@ export function LichSuDrawer({
     return () => {
       cancelled = true;
     };
-  }, [ownerId, expandedProfileId, sessionReload]);
+  }, [ownerId, selectedProfileId, sessionReload]);
 
   async function openSession(profile: ChartProfilePayload, sessionId: string | null) {
     if (!ownerId || mutating) return;
@@ -126,7 +126,8 @@ export function LichSuDrawer({
     setError(null);
     try {
       await deleteChartProfile({ ownerId, chartProfileId: profile.id });
-      setProfiles((items) => (items ?? []).filter((item) => item.id !== profile.id));
+      const remainingProfiles = (profiles ?? []).filter((item) => item.id !== profile.id);
+      setProfiles(remainingProfiles);
       setSessionsByProfile((items) => {
         const next = { ...items };
         delete next[profile.id];
@@ -135,6 +136,9 @@ export function LichSuDrawer({
       if (stash.chartProfileId === profile.id) {
         onCurrentDeleted();
         return;
+      }
+      if (selectedProfileId === profile.id) {
+        setSelectedProfileId(remainingProfiles[0]?.id ?? null);
       }
       setProfileReload((value) => value + 1);
     } catch (err) {
@@ -168,6 +172,11 @@ export function LichSuDrawer({
     }
   }
 
+  const selectedProfile = (profiles ?? []).find((profile) => profile.id === selectedProfileId) ?? null;
+  const selectedSessions = selectedProfile ? sessionsByProfile[selectedProfile.id] : undefined;
+  const loadingSessions = Boolean(ownerId && selectedProfile && selectedSessions == null);
+  const sessionItems = selectedSessions ?? [];
+
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-[rgba(244,237,224,0.55)] anim-fade-in" onClick={onClose} />
@@ -186,14 +195,29 @@ export function LichSuDrawer({
                 Sổ tay trò chuyện
               </h2>
               <div className="text-[12px] text-[var(--color-ink-3)] mt-1">
-                {profiles?.length ?? 0} lá số backend
+                {sessionItems.length} phiên · {profiles?.length ?? 0} lá số
               </div>
             </div>
             <Btn variant="ghost" className="text-[16px]" onClick={onClose} aria-label="Đóng">✕</Btn>
           </div>
 
-          <div className="flex items-center gap-3 mt-4">
-            <span className="text-[11px] text-[var(--color-ink-3)] uppercase tracking-[1px]">Lá số</span>
+          <div className="flex items-center gap-3 mt-4 min-w-0">
+            <label htmlFor="lichsu-profile" className="text-[11px] text-[var(--color-ink-3)] uppercase tracking-[1px]">
+              Lá số
+            </label>
+            <select
+              id="lichsu-profile"
+              value={selectedProfileId ?? ""}
+              disabled={!profiles?.length || mutating}
+              onChange={(event) => setSelectedProfileId(event.target.value || null)}
+              className="min-w-0 max-w-[220px] flex-1 bg-[var(--color-paper)] border border-[rgba(26,22,17,0.22)] px-3 py-2 text-[13px] text-[var(--color-ink)]"
+            >
+              {(profiles ?? []).map((profile) => (
+                <option key={profile.id} value={profile.id}>
+                  {displayName(profile)}
+                </option>
+              ))}
+            </select>
             <Btn
               type="button"
               variant="ghost"
@@ -205,7 +229,24 @@ export function LichSuDrawer({
             >
               ＋ thêm lá số
             </Btn>
+            {selectedProfile && (
+              <Btn
+                type="button"
+                variant="ghost"
+                className="ml-auto px-2 text-[14px]"
+                aria-label={`Xóa hồ sơ ${displayName(selectedProfile)}`}
+                disabled={mutating}
+                onClick={() => void removeProfile(selectedProfile)}
+              >
+                ×
+              </Btn>
+            )}
           </div>
+          {selectedProfile && (
+            <div className="mt-2 text-[11px] text-[var(--color-ink-3)]">
+              {formatBirth(selectedProfile)} · cập nhật {formatDateTime(selectedProfile.updated_at)}
+            </div>
+          )}
         </div>
 
         <div className="flex-1 py-2 overflow-auto">
@@ -229,115 +270,67 @@ export function LichSuDrawer({
               Chưa có hồ sơ lá số nào.
             </div>
           )}
-
-          {(profiles ?? []).map((profile) => {
-            const expanded = profile.id === expandedProfileId;
-            const currentProfile = profile.id === stash.chartProfileId;
-            const sessions = sessionsByProfile[profile.id];
-            const loadingSessions = sessions == null;
-            const sessionItems = sessions ?? [];
-
+          {loadingSessions && (
+            <div className="px-8 py-4 font-serif italic text-[14px] text-[var(--color-ink-3)]">
+              Đang tải phiên...
+            </div>
+          )}
+          {!loadingSessions && selectedProfile && sessionItems.length === 0 && (
+            <div className="px-8 py-4 font-serif italic text-[14px] text-[var(--color-ink-3)]">
+              Chưa có phiên cho lá số này.
+            </div>
+          )}
+          {selectedProfile && sessionItems.map((session) => {
+            const active = session.id === stash.sessionId;
             return (
-              <section key={profile.id} className="border-b border-[rgba(26,22,17,0.08)]">
-                <div className="flex items-stretch gap-1 px-6 py-2">
-                  <button
-                    type="button"
-                    onClick={() => setExpandedProfileId(expanded ? null : profile.id)}
-                    className="min-w-0 flex-1 text-left px-2 py-2 cursor-pointer transition-colors hover:bg-[rgba(139,42,31,0.06)]"
-                  >
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-[12px] text-[var(--color-ink-3)]">{expanded ? "▾" : "▸"}</span>
-                      <span className="min-w-0 flex-1 font-serif text-[18px] text-[var(--color-ink)] truncate">
-                        {displayName(profile)}
-                      </span>
-                      {currentProfile && (
-                        <span className="text-[10px] uppercase tracking-[1px] text-[var(--color-crimson)]">
-                          đang xem
-                        </span>
-                      )}
-                    </div>
-                    <div className="pl-5 text-[11px] text-[var(--color-ink-3)]">
-                      {formatBirth(profile)} · {formatDateTime(profile.updated_at)}
-                    </div>
-                  </button>
-                  <Btn
-                    type="button"
-                    variant="ghost"
-                    className="px-2 text-[15px]"
-                    aria-label={`Xóa hồ sơ ${displayName(profile)}`}
-                    disabled={mutating}
-                    onClick={() => void removeProfile(profile)}
-                  >
-                    ×
-                  </Btn>
-                </div>
-
-                {expanded && (
-                  <div className="ml-12 mr-6 mb-3 border-l border-[rgba(26,22,17,0.14)] pl-3">
-                    <Btn
-                      type="button"
-                      variant="default"
-                      className="w-full justify-center text-[12px] mb-2"
-                      disabled={mutating}
-                      onClick={() => void openSession(profile, null)}
-                    >
-                      ＋ Phiên mới
-                    </Btn>
-
-                    {loadingSessions && (
-                      <div className="py-2 text-[12px] text-[var(--color-ink-3)] font-serif italic">
-                        Đang tải phiên...
-                      </div>
-                    )}
-                    {!loadingSessions && sessionItems.length === 0 && (
-                      <div className="py-2 text-[12px] text-[var(--color-ink-3)] font-serif italic">
-                        Chưa có phiên.
-                      </div>
-                    )}
-                    {sessionItems.map((session) => {
-                      const active = session.id === stash.sessionId;
-                      return (
-                        <div key={session.id} className="flex items-stretch gap-1">
-                          <button
-                            type="button"
-                            disabled={mutating}
-                            onClick={() => void openSession(profile, session.id)}
-                            className="min-w-0 flex-1 text-left px-3 py-2 cursor-pointer disabled:opacity-50"
-                            style={{
-                              borderLeft: active ? "3px solid var(--color-crimson)" : "3px solid transparent",
-                              background: active ? "rgba(139,42,31,0.06)" : "transparent",
-                            }}
-                          >
-                            <div className="flex justify-between gap-3">
-                              <span className="min-w-0 flex-1 truncate font-serif text-[15px]">
-                                {session.title?.trim() || "Phiên trò chuyện"}
-                              </span>
-                              <span className="shrink-0 text-[11px] text-[var(--color-ink-3)]">
-                                {formatTime(session.updated_at)}
-                              </span>
-                            </div>
-                            <div className="mt-1 text-[11px] text-[var(--color-ink-3)]">
-                              {formatDateTime(session.updated_at)} · {session.message_count} tin
-                            </div>
-                          </button>
-                          <Btn
-                            type="button"
-                            variant="ghost"
-                            className="px-2 text-[14px]"
-                            aria-label="Xóa phiên trò chuyện"
-                            disabled={mutating}
-                            onClick={() => void removeSession(profile.id, session.id)}
-                          >
-                            ×
-                          </Btn>
-                        </div>
-                      );
-                    })}
+              <div key={session.id} className="flex items-stretch gap-1 border-b border-[rgba(26,22,17,0.08)] px-6 py-1">
+                <button
+                  type="button"
+                  disabled={mutating}
+                  onClick={() => void openSession(selectedProfile, session.id)}
+                  className="min-w-0 flex-1 text-left px-3 py-3 cursor-pointer disabled:opacity-50"
+                  style={{
+                    borderLeft: active ? "3px solid var(--color-crimson)" : "3px solid transparent",
+                    background: active ? "rgba(139,42,31,0.06)" : "transparent",
+                  }}
+                >
+                  <div className="flex justify-between gap-3">
+                    <span className="min-w-0 flex-1 truncate font-serif text-[16px]">
+                      {session.title?.trim() || "Phiên trò chuyện"}
+                    </span>
+                    <span className="shrink-0 text-[11px] text-[var(--color-ink-3)]">
+                      {formatTime(session.updated_at)}
+                    </span>
                   </div>
-                )}
-              </section>
+                  <div className="mt-1 text-[11px] text-[var(--color-ink-3)]">
+                    {formatDateTime(session.updated_at)} · {session.message_count} tin
+                  </div>
+                </button>
+                <Btn
+                  type="button"
+                  variant="ghost"
+                  className="px-2 text-[14px]"
+                  aria-label="Xóa phiên trò chuyện"
+                  disabled={mutating}
+                  onClick={() => void removeSession(selectedProfile.id, session.id)}
+                >
+                  ×
+                </Btn>
+              </div>
             );
           })}
+        </div>
+
+        <div className="px-8 py-4 border-t border-[rgba(26,22,17,0.14)]">
+          <Btn
+            type="button"
+            variant="crimson"
+            className="w-full justify-center"
+            disabled={!selectedProfile || mutating}
+            onClick={() => selectedProfile && void openSession(selectedProfile, null)}
+          >
+            ＋ Bắt đầu phiên mới
+          </Btn>
         </div>
       </div>
     </div>
