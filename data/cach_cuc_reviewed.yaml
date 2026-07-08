@@ -5657,6 +5657,7 @@ cach_cuc:
       stars:
       - thai_duong
       - hoa_ky
+      stars_matching_logic: all
 - id: co_vien_phu_tinh_tu_tam
   name: Thiên Cơ miếu vượng đắc địa tọa thủ Mệnh / Cơ Viên phú tính từ tâm
   page: 75
@@ -14354,6 +14355,7 @@ cach_cuc:
       stars:
       - van_xuong
       - liem_trinh
+      stars_matching_logic: all
 - id: van_xuong_vu_khuc_o_menh_than
   name: Văn Xương, Vũ Khúc ư Mệnh Thân
   page: 104

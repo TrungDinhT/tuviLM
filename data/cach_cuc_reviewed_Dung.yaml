@@ -448,6 +448,7 @@ cach_cuc:
           stars:
             - van_xuong
             - liem_trinh
+          stars_matching_logic: all
   - id: van_xuong_vu_khuc_o_menh_than
     name: Văn Xương, Vũ Khúc ư Mệnh Thân
     page: 104
