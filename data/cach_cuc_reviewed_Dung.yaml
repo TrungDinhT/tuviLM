@@ -4210,7 +4210,8 @@ cach_cuc:
               scope: hoi_hop
               stars: [dai_hao, tieu_hao]
               stars_matching_logic: any
-            - type: stars_meeting
+            - type: star_with_palace
+              palace: menh
               scope: hoi_hop
               group_name: sat_tinh
               at_least: 3
@@ -4284,7 +4285,8 @@ cach_cuc:
           palace: menh
           scope: dong_cung
           stars: [hoa_quyen]
-        - type: stars_meeting
+        - type: star_with_palace
+          palace: menh
           scope: hoi_hop
           group_name: sat_tinh
           at_least: 2
@@ -4351,7 +4353,8 @@ cach_cuc:
           scope: hoi_hop
           stars: [tu_vi, thien_phu, van_xuong, van_khuc, thien_khoi, thien_viet]
           stars_matching_logic: all
-        - type: stars_meeting
+        - type: star_with_palace
+          palace: menh
           scope: hoi_hop
           group_name: sat_tinh
           at_least: 3
@@ -4495,7 +4498,8 @@ cach_cuc:
           palace: menh
           scope: dong_cung
           stars: [hoa_ky]
-        - type: stars_meeting
+        - type: star_with_palace
+          palace: menh
           scope: hoi_hop
           group_name: sat_tinh
           at_least: 2
@@ -4923,7 +4927,8 @@ cach_cuc:
               scope: dong_cung
               stars: [hoa_loc, loc_ton]
               stars_matching_logic: any
-        - type: stars_meeting
+        - type: star_with_palace
+          palace: menh
           scope: hoi_hop
           group_name: sat_tinh
           at_least: 2
@@ -5194,7 +5199,8 @@ cach_cuc:
           palace: menh
           scope: dong_cung
           stars: [hoa_khoa]
-        - type: stars_meeting
+        - type: star_with_palace
+          palace: menh
           scope: hoi_hop
           group_name: sat_tinh
           at_least: 3
@@ -5292,7 +5298,8 @@ cach_cuc:
           scope: dong_cung
           stars: [dai_hao, tieu_hao]
           stars_matching_logic: any
-        - type: stars_meeting
+        - type: star_with_palace
+          palace: menh
           scope: hoi_hop
           group_name: sat_tinh
           at_least: 2
@@ -5401,7 +5408,8 @@ cach_cuc:
           scope: dong_cung
           stars: [tang_mon, bach_ho]
           stars_matching_logic: any
-        - type: stars_meeting
+        - type: star_with_palace
+          palace: menh
           scope: hoi_hop
           group_name: sat_tinh
           at_least: 2
