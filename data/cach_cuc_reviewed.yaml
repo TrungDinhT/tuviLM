@@ -14162,6 +14162,7 @@ cach_cuc:
       - van_xuong
       - van_khuc
       - thien_luong
+      stars_matching_logic: all
     - type: star_brightness
       stars:
       - van_xuong
@@ -19112,6 +19113,8 @@ cach_cuc:
       - hoa_ky
     - type: stars_meeting
       scope: hoi_hop
+      stars:
+      - hoa_ky
       group_name: sat_tinh
       at_least: 2
 - id: hoa_ky_hoi_tue_da
