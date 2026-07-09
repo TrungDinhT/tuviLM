@@ -3,7 +3,6 @@ from __future__ import annotations
 from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
-from src.agent.tool.ban_menh.laso_foundation import get_laso_foundation
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
@@ -14,6 +13,7 @@ from .tool import (
     read_catalog,
     get_xung_chieu,
     read_section,
+    get_laso_foundation,
 )
 from .skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
 
@@ -49,7 +49,7 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 5. Trước khi luận tổng quan hoặc luận Cung Mệnh, luôn gọi get_laso_foundation
 để nắm gốc lá số: Can Chi năm sinh, Âm/Dương Nam/Nữ, Bản Mệnh, Cục,
 quan hệ Mệnh-Cục, chiều vận và Đại hạn.
-5. Khi luận tư cách, khí chất nhập thế, Cung Mệnh, hoặc khi người dùng hỏi
+6. Khi luận tư cách, khí chất nhập thế, Cung Mệnh, hoặc khi người dùng hỏi
 về vòng Thái Tuế, phải gọi get_vong_thai_tue để xác định sao vòng Thái Tuế
 thủ Mệnh và nhóm tư cách tương ứng.
 
