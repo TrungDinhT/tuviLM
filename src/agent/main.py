@@ -7,13 +7,19 @@ from .tool import (
     get_cung_by_position,
     get_cung_by_role,
     get_list_cach_cuc,
+    get_phu_tinh_tam_phuong_tu_chinh,
     get_role_instruction,
     get_tam_hop,
+    get_trang_sinh,
     read_catalog,
     get_xung_chieu,
     read_section,
 )
-from .skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
+from .skills import (
+    luan_tinh_cach_b5_b6_skill,
+    get_cung_analyze_skill,
+    read_book_tuvi_tan_bien,
+)
 
 DEFAULT_MODEL = "gpt-4.1-mini"
 
@@ -74,11 +80,14 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_cung_by_position,
             get_cung_by_role,
             get_list_cach_cuc,
+            get_phu_tinh_tam_phuong_tu_chinh,
+            get_trang_sinh,
             get_tam_hop,
             get_xung_chieu,
             read_catalog,
             read_section,
             get_cung_analyze_skill,
+            luan_tinh_cach_b5_b6_skill,
             read_book_tuvi_tan_bien,
             get_role_instruction
         ]
