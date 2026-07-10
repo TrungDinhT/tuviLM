@@ -8,6 +8,7 @@ from src.agent.tool.chart import (
 )
 from src.agent.tool.guidance import get_role_instruction
 from src.agent.tool.cach_cuc import get_list_cach_cuc
+from src.agent.tool.personality import get_tinh_cach_b3_b4_context
 
 __all__ = [
     "get_cung_by_position",
@@ -19,4 +20,5 @@ __all__ = [
     "read_catalog",
     "read_section",
     "get_list_cach_cuc",
+    "get_tinh_cach_b3_b4_context",
 ]

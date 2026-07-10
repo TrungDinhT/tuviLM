@@ -9,11 +9,16 @@ from .tool import (
     get_list_cach_cuc,
     get_role_instruction,
     get_tam_hop,
+    get_tinh_cach_b3_b4_context,
     read_catalog,
     get_xung_chieu,
     read_section,
 )
-from .skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
+from .skills import (
+    get_cung_analyze_skill,
+    luan_tinh_cach_b3_b4,
+    read_book_tuvi_tan_bien,
+)
 
 DEFAULT_MODEL = "gpt-4.1-mini"
 
@@ -58,6 +63,7 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 - Sau khi có thông tin, hãy tổng hợp, tưởng tượng và chọn lọc để trả lời, không liệt kê một cách máy móc thông tin trong sách.
 
 ## Tính cách
+- Khi người dùng hỏi luận tính cách, luôn gọi luan_tinh_cach_b3_b4 trước.
 - Sử dụng giọng điềm đạm, rõ ràng, có chiều sâu.
 - Không phán chắc những điều tool không hỗ trợ.
 - Khi có những ý kiến trái chiều, cần xét đến độ ưu tiên : Chính tính > Tuần triệt > Tứ hóa > Phụ tinh > Tràng sinh > Xung chiếu > Tam hợp. Và luôn phải dựa trên vị trí của sao, chức vị của cung, sao đắc hay hãm để luận đoán.
@@ -76,9 +82,11 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_list_cach_cuc,
             get_tam_hop,
             get_xung_chieu,
+            get_tinh_cach_b3_b4_context,
             read_catalog,
             read_section,
             get_cung_analyze_skill,
+            luan_tinh_cach_b3_b4,
             read_book_tuvi_tan_bien,
             get_role_instruction
         ]
