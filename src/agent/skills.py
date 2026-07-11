@@ -12,6 +12,73 @@ def get_cung_analyze_skill() -> str:
 """
 
 
+def luan_tinh_cach_b1_b2() -> str:
+    """Skill luận tính cách bằng B1 nền lá số và B2 vòng Thái Tuế."""
+
+    return """Skill luan_tinh_cach_b1_b2: luận nền tính cách một người bằng B1-B2.
+
+Mục tiêu: dựng lớp nền trước khi xét chính tinh, Tuần/Triệt, cách cục và phụ tinh. B1 cho biết quan hệ giữa bản thân với môi trường nền; B2 cho biết tư cách, thái độ nhập thế và cách đương số đứng trước cuộc đời. Đây là khung định hướng, không phải kết luận toàn bộ tính cách hay số phận.
+
+Nguyên tắc nguồn:
+- Luôn gọi get_laso_foundation cho B1 và get_vong_thai_tue cho B2; chỉ diễn giải dữ kiện hai tool trả về, không tự suy ra dữ liệu còn thiếu.
+- Kiến thức cần thiết đã nằm trong payload của hai tool; không cần và không được đọc file knowledge khi chạy agent.
+- B1-B2 phải được thực hiện trước B3-B4 và B5-B6, nhưng không thay thế chính tinh, Tuần/Triệt, cách cục, Tứ Hóa hay phụ tinh.
+- Kết quả là diễn giải văn hóa/giả thuyết tự phản tỉnh, không phải chẩn đoán tâm lý hay sự thật khách quan.
+
+## Bước 1 - Nền lá số từ get_laso_foundation
+1. Đọc Âm/Dương thuận lý hoặc nghịch lý:
+   - Thuận lý: dùng các trường environment_alignment, thinking_consistency, action_style, resilience_pattern để mô tả xu hướng hòa nhịp với môi trường, độ nhất quán giữa suy nghĩ và hành động, và cách phản ứng trước hoàn cảnh.
+   - Nghịch lý: đọc như độ lệch pha ban đầu, tư duy đa luồng, khả năng tự phản biện và sức bền được rèn qua nghịch cảnh; không gắn nhãn xấu hay bất thường.
+   - Đây chỉ là dữ kiện nền; phải chuyển sang B3-B6 trước khi kết luận tính cách.
+2. Đọc Bản Mệnh:
+   - Dùng name, ngu_hanh và meaning để rút ra hình tượng nạp âm, khí chất nền, tiềm năng và điều kiện giúp phẩm chất đó biểu hiện đúng.
+   - Ưu tiên nature và reading_hint; không biến keywords thành danh sách tính từ cứng nhắc, không suy rộng sang nghề nghiệp, giàu nghèo, hôn nhân hay sức khỏe.
+3. Đọc Cục và quan hệ Mệnh-Cục:
+   - Bản Mệnh là "mình"; Cục là môi trường nền. Không dùng riêng Cục để gán tính cách.
+   - Lấy relation và meaning trong menh_cuc_relation làm trọng tâm để xác định môi trường nâng đỡ, đồng hành, làm đương số sinh xuất/hao lực, bị đương số khắc chế/cải tạo, hay gây áp lực lên đương số.
+   - Không tự tính lại quan hệ ngũ hành và không xếp loại tốt-xấu tuyệt đối.
+4. Tổng hợp B1 thành ba ý: khí chất nền; mức hòa hợp với hoàn cảnh; hướng phát triển hoặc cách dùng sức phù hợp.
+
+## Bước 2 - Tư cách nhập thế từ get_vong_thai_tue
+1. Lấy đúng sao vòng Thái Tuế thủ Mệnh từ menh.thai_tue_star; tool đã xác định sao này trực tiếp tại vị trí Mệnh.
+2. Dựng khung tư cách từ menh.group:
+   - overview cho mẫu thái độ nhập thế chính.
+   - reading_lens cho trục cần quan sát và mặt xây dựng.
+   - trap cho mặt dễ lệch khi thiếu cân bằng.
+   - Bốn nhóm có thể xuất hiện là Chính Phái, Khôn Ngoan, Đối Lập và Nhường Nhịn. Dùng đúng nội dung tool trả về, không suy diễn tên nhóm theo nghĩa đời thường.
+3. Dùng menh.star_meaning để cá thể hóa trong nhóm:
+   - keywords chỉ để định hướng nội bộ.
+   - at_menh mô tả biểu hiện chính; shadow mô tả mặt bóng; reading_hint chỉ cách cân bằng hai mặt.
+   - Không bê nguyên payload thành danh sách và không đóng đinh đương số vào một nhãn.
+4. Chỉ dùng technical_support khi trường tương ứng thật sự có trong payload:
+   - ego_and_collaboration_note: chỉ xuất hiện với Nhóm Chính Phái; dùng như ghi chú về tự trọng, chính danh và cách hợp tác. Chỉ nhấn mạnh cái tôi khi menh.thai_tue_star.id là thai_tue.
+   - thien_ma: chỉ có ý nghĩa đặc biệt với Nhóm Đối Lập. Dùng lens để đọc kiểu nghị lực; nếu tuan_triet không rỗng thì nói đà hành động bị cản hoặc phải đi vòng, không nói ý chí biến mất.
+   - thai_tue_sat_tinh_at_menh: chỉ áp dụng khi chính Thái Tuế thủ Mệnh đồng cung Không/Kiếp/Hỏa/Linh. Diễn giải thành bài học rèn tâm và quản sát khí, không hù dọa hay kết luận tai họa.
+5. Không dùng riêng vòng Thái Tuế để mở rộng luận giàu nghèo, nghề nghiệp, bệnh tật, hôn nhân hay vận hạn.
+6. Tổng hợp B2 thành ba ý: tư cách/động lực nhập thế; mặt xây dựng; cái bẫy cần tự điều chỉnh.
+
+## Ghép B1 với B2
+- B1 trả lời "khí nền vận hành trong môi trường ra sao"; B2 trả lời "đương số chọn thái độ nào để bước vào đời".
+- Tìm điểm đồng thuận và điểm căng giữa hai bước. Ví dụ, nền thiên về uyển chuyển có thể làm mềm nhóm trọng nguyên tắc; nền chịu áp lực có thể khiến nghị lực của Nhóm Đối Lập biểu hiện rõ hơn. Chỉ viết như giả thuyết, không tạo quan hệ nhân quả mà tool không hỗ trợ.
+- Nếu B1 và B2 trái sắc thái, giữ cả hai theo cấu trúc "bên trong/nền khí" và "cách biểu hiện ra đời"; không ép chúng thành một kết luận duy nhất.
+- Chuyển kết quả sang B3-B4 để chính tinh và Tuần/Triệt xác nhận, phản biện hoặc chỉnh cường độ; sau đó mới dùng B5-B6 hoàn thiện khung.
+
+Cách viết như người luận giỏi:
+- Đọc cấu trúc trước khi gán tính từ; tách khí nền, biểu hiện xã hội và bài học trưởng thành.
+- Viết hai mặt: khi được nâng đỡ thì biểu hiện ra sao, khi chịu áp lực thì dễ lệch thế nào.
+- Dùng câu điều kiện: "có xu hướng", "dễ", "thường", "nếu được rèn luyện".
+- Cô đọng, không đọc lại tên mọi trường trong payload, không liệt kê đủ 12 sao vòng Thái Tuế.
+
+Độ dài:
+- B1 và B2 mỗi phần 1-3 câu; phần ghép B1-B2 1-2 câu.
+- Chỉ mở rộng khi người dùng yêu cầu luận kỹ.
+
+Giọng văn:
+- Tiếng Việt tự nhiên, sâu nhưng rõ, giọng truyền đạt như thầy tử vi nhiều năm trong nghề.
+- Không chẩn đoán tâm lý, không khẳng định tuyệt đối, không hù dọa.
+"""
+
+
 def luan_tinh_cach_b3_b4() -> str:
     """Skill luận tính cách bằng B3 chính tinh thủ Mệnh và B4 Tuần/Triệt."""
 
@@ -78,7 +145,6 @@ Giọng văn:
 """
 
 
-
 def luan_tinh_cach_b5_b6_skill() -> str:
     """Quy trình luận khung tính cách từ cách cục (Bước 5) và tô màu chi tiết
     bằng phụ tinh + Tràng Sinh (Bước 6) của workflow
@@ -118,7 +184,6 @@ def read_book_tuvi_tan_bien() -> str:
 
     Always use this skill when you get new concepts, topics, etc.
     """
-
 
     return """Kỹ năng đọc sách Tử Vi Tân Biên
 
