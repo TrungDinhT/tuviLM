@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import TypedDict
 
 from pydantic_ai import RunContext
 
@@ -39,7 +38,6 @@ class ThaiTueGroupMeaning:
     id: str
     name: str
     archetype: str
-    star_ids: tuple[ComponentId, ...]
     overview: str
     reading_lens: str
     trap: str
@@ -50,7 +48,6 @@ class ThaiTueGroupMeaning:
             "id": self.id,
             "name": self.name,
             "archetype": self.archetype,
-            "star_ids": list(self.star_ids),
             "overview": self.overview,
             "reading_lens": self.reading_lens,
             "trap": self.trap,
@@ -71,21 +68,11 @@ class ThaiTueStarMeaning:
     def as_payload(self) -> dict[str, object]:
         """Return an agent-facing JSON-safe representation of the star."""
         return {
-            "id": self.id,
-            "group_id": self.group_id,
             "keywords": list(self.keywords),
             "at_menh": self.at_menh,
             "shadow": self.shadow,
             "reading_hint": self.reading_hint,
         }
-
-
-class TuanTrietMarkerPayload(TypedDict):
-    """Compact marker summary for Tuần/Triệt at a position."""
-
-    markers: list[dict[str, object]]
-    has_tuan: bool
-    has_triet: bool
 
 
 def get_vong_thai_tue(ctx: RunContext[TuviAgentDeps]) -> dict[str, object]:
@@ -119,68 +106,28 @@ def build_vong_thai_tue_payload(la_so: LaSo) -> dict[str, object]:
     star_id = _thai_tue_star_at_menh(menh_components)
     star_meaning = _THAI_TUE_STAR_MEANINGS[star_id]
     group = _THAI_TUE_GROUP_MEANINGS[star_meaning.group_id]
-    technical_support = {
-        "ego_and_collaboration_note": _ego_payload(star_id, group.id),
-    }
-    reading_steps = [
-        "Xác định sao vòng Thái Tuế tọa thủ Mệnh trước, rồi mới mở rộng sang tam phương tứ chính.",
-        "Luận theo nhóm tư cách của sao thủ Mệnh, sau đó dùng biến thể từng sao để chỉnh sắc thái.",
-    ]
+    technical_support: dict[str, object] = {}
+
+    if group.id == "chinh_phai":
+        technical_support["ego_and_collaboration_note"] = _ego_note(star_id)
 
     if group.id == "doi_lap":
         technical_support["thien_ma"] = _thien_ma_payload(la_so, menh_position)
-        reading_steps.append(
-            "Với Nhóm Đối Lập, dùng Thiên Mã để đọc nghị lực và xem Tuần/Triệt tại vị trí Thiên Mã nếu có."
-        )
 
     if _thai_tue_meets_sat_tinh(star_id, menh_components):
         technical_support["thai_tue_sat_tinh_at_menh"] = _thai_tue_sat_tinh_payload(
             la_so,
             menh_components,
         )
-        reading_steps.append(
-            "Khi Thái Tuế thủ Mệnh gặp Không/Kiếp/Hỏa/Linh, đọc theo bài học rèn tâm để không bị sát khí kéo lệch."
-        )
-
-    reading_steps.append(
-        "Không dùng vòng Thái Tuế một mình để kết luận giàu nghèo, nghề nghiệp, bệnh tật, hôn nhân hoặc vận hạn."
-    )
 
     return {
-        "scope": _scope_payload(),
         "menh": {
             "position": _dia_chi_payload(la_so, menh_position),
             "thai_tue_star": _component_payload(la_so, star_id),
             "group": group.as_payload(),
             "star_meaning": star_meaning.as_payload(),
         },
-        "ring_positions": _ring_positions_payload(la_so, menh_position),
         "technical_support": technical_support,
-        "reading_steps": reading_steps,
-    }
-
-
-def _scope_payload() -> dict[str, object]:
-    """Describe what this tool is allowed to conclude and what it must not replace."""
-    return {
-        "name": "Vòng Thái Tuế",
-        "method": (
-            "Xác định sao nào trong 12 sao vòng Thái Tuế đang tọa thủ cung "
-            "Mệnh: Thái Tuế, Thiếu Dương, Tang Môn, Thiếu Âm, Quan Phù, "
-            "Tử Phù, Tuế Phá, Long Đức, Bạch Hổ, Phúc Đức, Điếu Khách, "
-            "Trực Phù."
-        ),
-        "system_context": (
-            "Vòng Thái Tuế là lớp định vị tư cách và thái độ nhập thế. Khi "
-            "luận sâu về thành tựu, cách kiếm tiền hoặc sức khỏe, cần phối "
-            "hợp thêm hai vòng còn lại trong Tam Luân là Lộc Tồn và Trường Sinh."
-        ),
-        "ring_order": list(THAI_TUE_RING_STAR_IDS),
-        "scope_note": (
-            "Payload này phục vụ luận tư cách tại Mệnh. Nó không thay thế dữ "
-            "liệu cung Mệnh, chính tinh, sát tinh, tứ hóa, Tuần/Triệt, tam hợp "
-            "và xung chiếu."
-        ),
     }
 
 
@@ -195,26 +142,6 @@ def _thai_tue_star_at_menh(menh_components: frozenset[ComponentId]) -> Component
         if star_id in menh_components:
             return star_id
     raise ValueError("Không tìm thấy sao vòng Thái Tuế tại cung Mệnh.")
-
-
-def _ring_positions_payload(
-    la_so: LaSo,
-    menh_position: DiaChi,
-) -> list[dict[str, object]]:
-    """Return all natal positions of the Thái Tuế ring and mark the Mệnh one."""
-    positions: list[dict[str, object]] = []
-    for star_id in THAI_TUE_RING_STAR_IDS:
-        position = la_so.position_of(star_id)
-        if position is None:
-            continue
-        positions.append(
-            {
-                "star": _component_payload(la_so, star_id),
-                "position": _dia_chi_payload(la_so, position),
-                "is_menh": position == menh_position,
-            }
-        )
-    return positions
 
 
 def _thai_tue_meets_sat_tinh(
@@ -246,7 +173,7 @@ def _thien_ma_payload(
 
     lens = _THIEN_MA_POSITION_LENS.get(position)
     thien_ma_components = la_so.tinh_ban.layer(NATAL_LAYER_ID).components_at(position)
-    tuan_triet_at_thien_ma = _tuan_triet_marker_payload(
+    tuan_triet = _tuan_triet_markers(
         la_so,
         thien_ma_components,
     )
@@ -256,31 +183,20 @@ def _thien_ma_payload(
         "position": _dia_chi_payload(la_so, position),
         "at_menh": position == menh_position,
         "lens": lens,
-        "blocked_by_tuan_triet": bool(tuan_triet_at_thien_ma["markers"]),
-        "tuan_triet_at_position": tuan_triet_at_thien_ma,
-        "reading_hint": (
-            "Với Nhóm Đối Lập, Thiên Mã cho biết kiểu nghị lực và cách bật "
-            "lên trong nghịch cảnh; nếu Thiên Mã bị Tuần/Triệt thì ý chí và "
-            "đà hành động bị giảm đáng kể."
-        ),
+        "tuan_triet": tuan_triet,
     }
 
 
-def _tuan_triet_marker_payload(
+def _tuan_triet_markers(
     la_so: LaSo,
     components: frozenset[ComponentId],
-) -> TuanTrietMarkerPayload:
-    """Convert raw component ids at one position into Tuần/Triệt marker flags."""
-    markers = [
+) -> list[dict[str, object]]:
+    """Return the Tuần/Triệt markers present at one position."""
+    return [
         _component_payload(la_so, marker_id)
         for marker_id in _TUAN_TRIET_IDS
         if marker_id in components
     ]
-    return {
-        "markers": markers,
-        "has_tuan": any(marker["name"] == "Tuần" for marker in markers),
-        "has_triet": any(marker["name"] == "Triệt" for marker in markers),
-    }
 
 
 def _thai_tue_sat_tinh_payload(
@@ -294,41 +210,21 @@ def _thai_tue_sat_tinh_payload(
         if star_id in menh_components
     ]
 
-    return {
-        "stars": sat_tinh,
-        "reading_hint": (
-            "Thái Tuế thủ Mệnh gặp sát tinh Không/Kiếp/Hỏa/Linh: đây là bài "
-            "học rèn tư cách quân tử rất mạnh. Đương số phải rèn tâm nhiều "
-            "để không bị sát khí kéo theo hướng xấu; vẫn phải kiểm tra chính "
-            "tinh và toàn bộ cách cục trước khi kết luận."
-        ),
-    }
+    return {"stars": sat_tinh}
 
 
-def _ego_payload(star_id: ComponentId, group_id: str) -> dict[str, object]:
+def _ego_note(star_id: ComponentId) -> str:
     """Return the collaboration warning for strong Thái Tuế-style self-regard."""
     if star_id == "thai_tue":
-        note = (
+        return (
             "Thái Tuế thủ Mệnh làm lòng tự trọng và cảm giác chính danh rất "
             "mạnh. Khi hợp tác, cần tránh xúc phạm danh dự vì họ có thể bất "
             "cần và sẵn sàng bỏ ngang nếu thấy bị hạ thấp."
         )
-    elif group_id == "chinh_phai":
-        note = (
-            "Nhóm Chính Phái coi trọng danh dự và đúng sai. Khi giao tiếp, nên "
-            "rõ nguyên tắc, minh bạch trách nhiệm và tránh cách nói hạ thấp họ."
-        )
-    else:
-        note = (
-            "Ghi chú cái tôi cực đoan áp dụng mạnh nhất khi Thái Tuế thủ Mệnh; "
-            "với các nhóm khác chỉ dùng như điểm kiểm tra phụ nếu lá số có thêm "
-            "Thái Tuế hoặc cách cục làm tự trọng tăng mạnh."
-        )
-
-    return {
-        "applies_strongly": star_id == "thai_tue",
-        "note": note,
-    }
+    return (
+        "Nhóm Chính Phái coi trọng danh dự và đúng sai. Khi giao tiếp, nên "
+        "rõ nguyên tắc, minh bạch trách nhiệm và tránh cách nói hạ thấp họ."
+    )
 
 
 def _component_payload(la_so: LaSo, component_id: ComponentId) -> dict[str, object]:
@@ -359,7 +255,6 @@ _THAI_TUE_GROUP_MEANINGS: dict[str, ThaiTueGroupMeaning] = {
         id="chinh_phai",
         name="Nhóm Chính Phái",
         archetype="Nhóm Thái Tuế - Người Quân tử",
-        star_ids=("thai_tue", "quan_phuf", "bach_ho"),
         overview=(
             "Mẫu người sống có lý tưởng, trách nhiệm cao và hành động vì sự "
             "chính danh, danh chính ngôn thuận."
@@ -377,7 +272,6 @@ _THAI_TUE_GROUP_MEANINGS: dict[str, ThaiTueGroupMeaning] = {
         id="khon_ngoan",
         name="Nhóm Khôn Ngoan",
         archetype="Nhóm Thiếu Dương - Thiên Không, bài học Sắc tức thị Không",
-        star_ids=("thieu_duong", "tu_phu", "sao_phuc_duc"),
         overview=(
             "Mẫu người thông minh, sắc sảo, biết đi trước và có xu hướng muốn "
             "lấn lướt, vượt lên người khác."
@@ -396,7 +290,6 @@ _THAI_TUE_GROUP_MEANINGS: dict[str, ThaiTueGroupMeaning] = {
         id="doi_lap",
         name="Nhóm Đối Lập",
         archetype="Nhóm Tuế Phá - Sức mạnh nghịch cảnh",
-        star_ids=("tang_mon", "tue_pha", "dieu_khach"),
         overview=(
             "Mẫu người luôn bất mãn với thực tại, thích bàn ra, đi ngược đám "
             "đông và chống đối những gì người khác đề ra."
@@ -415,7 +308,6 @@ _THAI_TUE_GROUP_MEANINGS: dict[str, ThaiTueGroupMeaning] = {
         id="nhuong_nhin",
         name="Nhóm Nhường Nhịn",
         archetype="Nhóm Thiếu Âm - Sự nhẹ dạ",
-        star_ids=("thieu_am", "long_duc", "truc_phu"),
         overview=(
             "Mẫu người cam chịu, hiền lành, hay chịu phần thiệt về mình trong "
             "quan hệ và lấy đạo đức làm chỗ dựa."
