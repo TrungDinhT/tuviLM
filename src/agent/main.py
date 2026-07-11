@@ -22,11 +22,7 @@ from .skills import (
     get_cung_analyze_skill,
     luan_tinh_cach_b3_b4,
     read_book_tuvi_tan_bien,
-)
-from .skills import (
     luan_tinh_cach_b5_b6_skill,
-    get_cung_analyze_skill,
-    read_book_tuvi_tan_bien,
 )
 
 DEFAULT_MODEL = "gpt-4.1-mini"
