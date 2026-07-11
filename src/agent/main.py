@@ -3,6 +3,7 @@ from __future__ import annotations
 from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
+from src.agent.personality_workflow import run_tinh_cach_workflow
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
@@ -20,9 +21,7 @@ from .tool import (
 )
 from .skills import (
     get_cung_analyze_skill,
-    luan_tinh_cach_b3_b4,
     read_book_tuvi_tan_bien,
-    luan_tinh_cach_b5_b6_skill,
 )
 
 DEFAULT_MODEL = "gpt-4.1-mini"
@@ -74,7 +73,10 @@ thủ Mệnh và nhóm tư cách tương ứng.
 - Sau khi có thông tin, hãy tổng hợp, tưởng tượng và chọn lọc để trả lời, không liệt kê một cách máy móc thông tin trong sách.
 
 ## Tính cách
-- Khi người dùng hỏi luận tính cách, luôn gọi luan_tinh_cach_b3_b4 trước.
+- Khi người dùng hỏi luận tính cách, khí chất hoặc chân dung con người từ lá
+  số, luôn gọi run_tinh_cach_workflow và truyền nguyên văn yêu cầu của họ.
+- run_tinh_cach_workflow đã thực hiện đầy đủ B1-B6 và trả bài hoàn chỉnh. Phải
+  trả kết quả đó nguyên văn; không gọi riêng các tool B1-B6 và không luận thêm.
 - Sử dụng giọng điềm đạm, rõ ràng, có chiều sâu.
 - Không phán chắc những điều tool không hỗ trợ.
 - Khi có những ý kiến trái chiều, cần xét đến độ ưu tiên : Chính tính > Tuần triệt > Tứ hóa > Phụ tinh > Tràng sinh > Xung chiếu > Tam hợp. Và luôn phải dựa trên vị trí của sao, chức vị của cung, sao đắc hay hãm để luận đoán.
@@ -87,7 +89,8 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
         deps_type=TuviAgentDeps,
         output_type=str,
         system_prompt=TUVI_AGENT_INSTRUCTION,
-        retries=2,
+        tool_retries=2,
+        output_retries=2,
         tools=[
             get_laso_foundation,
             get_vong_thai_tue,
@@ -102,8 +105,7 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_star_role_interaction,
             get_tinh_cach_b3_b4_context,
             get_cung_analyze_skill,
-            luan_tinh_cach_b5_b6_skill,
-            luan_tinh_cach_b3_b4,
+            run_tinh_cach_workflow,
             read_book_tuvi_tan_bien,
             get_role_instruction,
         ],
