@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pydantic_ai import RunContext
 
+from src.refactored.components.definitions.cung_role import Role
+
 from .constant import get_sao_section_id
 from src.agent.book_index import SectionContent
 from src.agent.deps import TuviAgentDeps
@@ -29,7 +31,7 @@ def get_star_description(
 
 
 def get_star_role_interaction(
-    ctx: RunContext[TuviAgentDeps], star_name: str, role: str
+    ctx: RunContext[TuviAgentDeps], star_name: str, role: Role
 ) -> str | SectionContent:
     """Lấy mô tả về cách một sao cụ thể tương tác với một cung có vai trò nhất định.
 
