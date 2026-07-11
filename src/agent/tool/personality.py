@@ -6,6 +6,7 @@ from pydantic_ai import ModelRetry, RunContext
 
 from src.agent.deps import TuviAgentDeps
 from src.agent.tool.chart import _format_cung_at
+from src.refactored.la_so import LaSo
 from src.refactored.components.definitions.cung_role import Role
 from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet
 from src.refactored.model.elementary import CircleDirection, DiaChi, NguHanh
@@ -32,8 +33,7 @@ def _sao_ban_menh_relation(sao_ngu_hanh: NguHanh, ban_menh_ngu_hanh: NguHanh) ->
     return "không xác định"
 
 
-def _main_star_lines(ctx: TuviAgentDeps, position: DiaChi) -> list[str]:
-    la_so = ctx.require_la_so()
+def _main_star_lines(la_so: LaSo, position: DiaChi) -> list[str]:
     lines: list[str] = []
     for layered_component in la_so.cung_at(position).components:
         if layered_component.layer_id != NATAL_LAYER_ID:
@@ -50,17 +50,16 @@ def _main_star_lines(ctx: TuviAgentDeps, position: DiaChi) -> list[str]:
     return lines
 
 
-def _format_position(ctx: TuviAgentDeps, position: DiaChi) -> str:
-    return ctx.require_la_so().catalog.get_dia_chi(position).name
+def _format_position(la_so: LaSo, position: DiaChi) -> str:
+    return la_so.catalog.get_dia_chi(position).name
 
 
-def _main_star_block(ctx: TuviAgentDeps, label: str, position: DiaChi) -> str:
-    lines = _main_star_lines(ctx, position) or ["- Không có chính tinh."]
-    return f"{label} ({_format_position(ctx, position)}):\n" + "\n".join(lines)
+def _main_star_block(la_so: LaSo, label: str, position: DiaChi) -> str:
+    lines = _main_star_lines(la_so, position) or ["- Không có chính tinh."]
+    return f"{label} ({_format_position(la_so, position)}):\n" + "\n".join(lines)
 
 
-def _tuan_triet_line(ctx: TuviAgentDeps, label: str, position: DiaChi) -> str:
-    la_so = ctx.require_la_so()
+def _tuan_triet_line(la_so: LaSo, label: str, position: DiaChi) -> str:
     names: list[str] = []
     for layered_component in la_so.cung_at(position).components:
         if layered_component.layer_id != NATAL_LAYER_ID:
@@ -69,7 +68,7 @@ def _tuan_triet_line(ctx: TuviAgentDeps, label: str, position: DiaChi) -> str:
         if isinstance(component, TuanTriet):
             names.append(component.name)
     value = ", ".join(names) if names else "Không có"
-    return f"- {label} ({_format_position(ctx, position)}): {value}"
+    return f"- {label} ({_format_position(la_so, position)}): {value}"
 
 
 def _format_star_status(sao_id: str, position: DiaChi) -> str:
@@ -85,7 +84,11 @@ def get_tinh_cach_b3_b4_context(ctx: RunContext[TuviAgentDeps]) -> str:
     chiếu/tam hợp và Tuần/Triệt ở các cung liên quan.
     """
     _logger.info("Lấy context tính cách B3-B4")
-    la_so = ctx.deps.require_la_so()
+    return build_tinh_cach_b3_b4_context(ctx.deps.require_la_so())
+
+
+def build_tinh_cach_b3_b4_context(la_so: LaSo) -> str:
+    """Build deterministic B3-B4 evidence from a natal chart."""
     menh_position = la_so.position_of(Role.MENH.value)
     if menh_position is None:
         raise ModelRetry("Không tìm thấy cung Mệnh trong lá số.")
@@ -96,7 +99,7 @@ def get_tinh_cach_b3_b4_context(ctx: RunContext[TuviAgentDeps]) -> str:
         transform_tam_hop(menh_position, CircleDirection.CCW),
     )
     relation = la_so.menh_cuc_relation()
-    main_star_lines = _main_star_lines(ctx.deps, menh_position)
+    main_star_lines = _main_star_lines(la_so, menh_position)
     if not main_star_lines:
         main_star_lines = [
             "- Mệnh Vô Chính Diệu: dùng chính tinh cung xung chiếu làm nền B3, "
@@ -115,19 +118,19 @@ def get_tinh_cach_b3_b4_context(ctx: RunContext[TuviAgentDeps]) -> str:
             "Cung Mệnh:\n" + _format_cung_at(la_so, menh_position),
             "Chính tinh Mệnh và quan hệ với Bản Mệnh:\n" + "\n".join(main_star_lines),
             "Chính tinh xung chiếu Mệnh:\n"
-            + _main_star_block(ctx.deps, "Xung chiếu", xung_position),
+            + _main_star_block(la_so, "Xung chiếu", xung_position),
             "Chính tinh tam hợp Mệnh:\n"
             + "\n\n".join(
-                _main_star_block(ctx.deps, "Tam hợp", position)
+                _main_star_block(la_so, "Tam hợp", position)
                 for position in tam_hop_positions
             ),
             "Tuần/Triệt tại các cung liên quan:\n"
             + "\n".join(
                 [
-                    _tuan_triet_line(ctx.deps, "Mệnh", menh_position),
-                    _tuan_triet_line(ctx.deps, "Xung chiếu", xung_position),
+                    _tuan_triet_line(la_so, "Mệnh", menh_position),
+                    _tuan_triet_line(la_so, "Xung chiếu", xung_position),
                     *(
-                        _tuan_triet_line(ctx.deps, "Tam hợp", position)
+                        _tuan_triet_line(la_so, "Tam hợp", position)
                         for position in tam_hop_positions
                     ),
                 ]
