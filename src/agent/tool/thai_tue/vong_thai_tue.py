@@ -91,7 +91,14 @@ def get_vong_thai_tue(ctx: RunContext[TuviAgentDeps]) -> dict[str, object]:
     tam phương tứ chính, Lộc Tồn, Trường Sinh và các cách cục khác.
     """
     _logger.info("Lấy vòng Thái Tuế tại Mệnh")
-    return build_vong_thai_tue_payload(ctx.deps.require_la_so())
+    result = build_vong_thai_tue_payload(ctx.deps.require_la_so())
+    _logger.info(
+        "Đã lấy vòng Thái Tuế tại Mệnh: star=%s, group=%s, support=%s",
+        result["menh"]["thai_tue_star"]["id"],
+        result["menh"]["group"]["id"],
+        sorted(result["technical_support"]),
+    )
+    return result
 
 
 def build_vong_thai_tue_payload(la_so: LaSo) -> dict[str, object]:

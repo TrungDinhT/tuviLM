@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -39,6 +40,9 @@ from src.agent.tool.phu_tinh.tool import (
 from src.agent.tool.thai_tue.vong_thai_tue import build_vong_thai_tue_payload
 from src.refactored.components.definitions.cung_role import Role
 from src.refactored.la_so import LaSo
+
+
+_logger = logging.getLogger(__name__)
 
 
 class AmDuongEvidence(BaseModel):
@@ -269,7 +273,8 @@ def build_personality_agent(model: str) -> Agent:
 
 def collect_personality_evidence(la_so: LaSo) -> PersonalityEvidence:
     """Collect B1-B6 in application code, without model-selected tool calls."""
-    return PersonalityEvidence(
+    _logger.info("Thu thập evidence tính cách B1-B6")
+    evidence = PersonalityEvidence(
         foundation=FoundationEvidence.model_validate(
             build_laso_foundation_payload(la_so)
         ),
@@ -282,6 +287,16 @@ def collect_personality_evidence(la_so: LaSo) -> PersonalityEvidence:
         trang_sinh_menh=build_trang_sinh(la_so, Role.MENH),
         trang_sinh_than=build_trang_sinh(la_so, Role.CUNG_THAN),
     )
+    _logger.info(
+        "Đã thu thập evidence tính cách B1-B6: cach_cuc=%d, phu_tinh=%d, "
+        "trang_sinh_menh=%s, trang_sinh_than=%s",
+        len(evidence.cach_cuc),
+        sum(len(group.stars) for group in evidence.phu_tinh.groups)
+        + len(evidence.phu_tinh.khac),
+        evidence.trang_sinh_menh.star,
+        evidence.trang_sinh_than.star,
+    )
+    return evidence
 
 
 def get_personality_evidence(
@@ -292,7 +307,10 @@ def get_personality_evidence(
     Tool tổng hợp này thực thi toàn bộ bước lấy dữ liệu bằng code deterministic.
     Luôn gọi tool này trước khi luận nếu prompt chưa cung cấp sẵn evidence.
     """
-    return collect_personality_evidence(ctx.deps.require_la_so())
+    _logger.info("Tool get_personality_evidence bắt đầu")
+    result = collect_personality_evidence(ctx.deps.require_la_so())
+    _logger.info("Tool get_personality_evidence hoàn tất")
+    return result
 
 
 async def run_personality_workflow(
@@ -303,6 +321,7 @@ async def run_personality_workflow(
     usage: Any = None,
 ) -> str:
     """Collect evidence and execute exactly one plain-text synthesis run."""
+    _logger.info("Chạy personality workflow: request_chars=%d", len(request))
     evidence = collect_personality_evidence(deps.require_la_so())
     prompt = json.dumps(
         {
@@ -312,6 +331,7 @@ async def run_personality_workflow(
         ensure_ascii=False,
     )
     result = await agent.run(prompt, deps=deps, usage=usage)
+    _logger.info("Personality workflow hoàn tất: output_chars=%d", len(result.output))
     return result.output
 
 
@@ -325,10 +345,12 @@ async def run_tinh_cach_workflow(
     con người từ lá số. Truyền nguyên văn yêu cầu của người dùng. Kết quả đã là
     câu trả lời cuối; trả lại nguyên văn, không tự luận thêm bằng các tool riêng.
     """
+    _logger.info("Tool run_tinh_cach_workflow bắt đầu: request_chars=%d", len(request))
     analysis = await run_personality_workflow(
         agent=ctx.deps.require_personality_agent(),
         deps=ctx.deps,
         request=request,
         usage=ctx.usage,
     )
+    _logger.info("Tool run_tinh_cach_workflow hoàn tất: output_chars=%d", len(analysis))
     return analysis
