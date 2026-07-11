@@ -171,7 +171,6 @@ def get_menh_than_section_id(name: str) -> str | None:
     return MENH_THAN_SECTION_ID_MAP.get(name.strip())
 
 
-
 SECTION_5_2_ID_MAP = MappingProxyType(
     {
         "Tử Vi": "5.2.1",
@@ -211,7 +210,8 @@ SECTION_5_2_ID_MAP = MappingProxyType(
         "Quả Tú": "5.2.28",
         "Đào Hoa": "5.2.29",
         "Hồng Loan": "5.2.29",
-        "Tuần, Triệt án ngữ": "5.2.30",
+        "Tuần": "5.2.30",
+        "Triệt": "5.2.30",
         "Vô Chính diệu": "5.2.31",
     }
 )
@@ -548,7 +548,6 @@ def get_tat_ach_section_id(name: str) -> str | None:
     return TAT_ACH_SECTION_ID_MAP.get(name.strip())
 
 
-
 TAI_BACH_SECTION_ID_MAP = MappingProxyType(
     {
         "Tử Vi": "12.1",
@@ -808,18 +807,18 @@ def get_huynh_de_section_id(name: str) -> str | None:
 
 MAP_ROLE_SECTION_ID_FUNC = MappingProxyType(
     {
-        "Mệnh": get_menh_than_section_id,
-        "Thân": get_menh_than_section_id,
-        "Phụ Mẫu": get_phu_mau_section_id,
-        "Phúc Đức": get_phuc_duc_section_id,
-        "Điền Trạch": get_dien_trach_section_id,
-        "Quan Lộc": get_quan_loc_section_id,
-        "Nô Bộc": get_no_boc_section_id,
-        "Thiên Di": get_thien_di_section_id,
-        "Tật Ách": get_tat_ach_section_id,
-        "Tài Bạch": get_tai_bach_section_id,
-        "Tử Tức": get_tu_tuc_section_id,
-        "Phu Thê": get_phu_the_section_id,
-        "Huynh Đệ": get_huynh_de_section_id
+        "menh": get_menh_than_section_id,
+        "cung_than": get_menh_than_section_id,
+        "phu_mau": get_phu_mau_section_id,
+        "phuc_duc": get_phuc_duc_section_id,
+        "dien_trach": get_dien_trach_section_id,
+        "quan_loc": get_quan_loc_section_id,
+        "no_boc": get_no_boc_section_id,
+        "thien_di": get_thien_di_section_id,
+        "tat_ach": get_tat_ach_section_id,
+        "tai_bach": get_tai_bach_section_id,
+        "tu_tuc": get_tu_tuc_section_id,
+        "phu_the": get_phu_the_section_id,
+        "huynh_de": get_huynh_de_section_id,
     }
 )
