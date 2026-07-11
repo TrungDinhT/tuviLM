@@ -9,9 +9,7 @@ from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
 from src.agent.skills import (
-    luan_tinh_cach_b1_b2,
-    luan_tinh_cach_b3_b4,
-    luan_tinh_cach_b5_b6_skill,
+    luan_tinh_cach_skill,
     read_book_tuvi_tan_bien,
 )
 from src.agent.tool import (
@@ -235,9 +233,7 @@ Trả lời trực tiếp bằng văn bản tiếng Việt tự nhiên. Tự ch�
 
 Câu trả lời rõ ràng, rành mạch, sử dụng hơp lý in đậm, xuống dòng để phân đoạn, và có thể dùng gạch đầu dòng để liệt kê. Tránh lặp lại câu hỏi của người dùng. Tránh trích dẫn quá nhiều từ sách; chỉ trích dẫn khi thực sự cần thiết để chứng minh luận điểm. Khi trích dẫn, hãy tóm tắt nội dung và giải thích ý nghĩa của nó thay vì sao chép nguyên văn.
 """,
-        luan_tinh_cach_b1_b2(),
-        luan_tinh_cach_b3_b4(),
-        luan_tinh_cach_b5_b6_skill(),
+        luan_tinh_cach_skill(),
         read_book_tuvi_tan_bien(),
     ]
 )
