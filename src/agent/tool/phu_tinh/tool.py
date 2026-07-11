@@ -12,6 +12,7 @@ from src.agent.tool.phu_tinh.groups import (
     build_group_of_star,
     load_phu_tinh_groups,
 )
+from src.refactored.la_so import LaSo
 from src.refactored.components.definitions.cung_role import Role
 from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
 from src.refactored.components.definitions.sao import (
@@ -79,7 +80,14 @@ def get_phu_tinh_tam_phuong_tu_chinh(
 ) -> PhuTinhGroupedResult:
     """Gom phụ tinh chiếu về một cung theo tam phương tứ chính và phân nhóm."""
     _logger.info("Gom phụ tinh theo nhóm: role=%s", role)
-    la_so = ctx.deps.require_la_so()
+    return build_phu_tinh_tam_phuong_tu_chinh(ctx.deps.require_la_so(), role)
+
+
+def build_phu_tinh_tam_phuong_tu_chinh(
+    la_so: LaSo,
+    role: Role = Role.MENH,
+) -> PhuTinhGroupedResult:
+    """Build grouped B6 phụ-tinh evidence directly from a natal chart."""
     anchor = la_so.position_of(role.value, NATAL_LAYER_ID)
     if anchor is None:
         raise ModelRetry(f"Không tìm thấy vị trí cung '{role.value}'.")
@@ -129,7 +137,14 @@ def get_trang_sinh(
 ) -> TrangSinhResult:
     """Lấy sao vòng Tràng Sinh đóng tại một cung (mặc định Mệnh)."""
     _logger.info("Lấy Tràng Sinh: role=%s", role)
-    la_so = ctx.deps.require_la_so()
+    return build_trang_sinh(ctx.deps.require_la_so(), role)
+
+
+def build_trang_sinh(
+    la_so: LaSo,
+    role: Role = Role.MENH,
+) -> TrangSinhResult:
+    """Build B6 Tràng-Sinh evidence directly from a natal chart."""
     position = la_so.position_of(role.value, NATAL_LAYER_ID)
     if position is None:
         raise ModelRetry(f"Không tìm thấy vị trí cung '{role.value}'.")
