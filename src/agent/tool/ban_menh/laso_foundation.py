@@ -43,8 +43,6 @@ def build_laso_foundation_payload(la_so: LaSo) -> dict[str, object]:
     relation = la_so.menh_cuc_relation()
     ban_menh_meaning = build_ban_menh_meaning(la_so.ban_menh.id)
     menh_cuc_lens = build_menh_cuc_lens(
-        la_so.ban_menh.ngu_hanh,
-        context.cuc.ngu_hanh,
         relation.relation_type,
     )
     year_menh_polarity_relation = _year_menh_polarity_relation(
@@ -87,37 +85,16 @@ def _year_menh_polarity_relation(
 def _year_menh_polarity_lens(relation: str) -> dict[str, object]:
     lens = _YEAR_MENH_POLARITY_LENS[relation]
     return {
-        "status": lens["status"],
         "environment_alignment": lens["environment_alignment"],
         "thinking_consistency": lens["thinking_consistency"],
         "action_style": lens["action_style"],
         "resilience_pattern": lens["resilience_pattern"],
         "development_focus": lens["development_focus"],
-        "usage": list(_YEAR_MENH_POLARITY_USAGE),
-        "scope_note": _YEAR_MENH_POLARITY_SCOPE_NOTE,
-        "combination_note": _YEAR_MENH_POLARITY_COMBINATION_NOTE,
     }
 
 
-_YEAR_MENH_POLARITY_USAGE: tuple[str, ...] = (
-    "Đánh giá sơ bộ độ hòa hợp của cá nhân với môi trường sống và nơi sinh ra.",
-    "Xét luồng tư duy thiên về nhất quán một dòng hay đa luồng, hay tự phản biện.",
-    "Xem khuynh hướng phản ứng trước thuận cảnh hoặc nghịch cảnh.",
-)
-
-_YEAR_MENH_POLARITY_SCOPE_NOTE = (
-    "Đây chỉ là dữ kiện nền tảng trong nhiều lớp của lá số; không dùng riêng "
-    "nó để kết luận hoàn toàn tính cách."
-)
-
-_YEAR_MENH_POLARITY_COMBINATION_NOTE = (
-    "Phải phối hợp thêm Mệnh/Thân, chính tinh, sát tinh và các cách cục tại "
-    "cung Mệnh trước khi kết luận."
-)
-
 _YEAR_MENH_POLARITY_LENS: dict[str, dict[str, str]] = {
     "thuận lý": {
-        "status": "Thuận Lý",
         "environment_alignment": (
             "Hòa hợp cao với không gian sống nơi sinh ra; thường hợp lập nghiệp "
             "và phát triển tại quê hương hoặc môi trường gốc."
@@ -140,7 +117,6 @@ _YEAR_MENH_POLARITY_LENS: dict[str, dict[str, str]] = {
         ),
     },
     "nghịch lý": {
-        "status": "Nghịch Lý",
         "environment_alignment": (
             "Lệch pha với bối cảnh ban đầu; cá tính hoặc tư tưởng dễ cảm thấy "
             "không đồng điệu với môi trường xung quanh."
