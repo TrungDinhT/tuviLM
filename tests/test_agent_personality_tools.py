@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 
 from src.agent.deps import TuviAgentDeps
-from src.agent.skills import luan_tinh_cach_b3_b4
+from src.agent.skills import luan_tinh_cach_b1_b2, luan_tinh_cach_b3_b4
 from src.agent.tool.personality import (
     _sao_ban_menh_relation,
     get_tinh_cach_b3_b4_context,
@@ -20,6 +20,18 @@ def test_luan_tinh_cach_b3_b4_embeds_distilled_knowledge_without_file_tool():
     assert "Triệt" in skill
     assert "Hạt nhân 14 chính tinh" not in skill
     assert "read_luan_tinh_cach_b3_b4_knowledge" not in skill
+
+
+def test_luan_tinh_cach_b1_b2_orchestrates_foundation_and_thai_tue_tools():
+    skill = luan_tinh_cach_b1_b2()
+
+    assert "get_laso_foundation" in skill
+    assert "get_vong_thai_tue" in skill
+    assert "Bản Mệnh là \"mình\"" in skill
+    assert "Chính Phái, Khôn Ngoan, Đối Lập và Nhường Nhịn" in skill
+    assert "nếu tuan_triet không rỗng" in skill
+    assert "thai_tue_sat_tinh_at_menh" in skill
+    assert "không được đọc file knowledge" in skill
 
 
 def test_get_tinh_cach_b3_b4_context_runs_on_laso():
