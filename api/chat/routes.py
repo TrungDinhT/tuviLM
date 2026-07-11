@@ -352,13 +352,14 @@ async def _stream_session_chat_events(
 
     api_state = request.app.state.api_state
     base_deps = api_state.agent_deps
-    agent = base_deps.require_agent()
     agent_deps = TuviAgentDeps(
-        agent=agent,
+        agent=base_deps.agent,
+        personality_agent=base_deps.personality_agent,
         la_so=_build_la_so(context.chart_profile.birth_info),
         book=base_deps.book,
         book_root=base_deps.book_root,
     )
+    agent = agent_deps.require_agent()
     message_history = _visible_messages_to_model_history(history_messages)
     async with agent.run_stream_events(
         content,
@@ -369,8 +370,6 @@ async def _stream_session_chat_events(
             msg = _serialize_agent_event(event)
             if msg is not None:
                 yield msg
-
-
 def _build_la_so(birth_info: BirthInfo) -> LaSo:
     solar_dt = datetime(
         year=birth_info.year,

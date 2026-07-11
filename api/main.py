@@ -32,6 +32,7 @@ from api.schemas import (
 from api.settings import get_settings
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
+from src.agent.personality_workflow import build_personality_agent
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.view.builder import build_laso_view
@@ -68,8 +69,10 @@ async def lifespan(app: FastAPI):
     conversation_history_store = await MongoConversationHistoryStore.connect(
         settings.conversation_history_store,
     )
+    model = "openrouter:qwen/qwen3.7-max"
     agent_deps = TuviAgentDeps(
-        agent=build_tuvi_agent(model="openai:gpt-5.4-mini"),
+        agent=build_tuvi_agent(model=model),
+        personality_agent=build_personality_agent(model=model),
         book_root="./data/tuvitanbien_chunking_compact/part_2",
     )
     app.state.api_state = ApiState(
