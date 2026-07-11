@@ -80,7 +80,15 @@ def get_phu_tinh_tam_phuong_tu_chinh(
 ) -> PhuTinhGroupedResult:
     """Gom phụ tinh chiếu về một cung theo tam phương tứ chính và phân nhóm."""
     _logger.info("Gom phụ tinh theo nhóm: role=%s", role)
-    return build_phu_tinh_tam_phuong_tu_chinh(ctx.deps.require_la_so(), role)
+    result = build_phu_tinh_tam_phuong_tu_chinh(ctx.deps.require_la_so(), role)
+    grouped_count = sum(len(group.stars) for group in result.groups)
+    _logger.info(
+        "Đã gom phụ tinh theo nhóm: role=%s, grouped=%d, other=%d",
+        role,
+        grouped_count,
+        len(result.khac),
+    )
+    return result
 
 
 def build_phu_tinh_tam_phuong_tu_chinh(
@@ -137,7 +145,9 @@ def get_trang_sinh(
 ) -> TrangSinhResult:
     """Lấy sao vòng Tràng Sinh đóng tại một cung (mặc định Mệnh)."""
     _logger.info("Lấy Tràng Sinh: role=%s", role)
-    return build_trang_sinh(ctx.deps.require_la_so(), role)
+    result = build_trang_sinh(ctx.deps.require_la_so(), role)
+    _logger.info("Đã lấy Tràng Sinh: role=%s, star=%s", role, result.star)
+    return result
 
 
 def build_trang_sinh(

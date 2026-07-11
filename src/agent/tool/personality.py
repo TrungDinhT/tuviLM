@@ -84,7 +84,9 @@ def get_tinh_cach_b3_b4_context(ctx: RunContext[TuviAgentDeps]) -> str:
     chiếu/tam hợp và Tuần/Triệt ở các cung liên quan.
     """
     _logger.info("Lấy context tính cách B3-B4")
-    return build_tinh_cach_b3_b4_context(ctx.deps.require_la_so())
+    result = build_tinh_cach_b3_b4_context(ctx.deps.require_la_so())
+    _logger.info("Đã lấy context tính cách B3-B4: chars=%d", len(result))
+    return result
 
 
 def build_tinh_cach_b3_b4_context(la_so: LaSo) -> str:

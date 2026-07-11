@@ -37,8 +37,10 @@ def get_list_cach_cuc(
         source_kind,
         filtered_roles,
     )
-    return get_cach_cuc_tool_results(
+    results = get_cach_cuc_tool_results(
         ctx.deps.require_la_so(),
         source_kind=source_kind,
         filtered_roles=filtered_roles,
     )
+    _logger.info("Đã lấy danh sách cách cục: returned=%d", len(results))
+    return results

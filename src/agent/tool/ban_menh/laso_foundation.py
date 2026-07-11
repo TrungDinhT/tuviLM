@@ -33,7 +33,14 @@ def get_laso_foundation(ctx: RunContext[TuviAgentDeps]) -> dict[str, object]:
     nó chỉ là lớp nền để định khung luận giải.
     """
     _logger.info("Lấy gốc lá số")
-    return build_laso_foundation_payload(ctx.deps.require_la_so())
+    result = build_laso_foundation_payload(ctx.deps.require_la_so())
+    _logger.info(
+        "Đã lấy gốc lá số: am_duong=%s, ban_menh=%s, menh_cuc=%s",
+        result["am_duong_thuan_nghich"]["relation"],
+        result["ban_menh"]["name"],
+        result["menh_cuc_relation"]["relation"],
+    )
+    return result
 
 
 def build_laso_foundation_payload(la_so: LaSo) -> dict[str, object]:

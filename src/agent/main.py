@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
@@ -25,6 +27,8 @@ from .skills import (
 )
 
 DEFAULT_MODEL = "gpt-4.1-mini"
+
+_logger = logging.getLogger(__name__)
 
 TUVI_AGENT_INSTRUCTION = """
 Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của bạn là trả lời các câu hỏi liên quan đến lá số tử vi bao gồm :
@@ -116,6 +120,8 @@ async def run_tuvi_agent(
     ctx: RunContext[TuviAgentDeps],
     request: str,
 ) -> str:
+    _logger.info("Chạy Tử Vi agent: request_chars=%d", len(request))
     agent = ctx.deps.require_agent()
     result = await agent.run(request, deps=ctx.deps, usage=ctx.usage)
+    _logger.info("Tử Vi agent hoàn tất: output_chars=%d", len(result.output))
     return result.output
