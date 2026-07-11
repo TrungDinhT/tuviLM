@@ -81,12 +81,7 @@ def get_tam_hop(ctx: RunContext[TuviAgentDeps], position: DiaChi) -> str:
         transform_tam_hop(position, CircleDirection.CW),
         transform_tam_hop(position, CircleDirection.CCW),
     )
-    return _format_related_cung_details(
-        la_so, 
-        position, 
-        "tam hợp", 
-        tam_hop_positions
-    )
+    return _format_related_cung_details(la_so, position, "tam hợp", tam_hop_positions)
 
 
 def get_xung_chieu(ctx: RunContext[TuviAgentDeps], position: DiaChi) -> str:
