@@ -7,8 +7,10 @@ from .tool import (
     get_cung_by_position,
     get_cung_by_role,
     get_list_cach_cuc,
+    get_phu_tinh_tam_phuong_tu_chinh,
     get_role_instruction,
     get_tam_hop,
+    get_trang_sinh,
     get_tinh_cach_b3_b4_context,
     get_vong_thai_tue,
     get_xung_chieu,
@@ -19,6 +21,11 @@ from .tool import (
 from .skills import (
     get_cung_analyze_skill,
     luan_tinh_cach_b3_b4,
+    read_book_tuvi_tan_bien,
+)
+from .skills import (
+    luan_tinh_cach_b5_b6_skill,
+    get_cung_analyze_skill,
     read_book_tuvi_tan_bien,
 )
 
@@ -91,12 +98,15 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_cung_by_position,
             get_cung_by_role,
             get_list_cach_cuc,
+            get_phu_tinh_tam_phuong_tu_chinh,
+            get_trang_sinh,
             get_tam_hop,
             get_xung_chieu,
             get_star_description,
             get_star_role_interaction,
             get_tinh_cach_b3_b4_context,
             get_cung_analyze_skill,
+            luan_tinh_cach_b5_b6_skill,
             luan_tinh_cach_b3_b4,
             read_book_tuvi_tan_bien,
             get_role_instruction,
