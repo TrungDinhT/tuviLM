@@ -11,9 +11,17 @@ from .tool import (
     get_role_instruction,
     get_tam_hop,
     get_trang_sinh,
+    get_tinh_cach_b3_b4_context,
+    get_vong_thai_tue,
     read_catalog,
     get_xung_chieu,
     read_section,
+    get_laso_foundation,
+)
+from .skills import (
+    get_cung_analyze_skill,
+    luan_tinh_cach_b3_b4,
+    read_book_tuvi_tan_bien,
 )
 from .skills import (
     luan_tinh_cach_b5_b6_skill,
@@ -31,7 +39,7 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 
 ## Kết cấu một lá số tử vi
 
-- Lá số tử vi được hình thành từ ngày tháng năm và giờ sinh của một người, được dùng để dự đoán tính cách, vận mệnh, sự nghiệp, tình duyên, sức khỏe, v.v. của người đó.
+- Lá số tử vi được hình thành từ ngày tháng năm và giờ sinh của một người, được dùng để dự đoán tính cách, cuộc đời, sự nghiệp, tình duyên, sức khỏe, v.v. của người đó.
 - Một lá số tử vi có 12 cung, mỗi cung đại diện cho một khía cạnh của đời người (tính cách, công danh, tài chính, hôn nhân, cha mẹ, con cái, sức khỏe, nhà cửa, quan hệ xã hội, phúc đức).
 - Cung trong lá số tử vi được sắp xếp theo vị trí, theo tên từ Tí Sử Dần đến Hợi.
 - Mỗi cung mang một vai trò nhất định bao gồm : Mệnh, Phụ Mẫu, Phúc Đức, Điền Trạch, Quan Lộc, Nô Bộc, Thiên Di, Tài Bạch, Tử Tức, Huynh Đệ, Thê Thiếp, Huynh Đệ.
@@ -50,6 +58,12 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 2. Nếu chưa đủ dữ liệu để kết luận, phải nói rõ phần nào còn thiếu.
 3. Không lấy toàn bộ tinh bàn nếu câu hỏi chỉ nhắm vào một chủ đề/cung cụ thể.
 4. "Tiên minh cách cục, thứ khán chúng tinh": luôn xác định cách cục trước, luận sao chi tiết sau. Dùng get_list_cach_cuc để lấy cách cục đã match sẵn (engine deterministic, không cần tự suy đoán tổ hợp sao). Kết quả get_list_cach_cuc đã được sắp xếp theo priority giảm dần; ưu tiên dùng cách cục priority cao làm khung luận chính, các cách cục priority thấp hơn chỉ bổ trợ.
+5. Trước khi luận tổng quan hoặc luận Cung Mệnh, luôn gọi get_laso_foundation
+để nắm gốc lá số: Can Chi năm sinh, Âm/Dương Nam/Nữ, Bản Mệnh, Cục,
+quan hệ Mệnh-Cục, chiều vận và Đại hạn.
+6. Khi luận tư cách, khí chất nhập thế, Cung Mệnh, hoặc khi người dùng hỏi
+về vòng Thái Tuế, phải gọi get_vong_thai_tue để xác định sao vòng Thái Tuế
+thủ Mệnh và nhóm tư cách tương ứng.
 
 
 ## Phân tích cung
@@ -64,10 +78,12 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 - Sau khi có thông tin, hãy tổng hợp, tưởng tượng và chọn lọc để trả lời, không liệt kê một cách máy móc thông tin trong sách.
 
 ## Tính cách
+- Khi người dùng hỏi luận tính cách, luôn gọi luan_tinh_cach_b3_b4 trước.
 - Sử dụng giọng điềm đạm, rõ ràng, có chiều sâu.
 - Không phán chắc những điều tool không hỗ trợ.
 - Khi có những ý kiến trái chiều, cần xét đến độ ưu tiên : Chính tính > Tuần triệt > Tứ hóa > Phụ tinh > Tràng sinh > Xung chiếu > Tam hợp. Và luôn phải dựa trên vị trí của sao, chức vị của cung, sao đắc hay hãm để luận đoán.
 """
+
 
 def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
     return Agent(
@@ -77,6 +93,8 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
         system_prompt=TUVI_AGENT_INSTRUCTION,
         retries=2,
         tools=[
+            get_laso_foundation,
+            get_vong_thai_tue,
             get_cung_by_position,
             get_cung_by_role,
             get_list_cach_cuc,
@@ -84,15 +102,16 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_trang_sinh,
             get_tam_hop,
             get_xung_chieu,
+            get_tinh_cach_b3_b4_context,
             read_catalog,
             read_section,
             get_cung_analyze_skill,
             luan_tinh_cach_b5_b6_skill,
+            luan_tinh_cach_b3_b4,
             read_book_tuvi_tan_bien,
-            get_role_instruction
-        ]
+            get_role_instruction,
+        ],
     )
-
 
 
 async def run_tuvi_agent(

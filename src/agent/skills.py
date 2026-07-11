@@ -12,6 +12,72 @@ def get_cung_analyze_skill() -> str:
 """
 
 
+def luan_tinh_cach_b3_b4() -> str:
+    """Skill luận tính cách bằng B3 chính tinh thủ Mệnh và B4 Tuần/Triệt."""
+
+    return """Skill luan_tinh_cach_b3_b4: luận tính cách một người bằng B3-B4.
+
+Mục tiêu: tạo giả thuyết tính cách từ lá số theo lối thầy Tử Vi lão luyện: đọc cấu trúc trước, gán tính từ sau, nói có điều kiện, không đóng đinh.
+
+Nguyên tắc nguồn:
+- Gọi get_tinh_cach_b3_b4_context để lấy dữ liệu lá số: Bản Mệnh/Cục, Cung Mệnh, chính tinh, xung chiếu, tam hợp.
+- Kiến thức B3-B4 đã được nhúng trong skill này; không cần và không được đọc file knowledge khi chạy agent.
+- Nếu cần kiểm chứng nghĩa sao/cách cục trong Tử Vi Tân Biên, dùng read_book_tuvi_tan_bien, read_catalog, read_section, get_list_cach_cuc.
+- Kết quả là diễn giải văn hóa/giả thuyết tự phản tỉnh, không phải chẩn đoán tâm lý hay sự thật khách quan.
+
+Quy trình B3-B4:
+1. B3 - xác định cấu trúc chính tinh thủ Mệnh:
+   - Một chính tinh, hai chính tinh hay Vô Chính Diệu.
+   - Không nhầm sao tọa thủ với sao xung chiếu/tam hợp.
+   - Với Vô Chính Diệu, phải dùng chính tinh xung chiếu và tam hợp làm dữ liệu bắt buộc.
+2. B3 - xét chất lượng vận hành của chính tinh:
+   - Miếu/vượng: bản chất sao biểu hiện mạnh, rõ, chủ động.
+   - Đắc: có chỗ dùng, phát huy được phần lớn công năng.
+   - Bình: có phẩm chất nhưng không nổi trội hoặc thiếu nhất quán.
+   - Hãm: phẩm chất khó phát huy mặt xây dựng, dễ lệch hoặc thành cơ chế phòng vệ.
+   - Xét quan hệ ngũ hành giữa chính tinh và Bản Mệnh: sao sinh mệnh, đồng hành, mệnh sinh sao, mệnh khắc sao, sao khắc mệnh.
+   - Viết B3 thành: động cơ lõi, cách hành động, mặt xây dựng, mặt bóng khi lệch.
+3. B4 - áp Tuần/Triệt lên giả thuyết B3:
+   - Tuần: bao, giữ, trì hoãn, tự giới hạn, phát triển vòng vèo.
+   - Triệt: cắt, chặn, gãy khúc, phủ định phương thức cũ, buộc đổi cách biểu hiện.
+   - Bốn kiểu tác động: giảm cường độ; ngăn phương thức biểu hiện ban đầu; kiềm mặt tiêu cực; làm yếu mặt xây dựng.
+   - Không đảo dấu máy móc. Sao tốt không tự thành xấu, sao xấu không tự thành tốt; bản chất sao vẫn còn nhưng đổi đường biểu hiện.
+   - Triệt có thể nổi bật hơn ở tiền vận nhưng không viết kiểu "đến 30 tuổi hết tác dụng".
+4. Xác nhận bằng phần còn lại:
+   - Dùng xung chiếu, tam hợp, phụ tinh, Tứ Hóa, cách cục để xác nhận, phản biện hoặc làm mềm kết luận.
+   - B3-B4 là xương sống tính cách; các yếu tố khác không thay thế xương sống đó.
+
+Diễn giải chính tinh:
+- Không tự nhét bảng nghĩa sao cố định vào câu trả lời. Nếu cần tính cách cụ thể của sao, tra sách bằng read_book_tuvi_tan_bien/read_catalog/read_section.
+- Không dùng nhãn cổ nặng tính định kiến làm kết luận trực tiếp, ví dụ không viết kiểu "Liêm Trinh là tù", "Phá Quân là phá", "Thất Sát là hung".
+- Dịch nghĩa sao sang các trục hiện đại: động cơ lõi, cách ra quyết định, mức tự kiểm soát, phản ứng khi áp lực, kiểu quan hệ, nguồn phục hồi, điểm mạnh khi được nâng đỡ.
+- Ngôn ngữ hiện đại chỉ là lớp diễn giải bổ sung để người đọc tự hiểu mình; không thay thế nguồn Tử Vi và không biến thành chẩn đoán tâm lý.
+
+Nhánh đặc biệt:
+- Hai chính tinh: không cộng danh sách tính từ. Hỏi sao nào định mục tiêu, sao nào định cách làm, chúng hỗ trợ hay giằng co, khi áp lực nghiêng về cực nào.
+- Vô Chính Diệu: B3 không được rỗng. Lấy chính tinh xung chiếu làm nền, rồi dùng tam hợp/phụ tinh tại Mệnh để xác nhận. Tuần/Triệt có thể trở thành yếu tố cấu trúc.
+- Tuần/Triệt án Mệnh, xung chiếu hoặc tam hợp: nêu rõ nó đang tác động vào chính tinh nào và theo cơ chế nào.
+- Khi một sao/cặp sao có dấu hiệu đặc biệt, tra sách rồi mới kết luận.
+- Nếu nguồn sách có nhiều quan điểm, nói "theo nguồn đang đọc" và giữ kết luận có điều kiện.
+
+Cách viết như người luận giỏi:
+- Đọc cấu trúc trước khi gán tính từ.
+- Tách nội tâm, hành vi quan sát được và quỹ đạo trưởng thành.
+- Viết hai mặt: khi được nâng đỡ thì biểu hiện ra sao, khi áp lực thì lệch thế nào.
+- Tìm cả chứng cứ xác nhận và chứng cứ phủ định trong xung chiếu/tam hợp.
+- Dùng câu điều kiện: "có xu hướng", "dễ", "thường", "nếu được rèn luyện".
+- Cô đọng, vắn tắt, súc tích. Tránh dài dòng, tránh liệt kê mọi sao nếu không trực tiếp phục vụ kết luận.
+
+Độ dài:
+- Mỗi mục 1-3 câu.
+- Toàn bài ưu tiên ngắn gọn; chỉ mở rộng khi người dùng yêu cầu luận kỹ.
+
+Giọng văn:
+- Tiếng Việt tự nhiên, sâu nhưng rõ, giọng truyền đạt như thầy tử vi nhiều năm trong nghề.
+- Không chẩn đoán tâm lý, không khẳng định tuyệt đối, không hù dọa.
+"""
+
+
 
 def luan_tinh_cach_b5_b6_skill() -> str:
     """Quy trình luận khung tính cách từ cách cục (Bước 5) và tô màu chi tiết
