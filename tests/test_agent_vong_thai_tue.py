@@ -23,22 +23,19 @@ def test_vong_thai_tue_identifies_star_and_group_at_menh():
 
     thien_ma = payload["technical_support"]["thien_ma"]
     assert thien_ma["lens"]["element"] == "Kim"
-    assert thien_ma["blocked_by_tuan_triet"] is False
-    assert "tuan_triet_at_position" in thien_ma
+    assert thien_ma["tuan_triet"] == []
     assert "tuan_triet_at_menh" not in payload["technical_support"]
     assert "khong_kiep_at_menh" not in payload["technical_support"]
     assert "thai_tue_sat_tinh_at_menh" not in payload["technical_support"]
 
 
-def test_vong_thai_tue_reports_full_ring_positions_once():
+def test_vong_thai_tue_payload_omits_workflow_and_full_ring_metadata():
     payload = build_vong_thai_tue_payload(LaSo.from_prior(FIXTURE_PRIOR_A))
-    ring_positions = payload["ring_positions"]
 
-    assert len(ring_positions) == 12
-    assert [entry["star"]["id"] for entry in ring_positions] == list(
-        THAI_TUE_RING_STAR_IDS
-    )
-    assert sum(1 for entry in ring_positions if entry["is_menh"]) == 1
+    assert set(payload) == {"menh", "technical_support"}
+    assert "scope" not in payload
+    assert "reading_steps" not in payload
+    assert "ring_positions" not in payload
 
 
 def test_vong_thai_tue_group_meanings_include_core_notes():
@@ -62,11 +59,7 @@ def test_vong_thai_tue_group_meanings_include_core_notes():
 
     doi_lap = _combined_group_text(group_payloads["doi_lap"])
     assert "Sức mạnh nghịch cảnh" in group_payloads["doi_lap"]["archetype"]
-    assert group_payloads["doi_lap"]["star_ids"] == [
-        "tang_mon",
-        "tue_pha",
-        "dieu_khach",
-    ]
+    assert "star_ids" not in group_payloads["doi_lap"]
     assert "bàn ra" in doi_lap
     assert "Thiên Mã" in doi_lap
 
@@ -162,7 +155,6 @@ def test_vong_thai_tue_only_reports_sat_tinh_when_thai_tue_meets_it():
     assert sat_tinh["stars"] == [
         {"id": "dia_khong", "name": "Địa Không", "ngu_hanh": "Hỏa"}
     ]
-    assert "rèn tư cách quân tử" in sat_tinh["reading_hint"]
 
 
 def test_vong_thai_tue_reports_hoa_linh_as_sat_tinh_when_they_meet_thai_tue():
