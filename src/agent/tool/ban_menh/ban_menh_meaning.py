@@ -16,14 +16,15 @@ class BanMenhMeaning:
     aliases: tuple[str, ...] = ()
 
     def as_payload(self) -> dict[str, object]:
-        return {
-            "name": self.name,
-            "aliases": list(self.aliases),
+        payload: dict[str, object] = {
             "symbol": self.symbol,
             "keywords": list(self.keywords),
             "nature": self.nature,
             "reading_hint": self.reading_hint,
         }
+        if self.aliases:
+            payload["aliases"] = list(self.aliases)
+        return payload
 
 
 def _meaning(
@@ -513,14 +514,10 @@ def build_ban_menh_meaning(ban_menh_id: str) -> dict[str, object]:
 
 
 def build_menh_cuc_lens(
-    ngu_hanh_menh: NguHanh,
-    ngu_hanh_cuc: NguHanh,
     relation_type: MenhCucRelationType,
 ) -> dict[str, object]:
     relation_lens = _RELATION_LENS[relation_type]
     return {
-        "menh_element": ngu_hanh_menh.value,
-        "cuc_element": ngu_hanh_cuc.value,
         "relation": relation_lens["relation"],
         "meaning": relation_lens["meaning"],
     }
