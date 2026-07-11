@@ -167,3 +167,12 @@ cython_debug/
 .claude/
 docs/superpowers
 .playwright-mcp/
+
+
+.vite/
+.next/
+node_modules/
+
+
+data/tuvitanbien*
+data/tan_bien.md

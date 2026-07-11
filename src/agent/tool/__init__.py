@@ -11,6 +11,7 @@ from .chart import (
 from .guidance import get_role_instruction
 from .tu_vi_tan_bien import get_star_description, get_star_role_interaction
 from src.agent.tool.cach_cuc import get_list_cach_cuc
+from src.agent.tool.personality import get_tinh_cach_b3_b4_context
 from src.agent.tool.thai_tue import get_vong_thai_tue
 from src.agent.tool.ban_menh import get_laso_foundation
 
@@ -27,5 +28,6 @@ __all__ = [
     "read_catalog",
     "read_section",
     "get_list_cach_cuc",
+    "get_tinh_cach_b3_b4_context",
     "get_laso_foundation",
 ]
