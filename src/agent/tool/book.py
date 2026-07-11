@@ -30,10 +30,17 @@ def read_catalog(
     )
     try:
         bounded_depth = None if depth is None else max(1, min(depth, 8))
-        return ctx.deps.require_book().get_catalog(
+        result = ctx.deps.require_book().get_catalog(
             section_id=section_id,
             depth=bounded_depth,
         )
+        _logger.info(
+            "Đã đọc catalog sách: section_id=%s, depth=%s, chars=%d",
+            section_id,
+            bounded_depth,
+            len(result),
+        )
+        return result
     except ValueError as exc:
         raise ModelRetry(str(exc)) from exc
 
@@ -49,6 +56,13 @@ def read_section(
     """
     _logger.info("Đọc mục sách: section_id=%s", section_id)
     try:
-        return ctx.deps.require_book().read_section(section_id)
+        result = ctx.deps.require_book().read_section(section_id)
+        _logger.info(
+            "Đã đọc mục sách: section_id=%s, title=%s, chars=%d",
+            section_id,
+            result.title,
+            len(result.content),
+        )
+        return result
     except ValueError as exc:
         raise ModelRetry(f"Failed to read section {section_id}") from exc

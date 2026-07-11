@@ -1,5 +1,12 @@
+import logging
+
+
+_logger = logging.getLogger(__name__)
+
+
 def get_cung_analyze_skill() -> str:
-    return """Khi phân tích một cung trong Tử Vi, cần tuân theo quy trình sau:
+    _logger.info("Lấy skill phân tích cung")
+    result = """Khi phân tích một cung trong Tử Vi, cần tuân theo quy trình sau:
 - Xác định cung trọng tâm dựa trên chủ đề người dùng hỏi (tính cách, công danh, tài chính, hôn nhân, cha mẹ, con cái, sức khỏe, nhà cửa, quan hệ xã hội, phúc đức).
 - Lấy dữ liệu của bản cung bằng get_cung_by_role hoặc get_cung_by_position.
 - Dựa vào cung, sử dụng get_role_instruction(role) để lấy thêm thông tin về cách luận cung này.
@@ -10,6 +17,8 @@ def get_cung_analyze_skill() -> str:
 - Khi một cung Vô Chính Diệu, hãy xem như chính tinh ở cung đối diện là chính tinh của cung này, và áp dụng quy trình phân tích tương tự.
 - Sử dụng read_book_tuvi_tan_bien để tra cứu thông tin về các sao, cách cục, tổ hợp sao, hiệu ứng gặp, v.v. trong sách, không dựa vào kiến thức cá nhân hay phán đoán chủ quan.
 """
+    _logger.info("Đã lấy skill phân tích cung: chars=%d", len(result))
+    return result
 
 
 def luan_tinh_cach_b1_b2() -> str:
@@ -69,13 +78,10 @@ Cách viết như người luận giỏi:
 - Dùng câu điều kiện: "có xu hướng", "dễ", "thường", "nếu được rèn luyện".
 - Cô đọng, không đọc lại tên mọi trường trong payload, không liệt kê đủ 12 sao vòng Thái Tuế.
 
-Độ dài:
-- B1 và B2 mỗi phần 1-3 câu; phần ghép B1-B2 1-2 câu.
-- Chỉ mở rộng khi người dùng yêu cầu luận kỹ.
-
 Giọng văn:
 - Tiếng Việt tự nhiên, sâu nhưng rõ, giọng truyền đạt như thầy tử vi nhiều năm trong nghề.
 - Không chẩn đoán tâm lý, không khẳng định tuyệt đối, không hù dọa.
+- Viết thành chấm đầu dòng cho từng ý
 """
 
 
@@ -185,7 +191,8 @@ def read_book_tuvi_tan_bien() -> str:
     Always use this skill when you get new concepts, topics, etc.
     """
 
-    return """Kỹ năng đọc sách Tử Vi Tân Biên
+    _logger.info("Lấy skill đọc sách Tử Vi Tân Biên")
+    result = """Kỹ năng đọc sách Tử Vi Tân Biên theo kiểu progressive disclosure.
 
 ## Mục tiêu: dùng sách như nguồn tham chiếu có cấu trúc, không đọc lan man và không bịa ngoài nội dung đã đọc.
 
@@ -208,3 +215,5 @@ Sách có thể mang lại 2 loại thông tin chính :
 - Tam hợp : hai sao nằm ở cung tam hợp của nhau
 
 """
+    _logger.info("Đã lấy skill đọc sách Tử Vi Tân Biên: chars=%d", len(result))
+    return result
