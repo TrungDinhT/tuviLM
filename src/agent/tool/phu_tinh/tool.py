@@ -77,8 +77,7 @@ def get_phu_tinh_tam_phuong_tu_chinh(
     ctx: RunContext[TuviAgentDeps],
     role: Role = Role.MENH,
 ) -> PhuTinhGroupedResult:
-    """Gom phụ tinh chiếu về một cung theo tam phương tứ chính và phân nhóm.
-    """
+    """Gom phụ tinh chiếu về một cung theo tam phương tứ chính và phân nhóm."""
     _logger.info("Gom phụ tinh theo nhóm: role=%s", role)
     la_so = ctx.deps.require_la_so()
     anchor = la_so.position_of(role.value, NATAL_LAYER_ID)
@@ -128,8 +127,7 @@ def get_trang_sinh(
     ctx: RunContext[TuviAgentDeps],
     role: Role = Role.MENH,
 ) -> TrangSinhResult:
-    """Lấy sao vòng Tràng Sinh đóng tại một cung (mặc định Mệnh).
-    """
+    """Lấy sao vòng Tràng Sinh đóng tại một cung (mặc định Mệnh)."""
     _logger.info("Lấy Tràng Sinh: role=%s", role)
     la_so = ctx.deps.require_la_so()
     position = la_so.position_of(role.value, NATAL_LAYER_ID)
