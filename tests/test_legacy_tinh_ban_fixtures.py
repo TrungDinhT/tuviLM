@@ -55,8 +55,9 @@ LEGACY_DIA_CHI_BY_NAME = {
 }
 
 NAME_ALIASES = {
-    "Hoa Cái": "Hỏa Cái",
-    "Đế Vượng": "Đế Vương",
+    "Hỏa Cái": "Hoa Cái",
+    "Đế Vương": "Đế Vượng",
+    "Thiên Thuơng": "Thiên Thương",
 }
 
 

@@ -1,24 +1,63 @@
 from __future__ import annotations
 
-from typing import Any, Literal
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-
-class TuviTimePayload(BaseModel):
-    date: int = Field(ge=1, le=31)
-    month: int = Field(ge=1, le=12)
-    year: int = Field(ge=1900, le=2099)
-    hour: int = Field(ge=0, le=23)
-    gender: Literal["M", "F"]
+from api.chat.models import BirthInfo, ChatSession, ChatSessionSummary
 
 
-class BuildLasoRequest(TuviTimePayload):
+class BuildLasoRequest(BirthInfo):
     pass
 
 
 class BuildSaoLuuRequest(BaseModel):
-    observation_time: TuviTimePayload
+    observation_time: BirthInfo
+
+
+class CreateAnonymousResponse(BaseModel):
+    owner_id: str
+
+
+class CreateChartProfileRequest(BaseModel):
+    display_name: str
+    birth_info: BirthInfo
+
+
+class ChartProfilePayload(BaseModel):
+    id: str
+    display_name: str
+    birth_info: BirthInfo
+    created_at: datetime
+    updated_at: datetime
+
+
+class CreateChartProfileResponse(BaseModel):
+    chart_profile: ChartProfilePayload
+
+
+class ListChartProfilesResponse(BaseModel):
+    chart_profiles: list[ChartProfilePayload]
+
+
+class CreateSessionRequest(BaseModel):
+    title: str | None = None
+
+
+class CreateSessionResponse(BaseModel):
+    session: ChatSession
+
+
+class ListSessionsResponse(BaseModel):
+    sessions: list[ChatSessionSummary]
+
+
+class GetSessionResponse(BaseModel):
+    session: ChatSession
+
+
+class SessionChatStreamRequest(BaseModel):
+    content: str = Field(min_length=1)
 
 
 class StarPayload(BaseModel):
@@ -53,18 +92,3 @@ class BuildLasoResponse(BaseModel):
 
 class BuildSaoLuuResponse(BaseModel):
     cung_by_position: dict[str, CungPayload]
-
-
-class ChatRequest(BaseModel):
-    message: str
-
-
-class ChatToolCall(BaseModel):
-    id: str | None = None
-    name: str
-    arguments: Any
-
-
-class ChatResponse(BaseModel):
-    answer: str
-    tool_calls: list[ChatToolCall] = Field(default_factory=list)
