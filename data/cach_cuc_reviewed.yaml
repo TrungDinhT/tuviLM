@@ -68,6 +68,17 @@ groups:
       - hoa_khoa
       - hoa_quyen
       - hoa_loc
+  tu_linh:
+    stars:
+      - long_tri
+      - phuong_cac
+      - bach_ho
+      - hoa_cai
+  tam_minh:
+    stars:
+      - dao_hoa
+      - hong_loan
+      - thien_hi
   xuong_khuc_khoa_tue_tau:
     stars:
       - van_xuong

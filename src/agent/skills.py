@@ -79,6 +79,40 @@ Giọng văn:
 
 
 
+def luan_tinh_cach_b5_b6_skill() -> str:
+    """Quy trình luận khung tính cách từ cách cục (Bước 5) và tô màu chi tiết
+    bằng phụ tinh + Tràng Sinh (Bước 6) của workflow
+    """
+    return """Quy trình luận tính cách theo Bước 5 (cách cục) và Bước 6 (phụ tinh + Tràng Sinh).
+
+## Bước 5 — Khung tính cách lớn từ cách cục
+- Gọi get_list_cach_cuc để lấy các cách cục đang ứng với lá số.
+- Kết quả được sắp theo priority giảm dần: lấy cách priority cao nhất làm khung tính cách chính (giọng khẳng định mạnh), các cách priority thấp hơn chỉ bổ trợ.
+- Các cách cục là "xương sống", quyết định phần lớn tính cách.
+
+## Bước 6 — Tô điểm chi tiết (không lật khung Bước 5)
+- Gọi get_phu_tinh_tam_phuong_tu_chinh(role="menh") để lấy phụ tinh chiếu về theo tam phương tứ chính, đã phân nhóm Lục Cát / Lục Sát / Tứ Hóa / Tứ Linh / Tam Minh.
+  - Lục Cát: trợ lực, quý nhân, văn tài, thông tuệ — nâng đỡ khung.
+  - Lục Sát: nóng vội, biến động, áp lực, cô khắc — gây căng, thử thách khung (cát và hung phải xem cùng lúc).
+  - Tứ Hóa: Lộc (thuận lợi, sức hút), Quyền (uy lực, kiểm soát), Khoa (danh tiếng, học hỏi), Kỵ (vướng mắc, nút thắt) — bẻ hướng nét nào trội lên.
+  - Tứ Linh: tài hoa, phong thái, khí chất thanh quý.
+  - Tam Minh: duyên, sức hút, giao tế, tình cảm.
+  - Luôn đọc trạng thái đắc/hãm: đắc/miếu/vượng thì thiên về tốt/ưu điểm, hãm thì thiên về xấu/nhược điểm.
+- Gọi get_trang_sinh(role="menh"), thêm role="cung_than" nếu muốn xét cả Thân. Tràng Sinh là vòng vận hạn/phúc-lộc-thọ, ưu tiên thấp nhất khi luận tính cách. Chỉ đưa vào bài luận khi:
+  - Trong cung an Mệnh/Thân có sao tạo thành một tổ hợp đã biết. Ví dụ: Tuyệt + Hỏa Tinh + Thất Sát (nét "tàn nhẫn"); Thiên Mã + Trường Sinh (nét "chung thân bôn tẩu"); Mộ + Phá Quân tại Tứ Mộ (chế bớt cái hung của Phá Quân).
+  - Nếu KHÔNG khớp tổ hợp nào thì bỏ qua Tràng Sinh hoàn toàn, không nhắc tới thông tin này.
+
+## Cách viết phần Bước 6 cho user
+- Chỉ viết tổng quan ngắn gọn, tối đa 50 chữ: nêu vài nhóm nổi trội và tác động chung lên khung (nâng đỡ / gây căng / bẻ hướng). KHÔNG liệt kê hay đi sâu từng con sao.
+- Các mô tả chi tiết từng nhóm ở trên chỉ dùng để suy luận nội bộ, không bê nguyên vào câu trả lời.
+
+## Nguyên tắc
+- Thứ tự ưu tiên khi có ý kiến trái chiều: Chính tinh > Tuần triệt > Tứ hóa > Phụ tinh > Tràng sinh.
+- Bước 6 chỉ thêm chi tiết và điều chỉnh cường độ cho khung Bước 5, không thay đổi kết luận chính.
+- Chỉ dùng thông tin từ tool; không tự bịa sao hay tổ hợp không có trong lá số.
+"""
+
+
 def read_book_tuvi_tan_bien() -> str:
     """Skill to read the book Tử Vi Tân Biên with progressive disclosure
 
