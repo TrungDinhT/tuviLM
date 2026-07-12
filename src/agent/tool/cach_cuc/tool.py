@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 import logging
 
 from pydantic_ai import RunContext
@@ -32,6 +33,14 @@ def get_list_cach_cuc(
     Kết quả chỉ gồm id, tên, ý nghĩa, trang, priority và related_to; không trả
     về điều kiện nội bộ.
     """
+    # NOTE : Qwen have behavior to stringify the type before passing to the tool,
+    # We need to convert it back to the type of the argument.
+    # If the type is already correct, it will not change.
+
+    if isinstance(filtered_roles, str):
+        values = json.loads(json.loads(filtered_roles))
+        filtered_roles = [Role(value) for value in values]
+
     _logger.info(
         "Lấy danh sách cách cục: source_kind=%s, filtered_roles=%s",
         source_kind,
