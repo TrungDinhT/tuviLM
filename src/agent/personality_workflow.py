@@ -25,7 +25,6 @@ from src.agent.tool import (
     get_xung_chieu,
 )
 from src.agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
-from src.agent.tool.book import read_catalog, read_section
 from src.agent.tool.cach_cuc.matcher import get_cach_cuc_tool_results
 from src.agent.tool.cach_cuc.models import CachCucToolResult
 from src.agent.tool.personality import build_tinh_cach_b3_b4_context
@@ -36,6 +35,10 @@ from src.agent.tool.phu_tinh.tool import (
     build_trang_sinh,
 )
 from src.agent.tool.thai_tue.vong_thai_tue import build_vong_thai_tue_payload
+from src.agent.tool.tu_vi_tan_bien.tool import (
+    get_star_description,
+    get_star_role_interaction,
+)
 from src.refactored.components.definitions.cung_role import Role
 from src.refactored.la_so import LaSo
 
@@ -261,8 +264,8 @@ def build_personality_agent(model: str) -> Agent:
             get_tam_hop,
             get_xung_chieu,
             get_tinh_cach_b3_b4_context,
-            read_catalog,
-            read_section,
+            get_star_description,
+            get_star_role_interaction,
         ],
     )
 
