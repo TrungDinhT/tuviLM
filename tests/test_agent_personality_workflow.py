@@ -6,14 +6,20 @@ from types import SimpleNamespace
 import pytest
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
-from src.agent.personality_workflow import (
+from src.agent.workflow.personality import (
+    DEFAULT_PERSONALITY_CONFIG,
     PERSONALITY_AGENT_INSTRUCTION,
+    PERSONALITY_EVIDENCE_REGISTRY,
+    PERSONALITY_OUTPUT_REGISTRY,
+    PersonalityAgentConfig,
     build_personality_agent,
+    build_personality_agent_instruction,
     collect_personality_evidence,
     get_personality_evidence,
     run_personality_workflow,
     run_tinh_cach_workflow,
 )
+from src.agent.workflow.personality.input.tanbien import PersonalityEvidence
 from src.refactored.la_so import LaSo
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
@@ -38,6 +44,29 @@ def test_collect_personality_evidence_contains_complete_b1_b6_contract():
     assert evidence.phu_tinh.anchor == "Mệnh"
     assert evidence.trang_sinh_menh.palace == "Mệnh"
     assert evidence.trang_sinh_than.palace == "Thân"
+
+
+def test_personality_workflow_registers_input_and_prompt_output_schemas():
+    evidence_schema = PERSONALITY_EVIDENCE_REGISTRY["tanbien"]
+    output_schema = PERSONALITY_OUTPUT_REGISTRY["7_foundation_questions"]
+
+    assert DEFAULT_PERSONALITY_CONFIG == PersonalityAgentConfig(
+        evidence_schema="tanbien",
+        output_schema="7_foundation_questions",
+    )
+    assert evidence_schema.model is PersonalityEvidence
+    assert evidence_schema.collector is collect_personality_evidence
+    assert "Người này tự nhiên dễ phản ứng theo hướng nào?" in output_schema.prompt
+    assert "Chân dung kể chuyện" in output_schema.prompt
+
+
+def test_output_schema_is_selected_when_agent_instruction_is_built():
+    instruction = build_personality_agent_instruction(
+        output_schema="7_foundation_questions"
+    )
+
+    assert "Phần 1 - Bảy câu hỏi nền tảng" in instruction
+    assert "Phần 2 - Chân dung kể chuyện" in instruction
 
 
 def test_composite_evidence_tool_matches_the_deterministic_collector():
@@ -123,8 +152,8 @@ def test_personality_agent_can_run_standalone_with_full_toolset():
         "get_tam_hop",
         "get_xung_chieu",
         "get_tinh_cach_b3_b4_context",
-        "read_catalog",
-        "read_section",
+        "get_star_description",
+        "get_star_role_interaction",
     }
 
     assert expected == set(tools)

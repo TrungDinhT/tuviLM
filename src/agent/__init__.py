@@ -1,6 +1,10 @@
 from .deps import TuviAgentDeps
 from .main import DEFAULT_MODEL, build_tuvi_agent, run_tuvi_agent
-from src.agent.personality_workflow import (
+from src.agent.workflow.personality import (
+    DEFAULT_PERSONALITY_CONFIG,
+    PERSONALITY_EVIDENCE_REGISTRY,
+    PERSONALITY_OUTPUT_REGISTRY,
+    PersonalityAgentConfig,
     PersonalityEvidence,
     build_personality_agent,
     collect_personality_evidence,
@@ -10,6 +14,10 @@ from src.agent.personality_workflow import (
 
 __all__ = [
     "DEFAULT_MODEL",
+    "DEFAULT_PERSONALITY_CONFIG",
+    "PERSONALITY_EVIDENCE_REGISTRY",
+    "PERSONALITY_OUTPUT_REGISTRY",
+    "PersonalityAgentConfig",
     "PersonalityEvidence",
     "TuviAgentDeps",
     "build_personality_agent",
