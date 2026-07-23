@@ -16,6 +16,7 @@ from src.agent.workflow.personality import (
     build_personality_agent_instruction,
     collect_personality_evidence,
     get_personality_evidence,
+    luan_tinh_cach_skill,
     run_personality_workflow,
     run_tinh_cach_workflow,
 )
@@ -31,7 +32,7 @@ def _analysis() -> str:
     return "## Chân dung tính cách\nBài luận tự nhiên do model viết."
 
 
-def test_collect_personality_evidence_contains_complete_b1_b6_contract():
+def test_collect_personality_evidence_contains_complete_contract():
     evidence = collect_personality_evidence(LaSo.from_prior(FIXTURE_PRIOR_A))
 
     assert evidence.foundation.ban_menh.name
@@ -56,7 +57,11 @@ def test_personality_workflow_registers_input_and_prompt_output_schemas():
     )
     assert evidence_schema.model is PersonalityEvidence
     assert evidence_schema.collector is collect_personality_evidence
-    assert "Người này tự nhiên dễ phản ứng theo hướng nào?" in output_schema.prompt
+    assert evidence_schema.reasoning_prompt == luan_tinh_cach_skill()
+    assert "## Bước" not in evidence_schema.reasoning_prompt
+    assert "Bạn tự nhiên dễ phản ứng theo hướng nào?" in output_schema.prompt
+    assert "Người này" not in output_schema.prompt
+    assert "Họ đang" not in output_schema.prompt
     assert "Chân dung kể chuyện" in output_schema.prompt
 
 
@@ -67,6 +72,8 @@ def test_output_schema_is_selected_when_agent_instruction_is_built():
 
     assert "Phần 1 - Bảy câu hỏi nền tảng" in instruction
     assert "Phần 2 - Chân dung kể chuyện" in instruction
+    assert "## Bước" not in instruction
+    assert "B1-B6" not in instruction
 
 
 def test_composite_evidence_tool_matches_the_deterministic_collector():

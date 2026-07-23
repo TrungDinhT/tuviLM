@@ -95,7 +95,7 @@ def build_phu_tinh_tam_phuong_tu_chinh(
     la_so: LaSo,
     role: Role = Role.MENH,
 ) -> PhuTinhGroupedResult:
-    """Build grouped B6 phụ-tinh evidence directly from a natal chart."""
+    """Build grouped phụ-tinh evidence directly from a natal chart."""
     anchor = la_so.position_of(role.value, NATAL_LAYER_ID)
     if anchor is None:
         raise ModelRetry(f"Không tìm thấy vị trí cung '{role.value}'.")
@@ -154,7 +154,7 @@ def build_trang_sinh(
     la_so: LaSo,
     role: Role = Role.MENH,
 ) -> TrangSinhResult:
-    """Build B6 Tràng-Sinh evidence directly from a natal chart."""
+    """Build Tràng-Sinh evidence directly from a natal chart."""
     position = la_so.position_of(role.value, NATAL_LAYER_ID)
     if position is None:
         raise ModelRetry(f"Không tìm thấy vị trí cung '{role.value}'.")

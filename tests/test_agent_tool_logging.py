@@ -65,7 +65,7 @@ def test_agent_tools_log_start_and_compact_completion_metadata(caplog):
         "Đã lấy danh sách cách cục",
         "Đã gom phụ tinh theo nhóm",
         "Đã lấy Tràng Sinh",
-        "Đã lấy context tính cách B3-B4",
+        "Đã lấy context chính tinh tính cách",
         "Đã đọc catalog sách",
         "Đã đọc mục sách",
         "Đã lấy hướng dẫn luận cung",

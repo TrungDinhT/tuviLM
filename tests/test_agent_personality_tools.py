@@ -1,47 +1,44 @@
 from types import SimpleNamespace
 
 from src.agent.deps import TuviAgentDeps
-from src.agent.skills import luan_tinh_cach_skill
 from src.agent.tool.personality import (
     _sao_ban_menh_relation,
     get_tinh_cach_b3_b4_context,
 )
+from src.agent.workflow.personality.input.tanbien import luan_tinh_cach_skill
 from src.refactored.la_so import LaSo
 from src.refactored.model.elementary import DiaChi, NguHanh
 from src.refactored.model.prior import Gender, LaSoPrior
 
 
-def test_luan_tinh_cach_skill_preserves_complete_b1_b6_workflow():
+def test_luan_tinh_cach_skill_only_keeps_non_redundant_reasoning_rules():
     skill = luan_tinh_cach_skill()
 
-    assert "các trục hiện đại" in skill
+    assert "không tính lại quan hệ ngũ hành" in skill
+    assert "hai chính tinh" in skill
+    assert "miếu/vượng" in skill
     assert "Tuần" in skill
     assert "Triệt" in skill
-    assert "Hạt nhân 14 chính tinh" not in skill
-    assert "read_luan_tinh_cach_b3_b4_knowledge" not in skill
-    assert "get_laso_foundation" in skill
-    assert "get_vong_thai_tue" in skill
-    assert "get_tinh_cach_b3_b4_context" in skill
-    assert "get_list_cach_cuc" in skill
-    assert "get_phu_tinh_tam_phuong_tu_chinh" in skill
-    assert "get_trang_sinh" in skill
-    assert "Bản Mệnh là \"mình\"" in skill
-    assert "Chính Phái, Khôn Ngoan, Đối Lập và Nhường Nhịn" in skill
-    assert "nếu tuan_triet không rỗng" in skill
-    assert "thai_tue_sat_tinh_at_menh" in skill
+    assert "Lục Cát" in skill
+    assert "Tứ Hóa" in skill
     assert "Tuyệt + Hỏa Tinh + Thất Sát" in skill
-    assert "Hai chính tinh" in skill
-    assert "Vô Chính Diệu" in skill
-    assert "chính tinh > Tuần/Triệt > Tứ Hóa > phụ tinh > Tràng Sinh" in skill
-    assert "không được đọc file knowledge" in skill
-    for step in range(1, 7):
-        assert f"## Bước {step}" in skill
-    assert skill.count("## Nguyên tắc nguồn chung") == 1
-    assert "## Cách viết" not in skill
-    assert "không quy định bố cục, giọng văn, độ dài hay định dạng" in skill
-    assert "Viết tiếng Việt tự nhiên" not in skill
-    assert "Skill luan_tinh_cach_b1_b2" not in skill
-    assert "Skill luan_tinh_cach_b3_b4" not in skill
+    assert "priority cao nhất" in skill
+    assert "động cơ, cách quyết định" in skill
+
+    assert "## Bước" not in skill
+    assert "B1" not in skill
+    assert "B2" not in skill
+    assert "B3" not in skill
+    assert "B4" not in skill
+    assert "B5" not in skill
+    assert "B6" not in skill
+    assert "get_laso_foundation" not in skill
+    assert "get_vong_thai_tue" not in skill
+    assert "environment_alignment" not in skill
+    assert "reading_hint" not in skill
+    assert "technical_support" not in skill
+    assert "Chính Phái" not in skill
+    assert "Vô Chính Diệu" not in skill
 
 
 def test_get_tinh_cach_b3_b4_context_runs_on_laso():
