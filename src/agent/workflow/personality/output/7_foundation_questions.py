@@ -1,12 +1,6 @@
 """Prompt-only output schema built around seven foundation questions."""
 
-OUTPUT_SCHEMA_PROMPT = """
-## Output schema: Bảy câu hỏi nền tảng
-
-Toàn bộ cách trình bày câu trả lời phải nằm trong schema này. Tổng hợp evidence
-thành một chân dung thống nhất; không trình bày bài luận như báo cáo lần lượt
-từng nguồn dữ liệu và không bê nguyên payload ra câu trả lời.
-
+AVOID_EVIDENCE_PROMPT = """
 ### Evidence phải ẩn trong câu trả lời
 
 Evidence Tử Vi chỉ dùng để suy luận nội bộ. Câu trả lời phải đi thẳng vào kết
@@ -20,6 +14,15 @@ kết luận bằng nguồn Tử Vi đã tạo ra nó.
   hiện của bạn; không kể nguồn nào ủng hộ phía nào.
 - Chỉ khi người dùng yêu cầu rõ nguồn Tử Vi hoặc căn cứ luận giải thì mới giải
   thích ngắn gọn trong một phần riêng sau câu trả lời chính.
+""".strip()
+
+OUTPUT_SCHEMA_PROMPT = """
+## Output schema: Bảy câu hỏi nền tảng
+
+Toàn bộ cách trình bày câu trả lời phải nằm trong schema này. Tổng hợp evidence
+thành một chân dung thống nhất; không trình bày bài luận như báo cáo lần lượt
+từng nguồn dữ liệu và không bê nguyên payload ra câu trả lời.
+
 
 ### Phần 1 - Bảy câu hỏi nền tảng
 
