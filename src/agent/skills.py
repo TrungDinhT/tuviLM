@@ -22,11 +22,11 @@ def get_cung_analyze_skill() -> str:
 
 
 def luan_tinh_cach_skill() -> str:
-    """Quy trình hợp nhất luận tính cách theo đầy đủ Bước 1 đến Bước 6."""
+    """Cách đọc evidence và tư duy B1-B6, độc lập với cách trình bày."""
 
-    return """Skill luan_tinh_cach: luận tính cách một người theo workflow B1-B6.
+    return """Skill luan_tinh_cach: đọc evidence và tư duy theo workflow B1-B6.
 
-Mục tiêu: đọc cấu trúc lá số theo đúng thứ tự để hình thành một giả thuyết tính cách có chiều sâu: B1-B2 dựng nền, B3-B4 xác định lõi vận hành, B5 đặt lõi đó vào khung cách cục, B6 bổ sung sắc thái. Kết quả là diễn giải văn hóa để tự phản tỉnh, không phải chẩn đoán tâm lý, sự thật khách quan hay kết luận số phận.
+Mục tiêu: đọc cấu trúc lá số theo đúng thứ tự để hình thành một giả thuyết tính cách có chiều sâu: B1-B2 dựng nền, B3-B4 xác định lõi vận hành, B5 đặt lõi đó vào khung cách cục, B6 bổ sung sắc thái. Skill này không quy định bố cục, giọng văn, độ dài hay định dạng câu trả lời; các quy định đó thuộc hoàn toàn về output schema.
 
 ## Nguyên tắc nguồn chung
 - Chỉ dùng dữ liệu từ evidence hoặc tool; không tự bịa sao, trạng thái, cách cục hay tổ hợp không có trong lá số.
@@ -65,8 +65,8 @@ Dữ liệu: get_vong_thai_tue hoặc vong_thai_tue trong evidence.
    - Không bê nguyên payload thành danh sách và không đóng đinh đương số vào một nhãn.
 4. Chỉ dùng technical_support khi trường tương ứng thật sự có trong payload:
    - ego_and_collaboration_note: chỉ xuất hiện với Nhóm Chính Phái; dùng cho tự trọng, chính danh và cách hợp tác. Chỉ nhấn mạnh cái tôi khi menh.thai_tue_star.id là thai_tue.
-   - thien_ma: chỉ có ý nghĩa đặc biệt với Nhóm Đối Lập. Dùng lens để đọc kiểu nghị lực; nếu tuan_triet không rỗng thì nói đà hành động bị cản hoặc phải đi vòng, không nói ý chí biến mất.
-   - thai_tue_sat_tinh_at_menh: chỉ áp dụng khi chính Thái Tuế thủ Mệnh đồng cung Không/Kiếp/Hỏa/Linh. Diễn giải thành bài học rèn tâm và quản sát khí, không hù dọa hay kết luận tai họa.
+   - thien_ma: chỉ có ý nghĩa đặc biệt với Nhóm Đối Lập. Dùng lens để đọc kiểu nghị lực; nếu tuan_triet không rỗng thì hiểu đà hành động bị cản hoặc phải đi vòng, không suy ra ý chí biến mất.
+   - thai_tue_sat_tinh_at_menh: chỉ áp dụng khi chính Thái Tuế thủ Mệnh đồng cung Không/Kiếp/Hỏa/Linh. Đọc như một giả thuyết về nhu cầu rèn tâm và quản sát khí, không suy ra tai họa.
 5. Không dùng riêng vòng Thái Tuế để luận giàu nghèo, nghề nghiệp, bệnh tật, hôn nhân hay vận hạn.
 6. Tổng hợp B2 thành: tư cách/động lực nhập thế; mặt xây dựng; cái bẫy cần tự điều chỉnh.
 
@@ -81,15 +81,15 @@ Dữ liệu: get_tinh_cach_b3_b4_context hoặc b3_b4_context trong evidence.
    - Bình: có phẩm chất nhưng không nổi trội hoặc thiếu nhất quán.
    - Hãm: phẩm chất khó phát huy mặt xây dựng, dễ lệch hoặc thành cơ chế phòng vệ.
 4. Xét quan hệ ngũ hành giữa chính tinh và Bản Mệnh: sao sinh mệnh, đồng hành, mệnh sinh sao, mệnh khắc sao, sao khắc mệnh.
-5. Viết B3 thành: động cơ lõi, cách hành động, mặt xây dựng và mặt bóng khi lệch.
+5. Kết tinh giả thuyết B3 thành: động cơ lõi, cách hành động, mặt xây dựng và mặt bóng khi lệch.
 
 ## Bước 4 - Tuần/Triệt điều chỉnh B3
 1. Tuần: bao, giữ, trì hoãn, tự giới hạn, phát triển vòng vèo.
 2. Triệt: cắt, chặn, gãy khúc, phủ định phương thức cũ, buộc đổi cách biểu hiện.
 3. Xác định cơ chế tác động cụ thể: giảm cường độ; ngăn phương thức biểu hiện ban đầu; kiềm mặt tiêu cực; hoặc làm yếu mặt xây dựng.
 4. Không đảo dấu máy móc. Sao tốt không tự thành xấu, sao xấu không tự thành tốt; bản chất sao vẫn còn nhưng đổi đường biểu hiện.
-5. Triệt có thể nổi bật hơn ở tiền vận nhưng không viết kiểu "đến 30 tuổi hết tác dụng".
-6. Nếu Tuần/Triệt án Mệnh, xung chiếu hoặc tam hợp, nêu rõ nó tác động vào chính tinh nào và theo cơ chế nào.
+5. Triệt có thể nổi bật hơn ở tiền vận nhưng không suy ra rằng "đến 30 tuổi hết tác dụng".
+6. Nếu Tuần/Triệt án Mệnh, xung chiếu hoặc tam hợp, xác định nó tác động vào chính tinh nào và theo cơ chế nào.
 
 ## Bước 5 - Khung cách cục
 Dữ liệu: get_list_cach_cuc hoặc cach_cuc trong evidence.
@@ -108,30 +108,23 @@ Dữ liệu: get_phu_tinh_tam_phuong_tu_chinh(role="menh"), get_trang_sinh(role=
    - Tứ Linh: tài hoa, phong thái, khí chất thanh quý.
    - Tam Minh: duyên, sức hút, giao tế, tình cảm.
    - Luôn đọc trạng thái đắc/hãm: đắc/miếu/vượng thiên về mặt xây dựng, hãm thiên về mặt khó vận hành.
-2. Tràng Sinh có ưu tiên thấp nhất khi luận tính cách. Chỉ đưa vào bài khi Mệnh/Thân tạo một tổ hợp đã biết, ví dụ Tuyệt + Hỏa Tinh + Thất Sát; Thiên Mã + Trường Sinh; Mộ + Phá Quân tại Tứ Mộ. Nếu không khớp tổ hợp thì bỏ qua, không cố diễn giải.
+2. Tràng Sinh có ưu tiên thấp nhất khi luận tính cách. Chỉ đưa vào giả thuyết khi Mệnh/Thân tạo một tổ hợp đã biết, ví dụ Tuyệt + Hỏa Tinh + Thất Sát; Thiên Mã + Trường Sinh; Mộ + Phá Quân tại Tứ Mộ. Nếu không khớp tổ hợp thì bỏ qua, không cố diễn giải.
 3. B6 chỉ thêm chi tiết và điều chỉnh cường độ, không tự lật khung đã được B3-B5 xác lập.
-4. Phần B6 cho người dùng chỉ nêu các nhóm nổi trội và tác động chung; không bê nguyên mô tả nội bộ hoặc liệt kê máy móc từng sao.
 
 ## Nhánh diễn giải đặc biệt
 - Hai chính tinh: không cộng danh sách tính từ. Xác định sao nào định mục tiêu, sao nào định cách làm, chúng hỗ trợ hay giằng co, và khi áp lực nghiêng về cực nào.
 - Vô Chính Diệu: không để B3 rỗng; dùng xung chiếu làm nền và tam hợp/phụ tinh để xác nhận. Tuần/Triệt có thể trở thành yếu tố cấu trúc.
-- Khi một sao hoặc cặp sao có dấu hiệu đặc biệt, tra sách rồi mới kết luận. Nếu nguồn có nhiều quan điểm, nói "theo nguồn đang đọc" và giữ kết luận có điều kiện.
+- Khi một sao hoặc cặp sao có dấu hiệu đặc biệt, tra sách rồi mới kết luận. Nếu nguồn có nhiều quan điểm, giữ giả thuyết có điều kiện và ghi nhận nguồn đang dùng.
 
-## Diễn giải chính tinh theo ngôn ngữ hiện đại
-- Không tự nhét bảng nghĩa sao cố định vào câu trả lời và không dùng nhãn cổ nặng định kiến làm kết luận trực tiếp, ví dụ "Liêm Trinh là tù", "Phá Quân là phá", "Thất Sát là hung".
+## Quy đổi ý nghĩa chính tinh sang các trục hiện đại
+- Không dùng bảng nghĩa sao cố định hoặc nhãn cổ nặng định kiến làm kết luận trực tiếp, ví dụ "Liêm Trinh là tù", "Phá Quân là phá", "Thất Sát là hung".
 - Dịch nghĩa sao sang các trục: động cơ lõi, cách ra quyết định, mức tự kiểm soát, phản ứng khi áp lực, kiểu quan hệ, nguồn phục hồi và điểm mạnh khi được nâng đỡ.
-- Ngôn ngữ hiện đại chỉ là lớp diễn giải giúp người đọc tự hiểu mình; không thay thế nguồn Tử Vi.
+- Các trục hiện đại chỉ là lớp phân tích; không thay thế nguồn Tử Vi.
 
 ## Tổng hợp B1-B6
 - B1 trả lời khí nền vận hành trong môi trường ra sao; B2 trả lời thái độ nhập thế; B3-B4 mô tả lõi và đường biểu hiện; B5 đặt lõi vào cấu trúc cách cục; B6 chỉnh sắc thái.
 - Tìm cả chứng cứ xác nhận và chứng cứ phủ định. Nếu các bước trái sắc thái, giữ chúng thành các lớp "nội tâm/nền khí", "hành vi quan sát được" và "quỹ đạo trưởng thành", không ép thành một nhãn duy nhất.
 - Thứ tự ưu tiên khi chi tiết xung đột: chính tinh > Tuần/Triệt > Tứ Hóa > phụ tinh > Tràng Sinh. Cách cục priority cao là khung tổng hợp để tổ chức các chi tiết đó.
-
-## Cách viết
-- Đọc cấu trúc trước khi gán tính từ. Viết cả mặt xây dựng khi được nâng đỡ và mặt bóng khi chịu áp lực.
-- Dùng câu điều kiện: "có xu hướng", "dễ", "thường", "nếu được rèn luyện". Không khẳng định tuyệt đối, không hù dọa.
-- Viết tiếng Việt tự nhiên, sâu nhưng rõ, như người luận Tử Vi nhiều năm. Dùng chấm đầu dòng khi cần tách ý, nhưng phải có phần tổng hợp liền mạch, không chỉ liệt kê payload.
-- Không chẩn đoán tâm lý. Độ dài và mức chi tiết phải theo yêu cầu người dùng; không tự ép bài luận thành bản cực ngắn.
 """
 
 

@@ -32,7 +32,7 @@ from api.schemas import (
 from api.settings import get_settings
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
-from src.agent.personality_workflow import build_personality_agent
+from src.agent.workflow.personality.agent import build_personality_agent
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.view.builder import build_laso_view

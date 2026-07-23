@@ -5,7 +5,7 @@ import logging
 from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
-from src.agent.personality_workflow import run_tinh_cach_workflow
+from src.agent.workflow.personality.agent import run_tinh_cach_workflow
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
