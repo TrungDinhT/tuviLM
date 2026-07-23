@@ -14,7 +14,7 @@ from src.refactored.model.prior import Gender, LaSoPrior
 def test_luan_tinh_cach_skill_preserves_complete_b1_b6_workflow():
     skill = luan_tinh_cach_skill()
 
-    assert "ngôn ngữ hiện đại" in skill
+    assert "các trục hiện đại" in skill
     assert "Tuần" in skill
     assert "Triệt" in skill
     assert "Hạt nhân 14 chính tinh" not in skill
@@ -37,7 +37,9 @@ def test_luan_tinh_cach_skill_preserves_complete_b1_b6_workflow():
     for step in range(1, 7):
         assert f"## Bước {step}" in skill
     assert skill.count("## Nguyên tắc nguồn chung") == 1
-    assert skill.count("## Cách viết") == 1
+    assert "## Cách viết" not in skill
+    assert "không quy định bố cục, giọng văn, độ dài hay định dạng" in skill
+    assert "Viết tiếng Việt tự nhiên" not in skill
     assert "Skill luan_tinh_cach_b1_b2" not in skill
     assert "Skill luan_tinh_cach_b3_b4" not in skill
 
