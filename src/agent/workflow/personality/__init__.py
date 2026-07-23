@@ -23,6 +23,7 @@ from .input.tanbien import (
     PersonalityEvidence,
     collect_personality_evidence,
     get_personality_evidence,
+    luan_tinh_cach_skill,
 )
 
 __all__ = [
@@ -41,6 +42,7 @@ __all__ = [
     "get_personality_evidence",
     "get_personality_evidence_schema",
     "get_personality_output_schema",
+    "luan_tinh_cach_skill",
     "register_personality_evidence_schema",
     "register_personality_output_schema",
     "resolve_personality_config",

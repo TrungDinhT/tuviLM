@@ -157,7 +157,7 @@ class VongThaiTueEvidence(BaseModel):
 
 
 class PersonalityEvidence(BaseModel):
-    """Complete deterministic Tân Biên evidence required by the B1-B6 workflow."""
+    """Complete deterministic Tân Biên evidence for personality synthesis."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -170,9 +170,60 @@ class PersonalityEvidence(BaseModel):
     trang_sinh_than: TrangSinhResult
 
 
+def luan_tinh_cach_skill() -> str:
+    """Return only reasoning rules that are not already encoded in the evidence."""
+
+    return """## Quy tắc suy luận bổ sung cho evidence Tân Biên
+
+Các trường diễn giải trong evidence đã chứa sẵn ý nghĩa của chính chúng. Dùng
+trực tiếp nội dung đó; không tính lại quan hệ ngũ hành, không suy diễn từ tên
+nhóm và không biến keywords thành kết luận độc lập.
+
+### Xác định lõi và các lớp điều chỉnh
+
+- Chính tinh tại Mệnh là lõi vận hành. Nếu có hai chính tinh, xác định sao nào
+  định mục tiêu, sao nào định cách làm, chúng hỗ trợ hay giằng co và khi áp lực
+  thì xu hướng nào lấn át. Không cộng hai danh sách tính từ.
+- Trạng thái sao điều chỉnh khả năng biểu hiện: miếu/vượng là mạnh và chủ động;
+  đắc là có chỗ phát huy; bình là không nổi trội hoặc thiếu nhất quán; hãm là
+  khó dùng mặt xây dựng và dễ thành cơ chế phòng vệ.
+- Tuần thiên về bao, giữ, trì hoãn, tự giới hạn hoặc làm đường phát triển vòng
+  vèo. Triệt thiên về cắt, chặn, gây gãy khúc và buộc đổi cách biểu hiện. Chúng
+  không đảo tốt thành xấu hay xấu thành tốt; phải xác định phẩm chất nào bị
+  giảm, bị chặn, được kiềm hoặc phải đổi đường biểu hiện.
+- Cách cục có priority cao nhất là khung cấu trúc chính; cách thấp hơn chỉ bổ
+  trợ. Chỉ dùng cách cục đã có trong evidence, không tự dựng cách mới từ sao.
+
+### Các dữ kiện chỉ có tên hoặc trạng thái
+
+- Lục Cát là lớp trợ lực; Lục Sát là lớp áp lực và biến động. Phải xét cả hai,
+  không dùng một phía để xóa phía còn lại.
+- Với Tứ Hóa: Lộc tăng thuận lợi hoặc sức hút; Quyền tăng chủ động hoặc kiểm
+  soát; Khoa tăng học hỏi hoặc uy tín; Kỵ tạo vướng mắc hoặc nút thắt.
+- Tứ Linh bổ sung tài hoa và phong thái; Tam Minh bổ sung sức hút, giao tế và
+  sắc thái tình cảm. Đắc/miếu/vượng nghiêng về biểu hiện xây dựng, hãm nghiêng
+  về khó vận hành.
+- Sao đồng cung tác động trực tiếp hơn sao xung chiếu hoặc tam hợp.
+- Tràng Sinh có trọng số thấp nhất. Chỉ dùng khi tạo tổ hợp có nghĩa với Mệnh
+  hoặc Thân, chẳng hạn Tuyệt + Hỏa Tinh + Thất Sát, Thiên Mã + Trường Sinh,
+  hoặc Mộ + Phá Quân tại Tứ Mộ; nếu không có tổ hợp thì bỏ qua.
+
+### Tổng hợp
+
+- Khi dữ kiện xung đột, ưu tiên chính tinh, rồi Tuần/Triệt, Tứ Hóa, phụ tinh và
+  cuối cùng là Tràng Sinh; dùng cách cục priority cao để tổ chức toàn bộ khung.
+- Tìm cả chứng cứ xác nhận và phản chứng. Giữ khác biệt hợp lý thành các lớp
+  nền khí, hành vi quan sát được và xu hướng khi trưởng thành thay vì ép thành
+  một nhãn duy nhất.
+- Chuyển ý nghĩa Tử Vi sang các trục: động cơ, cách quyết định, tự kiểm soát,
+  phản ứng dưới áp lực, quan hệ, khả năng thích nghi và nguồn phục hồi. Không
+  dùng nhãn cổ nặng định kiến làm kết luận trực tiếp.
+"""
+
+
 def collect_personality_evidence(la_so: LaSo) -> PersonalityEvidence:
-    """Collect the Tân Biên B1-B6 evidence without model-selected tool calls."""
-    _logger.info("Thu thập evidence tính cách B1-B6")
+    """Collect Tân Biên evidence without model-selected tool calls."""
+    _logger.info("Thu thập evidence tính cách Tân Biên")
     evidence = PersonalityEvidence(
         foundation=FoundationEvidence.model_validate(
             build_laso_foundation_payload(la_so)
@@ -187,7 +238,7 @@ def collect_personality_evidence(la_so: LaSo) -> PersonalityEvidence:
         trang_sinh_than=build_trang_sinh(la_so, Role.CUNG_THAN),
     )
     _logger.info(
-        "Đã thu thập evidence tính cách B1-B6: cach_cuc=%d, phu_tinh=%d, "
+        "Đã thu thập evidence tính cách Tân Biên: cach_cuc=%d, phu_tinh=%d, "
         "trang_sinh_menh=%s, trang_sinh_than=%s",
         len(evidence.cach_cuc),
         sum(len(group.stars) for group in evidence.phu_tinh.groups)
@@ -201,7 +252,7 @@ def collect_personality_evidence(la_so: LaSo) -> PersonalityEvidence:
 def get_personality_evidence(
     ctx: RunContext[TuviAgentDeps],
 ) -> PersonalityEvidence:
-    """Thu thập đầy đủ evidence Tân Biên B1-B6 cho một lần luận độc lập.
+    """Thu thập đầy đủ evidence Tân Biên cho một lần luận độc lập.
 
     Luôn gọi tool này trước khi luận nếu prompt chưa cung cấp sẵn evidence.
     """
