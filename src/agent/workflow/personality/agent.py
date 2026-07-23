@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
-from src.agent.skills import luan_tinh_cach_skill, read_book_tuvi_tan_bien
+from src.agent.skills import read_book_tuvi_tan_bien
 from src.agent.tool import (
     get_cung_by_position,
     get_cung_by_role,
@@ -33,6 +33,7 @@ from src.agent.workflow.personality.input.tanbien import (
     PersonalityEvidence,
     collect_personality_evidence,
     get_personality_evidence,
+    luan_tinh_cach_skill,
 )
 from src.agent.workflow.personality.output import (
     SEVEN_FOUNDATION_QUESTIONS_PROMPT,
@@ -54,6 +55,7 @@ class PersonalityEvidenceSchema:
     model: type[BaseModel]
     collector: EvidenceCollector
     tool: EvidenceTool
+    reasoning_prompt: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -126,6 +128,7 @@ register_personality_evidence_schema(
         model=PersonalityEvidence,
         collector=collect_personality_evidence,
         tool=get_personality_evidence,
+        reasoning_prompt=luan_tinh_cach_skill(),
     )
 )
 register_personality_output_schema(
@@ -154,10 +157,7 @@ vận hành và chân dung con người.
 1. Chỉ kết luận từ evidence, tool hoặc nội dung sách đã thực sự đọc qua tool.
 2. Không tự bịa sao, trạng thái, cách cục hay tổ hợp.
 3. Nếu dữ liệu chưa đủ, không suy diễn để lấp chỗ trống.
-4. Khi nguồn trái chiều, giữ chúng thành các lớp biểu hiện và xét thứ tự ưu tiên:
-   chính tinh > Tuần/Triệt > Tứ Hóa > phụ tinh > Tràng Sinh. Cách cục có
-   priority cao dùng làm khung tổng hợp.
-5. Không coi diễn giải là chẩn đoán tâm lý hay sự thật khách quan; không hù dọa,
+4. Không coi diễn giải là chẩn đoán tâm lý hay sự thật khách quan; không hù dọa,
    định mệnh hóa hoặc suy rộng sang bệnh tật, tai họa, giàu nghèo hay hôn nhân.
 
 Có hai chế độ chạy:
@@ -168,8 +168,9 @@ Có hai chế độ chạy:
   để thu thập evidence bằng code deterministic. Chỉ gọi tool lá số riêng lẻ khi
   cần kiểm tra hoặc bổ sung ngoài payload tổng hợp.
 
-Skill luận tính cách bên dưới chỉ quy định cách đọc evidence và cách tư duy.
-Prompt output schema ở cuối chỉ dẫn toàn bộ cách cấu trúc và diễn đạt câu trả lời.
+Prompt suy luận của evidence schema bên dưới chỉ bổ sung những quy tắc chưa có
+trong payload. Prompt output schema ở cuối chỉ dẫn toàn bộ cách cấu trúc và diễn
+đạt câu trả lời.
 """.strip()
 
 
@@ -235,7 +236,7 @@ def build_personality_agent_instruction(
             PERSONALITY_AGENT_BASE_INSTRUCTION.format(
                 evidence_tool=evidence.tool.__name__
             ),
-            luan_tinh_cach_skill(),
+            evidence.reasoning_prompt,
             read_book_tuvi_tan_bien(),
             output.prompt,
         ]

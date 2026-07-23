@@ -78,19 +78,19 @@ def _format_star_status(sao_id: str, position: DiaChi) -> str:
 
 
 def get_tinh_cach_b3_b4_context(ctx: RunContext[TuviAgentDeps]) -> str:
-    """Lấy dữ liệu nền cần thiết để luận tính cách theo B3-B4.
+    """Lấy dữ liệu chính tinh và các cung liên quan để luận tính cách.
 
     Tool này gom Bản Mệnh/Cục, cung Mệnh, chính tinh Mệnh, chính tinh xung
     chiếu/tam hợp và Tuần/Triệt ở các cung liên quan.
     """
-    _logger.info("Lấy context tính cách B3-B4")
+    _logger.info("Lấy context chính tinh tính cách")
     result = build_tinh_cach_b3_b4_context(ctx.deps.require_la_so())
-    _logger.info("Đã lấy context tính cách B3-B4: chars=%d", len(result))
+    _logger.info("Đã lấy context chính tinh tính cách: chars=%d", len(result))
     return result
 
 
 def build_tinh_cach_b3_b4_context(la_so: LaSo) -> str:
-    """Build deterministic B3-B4 evidence from a natal chart."""
+    """Build deterministic main-star evidence from a natal chart."""
     menh_position = la_so.position_of(Role.MENH.value)
     if menh_position is None:
         raise ModelRetry("Không tìm thấy cung Mệnh trong lá số.")
@@ -104,13 +104,13 @@ def build_tinh_cach_b3_b4_context(la_so: LaSo) -> str:
     main_star_lines = _main_star_lines(la_so, menh_position)
     if not main_star_lines:
         main_star_lines = [
-            "- Mệnh Vô Chính Diệu: dùng chính tinh cung xung chiếu làm nền B3, "
+            "- Mệnh Vô Chính Diệu: dùng chính tinh cung xung chiếu làm nền, "
             "rồi kiểm tam hợp và phụ tinh tại Mệnh."
         ]
 
     return "\n\n".join(
         [
-            "Dữ liệu nền B3-B4",
+            "Dữ liệu chính tinh và các cung liên quan",
             (
                 f"Bản Mệnh: {la_so.ban_menh.name} ({la_so.ban_menh.ngu_hanh.value}).\n"
                 f"Cục: {la_so.natal_context.cuc.name} "
