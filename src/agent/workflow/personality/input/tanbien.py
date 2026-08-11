@@ -27,8 +27,6 @@ _logger = logging.getLogger(__name__)
 
 
 class AmDuongEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     relation: str
     environment_alignment: str
     thinking_consistency: str
@@ -37,42 +35,23 @@ class AmDuongEvidence(BaseModel):
     development_focus: str
 
 
-class BanMenhMeaningEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    aliases: list[str] = Field(default_factory=list)
-    symbol: str
-    keywords: list[str]
-    nature: str
-    reading_hint: str
-
-
 class BanMenhEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     id: str
     name: str
     ngu_hanh: str
-    meaning: BanMenhMeaningEvidence
 
 
 class CucEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     name: str
     ngu_hanh: str
 
 
 class MenhCucEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     relation: str
     meaning: str
 
 
 class FoundationEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     am_duong_thuan_nghich: AmDuongEvidence
     ban_menh: BanMenhEvidence
     cuc: CucEvidence
@@ -80,16 +59,12 @@ class FoundationEvidence(BaseModel):
 
 
 class ComponentEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     id: str
     name: str
     ngu_hanh: str | None = None
 
 
 class ThaiTueGroupEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     id: str
     name: str
     archetype: str
@@ -99,8 +74,6 @@ class ThaiTueGroupEvidence(BaseModel):
 
 
 class ThaiTueStarMeaningEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     keywords: list[str]
     at_menh: str
     shadow: str
@@ -108,8 +81,6 @@ class ThaiTueStarMeaningEvidence(BaseModel):
 
 
 class ThaiTueMenhEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     position: ComponentEvidence
     thai_tue_star: ComponentEvidence
     group: ThaiTueGroupEvidence
@@ -117,15 +88,11 @@ class ThaiTueMenhEvidence(BaseModel):
 
 
 class ThienMaLensEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     element: str
     will_style: str
 
 
 class ThienMaEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     available: bool
     reason: str | None = None
     star: ComponentEvidence | None = None
@@ -136,22 +103,16 @@ class ThienMaEvidence(BaseModel):
 
 
 class SatTinhEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     stars: list[ComponentEvidence]
 
 
 class ThaiTueTechnicalEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     ego_and_collaboration_note: str | None = None
     thien_ma: ThienMaEvidence | None = None
     thai_tue_sat_tinh_at_menh: SatTinhEvidence | None = None
 
 
 class VongThaiTueEvidence(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
     menh: ThaiTueMenhEvidence
     technical_support: ThaiTueTechnicalEvidence
 
