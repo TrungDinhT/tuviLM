@@ -1,6 +1,8 @@
-"""Prompt-only output schema built around seven foundation questions."""
+"""Output instructions built around seven foundation questions."""
 
-AVOID_EVIDENCE_PROMPT = """
+# Optional research fragment. It is intentionally not part of the default output
+# instruction; experiments may compose it explicitly and compare results.
+OPTIONAL_AVOID_EVIDENCE_INSTRUCTION = """
 ### Evidence phải ẩn trong câu trả lời
 
 Evidence Tử Vi chỉ dùng để suy luận nội bộ. Câu trả lời phải đi thẳng vào kết
@@ -16,13 +18,12 @@ kết luận bằng nguồn Tử Vi đã tạo ra nó.
   thích ngắn gọn trong một phần riêng sau câu trả lời chính.
 """.strip()
 
-OUTPUT_SCHEMA_PROMPT = """
-## Output schema: Bảy câu hỏi nền tảng
+SEVEN_FOUNDATION_QUESTIONS_INSTRUCTION = """
+## Output instruction: Bảy câu hỏi nền tảng
 
-Toàn bộ cách trình bày câu trả lời phải nằm trong schema này. Tổng hợp evidence
+Toàn bộ cách trình bày câu trả lời phải theo instruction này. Tổng hợp evidence
 thành một chân dung thống nhất; không trình bày bài luận như báo cáo lần lượt
 từng nguồn dữ liệu và không bê nguyên payload ra câu trả lời.
-
 
 ### Phần 1 - Bảy câu hỏi nền tảng
 

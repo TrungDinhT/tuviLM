@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import json
 import logging
-from collections.abc import Callable
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from pydantic import BaseModel
 from pydantic_ai import Agent, RunContext
+from pydantic_ai.messages import ModelMessage
 
 from src.agent.deps import TuviAgentDeps
 from src.agent.skills import read_book_tuvi_tan_bien
@@ -29,112 +28,108 @@ from src.agent.tool.tu_vi_tan_bien.tool import (
     get_star_description,
     get_star_role_interaction,
 )
+from src.agent.workflow.contracts import (
+    WorkflowInputDefinition,
+    WorkflowOutputInstruction,
+)
 from src.agent.workflow.personality.input.tanbien import (
     PersonalityEvidence,
-    collect_personality_evidence,
     get_personality_evidence,
     luan_tinh_cach_skill,
 )
 from src.agent.workflow.personality.output import (
-    SEVEN_FOUNDATION_QUESTIONS_PROMPT,
+    SEVEN_FOUNDATION_QUESTIONS_INSTRUCTION,
 )
-from src.refactored.la_so import LaSo
-
 
 _logger = logging.getLogger(__name__)
-
-EvidenceCollector = Callable[[LaSo], BaseModel]
-EvidenceTool = Callable[[RunContext[TuviAgentDeps]], BaseModel]
-
-
-@dataclass(frozen=True, slots=True)
-class PersonalityEvidenceSchema:
-    """One selectable evidence contract and its deterministic collector."""
-
-    name: str
-    model: type[BaseModel]
-    collector: EvidenceCollector
-    tool: EvidenceTool
-    reasoning_prompt: str
-
-
-@dataclass(frozen=True, slots=True)
-class PersonalityOutputSchema:
-    """One selectable prompt that owns the complete response format."""
-
-    name: str
-    prompt: str
 
 
 @dataclass(frozen=True, slots=True)
 class PersonalityAgentConfig:
-    """Names of the evidence and prompt-output schemas used by an agent."""
+    """Input and output-instruction names bound when the agent is built."""
 
-    evidence_schema: str = "tanbien"
-    output_schema: str = "7_foundation_questions"
+    input_name: str = "tanbien"
+    output_instruction: str = "7_foundation_questions"
 
 
-PERSONALITY_EVIDENCE_REGISTRY: dict[str, PersonalityEvidenceSchema] = {}
-PERSONALITY_OUTPUT_REGISTRY: dict[str, PersonalityOutputSchema] = {}
+PERSONALITY_INPUT_REGISTRY: dict[str, WorkflowInputDefinition] = {}
+PERSONALITY_OUTPUT_INSTRUCTION_REGISTRY: dict[str, WorkflowOutputInstruction] = {}
 
 DEFAULT_PERSONALITY_CONFIG = PersonalityAgentConfig()
 
 
-def register_personality_evidence_schema(
-    schema: PersonalityEvidenceSchema,
+def register_personality_input(
+    input_definition: WorkflowInputDefinition,
     *,
     replace: bool = False,
 ) -> None:
-    """Register an evidence schema under its stable configuration name."""
-    _register_schema(
-        PERSONALITY_EVIDENCE_REGISTRY,
-        schema.name,
-        schema,
+    """Register a tool-backed personality input under its stable name."""
+    _register_definition(
+        PERSONALITY_INPUT_REGISTRY,
+        input_definition.name,
+        input_definition,
         replace=replace,
     )
 
 
-def register_personality_output_schema(
-    schema: PersonalityOutputSchema,
+def register_personality_output_instruction(
+    output_instruction: WorkflowOutputInstruction,
     *,
     replace: bool = False,
 ) -> None:
-    """Register a prompt-only output schema under its stable configuration name."""
-    _register_schema(
-        PERSONALITY_OUTPUT_REGISTRY,
-        schema.name,
-        schema,
+    """Register response instructions and their enforced output type."""
+    _register_definition(
+        PERSONALITY_OUTPUT_INSTRUCTION_REGISTRY,
+        output_instruction.name,
+        output_instruction,
         replace=replace,
     )
 
 
-def _register_schema(
+def _register_definition(
     registry: dict[str, Any],
     name: str,
-    schema: Any,
+    definition: Any,
     *,
     replace: bool,
 ) -> None:
     if not name:
-        raise ValueError("Personality schema name must not be empty.")
+        raise ValueError("Personality definition name must not be empty.")
     if name in registry and not replace:
-        raise ValueError(f"Personality schema {name!r} is already registered.")
-    registry[name] = schema
+        raise ValueError(f"Personality definition {name!r} is already registered.")
+    registry[name] = definition
 
 
-register_personality_evidence_schema(
-    PersonalityEvidenceSchema(
+register_personality_input(
+    WorkflowInputDefinition(
         name="tanbien",
         model=PersonalityEvidence,
-        collector=collect_personality_evidence,
         tool=get_personality_evidence,
-        reasoning_prompt=luan_tinh_cach_skill(),
+        instructions=(
+            luan_tinh_cach_skill(),
+            read_book_tuvi_tan_bien(),
+        ),
+        supporting_tools=(
+            get_laso_foundation,
+            get_vong_thai_tue,
+            get_cung_by_position,
+            get_cung_by_role,
+            get_list_cach_cuc,
+            get_phu_tinh_tam_phuong_tu_chinh,
+            get_trang_sinh,
+            get_tam_hop,
+            get_xung_chieu,
+            get_tinh_cach_b3_b4_context,
+            get_star_description,
+            get_star_role_interaction,
+        ),
     )
 )
-register_personality_output_schema(
-    PersonalityOutputSchema(
+register_personality_output_instruction(
+    WorkflowOutputInstruction(
         name="7_foundation_questions",
-        prompt=SEVEN_FOUNDATION_QUESTIONS_PROMPT,
+        instruction=SEVEN_FOUNDATION_QUESTIONS_INSTRUCTION,
+        output_type=str,
     )
 )
 
@@ -160,85 +155,64 @@ vận hành và chân dung con người.
 4. Không coi diễn giải là chẩn đoán tâm lý hay sự thật khách quan; không hù dọa,
    định mệnh hóa hoặc suy rộng sang bệnh tật, tai họa, giàu nghèo hay hôn nhân.
 
-Có hai chế độ chạy:
+Luôn gọi {input_tool} trước khi suy luận. Tool này là đường duy nhất
+dựng input contract đã chọn. Chỉ gọi tool hỗ trợ riêng lẻ khi cần kiểm tra
+hoặc bổ sung cho yêu cầu ngoài payload tổng hợp.
 
-- Nếu prompt có khối evidence, application code đã thu thập đủ dữ liệu. Dùng
-  trực tiếp khối này và không gọi lại tool dữ liệu lá số.
-- Nếu prompt không có evidence, đây là lần chạy độc lập. Luôn gọi {evidence_tool} trước
-  để thu thập evidence bằng code deterministic. Chỉ gọi tool lá số riêng lẻ khi
-  cần kiểm tra hoặc bổ sung ngoài payload tổng hợp.
-
-Prompt suy luận của evidence schema bên dưới chỉ bổ sung những quy tắc chưa có
-trong payload. Prompt output schema ở cuối chỉ dẫn toàn bộ cách cấu trúc và diễn
+Instruction suy luận của input bên dưới chỉ bổ sung những quy tắc chưa
+có trong payload. Output instruction ở cuối chỉ dẫn cách cấu trúc và diễn
 đạt câu trả lời.
 """.strip()
 
 
-def get_personality_evidence_schema(name: str) -> PersonalityEvidenceSchema:
-    """Resolve one registered evidence schema or fail with available names."""
-    return _resolve_schema(PERSONALITY_EVIDENCE_REGISTRY, name, "evidence")
+def get_personality_input(name: str) -> WorkflowInputDefinition:
+    """Resolve one registered input or fail with available names."""
+    return _resolve_definition(PERSONALITY_INPUT_REGISTRY, name, "input")
 
 
-def get_personality_output_schema(name: str) -> PersonalityOutputSchema:
-    """Resolve one registered output schema or fail with available names."""
-    return _resolve_schema(PERSONALITY_OUTPUT_REGISTRY, name, "output")
+def get_personality_output_instruction(name: str) -> WorkflowOutputInstruction:
+    """Resolve one registered output instruction or fail with available names."""
+    return _resolve_definition(
+        PERSONALITY_OUTPUT_INSTRUCTION_REGISTRY,
+        name,
+        "output instruction",
+    )
 
 
-def _resolve_schema(registry: dict[str, Any], name: str, kind: str) -> Any:
+def _resolve_definition(registry: dict[str, Any], name: str, kind: str) -> Any:
     try:
         return registry[name]
     except KeyError as exc:
         available = ", ".join(sorted(registry)) or "(none)"
         raise ValueError(
-            f"Unknown personality {kind} schema {name!r}. Available: {available}."
+            f"Unknown personality {kind} {name!r}. Available: {available}."
         ) from exc
 
 
 def resolve_personality_config(
     config: PersonalityAgentConfig | None = None,
-    *,
-    evidence_schema: str | None = None,
-    output_schema: str | None = None,
 ) -> PersonalityAgentConfig:
-    """Resolve explicit overrides on top of a config or the defaults."""
-    base = config or DEFAULT_PERSONALITY_CONFIG
-    resolved = PersonalityAgentConfig(
-        evidence_schema=(
-            evidence_schema
-            if evidence_schema is not None
-            else base.evidence_schema
-        ),
-        output_schema=(
-            output_schema if output_schema is not None else base.output_schema
-        ),
-    )
-    get_personality_evidence_schema(resolved.evidence_schema)
-    get_personality_output_schema(resolved.output_schema)
+    """Validate one immutable build-time configuration."""
+    resolved = config or DEFAULT_PERSONALITY_CONFIG
+    get_personality_input(resolved.input_name)
+    get_personality_output_instruction(resolved.output_instruction)
     return resolved
 
 
 def build_personality_agent_instruction(
     config: PersonalityAgentConfig | None = None,
-    *,
-    evidence_schema: str | None = None,
-    output_schema: str | None = None,
 ) -> str:
-    """Compose reasoning instructions with the selected prompt output schema."""
-    resolved = resolve_personality_config(
-        config,
-        evidence_schema=evidence_schema,
-        output_schema=output_schema,
-    )
-    evidence = get_personality_evidence_schema(resolved.evidence_schema)
-    output = get_personality_output_schema(resolved.output_schema)
+    """Compose the selected input and output instructions."""
+    resolved = resolve_personality_config(config)
+    input_definition = get_personality_input(resolved.input_name)
+    output_instruction = get_personality_output_instruction(resolved.output_instruction)
     return "\n\n".join(
         [
             PERSONALITY_AGENT_BASE_INSTRUCTION.format(
-                evidence_tool=evidence.tool.__name__
+                input_tool=input_definition.tool.__name__
             ),
-            evidence.reasoning_prompt,
-            read_book_tuvi_tan_bien(),
-            output.prompt,
+            *input_definition.instructions,
+            output_instruction.instruction,
         ]
     )
 
@@ -250,42 +224,24 @@ def build_personality_agent(
     model: str,
     *,
     config: PersonalityAgentConfig | None = None,
-    evidence_schema: str | None = None,
-    output_schema: str | None = None,
 ) -> Agent:
-    """Build a synthesis agent from registered evidence and output schemas."""
-    resolved = resolve_personality_config(
-        config,
-        evidence_schema=evidence_schema,
-        output_schema=output_schema,
-    )
-    evidence = get_personality_evidence_schema(resolved.evidence_schema)
-    agent = Agent(
+    """Build a synthesis agent from one immutable workflow configuration."""
+    resolved = resolve_personality_config(config)
+    input_definition = get_personality_input(resolved.input_name)
+    output_instruction = get_personality_output_instruction(resolved.output_instruction)
+    return Agent(
         model=model,
         name="tinh_cach_agent",
         deps_type=TuviAgentDeps,
-        output_type=str,
+        output_type=output_instruction.output_type,
         instructions=build_personality_agent_instruction(resolved),
         tool_retries=2,
         output_retries=2,
         tools=[
-            evidence.tool,
-            get_laso_foundation,
-            get_vong_thai_tue,
-            get_cung_by_position,
-            get_cung_by_role,
-            get_list_cach_cuc,
-            get_phu_tinh_tam_phuong_tu_chinh,
-            get_trang_sinh,
-            get_tam_hop,
-            get_xung_chieu,
-            get_tinh_cach_b3_b4_context,
-            get_star_description,
-            get_star_role_interaction,
+            input_definition.tool,
+            *input_definition.supporting_tools,
         ],
     )
-    agent._personality_workflow_config = resolved
-    return agent
 
 
 async def run_personality_workflow(
@@ -294,41 +250,16 @@ async def run_personality_workflow(
     deps: TuviAgentDeps,
     request: str,
     usage: Any = None,
-    evidence_schema: str | None = None,
+    message_history: Sequence[ModelMessage] | None = None,
 ) -> str:
-    """Collect configured evidence and execute exactly one text synthesis run."""
-    config = getattr(agent, "_personality_workflow_config", None)
-    resolved = resolve_personality_config(
-        config if isinstance(config, PersonalityAgentConfig) else None,
-        evidence_schema=evidence_schema,
+    """Run the configured agent; its input tool builds evidence exactly once."""
+    _logger.info("Chạy personality workflow: request_chars=%d", len(request))
+    result = await agent.run(
+        request,
+        deps=deps,
+        usage=usage,
+        message_history=message_history,
     )
-    evidence_definition = get_personality_evidence_schema(
-        resolved.evidence_schema
-    )
-
-    _logger.info(
-        "Chạy personality workflow: request_chars=%d, evidence_schema=%s, "
-        "output_schema=%s",
-        len(request),
-        resolved.evidence_schema,
-        resolved.output_schema,
-    )
-    evidence = evidence_definition.collector(deps.require_la_so())
-    if not isinstance(evidence, evidence_definition.model):
-        raise TypeError(
-            f"Collector for {resolved.evidence_schema!r} returned "
-            f"{type(evidence).__name__}; expected "
-            f"{evidence_definition.model.__name__}."
-        )
-    prompt = json.dumps(
-        {
-            "user_request": request,
-            "evidence_schema": resolved.evidence_schema,
-            "evidence": evidence.model_dump(mode="json", exclude_none=True),
-        },
-        ensure_ascii=False,
-    )
-    result = await agent.run(prompt, deps=deps, usage=usage)
     _logger.info(
         "Personality workflow hoàn tất: output_chars=%d",
         len(result.output),
@@ -340,7 +271,7 @@ async def run_tinh_cach_workflow(
     ctx: RunContext[TuviAgentDeps],
     request: str,
 ) -> str:
-    """Luận tính cách bằng evidence và output schema đã cấu hình.
+    """Luận tính cách bằng input và output instruction đã cấu hình.
 
     Truyền nguyên văn yêu cầu của người dùng. Kết quả đã là câu trả lời cuối;
     trả lại nguyên văn và không tự luận thêm bằng các tool riêng.
@@ -354,6 +285,7 @@ async def run_tinh_cach_workflow(
         deps=ctx.deps,
         request=request,
         usage=ctx.usage,
+        message_history=ctx.deps.message_history,
     )
     _logger.info(
         "Tool run_tinh_cach_workflow hoàn tất: output_chars=%d",
