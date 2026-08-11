@@ -21,7 +21,6 @@ from src.agent.tool.phu_tinh.tool import (
 from src.agent.tool.thai_tue.vong_thai_tue import build_vong_thai_tue_payload
 from src.refactored.components.definitions.cung_role import Role
 
-
 _logger = logging.getLogger(__name__)
 
 
