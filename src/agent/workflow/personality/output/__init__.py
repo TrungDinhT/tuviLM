@@ -1,15 +1,11 @@
-"""Prompt output schemas available to the personality workflow."""
+"""Output instructions available to the personality workflow."""
 
-from importlib import import_module
-
-
-_seven_foundation_questions = import_module(
-    ".7_foundation_questions",
-    package=__name__,
+from .seven_foundation_questions import (
+    OPTIONAL_AVOID_EVIDENCE_INSTRUCTION,
+    SEVEN_FOUNDATION_QUESTIONS_INSTRUCTION,
 )
 
-SEVEN_FOUNDATION_QUESTIONS_PROMPT: str = (
-    _seven_foundation_questions.OUTPUT_SCHEMA_PROMPT
-)
-
-__all__ = ["SEVEN_FOUNDATION_QUESTIONS_PROMPT"]
+__all__ = [
+    "OPTIONAL_AVOID_EVIDENCE_INSTRUCTION",
+    "SEVEN_FOUNDATION_QUESTIONS_INSTRUCTION",
+]

@@ -352,15 +352,16 @@ async def _stream_session_chat_events(
 
     api_state = request.app.state.api_state
     base_deps = api_state.agent_deps
+    message_history = _visible_messages_to_model_history(history_messages)
     agent_deps = TuviAgentDeps(
         agent=base_deps.agent,
         personality_agent=base_deps.personality_agent,
         la_so=_build_la_so(context.chart_profile.birth_info),
         book=base_deps.book,
         book_root=base_deps.book_root,
+        message_history=message_history,
     )
     agent = agent_deps.require_agent()
-    message_history = _visible_messages_to_model_history(history_messages)
     async with agent.run_stream_events(
         content,
         deps=agent_deps,

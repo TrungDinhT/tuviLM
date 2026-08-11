@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from pydantic_ai import Agent, ModelRetry
+from pydantic_ai.messages import ModelMessage
 
 from src.agent.book_index import BookIndex
 from src.refactored.la_so import LaSo
@@ -21,6 +22,7 @@ class TuviAgentDeps:
     la_so: LaSo | None = None
     book: BookIndex | None = None
     book_root: Path = DEFAULT_BOOK_ROOT
+    message_history: list[ModelMessage] = field(default_factory=list)
 
     def require_agent(self) -> Agent:
         if self.agent is None:
