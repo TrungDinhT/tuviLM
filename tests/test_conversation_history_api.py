@@ -763,6 +763,7 @@ async def test_session_chat_stream_default_runner_reconstructs_agent_context(
     assert fake_agent.user_prompt == "New question."
     assert fake_agent.deps.la_so is not None
     assert len(fake_agent.message_history) == 2
+    assert fake_agent.deps.message_history == fake_agent.message_history
     assert '"type": "text", "delta": "New answer."' in response.text
 
 

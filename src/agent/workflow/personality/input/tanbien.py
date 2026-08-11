@@ -20,7 +20,6 @@ from src.agent.tool.phu_tinh.tool import (
 )
 from src.agent.tool.thai_tue.vong_thai_tue import build_vong_thai_tue_payload
 from src.refactored.components.definitions.cung_role import Role
-from src.refactored.la_so import LaSo
 
 
 _logger = logging.getLogger(__name__)
@@ -118,9 +117,13 @@ class VongThaiTueEvidence(BaseModel):
 
 
 class PersonalityEvidence(BaseModel):
-    """Complete deterministic Tân Biên evidence for personality synthesis."""
+    """Tân Biên projection consumed by personality synthesis.
 
-    model_config = ConfigDict(extra="forbid")
+    Shared tool payloads may contain more information than this workflow uses.
+    Extra fields are intentionally ignored while declared fields remain required.
+    """
+
+    model_config = ConfigDict(extra="ignore")
 
     foundation: FoundationEvidence
     vong_thai_tue: VongThaiTueEvidence
@@ -182,9 +185,16 @@ nhóm và không biến keywords thành kết luận độc lập.
 """
 
 
-def collect_personality_evidence(la_so: LaSo) -> PersonalityEvidence:
-    """Collect Tân Biên evidence without model-selected tool calls."""
-    _logger.info("Thu thập evidence tính cách Tân Biên")
+def get_personality_evidence(
+    ctx: RunContext[TuviAgentDeps],
+) -> PersonalityEvidence:
+    """Build the complete Tân Biên input contract for personality synthesis.
+
+    This is the only public construction path for ``PersonalityEvidence``.
+    Shared lower-level tools may return more fields than its projections consume.
+    """
+    _logger.info("Tool get_personality_evidence bắt đầu")
+    la_so = ctx.deps.require_la_so()
     evidence = PersonalityEvidence(
         foundation=FoundationEvidence.model_validate(
             build_laso_foundation_payload(la_so)
@@ -207,17 +217,5 @@ def collect_personality_evidence(la_so: LaSo) -> PersonalityEvidence:
         evidence.trang_sinh_menh.star,
         evidence.trang_sinh_than.star,
     )
-    return evidence
-
-
-def get_personality_evidence(
-    ctx: RunContext[TuviAgentDeps],
-) -> PersonalityEvidence:
-    """Thu thập đầy đủ evidence Tân Biên cho một lần luận độc lập.
-
-    Luôn gọi tool này trước khi luận nếu prompt chưa cung cấp sẵn evidence.
-    """
-    _logger.info("Tool get_personality_evidence bắt đầu")
-    result = collect_personality_evidence(ctx.deps.require_la_so())
     _logger.info("Tool get_personality_evidence hoàn tất")
-    return result
+    return evidence
