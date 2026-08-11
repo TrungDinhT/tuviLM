@@ -4,17 +4,16 @@ import logging
 
 from pydantic_ai import RunContext
 
+from src.agent.deps import TuviAgentDeps
 from src.agent.tool.ban_menh.ban_menh_meaning import (
     build_ban_menh_meaning,
     build_menh_cuc_lens,
 )
-from src.agent.deps import TuviAgentDeps
 from src.refactored.la_so import LaSo
 from src.refactored.model.elementary import (
     DiaChi,
     LuongNghi,
 )
-
 
 _logger = logging.getLogger(__name__)
 
