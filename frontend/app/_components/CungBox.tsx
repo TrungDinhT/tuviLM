@@ -72,8 +72,8 @@ export function CungBox({ cung, highlighted, tieuVan, onClick }: CungBoxProps) {
 
       {/* Phụ tinh + Tứ Hóa: single 2-col grid so tứ hóa flows directly after lưu in each column */}
       {(() => {
-        const tuhoaLeft = cung.tuhoa.filter((h) => !h.includes("Kỵ"));
-        const tuhoaRight = cung.tuhoa.filter((h) => h.includes("Kỵ"));
+        const tuhoaLeft = cung.tuhoa.filter((h) => !h.display.includes("Kỵ"));
+        const tuhoaRight = cung.tuhoa.filter((h) => h.display.includes("Kỵ"));
         return (
           <div className="mt-0.5 text-[5px] sm:text-[6.5px] md:text-[7.5px] lg:text-[9.5px]">
             <div className="grid grid-cols-2 gap-x-1 md:gap-x-2 tracking-[0.2px]">
@@ -82,7 +82,7 @@ export function CungBox({ cung, highlighted, tieuVan, onClick }: CungBoxProps) {
                   <span key={`fc-${s.name}`} style={{ color: colorForElement(s.element) }}>{s.name}</span>
                 ))}
                 {tuhoaLeft.map((h) => (
-                  <span key={`th-l-${h}`} className="font-semibold" style={{ color: colorForStarName(h) }}>{h}</span>
+                  <span key={`th-l-${h.name}`} className="font-semibold" style={{ color: colorForElement(h.element) }}>{h.display}</span>
                 ))}
                 {luuCat.map((s) => (
                   <span key={`lc-${s.name}`} style={{ color: colorForElement(s.element) }}>L.{s.name}</span>
@@ -93,7 +93,7 @@ export function CungBox({ cung, highlighted, tieuVan, onClick }: CungBoxProps) {
                   <span key={`fh-${s.name}`} style={{ color: colorForElement(s.element) }}>{s.name}</span>
                 ))}
                 {tuhoaRight.map((h) => (
-                  <span key={`th-r-${h}`} className="font-semibold" style={{ color: colorForStarName(h) }}>{h}</span>
+                  <span key={`th-r-${h.name}`} className="font-semibold" style={{ color: colorForElement(h.element) }}>{h.display}</span>
                 ))}
                 {luuHung.map((s) => (
                   <span key={`lh-${s.name}`} style={{ color: colorForElement(s.element) }}>L.{s.name}</span>

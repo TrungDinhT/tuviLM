@@ -5,12 +5,24 @@ export interface CreateAnonymousResponse {
   owner_id: string;
 }
 
+export interface BirthInfoPayload extends BuildLasoRequest {
+  calendar?: "solar" | "lunar";
+}
+
 export interface ChartProfilePayload {
   id: string;
+  display_name: string;
+  birth_info: BirthInfoPayload;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CreateChartProfileResponse {
   chart_profile: ChartProfilePayload;
+}
+
+export interface ListChartProfilesResponse {
+  chart_profiles: ChartProfilePayload[];
 }
 
 export interface ChatSessionPayload {
@@ -85,7 +97,7 @@ export async function createChartProfile({
     },
     body: JSON.stringify({
       display_name: displayName,
-      birth_info: birthInfo,
+      birth_info: { calendar: "solar", ...birthInfo },
     }),
   });
   if (!res.ok) {
@@ -99,6 +111,43 @@ export async function createChartProfile({
   return data.chart_profile.id;
 }
 
+export async function listChartProfiles({
+  ownerId,
+}: {
+  ownerId: string;
+}): Promise<ChartProfilePayload[]> {
+  const res = await fetch(`${API_URL}/api/v1/chart-profiles`, {
+    method: "GET",
+    headers: {
+      "X-Anonymous-Owner-Id": ownerId,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Không tải được hồ sơ lá số (HTTP ${res.status})`);
+  }
+
+  const data = (await res.json()) as ListChartProfilesResponse;
+  return data.chart_profiles ?? [];
+}
+
+export async function deleteChartProfile({
+  ownerId,
+  chartProfileId,
+}: {
+  ownerId: string;
+  chartProfileId: string;
+}): Promise<void> {
+  const res = await fetch(`${API_URL}/api/v1/chart-profiles/${encodeURIComponent(chartProfileId)}`, {
+    method: "DELETE",
+    headers: {
+      "X-Anonymous-Owner-Id": ownerId,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Không xoá được hồ sơ lá số (HTTP ${res.status})`);
+  }
+}
+
 export async function createChatSession({
   ownerId,
   chartProfileId,
@@ -110,7 +159,7 @@ export async function createChatSession({
   idempotencyKey: string;
   title?: string;
 }): Promise<string> {
-  const res = await fetch(`${API_URL}/api/v1/chart-profiles/${chartProfileId}/sessions`, {
+  const res = await fetch(`${API_URL}/api/v1/chart-profiles/${encodeURIComponent(chartProfileId)}/sessions`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -137,7 +186,7 @@ export async function listChatSessions({
   ownerId: string;
   chartProfileId: string;
 }): Promise<ChatSessionSummaryPayload[]> {
-  const res = await fetch(`${API_URL}/api/v1/chart-profiles/${chartProfileId}/sessions`, {
+  const res = await fetch(`${API_URL}/api/v1/chart-profiles/${encodeURIComponent(chartProfileId)}/sessions`, {
     method: "GET",
     headers: {
       "X-Anonymous-Owner-Id": ownerId,
@@ -158,7 +207,7 @@ export async function getChatSession({
   ownerId: string;
   sessionId: string;
 }): Promise<ChatSessionPayload> {
-  const res = await fetch(`${API_URL}/api/v1/sessions/${sessionId}`, {
+  const res = await fetch(`${API_URL}/api/v1/sessions/${encodeURIComponent(sessionId)}`, {
     method: "GET",
     headers: {
       "X-Anonymous-Owner-Id": ownerId,
@@ -173,4 +222,22 @@ export async function getChatSession({
     throw new Error("Phản hồi phiên trò chuyện không hợp lệ");
   }
   return data.session;
+}
+
+export async function deleteChatSession({
+  ownerId,
+  sessionId,
+}: {
+  ownerId: string;
+  sessionId: string;
+}): Promise<void> {
+  const res = await fetch(`${API_URL}/api/v1/sessions/${encodeURIComponent(sessionId)}`, {
+    method: "DELETE",
+    headers: {
+      "X-Anonymous-Owner-Id": ownerId,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Không xoá được phiên trò chuyện (HTTP ${res.status})`);
+  }
 }

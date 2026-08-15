@@ -35,7 +35,7 @@ def to_cung_payload(cung_view: CungView) -> CungPayload:
     phu_tinh: list[StarPayload] = []
     is_tuan: bool = False
     is_triet: bool = False
-    tu_hoa: list[str] = []
+    tu_hoa: list[StarPayload] = []
     trang_sinh: str
 
     for component_view in cung_view.components:
@@ -50,7 +50,14 @@ def to_cung_payload(cung_view: CungView) -> CungPayload:
             else:
                 phu_tinh.append(to_sao_payload(component, cung_view))
         elif isinstance(component, TuHoa):
-            tu_hoa.append(component.name)
+            tu_hoa.append(
+                StarPayload(
+                    name=component.name,
+                    display=component.name,
+                    element=component.ngu_hanh.value,
+                    sao_type=[st.value for st in component.sao_type],
+                )
+            )
         elif isinstance(component, VongTrangSinh):
             trang_sinh = component.name
         elif isinstance(component, TuanTriet):
@@ -72,17 +79,18 @@ def to_cung_payload(cung_view: CungView) -> CungPayload:
         saoLuu=[
             to_sao_payload(comp.component, cung_view)
             for comp in cung_view.components
-            if isinstance(comp.component, ChinhPhuTinh)
+            if isinstance(comp.component, (ChinhPhuTinh, TuHoa))
             and comp.layer_kind == "tieu_han"
         ],
     )
 
 
-def to_sao_payload(component: ChinhPhuTinh, cung_view: CungView) -> StarPayload:
+def to_sao_payload(component: ChinhPhuTinh | TuHoa, cung_view: CungView) -> StarPayload:
     status = _get_sao_status(component.id, cung_view.dia_chi_entity.value)
     sao_str = f"{component.name} ({status})" if status else component.name
     return StarPayload(
         name=component.name,
         display=sao_str,
         element=component.ngu_hanh.value,
+        sao_type=[st.value for st in component.sao_type],
     )

@@ -4,7 +4,7 @@ from functools import cached_property
 
 import pydantic
 
-from src.refactored.calendar import solar_to_lunar_date
+from src.refactored.calendar import lunar_month_length, solar_to_lunar_date
 from src.refactored.model.elementary import DiaChi, ThienCan
 
 
@@ -34,6 +34,7 @@ class LaSoPrior(pydantic.BaseModel):
     date: int
     month: int
     year: int
+    is_leap_month: bool = False
 
     gender: Gender
 
@@ -64,6 +65,30 @@ class LaSoPrior(pydantic.BaseModel):
             date=lunar_date.day,
             month=lunar_date.month,
             year=lunar_date.year,
+            is_leap_month=lunar_date.is_leap_month,
+            gender=gender,
+        )
+
+    @classmethod
+    def from_lunar_day(
+        cls,
+        *,
+        year: int,
+        month: int,
+        day: int,
+        hour: DiaChi,
+        gender: Gender,
+        is_leap_month: bool = False,
+    ) -> "LaSoPrior":
+        month_length = lunar_month_length(year, month, is_leap_month)
+        if day > month_length:
+            raise ValueError(f"Âm lịch năm {year} tháng {month} chỉ có {month_length} ngày")
+        return cls(
+            hour=hour,
+            date=day,
+            month=month,
+            year=year,
+            is_leap_month=is_leap_month,
             gender=gender,
         )
 

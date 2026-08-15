@@ -3,6 +3,7 @@ export interface StarPayload {
   name: string;
   display: string;
   element: string;
+  sao_type?: string[];
 }
 
 export interface CungPayload {
@@ -10,7 +11,7 @@ export interface CungPayload {
   role: string | null;
   chinh_tinh: string[];
   phu_tinh: StarPayload[];
-  tuhoa: string[];
+  tuhoa: StarPayload[];
   trang_sinh: string | null;
   is_tuan: boolean;
   is_triet: boolean;
@@ -25,12 +26,39 @@ export interface BuildLasoResponse {
   cung_by_position: Record<string, CungPayload>;
 }
 
+export type BirthCalendar = "solar" | "lunar";
+export type DiaChiId =
+  | "ty"
+  | "suu"
+  | "dan"
+  | "meo"
+  | "thin"
+  | "ti"
+  | "ngo"
+  | "mui"
+  | "than"
+  | "dau"
+  | "tuat"
+  | "hoi";
+
 export interface BuildLasoRequest {
+  calendar?: BirthCalendar;
   day: number;
   month: number;
   year: number;
-  hour: number;
+  hour?: number;
+  hour_in_dia_chi?: DiaChiId;
+  is_leap_month?: boolean;
   gender: "M" | "F";
+}
+
+export interface BuildSaoLuuRequest {
+  birth_info: BuildLasoRequest;
+  observation_time: BuildLasoRequest;
+}
+
+export interface BuildSaoLuuResponse {
+  cung_by_position: Record<string, CungPayload>;
 }
 
 export type Calendar = "duong" | "am";
@@ -42,8 +70,10 @@ export interface UserProfile {
   day: number;
   month: number;
   year: number;
-  hour: number;
-  minute: number;
+  hour?: number;
+  minute?: number;
+  hour_in_dia_chi?: DiaChiId;
+  is_leap_month?: boolean;
 }
 
 export interface SessionStash {

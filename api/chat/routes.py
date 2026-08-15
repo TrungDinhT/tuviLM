@@ -4,7 +4,6 @@ import asyncio
 import json
 import logging
 import secrets
-from datetime import datetime
 from typing import Any, AsyncIterator
 
 from fastapi import APIRouter, Header, Request, Response
@@ -46,9 +45,8 @@ from api.schemas import (
     ListSessionsResponse,
     SessionChatStreamRequest,
 )
+from api.laso.build import build_la_so
 from src.agent.deps import TuviAgentDeps
-from src.refactored.la_so import LaSo
-from src.refactored.model.prior import Gender, LaSoPrior
 
 
 logger = logging.getLogger(__name__)
@@ -355,7 +353,7 @@ async def _stream_session_chat_events(
     agent = base_deps.require_agent()
     agent_deps = TuviAgentDeps(
         agent=agent,
-        la_so=_build_la_so(context.chart_profile.birth_info),
+        la_so=build_la_so(context.chart_profile.birth_info),
         book=base_deps.book,
         book_root=base_deps.book_root,
     )
@@ -369,20 +367,6 @@ async def _stream_session_chat_events(
             msg = _serialize_agent_event(event)
             if msg is not None:
                 yield msg
-
-
-def _build_la_so(birth_info: BirthInfo) -> LaSo:
-    solar_dt = datetime(
-        year=birth_info.year,
-        month=birth_info.month,
-        day=birth_info.day,
-        hour=birth_info.hour,
-    )
-    prior = LaSoPrior.from_solar_day(
-        solar_dt,
-        Gender.MALE if birth_info.gender == "M" else Gender.FEMALE,
-    )
-    return LaSo.from_prior(prior)
 
 
 def _visible_messages_to_model_history(

@@ -1,0 +1,251 @@
+/* Styles adapted from feature/new_frontend frontend/src/styles.css
+   for the full-chart dialog and its cells. */
+
+:root {
+  /* Full-chart UI tokens */
+  --fc-border: #d5c8b3;
+  --fc-cell-bg: #fffdfa;
+  --fc-selected-border: #8b5e34;
+  --fc-selected-shadow: rgba(139, 94, 52, 0.25);
+  --fc-cung-than-border: #8b5e34;
+  --fc-age-color: #855a31;
+  --fc-role-color: #2a2d34;
+  --fc-tuhoa-color: #855a31;
+  --fc-divider-color: #d0d7de;
+  --fc-star-sub-color: #374151;
+  --fc-trangsinh-color: #667085;
+  --fc-position-color: #8b5e34;
+  --fc-center-border: #d4bfa5;
+  --fc-center-bg-start: #fff6e9;
+  --fc-center-bg-end: #f2e0c3;
+  --fc-center-name-color: #2a2d34;
+  --fc-center-birth-color: #6b7280;
+  --fc-center-line-color: #8b5e34;
+  --fc-badge-bg: #9e2a2b;
+  --fc-badge-color: #fff;
+  --fc-badge-shadow: rgba(26, 22, 17, 0.3);
+  --fc-center-label-color: #6b7280;
+  --fc-text-sub-star: clamp(6px, 7.5cqi, 14px);
+}
+
+.fc-grid {
+  aspect-ratio: 2 / 3;
+  position: relative;
+  padding: clamp(0px, 1cqi, 10px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: clamp(1px, 0.5cqi, 4px);
+  background: transparent;
+  border-radius: clamp(0px, 1cqi, 14px);
+  container-type: inline-size;
+}
+
+.fc-cell {
+  border: 1px solid var(--fc-border);
+  border-radius: clamp(4px, 1cqi, 10px);
+  text-align: left;
+  background: var(--fc-cell-bg);
+  padding: clamp(4px, 1cqi, 8px);
+  overflow-y: auto;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  container-type: inline-size;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.fc-cell::-webkit-scrollbar {
+  display: none;
+}
+
+.fc-cell.selected {
+  border: 2px solid var(--fc-selected-border);
+  box-shadow: 0 0 0 2px var(--fc-selected-shadow);
+}
+
+.fc-cell.cung-than {
+  border: 1px solid var(--fc-cung-than-border);
+}
+
+.fc-age {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: clamp(9px, 8cqi, 12px);
+  font-weight: 700;
+  color: var(--fc-age-color);
+  line-height: 1;
+}
+
+.fc-role {
+  margin: 0;
+  padding: 2px 0 4px 0;
+  font-size: clamp(6px, 8cqi, 16px);
+  font-weight: 600;
+  text-align: center;
+  color: var(--fc-role-color);
+}
+
+.fc-main-tuhoa-row {
+  min-height: clamp(15px, 25cqi, 40px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.fc-main-stars-col {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: 100%;
+  justify-content: center;
+}
+
+.fc-tuhoa-col {
+  width: 38%;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  gap: 2px;
+}
+
+.fc-star-main {
+  font-weight: 700;
+  font-size: clamp(6px, 8cqi, 16px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fc-star-tuhoa {
+  font-size: var(--fc-text-sub-star);
+  color: var(--fc-tuhoa-color);
+}
+
+.fc-divider {
+  margin: 4px 0;
+  border: none;
+  border-top: 1px dashed var(--fc-divider-color);
+}
+
+.fc-star-sub {
+  font-size: var(--fc-text-sub-star);
+  color: var(--fc-star-sub-color);
+  line-height: 1.3;
+}
+
+.fc-phu-tinh-row {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.fc-phu-tinh-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.fc-phu-tinh-col:empty {
+  display: none;
+}
+
+.fc-star-luu-divider {
+  font-size: var(--fc-text-sub-star);
+  font-weight: 700;
+  color: #5b3d20;
+  text-align: center;
+  width: 100%;
+}
+
+.fc-trangsinh {
+  margin-top: auto;
+  font-size: var(--fc-text-sub-star);
+  color: var(--fc-trangsinh-color);
+  text-align: center;
+}
+
+.fc-position {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--fc-position-color);
+}
+
+.fc-center {
+  grid-column: span 2;
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--fc-center-border);
+  border-radius: 10px;
+  background: radial-gradient(circle at center, var(--fc-center-bg-start) 0%, var(--fc-center-bg-end) 100%);
+  text-align: center;
+  gap: 6px;
+  padding: 12px;
+  container-type: inline-size;
+}
+
+.fc-center-name {
+  font-size: clamp(11px, 6cqi, 15px);
+  font-weight: 500;
+  color: var(--fc-center-name-color);
+}
+
+.fc-center-birth {
+  font-size: clamp(9px, 4.5cqi, 11px);
+  color: var(--fc-center-birth-color);
+}
+
+.fc-center-line {
+  font-size: clamp(10px, 5cqi, 13px);
+  font-weight: 600;
+  color: var(--fc-center-line-color);
+  letter-spacing: 0.02em;
+}
+
+.fc-info-label {
+  font-size: clamp(8px, 4cqi, 10px);
+}
+
+.fc-info-name {
+  font-size: clamp(11px, 6cqi, 15px);
+}
+
+.fc-info-value {
+  font-size: clamp(9px, 4.5cqi, 11px);
+}
+
+.fc-badge-tuan-triet {
+  position: absolute;
+  z-index: 10;
+  padding: 2px 6px;
+  font-size: clamp(6px, 1.2cqi, 9px);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  background: var(--fc-badge-bg);
+  color: var(--fc-badge-color);
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 6px var(--fc-badge-shadow);
+  transform: translate(-50%, -50%);
+}
+
+.fc-center-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fc-center-label-color);
+}

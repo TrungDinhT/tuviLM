@@ -73,11 +73,11 @@ export function CungDetailCard({ cung, onSaoClick, onClose }: CungDetailCardProp
           <div className="flex flex-wrap gap-1.5 mt-1.5">
             {cung.tuhoa.map((h) => (
               <span
-                key={`tuhoa-${h}`}
+                key={`tuhoa-${h.name}`}
                 className="text-[12.5px] font-semibold text-[var(--color-gold)] px-2 py-0.5 border border-[var(--color-gold)] rounded-sm"
                 style={{ background: "rgba(168,133,74,0.10)" }}
               >
-                {h}
+                {h.display}
               </span>
             ))}
           </div>

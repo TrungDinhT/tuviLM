@@ -3,10 +3,20 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { ChatMessage as Msg, ChatToolEntry, ChatMessageRole, CungPayload, SessionStash, OverlayKind } from "../_lib/types";
-import { loadStash, saveStash } from "../_lib/session-store";
+import {
+  DEFAULT_VIEW_YEAR,
+  buildRequestFromProfile,
+  diaChiForYear,
+  formatChartYearLabel,
+  withSaoLuuOverlay,
+  VIEW_YEAR_MAX,
+  VIEW_YEAR_MIN,
+} from "../_lib/sao-luu-overlay";
+import { clearStash, loadStash, saveStash } from "../_lib/session-store";
 import { SUGGESTED_CHIPS } from "../_data/chat-suggestions";
 import { useStreamChat } from "@/services/api/v1/chat/send";
 import { getChatSession, type ChatMessagePayload } from "@/services/api/v1/conversation-history";
+import { buildSaoLuu } from "@/services/api/v1/laso/build";
 import { StickToBottom } from "use-stick-to-bottom";
 import { getSaoDetail } from "../_data/mock-stars";
 import { Chart } from "./Chart";
@@ -19,8 +29,6 @@ import { LichSuDrawer } from "./LichSuDrawer";
 import { useResponsiveSize } from "./useResponsiveSize";
 import { useIsMobile } from "./useIsMobile";
 import { DefaultPanels } from "./DefaultPanels";
-
-const TIEU_VAN_POSITION = "Ngọ";
 
 function shortName(full: string): string {
   const parts = full.trim().split(/\s+/).filter(Boolean);
@@ -37,6 +45,9 @@ export function MobileChartView() {
   const [openOverlay, setOpenOverlay] = useState<OverlayKind>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
+  const [viewYear, setViewYear] = useState(DEFAULT_VIEW_YEAR);
+  const [saoLuuPendingYear, setSaoLuuPendingYear] = useState<number | null>(null);
+  const [saoLuuError, setSaoLuuError] = useState<string | null>(null);
   const chat = useStreamChat();
   const pending = chat.isPending;
   const chartSize = useResponsiveSize();
@@ -201,19 +212,56 @@ export function MobileChartView() {
     else setSelectedRole(value);
   }, []);
 
-  const onSessionChange = useCallback((sessionId: string) => {
-    setStash((current) => {
-      if (!current) return current;
-      const next = {
-        ...current,
-        sessionId,
-        fetchedAt: new Date().toISOString(),
-      };
-      saveStash(next);
-      return next;
-    });
+  const onSessionChange = useCallback((next: SessionStash) => {
+    saveStash(next);
+    setStash(next);
     setMessages([]);
+    setViewYear(DEFAULT_VIEW_YEAR);
+    setSaoLuuError(null);
   }, []);
+
+  const onCurrentDeleted = useCallback(() => {
+    clearStash();
+    setMessages([]);
+    setStash(null);
+    router.replace("/");
+  }, [router]);
+
+  const onSelectViewYear = useCallback(
+    async (year: number) => {
+      if (!stash || saoLuuPendingYear != null || year < VIEW_YEAR_MIN || year > VIEW_YEAR_MAX) return;
+
+      setSaoLuuPendingYear(year);
+      setSaoLuuError(null);
+      try {
+        const birthInfo = buildRequestFromProfile(stash.profile);
+        const overlay = await buildSaoLuu({
+          birth_info: birthInfo,
+          observation_time: {
+            day: 1,
+            month: 1,
+            year,
+            hour: 0,
+            gender: birthInfo.gender,
+          },
+        });
+        setStash((current) =>
+          current
+            ? {
+                ...current,
+                laso: withSaoLuuOverlay(current.laso, overlay),
+              }
+            : current,
+        );
+        setViewYear(year);
+      } catch (err) {
+        setSaoLuuError(err instanceof Error ? err.message : "Không đổi được năm xem");
+      } finally {
+        setSaoLuuPendingYear(null);
+      }
+    },
+    [saoLuuPendingYear, stash],
+  );
 
   if (!hydrated || !stash) {
     return (
@@ -257,7 +305,7 @@ export function MobileChartView() {
             className="text-[12px] text-[var(--color-crimson)] font-serif italic bg-transparent border-0 p-0 cursor-pointer"
             onClick={() => setOpenOverlay("daiVan")}
           >
-            2026 ▾
+            {viewYear} ▾
           </button>
         </div>
       </div>
@@ -274,7 +322,9 @@ export function MobileChartView() {
               profile={stash.profile}
               size={chartSize}
               highlightedRole={selectedRole}
-              tieuVanPosition={TIEU_VAN_POSITION}
+              tieuVanPosition={diaChiForYear(viewYear)}
+              tieuVanYear={viewYear}
+              viewYearLabel={formatChartYearLabel(viewYear)}
               onCungClick={(role) => setSelectedRole((prev) => (prev === role ? null : role))}
             />
           </div>
@@ -289,7 +339,9 @@ export function MobileChartView() {
                 profile={stash.profile}
                 size={chartSize}
                 highlightedRole={selectedRole}
-                tieuVanPosition={TIEU_VAN_POSITION}
+                tieuVanPosition={diaChiForYear(viewYear)}
+                tieuVanYear={viewYear}
+                viewYearLabel={formatChartYearLabel(viewYear)}
                 onCungClick={(role) => setSelectedRole((prev) => (prev === role ? null : role))}
               />
             </div>
@@ -459,13 +511,20 @@ export function MobileChartView() {
         );
       })()}
 
-      {openOverlay === "daiVan" && <DaiVanModal onClose={() => setOpenOverlay(null)} />}
+      {openOverlay === "daiVan" && (
+        <DaiVanModal
+          selectedYear={viewYear}
+          pendingYear={saoLuuPendingYear}
+          error={saoLuuError}
+          onSelectYear={(year) => void onSelectViewYear(year)}
+          onClose={() => setOpenOverlay(null)}
+        />
+      )}
       {openOverlay === "lichSu" && (
         <LichSuDrawer
-          ownerId={stash.ownerId}
-          chartProfileId={stash.chartProfileId}
-          currentSessionId={stash.sessionId}
+          stash={stash}
           onSessionChange={onSessionChange}
+          onCurrentDeleted={onCurrentDeleted}
           onClose={() => setOpenOverlay(null)}
         />
       )}

@@ -11,6 +11,7 @@ function isValidCalendarDate(year: number, month: number, day: number): boolean 
 
 export const EntryFormSchema = z
   .object({
+    calendar: z.enum(["duong", "am"]),
     day: z
       .number({ message: "Ngày phải là số" })
       .int("Ngày phải là số nguyên")
@@ -36,10 +37,25 @@ export const EntryFormSchema = z
       .int("Phút phải là số nguyên")
       .min(0, "Vui lòng nhập phút sinh trong khoảng 0 đến 59")
       .max(59, "Vui lòng nhập phút sinh trong khoảng 0 đến 59"),
+    hour_in_dia_chi: z.enum([
+      "ty",
+      "suu",
+      "dan",
+      "meo",
+      "thin",
+      "ti",
+      "ngo",
+      "mui",
+      "than",
+      "dau",
+      "tuat",
+      "hoi",
+    ]),
+    is_leap_month: z.boolean(),
     gender: z.enum(["M", "F"]),
   })
   .superRefine((v, ctx) => {
-    if (!isValidCalendarDate(v.year, v.month, v.day)) {
+    if (v.calendar === "duong" && !isValidCalendarDate(v.year, v.month, v.day)) {
       ctx.addIssue({
         code: "custom",
         path: ["day"],

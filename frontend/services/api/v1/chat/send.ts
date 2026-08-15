@@ -62,6 +62,26 @@ export async function streamChat(
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  const emit = (raw: string): boolean => {
+    const data = raw
+      .split("\n")
+      .filter((line) => line.trimStart().startsWith("data:"))
+      .map((line) => line.slice(line.indexOf("data:") + 5).trim())
+      .join("\n");
+    if (!data) return false;
+
+    let event: StreamEvent;
+    try {
+      event = JSON.parse(data) as StreamEvent;
+    } catch {
+      throw new Error("Không đọc được phản hồi trò chuyện.");
+    }
+    onEvent(event);
+    if (event.type === "error") {
+      throw new Error(event.message || "Luồng trò chuyện gặp lỗi.");
+    }
+    return event.type === "done";
+  };
 
   while (true) {
     const { value, done } = await reader.read();
@@ -72,19 +92,10 @@ export async function streamChat(
     while ((sep = buffer.indexOf("\n\n")) !== -1) {
       const raw = buffer.slice(0, sep);
       buffer = buffer.slice(sep + 2);
-      const line = raw.trim();
-      if (!line.startsWith("data:")) continue;
-      const json = line.slice(5).trim();
-      if (!json) continue;
-      try {
-        const event = JSON.parse(json) as StreamEvent;
-        onEvent(event);
-        if (event.type === "done") return;
-      } catch {
-        // skip malformed lines
-      }
+      if (emit(raw)) return;
     }
   }
+  if (buffer.trim()) emit(buffer);
 }
 
 export function useStreamChat() {
