@@ -1,13 +1,79 @@
 from __future__ import annotations
 
-from pydantic_ai import RunContext
+import logging
 
+from pydantic_ai import ModelRetry, RunContext
+
+from src.agent.book_index import SectionContent, SectionSearchHit
+from src.agent.deps import TuviAgentDeps
+from src.agent.tool.tu_vi_tan_bien.constant import MAP_ROLE_SECTION_ID_FUNC
+from src.agent.tool.tu_vi_tan_bien.models import (
+    SaoInfoSearchResult,
+    SaoInfoSection,
+)
 from src.refactored.components.definitions.cung_role import Role
 
 from .constant import get_sao_section_id
-from src.agent.book_index import SectionContent
-from src.agent.deps import TuviAgentDeps
-from src.agent.tool.tu_vi_tan_bien.constant import MAP_ROLE_SECTION_ID_FUNC
+
+_logger = logging.getLogger(__name__)
+_MAX_STAR_INFO_NAMES = 12
+
+
+def search_star_info(
+    ctx: RunContext[TuviAgentDeps],
+    star_names: list[str],
+) -> SaoInfoSearchResult:
+    """Tra ý nghĩa nhiều chính tinh và phụ tinh trong một lần gọi.
+
+    Tên sao phải lấy nguyên văn từ evidence của lá số. Tool ưu tiên catalog sao
+    có cấu trúc; các tên chưa khớp chỉ trả gợi ý tìm kiếm để reasoning layer
+    không tự gán nhầm ý nghĩa. Các sao dùng chung một mục sách được gom lại để
+    tránh lặp nội dung.
+
+    Args:
+        star_names: Từ 1 đến 12 tên chính tinh hoặc phụ tinh có trong evidence.
+    """
+    unique_names = list(
+        dict.fromkeys(name.strip() for name in star_names if name.strip())
+    )
+    if not unique_names:
+        raise ModelRetry("Cần ít nhất một tên sao để tra cứu.")
+    if len(unique_names) > _MAX_STAR_INFO_NAMES:
+        raise ModelRetry(
+            "Mỗi lần chỉ tra tối đa 12 sao; hãy chia danh sách thành nhiều lần gọi."
+        )
+
+    book = ctx.deps.require_book()
+    names_by_section: dict[str, list[str]] = {}
+    not_found: list[str] = []
+    suggestions: dict[str, list[SectionSearchHit]] = {}
+    for star_name in unique_names:
+        section_id = get_sao_section_id(star_name)
+        if section_id is None:
+            not_found.append(star_name)
+            suggestions[star_name] = book.search_sections(star_name, top_k=3)
+            continue
+        names_by_section.setdefault(section_id, []).append(star_name)
+
+    sections = [
+        SaoInfoSection(
+            star_names=section_star_names,
+            section=book.read_section(section_id),
+        )
+        for section_id, section_star_names in names_by_section.items()
+    ]
+    _logger.info(
+        "Đã tra ý nghĩa sao: requested=%d sections=%d not_found=%d",
+        len(unique_names),
+        len(sections),
+        len(not_found),
+    )
+    return SaoInfoSearchResult(
+        requested_star_names=unique_names,
+        sections=sections,
+        not_found=not_found,
+        suggestions=suggestions,
+    )
 
 
 def get_star_description(
