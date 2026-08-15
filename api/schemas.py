@@ -60,6 +60,13 @@ class SessionChatStreamRequest(BaseModel):
     content: str = Field(min_length=1)
 
 
+class StrengthWeaknessRequest(BaseModel):
+    content: str = Field(
+        default="Đánh giá điểm mạnh và điểm yếu của tôi.",
+        min_length=1,
+    )
+
+
 class StarPayload(BaseModel):
     name: str
     display: str

@@ -45,8 +45,13 @@ from api.schemas import (
     ListChartProfilesResponse,
     ListSessionsResponse,
     SessionChatStreamRequest,
+    StrengthWeaknessRequest,
 )
 from src.agent.deps import TuviAgentDeps
+from src.agent.workflow.strength_weakness import (
+    StrengthWeaknessAssessment,
+    run_strength_weakness_agent,
+)
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
 
@@ -151,6 +156,37 @@ async def delete_session(
 ) -> Response:
     await _get_store(request).delete_session(owner_id, session_id)
     return Response(status_code=204)
+
+
+@router.post(
+    "/sessions/{session_id}/strength-weakness",
+    response_model=StrengthWeaknessAssessment,
+)
+async def session_strength_weakness(
+    session_id: str,
+    payload: StrengthWeaknessRequest,
+    request: Request,
+    owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
+) -> StrengthWeaknessAssessment:
+    """Run the structured strength/weakness workflow for one saved chart."""
+    context = await _get_store(request).load_session_context(owner_id, session_id)
+    history = _visible_messages_to_model_history(context.session.messages)
+    base_deps = request.app.state.api_state.agent_deps
+    deps = TuviAgentDeps(
+        agent=base_deps.agent,
+        personality_agent=base_deps.personality_agent,
+        strength_weakness_agent=base_deps.strength_weakness_agent,
+        la_so=_build_la_so(context.chart_profile.birth_info),
+        book=base_deps.book,
+        book_root=base_deps.book_root,
+        message_history=history,
+    )
+    return await run_strength_weakness_agent(
+        agent=deps.require_strength_weakness_agent(),
+        deps=deps,
+        request=payload.content,
+        message_history=history,
+    )
 
 
 @router.post("/sessions/{session_id}/chat/stream")
@@ -356,6 +392,7 @@ async def _stream_session_chat_events(
     agent_deps = TuviAgentDeps(
         agent=base_deps.agent,
         personality_agent=base_deps.personality_agent,
+        strength_weakness_agent=base_deps.strength_weakness_agent,
         la_so=_build_la_so(context.chart_profile.birth_info),
         book=base_deps.book,
         book_root=base_deps.book_root,
