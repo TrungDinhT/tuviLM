@@ -10,6 +10,7 @@ from .chart import (
 )
 from .guidance import get_role_instruction
 from .tu_vi_tan_bien import get_star_description, get_star_role_interaction
+from src.agent.tool.cach_cuc import get_list_cach_cuc
 
 __all__ = [
     "get_cung_by_position",
@@ -22,4 +23,5 @@ __all__ = [
     "get_star_role_interaction",
     "read_catalog",
     "read_section",
+    "get_list_cach_cuc",
 ]

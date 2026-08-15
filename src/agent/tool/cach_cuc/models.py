@@ -1,10 +1,18 @@
 from __future__ import annotations
 
 import re
+from enum import StrEnum
 from typing import Annotated, Literal
-import annotated_types as at
 
-from pydantic import AliasChoices, BaseModel, Field, field_validator, model_validator
+import annotated_types as at
+from pydantic import (
+    AliasChoices,
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 from src.refactored.components.definitions.cung_role import Role
 from src.refactored.model.elementary import DiaChi, ThienCan
@@ -38,6 +46,10 @@ Scope = Literal[
     "giap",
 ]
 Brightness = Literal["mieu", "vuong", "dac", "binh hoa", "ham"]
+
+
+class SourceKind(StrEnum):
+    TUVITANBIEN = "tuvitanbien"
 
 
 class BaseCondition(BaseModel):
@@ -93,7 +105,7 @@ class OnlyChinhTinhCondition(BaseCondition):
 
 class StarBrightnessCondition(BaseCondition):
     type: Literal["star_brightness"] = "star_brightness"
-    stars: list[str]
+    stars: Annotated[list[str], at.MinLen(1)]
     brightness: Annotated[list[Brightness], at.MinLen(1)]
 
 
@@ -108,7 +120,7 @@ class StarWithPalaceCondition(BaseCondition, GroupSupportMixin):
     def _validate_group_mode(self) -> StarWithPalaceCondition:
         if not self.stars and self.group_name is None:
             raise ValueError("star_with_palace requires stars or group_name")
-        if self.group_name is not None:
+        if self.group_name is not None and not self.stars:
             self.stars_matching_logic = None
         return self
 
@@ -117,26 +129,28 @@ class StarAtChiCondition(BaseCondition, GroupSupportMixin):
     type: Literal["star_at_chi"] = "star_at_chi"
     at_chi: Annotated[list[DiaChi], at.MinLen(1)]
     stars: list[str] = Field(default_factory=list)
+    stars_matching_logic: Mode | None = "all"
 
     @model_validator(mode="after")
     def _validate_group_mode(self) -> StarAtChiCondition:
         if not self.stars and self.group_name is None:
             raise ValueError("star_at_chi requires stars or group_name")
+        if self.group_name is not None:
+            self.stars_matching_logic = None
         return self
 
 
 class StarsMeetingCondition(BaseCondition, GroupSupportMixin):
+    model_config = ConfigDict(extra="forbid")
+
     type: Literal["stars_meeting"] = "stars_meeting"
     scope: Scope
     stars: list[str] = Field(default_factory=list)
-    stars_matching_logic: Mode | None = "any"
 
     @model_validator(mode="after")
     def _validate_group_mode(self) -> StarsMeetingCondition:
         if not self.stars and self.group_name is None:
             raise ValueError("stars_meeting requires stars or group_name")
-        if self.group_name is not None:
-            self.stars_matching_logic = None
         return self
 
 
@@ -187,6 +201,7 @@ class CachCuc(BaseModel):
     meaning: str
     evidence: str | None = None
     conditions: Condition
+    related_roles: list[Role] = Field(default_factory=list)
 
     @field_validator("evidence", mode="before")
     @classmethod
@@ -197,8 +212,26 @@ class CachCuc(BaseModel):
 
 
 class CachCucData(BaseModel):
-    groups: dict[str, Group] = {}
-    cach_cuc: list[CachCuc] = []
+    groups: dict[str, Group] = Field(default_factory=dict)
+    cach_cuc: list[CachCuc] = Field(default_factory=list)
+
+
+class CachCucToolResult(BaseModel):
+    id: str
+    name: str
+    priority: int = 0
+    meaning: str
+    related_roles: list[Role] = Field(default_factory=list)
+
+    @classmethod
+    def from_cach_cuc(cls, cach_cuc: CachCuc) -> CachCucToolResult:
+        return cls(
+            id=cach_cuc.id,
+            name=cach_cuc.name,
+            priority=cach_cuc.priority,
+            meaning=cach_cuc.meaning,
+            related_roles=list(cach_cuc.related_roles),
+        )
 
 
 AllCondition.model_rebuild()
@@ -206,3 +239,36 @@ AnyCondition.model_rebuild()
 NotCondition.model_rebuild()
 CachCuc.model_rebuild()
 CachCucData.model_rebuild()
+
+
+__all__ = [
+    "AllCondition",
+    "AnyCondition",
+    "BaseCondition",
+    "Brightness",
+    "CachCuc",
+    "CachCucData",
+    "CachCucToolResult",
+    "CanExcludeCondition",
+    "CanMatchCondition",
+    "Condition",
+    "CungThanAtPalaceCondition",
+    "DiaChi",
+    "Gender",
+    "GenderMatchCondition",
+    "Group",
+    "GroupName",
+    "GroupSupportMixin",
+    "Mode",
+    "NotCondition",
+    "OnlyChinhTinhCondition",
+    "PalaceAtCondition",
+    "Role",
+    "Scope",
+    "SourceKind",
+    "StarAtChiCondition",
+    "StarBrightnessCondition",
+    "StarWithPalaceCondition",
+    "StarsMeetingCondition",
+    "ThienCan",
+]

@@ -3,6 +3,7 @@
 Run with:
     streamlit run support_tool/cach_cuc/cach_cuc_editor.py
 """
+
 from __future__ import annotations
 
 import json
@@ -17,11 +18,21 @@ import streamlit as st
 import yaml
 from pydantic import ValidationError
 
+from support_tool.cach_cuc.condition_models import (
+    Brightness,
+    CachCuc,
+    DiaChi,
+    Gender,
+    Mode,
+    Role,
+    Scope,
+    ThienCan,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from support_tool.cach_cuc.condition_models import Brightness, CachCuc, DiaChi, Gender, Mode, Role, Scope, ThienCan
 
 STARS_PATH = ROOT / "src/refactored/components/data/sao.json"
 DEFAULT_EXPORT_FILENAME = "cach_cuc_reviewed.yaml"
@@ -33,7 +44,15 @@ CHI = [chi.value for chi in DiaChi]
 CAN = [can.value for can in ThienCan]
 SCOPES_MEETING = list(get_args(Scope))
 SCOPES_XOR = ["hoi_hop", "dong_hoac_xung", "dong_cung", "nhi_hop", "xung_chieu"]
-GROUPS = ["luc_sat", "sat_tinh", "luc_cat", "cat_tinh", "tu_hoa", "tam_hoa", "xuong_khuc_khoa_tue_tau"]
+GROUPS = [
+    "luc_sat",
+    "sat_tinh",
+    "luc_cat",
+    "cat_tinh",
+    "tu_hoa",
+    "tam_hoa",
+    "xuong_khuc_khoa_tue_tau",
+]
 BRIGHTNESS = list(get_args(Brightness))
 GENDERS = list(get_args(Gender))
 MODES = list(get_args(Mode))
@@ -61,15 +80,64 @@ INCOMPATIBLE_EMPTY_FIELDS = {
 }
 
 DEFAULT_GROUPS = {
-    "luc_sat": {"stars": ["kinh_duong", "da_la", "dia_khong", "dia_kiep", "linh_tinh", "hoa_tinh"]},
-    "sat_tinh": {"stars": ["kinh_duong", "da_la", "dia_khong", "dia_kiep", "linh_tinh", "hoa_tinh"]},
-    "luc_cat": {"stars": ["ta_phu", "huu_bat", "thien_khoi", "thien_viet", "van_xuong", "van_khuc"]},
-    "cat_tinh": {"stars": ["ta_phu", "huu_bat", "thien_khoi", "thien_viet", "van_xuong", "van_khuc"]},
+    "luc_sat": {
+        "stars": [
+            "kinh_duong",
+            "da_la",
+            "dia_khong",
+            "dia_kiep",
+            "linh_tinh",
+            "hoa_tinh",
+        ]
+    },
+    "sat_tinh": {
+        "stars": [
+            "kinh_duong",
+            "da_la",
+            "dia_khong",
+            "dia_kiep",
+            "linh_tinh",
+            "hoa_tinh",
+        ]
+    },
+    "luc_cat": {
+        "stars": [
+            "ta_phu",
+            "huu_bat",
+            "thien_khoi",
+            "thien_viet",
+            "van_xuong",
+            "van_khuc",
+        ]
+    },
+    "cat_tinh": {
+        "stars": [
+            "ta_phu",
+            "huu_bat",
+            "thien_khoi",
+            "thien_viet",
+            "van_xuong",
+            "van_khuc",
+        ]
+    },
     "tu_hoa": {"stars": ["hoa_khoa", "hoa_quyen", "hoa_loc", "hoa_ky"]},
     "tam_hoa": {"stars": ["hoa_khoa", "hoa_quyen", "hoa_loc"]},
-    "xuong_khuc_khoa_tue_tau": {"stars": ["van_xuong", "van_khuc", "hoa_khoa", "thai_tue", "tau_thu"]},
-    "khong_kiep_hao_ky_tue": {"stars": ["dia_khong", "dia_kiep", "dai_hao", "tieu_hao", "hoa_ky", "thai_tue"]},
-    "tu_phu_xuong_khuc_khoi_viet": {"stars": ["tu_vi", "thien_phu", "van_xuong", "van_khuc", "thien_khoi", "thien_viet"]},
+    "xuong_khuc_khoa_tue_tau": {
+        "stars": ["van_xuong", "van_khuc", "hoa_khoa", "thai_tue", "tau_thu"]
+    },
+    "khong_kiep_hao_ky_tue": {
+        "stars": ["dia_khong", "dia_kiep", "dai_hao", "tieu_hao", "hoa_ky", "thai_tue"]
+    },
+    "tu_phu_xuong_khuc_khoi_viet": {
+        "stars": [
+            "tu_vi",
+            "thien_phu",
+            "van_xuong",
+            "van_khuc",
+            "thien_khoi",
+            "thien_viet",
+        ]
+    },
 }
 
 PALACE_ALIASES = {
@@ -213,7 +281,12 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
         cond.setdefault("scope", "dong_cung")
         notes.append("star_in_palace -> star_with_palace(scope=dong_cung)")
 
-    if cond.get("type") in {"star_brightness", "star_with_palace", "star_at_chi", "stars_meeting"} and "star" in cond and "stars" not in cond:
+    if (
+        cond.get("type")
+        in {"star_brightness", "star_with_palace", "star_at_chi", "stars_meeting"}
+        and "star" in cond
+        and "stars" not in cond
+    ):
         cond["stars"] = [cond.pop("star")]
         notes.append("star -> stars")
     normalize_star_fields(cond, notes)
@@ -221,8 +294,7 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
         cond["group_name"] = cond.pop("group")
         notes.append("group -> group_name")
     if (
-        cond.get("type")
-        in {"star_with_palace", "star_at_chi", "stars_meeting"}
+        cond.get("type") in {"star_with_palace", "star_at_chi", "stars_meeting"}
         and cond.get("group_name") is None
     ):
         for field in ("mode", "at_least"):
@@ -250,7 +322,9 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
                 cond["type"] = "star_at_chi"
                 cond["at_chi"] = [chi_value]
                 cond.pop("palace", None)
-                notes.append(f"star_with_palace with chi-like palace {old!r} -> star_at_chi")
+                notes.append(
+                    f"star_with_palace with chi-like palace {old!r} -> star_at_chi"
+                )
     if "in_palace" in cond:
         old = cond["in_palace"]
         cond["in_palace"] = normalize_token(old, PALACE_ALIASES)
@@ -270,20 +344,28 @@ def normalize_leaf(raw: dict, notes: list[str]) -> dict:
 
     for ctype_with_min_len, field in INCOMPATIBLE_EMPTY_FIELDS:
         if cond.get("type") == ctype_with_min_len and cond.get(field) == []:
-            notes.append(f"{cond.get('type')}.{field} is empty but the model requires at least one value; kept as raw YAML")
+            notes.append(
+                f"{cond.get('type')}.{field} is empty but the model requires at least one value; kept as raw YAML"
+            )
             return raw_node(cond)
 
     if cond.get("type") in INCOMPATIBLE_CONDITION_TYPES:
-        notes.append(f"{cond.get('type')} is outside the normalized language; kept as raw YAML")
+        notes.append(
+            f"{cond.get('type')} is outside the normalized language; kept as raw YAML"
+        )
         return raw_node(cond)
     if cond.get("type") not in CONDITION_TYPES:
-        notes.append(f"unsupported condition type {cond.get('type')!r}; kept as raw YAML")
+        notes.append(
+            f"unsupported condition type {cond.get('type')!r}; kept as raw YAML"
+        )
         return raw_node(cond)
 
     return dict_to_node(cond, normalize=False, notes=notes)
 
 
-def dict_to_node(raw: Any, normalize: bool = True, notes: list[str] | None = None) -> dict:
+def dict_to_node(
+    raw: Any, normalize: bool = True, notes: list[str] | None = None
+) -> dict:
     notes = notes if notes is not None else []
     if not isinstance(raw, dict):
         notes.append("non-dict condition kept as raw YAML")
@@ -294,7 +376,10 @@ def dict_to_node(raw: Any, normalize: bool = True, notes: list[str] | None = Non
             "_kind": "group",
             "_key": _new_key("group"),
             "operator": operator,
-            "children": [dict_to_node(child, normalize=normalize, notes=notes) for child in raw.get(operator, []) or []],
+            "children": [
+                dict_to_node(child, normalize=normalize, notes=notes)
+                for child in raw.get(operator, []) or []
+            ],
         }
     if "not" in raw:
         return {
@@ -321,7 +406,9 @@ def collect_incompatible_conditions(node: dict, path: str = "conditions") -> lis
         found.append({"path": path, "condition": raw})
         return found
     for index, child in enumerate(node.get("children", []) or []):
-        child_path = f"{path}.{node.get('operator', node.get('_kind', 'node'))}[{index}]"
+        child_path = (
+            f"{path}.{node.get('operator', node.get('_kind', 'node'))}[{index}]"
+        )
         found.extend(collect_incompatible_conditions(child, child_path))
     return found
 
@@ -339,7 +426,9 @@ def imported_entry_to_state(entry: dict) -> dict:
     }
     if "applicable_palaces" in entry:
         notes.append("dropped legacy applicable_palaces field")
-    normalized["root"] = dict_to_node(normalized.pop("conditions"), normalize=True, notes=notes)
+    normalized["root"] = dict_to_node(
+        normalized.pop("conditions"), normalize=True, notes=notes
+    )
     normalized["import_notes"] = notes
     return normalized
 
@@ -411,6 +500,7 @@ def unknown_star_errors(cach_cuc: dict) -> list[str]:
 
     visit(cach_cuc.get("conditions"), "conditions")
     return errors
+
 
 def new_leaf(ctype: str = "stars_meeting") -> dict:
     return {
@@ -727,7 +817,11 @@ def leaf_to_dict(cond: dict) -> dict:
         value = cond.get(field)
         if value is None:
             continue
-        if isinstance(value, list) and not value and (ctype, field) not in {("palace_at", "chi")}:
+        if (
+            isinstance(value, list)
+            and not value
+            and (ctype, field) not in {("palace_at", "chi")}
+        ):
             continue
         out[field] = value
     return out
@@ -756,7 +850,9 @@ def rekey_node(node: dict) -> dict:
     return copied
 
 
-def render_node(node: dict, stars: list[str], parent_list: list, index: int, depth: int = 0) -> None:
+def render_node(
+    node: dict, stars: list[str], parent_list: list, index: int, depth: int = 0
+) -> None:
     key = node["_key"]
     with st.container(border=True):
         header = st.columns([5, 1, 1, 1])
@@ -772,7 +868,10 @@ def render_node(node: dict, stars: list[str], parent_list: list, index: int, dep
             st.markdown(f"**#{index + 1} — {label}**")
         with header[1]:
             if index > 0 and st.button("↑", key=f"{key}_up"):
-                parent_list[index - 1], parent_list[index] = parent_list[index], parent_list[index - 1]
+                parent_list[index - 1], parent_list[index] = (
+                    parent_list[index],
+                    parent_list[index - 1],
+                )
                 st.rerun()
         with header[2]:
             if st.button("Copy", key=f"{key}_copy"):
@@ -788,7 +887,9 @@ def render_node(node: dict, stars: list[str], parent_list: list, index: int, dep
         elif node["_kind"] == "raw":
             raw_text = st.text_area(
                 "raw condition",
-                value=yaml.safe_dump(node.get("raw", {}), allow_unicode=True, sort_keys=False).strip(),
+                value=yaml.safe_dump(
+                    node.get("raw", {}), allow_unicode=True, sort_keys=False
+                ).strip(),
                 key=f"{key}_raw",
                 height=180,
             )
@@ -879,7 +980,9 @@ def init_state() -> None:
 
 
 def refresh_entry_lists() -> None:
-    st.session_state.entry_list_refresh = st.session_state.get("entry_list_refresh", 0) + 1
+    st.session_state.entry_list_refresh = (
+        st.session_state.get("entry_list_refresh", 0) + 1
+    )
 
 
 def select_entry(cc_id: str) -> None:
@@ -934,14 +1037,20 @@ def mark_entry_modified(cc_id: str) -> None:
     st.session_state.modified_ids.add(cc_id)
     st.session_state.modified_order = [
         cc_id,
-        *[existing_id for existing_id in st.session_state.modified_order if existing_id != cc_id],
+        *[
+            existing_id
+            for existing_id in st.session_state.modified_order
+            if existing_id != cc_id
+        ],
     ]
 
 
 def unmark_entry_modified(cc_id: str) -> None:
     st.session_state.modified_ids.discard(cc_id)
     st.session_state.modified_order = [
-        existing_id for existing_id in st.session_state.modified_order if existing_id != cc_id
+        existing_id
+        for existing_id in st.session_state.modified_order
+        if existing_id != cc_id
     ]
 
 
@@ -952,14 +1061,18 @@ def mark_entry_saved_clean(previous_id: str | None, saved_entry: dict) -> str | 
             unmark_entry_modified(cc_id)
             st.session_state.skipped_remediated_ids.discard(cc_id)
     if saved_id and saved_id in st.session_state.export_entries_by_id:
-        st.session_state.entries[saved_id] = imported_entry_to_state(st.session_state.export_entries_by_id[saved_id])
+        st.session_state.entries[saved_id] = imported_entry_to_state(
+            st.session_state.export_entries_by_id[saved_id]
+        )
         select_entry(saved_id)
     return saved_id
 
 
 def baseline_cach_cuc_for_entry(cc_id: str) -> dict | None:
     if cc_id in st.session_state.export_entries_by_id:
-        return entry_state_to_cach_cuc(imported_entry_to_state(st.session_state.export_entries_by_id[cc_id]))
+        return entry_state_to_cach_cuc(
+            imported_entry_to_state(st.session_state.export_entries_by_id[cc_id])
+        )
     if cc_id in st.session_state.original_entries:
         return entry_state_to_cach_cuc(st.session_state.original_entries[cc_id])
     return None
@@ -1030,9 +1143,13 @@ def reset_form() -> None:
     if not selected_id:
         return
     if selected_id in st.session_state.export_entries_by_id:
-        st.session_state.entries[selected_id] = imported_entry_to_state(st.session_state.export_entries_by_id[selected_id])
+        st.session_state.entries[selected_id] = imported_entry_to_state(
+            st.session_state.export_entries_by_id[selected_id]
+        )
     elif selected_id in st.session_state.original_entries:
-        st.session_state.entries[selected_id] = deepcopy(st.session_state.original_entries[selected_id])
+        st.session_state.entries[selected_id] = deepcopy(
+            st.session_state.original_entries[selected_id]
+        )
     else:
         return
     unmark_entry_modified(selected_id)
@@ -1104,7 +1221,9 @@ def load_import_into_state(path: Path, mark_remediated: bool = True) -> None:
     refresh_entry_lists()
 
 
-def load_uploaded_import_into_state(uploaded_file, mark_remediated: bool = True) -> None:
+def load_uploaded_import_into_state(
+    uploaded_file, mark_remediated: bool = True
+) -> None:
     data = yaml.safe_load(uploaded_file.getvalue().decode("utf-8")) or {}
     entries, source_data = load_cach_cuc_data(data)
     st.session_state.entries = entries
@@ -1139,7 +1258,9 @@ def render_entry_selector() -> None:
         )
         if st.session_state.loaded_import_upload_token != upload_token:
             try:
-                load_uploaded_import_into_state(uploaded_file, mark_remediated=mark_remediated)
+                load_uploaded_import_into_state(
+                    uploaded_file, mark_remediated=mark_remediated
+                )
             except Exception as exc:  # noqa: BLE001 - show Streamlit users the load failure.
                 st.sidebar.error(f"Could not load file: {exc}")
             else:
@@ -1157,16 +1278,22 @@ def render_entry_selector() -> None:
         st.sidebar.info("Load a cach_cuc YAML file to begin.")
         return
 
-    entry_number_by_id = {cc_id: index for index, cc_id in enumerate(original_ids, start=1)}
+    entry_number_by_id = {
+        cc_id: index for index, cc_id in enumerate(original_ids, start=1)
+    }
     entry_filter = st.sidebar.selectbox(
         "Show",
         ["All entries", "Modified entries", "Unmodified entries"],
         key="entry_selector_filter",
     )
     if entry_filter == "Modified entries":
-        visible_ids = [cc_id for cc_id in original_ids if entry_review_status(cc_id) != "original"]
+        visible_ids = [
+            cc_id for cc_id in original_ids if entry_review_status(cc_id) != "original"
+        ]
     elif entry_filter == "Unmodified entries":
-        visible_ids = [cc_id for cc_id in original_ids if entry_review_status(cc_id) == "original"]
+        visible_ids = [
+            cc_id for cc_id in original_ids if entry_review_status(cc_id) == "original"
+        ]
     else:
         visible_ids = original_ids
     selector_key_by_filter = {
@@ -1208,7 +1335,8 @@ def render_entry_selector() -> None:
             cc_id
             for cc_id in visible_ids
             if query.casefold() in cc_id.casefold()
-            or query.casefold() in str(st.session_state.entries[cc_id].get("name", "")).casefold()
+            or query.casefold()
+            in str(st.session_state.entries[cc_id].get("name", "")).casefold()
         ]
         st.sidebar.caption(f"{len(matches)} matches")
         for cc_id in matches[:20]:
@@ -1257,7 +1385,9 @@ def ensure_export_cache(path: Path) -> None:
 def load_export_payload_into_cache(payload: dict, path: Path) -> None:
     st.session_state.export_cache_path = str(path.expanduser())
     st.session_state.export_payload = normalize_export_payload(payload)
-    st.session_state.export_entries_by_id = index_export_entries(st.session_state.export_payload)
+    st.session_state.export_entries_by_id = index_export_entries(
+        st.session_state.export_payload
+    )
     st.session_state.saved_ids = set(st.session_state.export_entries_by_id)
     sync_export_cache_to_memory()
     refresh_entry_lists()
@@ -1271,14 +1401,22 @@ def current_export_path() -> Path:
 def write_export_cache(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
-        yaml.safe_dump(st.session_state.export_payload, f, allow_unicode=True, sort_keys=False)
+        yaml.safe_dump(
+            st.session_state.export_payload, f, allow_unicode=True, sort_keys=False
+        )
 
 
 def upsert_entries_to_export(path: Path, entries: list[dict]) -> None:
     ensure_export_cache(path)
     payload = st.session_state.export_payload
-    existing_entries = [entry for entry in payload.get("cach_cuc", []) if isinstance(entry, dict)]
-    index_by_id = {entry.get("id"): index for index, entry in enumerate(existing_entries) if entry.get("id")}
+    existing_entries = [
+        entry for entry in payload.get("cach_cuc", []) if isinstance(entry, dict)
+    ]
+    index_by_id = {
+        entry.get("id"): index
+        for index, entry in enumerate(existing_entries)
+        if entry.get("id")
+    }
 
     for entry in entries:
         entry_id = entry.get("id")
@@ -1335,7 +1473,10 @@ def render_save_panel(current_cach_cuc: dict) -> None:
     st.caption("Export file")
     export_cols = st.columns([3, 1])
     with export_cols[0]:
-        export_file = st.text_input("Save path", value=DEFAULT_EXPORT_FILENAME, key="export_path") or DEFAULT_EXPORT_FILENAME
+        export_file = (
+            st.text_input("Save path", value=DEFAULT_EXPORT_FILENAME, key="export_path")
+            or DEFAULT_EXPORT_FILENAME
+        )
     export_path = Path(export_file).expanduser()
     ensure_export_cache(export_path)
     with export_cols[1]:
@@ -1355,9 +1496,7 @@ def render_save_panel(current_cach_cuc: dict) -> None:
         for cc_id in review_ids
     }
     saved_status = {
-        cc_id: "edited"
-        for cc_id in saved_ids
-        if cc_id in st.session_state.modified_ids
+        cc_id: "edited" for cc_id in saved_ids if cc_id in st.session_state.modified_ids
     }
 
     st.subheader(f"Modified entries ({len(review_ids)})")
@@ -1384,7 +1523,9 @@ def render_save_panel(current_cach_cuc: dict) -> None:
             args=("saved_entries_dropdown",),
         )
 
-    allow_invalid = st.checkbox("Allow saving entries that still have validation errors", value=False)
+    allow_invalid = st.checkbox(
+        "Allow saving entries that still have validation errors", value=False
+    )
 
     selected_id = st.session_state.selected_id
 
@@ -1397,7 +1538,9 @@ def render_save_panel(current_cach_cuc: dict) -> None:
     if save_selected:
         errors = validation_errors(current_cach_cuc)
         if errors and not allow_invalid:
-            st.error("Selected entry has validation errors. Fix it or enable invalid saves.")
+            st.error(
+                "Selected entry has validation errors. Fix it or enable invalid saves."
+            )
         else:
             upsert_entries_to_export(export_path, [current_cach_cuc])
             saved_id = mark_entry_saved_clean(selected_id, current_cach_cuc)
@@ -1411,11 +1554,18 @@ def render_save_panel(current_cach_cuc: dict) -> None:
         if not memory_modified_ids:
             st.info("No modified entries to save.")
             return
-        entries = [entry_state_to_cach_cuc(st.session_state.entries[cc_id]) for cc_id in memory_modified_ids]
+        entries = [
+            entry_state_to_cach_cuc(st.session_state.entries[cc_id])
+            for cc_id in memory_modified_ids
+        ]
         errors_by_id = {entry["id"]: validation_errors(entry) for entry in entries}
-        errors_by_id = {cc_id: errors for cc_id, errors in errors_by_id.items() if errors}
+        errors_by_id = {
+            cc_id: errors for cc_id, errors in errors_by_id.items() if errors
+        }
         if errors_by_id and not allow_invalid:
-            st.error("Some modified entries have validation errors. Fix them or enable invalid saves.")
+            st.error(
+                "Some modified entries have validation errors. Fix them or enable invalid saves."
+            )
             with st.expander("Validation errors", expanded=True):
                 st.json(errors_by_id)
         else:
@@ -1446,13 +1596,33 @@ def main() -> None:
     st.subheader("Basic info")
     c1, c2 = st.columns(2)
     with c1:
-        cc_id = st.text_input("id", value=entry.get("id", ""), key=f"{selected_id}_cc_id")
-        cc_name = st.text_input("name", value=entry.get("name", ""), key=f"{selected_id}_cc_name")
+        cc_id = st.text_input(
+            "id", value=entry.get("id", ""), key=f"{selected_id}_cc_id"
+        )
+        cc_name = st.text_input(
+            "name", value=entry.get("name", ""), key=f"{selected_id}_cc_name"
+        )
     with c2:
-        cc_page = st.number_input("page", min_value=0, step=1, value=int(entry.get("page") or 0), key=f"{selected_id}_cc_page")
-        cc_priority = st.number_input("priority", min_value=0, step=1, value=int(entry.get("priority") or 0), key=f"{selected_id}_cc_priority")
-    cc_meaning = st.text_area("meaning", value=entry.get("meaning", ""), key=f"{selected_id}_cc_meaning")
-    cc_evidence = st.text_area("evidence", value=entry.get("evidence") or "", key=f"{selected_id}_cc_evidence")
+        cc_page = st.number_input(
+            "page",
+            min_value=0,
+            step=1,
+            value=int(entry.get("page") or 0),
+            key=f"{selected_id}_cc_page",
+        )
+        cc_priority = st.number_input(
+            "priority",
+            min_value=0,
+            step=1,
+            value=int(entry.get("priority") or 0),
+            key=f"{selected_id}_cc_priority",
+        )
+    cc_meaning = st.text_area(
+        "meaning", value=entry.get("meaning", ""), key=f"{selected_id}_cc_meaning"
+    )
+    cc_evidence = st.text_area(
+        "evidence", value=entry.get("evidence") or "", key=f"{selected_id}_cc_evidence"
+    )
 
     entry["id"] = cc_id
     entry["name"] = cc_name
@@ -1468,11 +1638,15 @@ def main() -> None:
 
     incompatible_conditions = collect_incompatible_conditions(entry["root"])
     if incompatible_conditions:
-        st.warning(f"{len(incompatible_conditions)} incompatible condition(s) need manual migration.")
+        st.warning(
+            f"{len(incompatible_conditions)} incompatible condition(s) need manual migration."
+        )
         with st.expander("Incompatible condition YAML", expanded=True):
             st.text_area(
                 "Current incompatible syntax",
-                value=yaml.safe_dump(incompatible_conditions, allow_unicode=True, sort_keys=False),
+                value=yaml.safe_dump(
+                    incompatible_conditions, allow_unicode=True, sort_keys=False
+                ),
                 height=220,
                 disabled=True,
                 key=f"{selected_id}_incompatible_conditions",
@@ -1537,7 +1711,9 @@ def main() -> None:
     can_skip_remediated = is_review_only_remediation(selected_id, cach_cuc)
     action_cols = st.columns([1, 1, 1, 3])
     with action_cols[0]:
-        if st.button("Discard edits for current entry", disabled=not can_discard_to_original):
+        if st.button(
+            "Discard edits for current entry", disabled=not can_discard_to_original
+        ):
             reset_form()
             st.rerun()
     with action_cols[1]:
