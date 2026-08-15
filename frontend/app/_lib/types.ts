@@ -73,7 +73,52 @@ export interface ChatMessage {
   streaming?: boolean;
 }
 
-export type OverlayKind = "daiVan" | "lichSu" | null;
+export type OverlayKind = "daiVan" | "lichSu" | "strengthWeakness" | null;
+
+export type StrengthWeaknessDimension =
+  | "analysis_reasoning"
+  | "learning_absorption"
+  | "foresight_preparedness"
+  | "decision_making"
+  | "action_execution"
+  | "structuring_organization"
+  | "expression_persuasion"
+  | "adaptability"
+  | "creativity_new_approaches"
+  | "collaboration_coordination"
+  | "leadership_mobilization";
+
+export type StrengthWeaknessLevel =
+  | "nearly_absent"
+  | "very_weak"
+  | "weak"
+  | "improvable"
+  | "normal"
+  | "above_normal"
+  | "good"
+  | "very_good"
+  | "excellent";
+
+export type StrengthWeaknessBasis =
+  | "supported"
+  | "insufficient_evidence"
+  | "balanced_conflict";
+
+export interface StrengthWeaknessExplanation {
+  dimension: StrengthWeaknessDimension;
+  level: StrengthWeaknessLevel;
+  summary: string;
+  reasoning: string;
+  tradeoff: string | null;
+  potential: string | null;
+}
+
+export interface StrengthWeaknessAssessment {
+  scores: Record<StrengthWeaknessDimension, StrengthWeaknessLevel>;
+  score_bases: Record<StrengthWeaknessDimension, StrengthWeaknessBasis>;
+  overview: string;
+  notable_dimensions: StrengthWeaknessExplanation[];
+}
 
 export interface ChatToolCall {
   id: string | null;

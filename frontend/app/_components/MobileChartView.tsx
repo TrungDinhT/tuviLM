@@ -19,6 +19,7 @@ import { LichSuDrawer } from "./LichSuDrawer";
 import { useResponsiveSize } from "./useResponsiveSize";
 import { useIsMobile } from "./useIsMobile";
 import { DefaultPanels } from "./DefaultPanels";
+import { StrengthWeaknessPanel } from "./StrengthWeaknessPanel";
 
 const TIEU_VAN_POSITION = "Ngọ";
 
@@ -247,6 +248,13 @@ export function MobileChartView() {
         <div className="flex items-center gap-3">
           <button
             type="button"
+            className="text-[11px] text-[var(--color-crimson)] cursor-pointer bg-transparent border-0 p-0"
+            onClick={() => setOpenOverlay("strengthWeakness")}
+          >
+            ✦ Năng lực
+          </button>
+          <button
+            type="button"
             className="text-[11px] text-[var(--color-ink-2)] cursor-pointer bg-transparent border-0 p-0"
             onClick={() => setOpenOverlay("lichSu")}
           >
@@ -466,6 +474,13 @@ export function MobileChartView() {
           chartProfileId={stash.chartProfileId}
           currentSessionId={stash.sessionId}
           onSessionChange={onSessionChange}
+          onClose={() => setOpenOverlay(null)}
+        />
+      )}
+      {openOverlay === "strengthWeakness" && (
+        <StrengthWeaknessPanel
+          ownerId={stash.ownerId}
+          sessionId={stash.sessionId}
           onClose={() => setOpenOverlay(null)}
         />
       )}

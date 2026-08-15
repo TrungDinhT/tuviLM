@@ -21,6 +21,7 @@ import { RightRail } from "./RightRail";
 import { DaiVanModal } from "./DaiVanModal";
 import { LichSuDrawer } from "./LichSuDrawer";
 import { useResponsiveSize } from "./useResponsiveSize";
+import { StrengthWeaknessPanel } from "./StrengthWeaknessPanel";
 
 // 2026 = Bính Ngọ → tiểu vận badge sits on cung at địa chi "Ngọ"
 const TIEU_VAN_POSITION = "Ngọ";
@@ -247,7 +248,12 @@ export function ChartView() {
             <span className="text-[var(--color-ink-4)]"></span>
           </>
         }
-        rightActions={<TopBarMenu onOpenLichSu={() => setOpenOverlay("lichSu")} />}
+        rightActions={
+          <TopBarMenu
+            onOpenLichSu={() => setOpenOverlay("lichSu")}
+            onOpenStrengthWeakness={() => setOpenOverlay("strengthWeakness")}
+          />
+        }
       />
 
       <div className="flex-1 grid grid-cols-1 xl:grid-cols-[720px_1fr_320px] gap-6 xl:gap-8 px-4 sm:px-6 xl:px-9 py-5 xl:py-7 min-h-0">
@@ -285,6 +291,13 @@ export function ChartView() {
           chartProfileId={stash.chartProfileId}
           currentSessionId={stash.sessionId}
           onSessionChange={onSessionChange}
+          onClose={() => setOpenOverlay(null)}
+        />
+      )}
+      {openOverlay === "strengthWeakness" && (
+        <StrengthWeaknessPanel
+          ownerId={stash.ownerId}
+          sessionId={stash.sessionId}
           onClose={() => setOpenOverlay(null)}
         />
       )}
