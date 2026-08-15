@@ -51,7 +51,13 @@ GROUPS = [
     "cat_tinh",
     "tu_hoa",
     "tam_hoa",
+    "cat_tinh_tam_hoa",
+    "cat_tinh_tam_hoa_tam_minh",
+    "tu_linh",
+    "tam_minh",
     "xuong_khuc_khoa_tue_tau",
+    "khong_kiep_hao_ky_tue",
+    "tu_phu_xuong_khuc_khoi_viet",
 ]
 BRIGHTNESS = list(get_args(Brightness))
 GENDERS = list(get_args(Gender))
