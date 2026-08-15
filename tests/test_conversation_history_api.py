@@ -42,6 +42,14 @@ from api.chat.storage.mappers import chart_profile_from_document
 from api.chat.storage.store import MongoConversationHistoryStore
 from api.main import ApiState, app
 from src.agent.deps import TuviAgentDeps
+from src.agent.workflow.strength_weakness import (
+    StrengthWeaknessAssessment,
+    StrengthWeaknessBases,
+    StrengthWeaknessBasis,
+    StrengthWeaknessDimension,
+    StrengthWeaknessLevel,
+    StrengthWeaknessScores,
+)
 
 
 pytestmark = pytest.mark.anyio
@@ -307,6 +315,66 @@ async def test_delete_session_route_returns_no_content(
 
     assert delete_response.status_code == 204
     assert fake_store.deleted_session_ids == [session.id]
+
+
+async def test_strength_weakness_route_runs_structured_workflow_for_session(
+    api_client,
+    fake_store,
+) -> None:
+    expected = StrengthWeaknessAssessment(
+        scores=StrengthWeaknessScores(
+            **{
+                dimension.value: StrengthWeaknessLevel.NORMAL
+                for dimension in StrengthWeaknessDimension
+            }
+        ),
+        score_bases=StrengthWeaknessBases(
+            **{
+                dimension.value: StrengthWeaknessBasis.INSUFFICIENT_EVIDENCE
+                for dimension in StrengthWeaknessDimension
+            }
+        ),
+        overview="Các năng lực hiện ở vùng cân bằng.",
+    )
+
+    class FakeStrengthWeaknessAgent:
+        async def run(self, prompt, *, deps, message_history=None, **kwargs):
+            self.prompt = prompt
+            self.deps = deps
+            self.message_history = message_history
+            return type("Result", (), {"output": expected})()
+
+    fake_agent = FakeStrengthWeaknessAgent()
+    app.state.api_state = ApiState(
+        agent_deps=TuviAgentDeps(
+            strength_weakness_agent=fake_agent,
+            book_root="",
+        ),
+        conversation_history_store=fake_store,
+    )
+    profile = await _create_profile(fake_store)
+    session = fake_store.add_session(
+        profile.id,
+        messages=[
+            _chat_message(
+                role=ChatRole.USER,
+                content="Câu hỏi trước.",
+                status=ChatMessageStatus.CONFIRMED,
+            )
+        ],
+    )
+
+    response = await api_client.post(
+        f"/api/v1/sessions/{session.id}/strength-weakness",
+        headers={"X-Anonymous-Owner-Id": "anon_owner"},
+        json={"content": "Đánh giá năng lực của tôi."},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == expected.model_dump(mode="json")
+    assert fake_agent.prompt == "Đánh giá năng lực của tôi."
+    assert fake_agent.deps.la_so is not None
+    assert len(fake_agent.message_history) == 1
 
 
 async def test_delete_chart_profile_route_returns_no_content(
@@ -729,8 +797,13 @@ async def test_session_chat_stream_default_runner_reconstructs_agent_context(
             return FakeStream()
 
     fake_agent = FakeAgent()
+    strength_weakness_agent = object()
     app.state.api_state = ApiState(
-        agent_deps=TuviAgentDeps(agent=fake_agent, book_root=""),
+        agent_deps=TuviAgentDeps(
+            agent=fake_agent,
+            strength_weakness_agent=strength_weakness_agent,
+            book_root="",
+        ),
         conversation_history_store=fake_store,
     )
     profile = await _create_profile(fake_store)
@@ -764,6 +837,7 @@ async def test_session_chat_stream_default_runner_reconstructs_agent_context(
     assert fake_agent.deps.la_so is not None
     assert len(fake_agent.message_history) == 2
     assert fake_agent.deps.message_history == fake_agent.message_history
+    assert fake_agent.deps.strength_weakness_agent is strength_weakness_agent
     assert '"type": "text", "delta": "New answer."' in response.text
 
 
