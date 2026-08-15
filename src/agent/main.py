@@ -6,6 +6,9 @@ from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
 from src.agent.workflow.personality.agent import run_tinh_cach_workflow
+from src.agent.workflow.strength_weakness.agent import (
+    run_strength_weakness_workflow,
+)
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
@@ -111,6 +114,7 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_tinh_cach_b3_b4_context,
             get_cung_analyze_skill,
             run_tinh_cach_workflow,
+            run_strength_weakness_workflow,
             read_book_tuvi_tan_bien,
             get_role_instruction,
         ],

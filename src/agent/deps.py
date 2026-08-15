@@ -9,7 +9,6 @@ from pydantic_ai.messages import ModelMessage
 from src.agent.book_index import BookIndex
 from src.refactored.la_so import LaSo
 
-
 DEFAULT_BOOK_ROOT = (
     Path(__file__).resolve().parents[2] / "data" / "tuvitanbien_chunking"
 )
@@ -19,6 +18,7 @@ DEFAULT_BOOK_ROOT = (
 class TuviAgentDeps:
     agent: Agent | None = None
     personality_agent: Agent | None = None
+    strength_weakness_agent: Agent | None = None
     la_so: LaSo | None = None
     book: BookIndex | None = None
     book_root: Path = DEFAULT_BOOK_ROOT
@@ -38,6 +38,11 @@ class TuviAgentDeps:
         if self.personality_agent is None:
             raise ModelRetry("Agent luận tính cách chưa được gán vào deps.")
         return self.personality_agent
+
+    def require_strength_weakness_agent(self) -> Agent:
+        if self.strength_weakness_agent is None:
+            raise ModelRetry("Agent điểm mạnh/điểm yếu chưa được gán vào deps.")
+        return self.strength_weakness_agent
 
     def require_book(self) -> BookIndex:
         if self.book is None:
