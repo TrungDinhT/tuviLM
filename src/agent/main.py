@@ -6,24 +6,25 @@ from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
 from src.agent.workflow.personality.agent import run_tinh_cach_workflow
-from .tool import (
-    get_cung_by_position,
-    get_cung_by_role,
-    get_list_cach_cuc,
-    get_phu_tinh_tam_phuong_tu_chinh,
-    get_role_instruction,
-    get_tam_hop,
-    get_trang_sinh,
-    get_tinh_cach_b3_b4_context,
-    get_vong_thai_tue,
-    get_xung_chieu,
-    get_star_description,
-    get_star_role_interaction,
-    get_laso_foundation,
-)
+
 from .skills import (
     get_cung_analyze_skill,
     read_book_tuvi_tan_bien,
+)
+from .tool import (
+    get_cung_by_position,
+    get_cung_by_role,
+    get_laso_foundation,
+    get_list_cach_cuc,
+    get_phu_tinh_tam_phuong_tu_chinh,
+    get_role_instruction,
+    get_star_description,
+    get_star_role_interaction,
+    get_tam_hop,
+    get_tinh_cach_b3_b4_context,
+    get_trang_sinh,
+    get_vong_thai_tue,
+    get_xung_chieu,
 )
 
 DEFAULT_MODEL = "gpt-4.1-mini"
@@ -57,12 +58,6 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 2. Nếu chưa đủ dữ liệu để kết luận, phải nói rõ phần nào còn thiếu.
 3. Không lấy toàn bộ tinh bàn nếu câu hỏi chỉ nhắm vào một chủ đề/cung cụ thể.
 4. "Tiên minh cách cục, thứ khán chúng tinh": luôn xác định cách cục trước, luận sao chi tiết sau. Dùng get_list_cach_cuc để lấy cách cục đã match sẵn (engine deterministic, không cần tự suy đoán tổ hợp sao). Kết quả get_list_cach_cuc đã được sắp xếp theo priority giảm dần; ưu tiên dùng cách cục priority cao làm khung luận chính, các cách cục priority thấp hơn chỉ bổ trợ.
-5. Trước khi luận tổng quan hoặc luận Cung Mệnh, luôn gọi get_laso_foundation
-để nắm gốc lá số: Can Chi năm sinh, Âm/Dương Nam/Nữ, Bản Mệnh, Cục,
-quan hệ Mệnh-Cục, chiều vận và Đại hạn.
-6. Khi luận tư cách, khí chất nhập thế, Cung Mệnh, hoặc khi người dùng hỏi
-về vòng Thái Tuế, phải gọi get_vong_thai_tue để xác định sao vòng Thái Tuế
-thủ Mệnh và nhóm tư cách tương ứng.
 
 
 ## Phân tích cung

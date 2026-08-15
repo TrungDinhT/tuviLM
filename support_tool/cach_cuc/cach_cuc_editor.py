@@ -6,8 +6,8 @@ Run with:
 
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import sys
 import uuid
 from copy import deepcopy
