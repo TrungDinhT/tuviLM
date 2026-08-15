@@ -6,7 +6,6 @@ from pydantic_ai import RunContext
 
 from src.agent.deps import TuviAgentDeps
 from src.agent.tool.ban_menh.ban_menh_meaning import (
-    build_ban_menh_meaning,
     build_menh_cuc_lens,
 )
 from src.refactored.la_so import LaSo
@@ -47,7 +46,6 @@ def build_laso_foundation_payload(la_so: LaSo) -> dict[str, object]:
     prior = la_so.prior
     context = la_so.natal_context
     relation = la_so.menh_cuc_relation()
-    ban_menh_meaning = build_ban_menh_meaning(la_so.ban_menh.id)
     menh_cuc_lens = build_menh_cuc_lens(
         relation.relation_type,
     )
@@ -65,7 +63,6 @@ def build_laso_foundation_payload(la_so: LaSo) -> dict[str, object]:
             "id": la_so.ban_menh.id,
             "name": la_so.ban_menh.name,
             "ngu_hanh": la_so.ban_menh.ngu_hanh.value,
-            "meaning": ban_menh_meaning,
         },
         "cuc": {
             "name": context.cuc.name,

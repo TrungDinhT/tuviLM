@@ -1,4 +1,3 @@
-from src.agent.tool.ban_menh.ban_menh_meaning import BAN_MENH_MEANINGS
 from src.agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
 from src.refactored.la_so import LaSo
 from src.refactored.model.elementary import DiaChi
@@ -36,9 +35,6 @@ def test_laso_foundation_projects_root_chart_factors():
 
     assert foundation["ban_menh"]["name"] == "Giản Hạ Thủy"
     assert foundation["ban_menh"]["ngu_hanh"] == "Thủy"
-    assert foundation["ban_menh"]["meaning"]["symbol"] == "Nước khe suối"
-    assert "khó dò" in foundation["ban_menh"]["meaning"]["keywords"]
-    assert "sources" not in foundation["ban_menh"]["meaning"]
 
     assert foundation["cuc"]["name"] == "Hỏa Lục cục"
     assert foundation["cuc"]["ngu_hanh"] == "Hỏa"
@@ -68,26 +64,3 @@ def test_laso_foundation_reports_both_am_duong_polarity_relations():
     assert relation["relation"] == "thuận lý"
     assert "Hòa hợp" in relation["environment_alignment"]
     assert "một dòng mạch lạc" in relation["thinking_consistency"]
-
-
-def test_laso_foundation_has_ban_menh_meanings_without_source_metadata():
-    assert len(BAN_MENH_MEANINGS) == 30
-
-    foundation = build_laso_foundation_payload(
-        LaSo.from_prior(
-            LaSoPrior(
-                hour=DiaChi.MEO,
-                date=10,
-                month=11,
-                year=1998,
-                gender=Gender.MALE,
-            )
-        )
-    )
-
-    ban_menh_meaning = foundation["ban_menh"]["meaning"]
-
-    assert foundation["ban_menh"]["name"] == "Thành Đầu Thổ"
-    assert "phòng thủ" in ban_menh_meaning["keywords"]
-    assert "sources" not in ban_menh_meaning
-    assert foundation["menh_cuc_relation"]["relation"] == "Cục khắc Mệnh"

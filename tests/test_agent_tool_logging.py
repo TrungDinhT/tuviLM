@@ -62,7 +62,6 @@ def test_agent_tools_log_start_and_compact_completion_metadata(caplog):
         "Đã lấy cung theo vai trò",
         "Đã lấy cung tam hợp",
         "Đã lấy cung xung chiếu",
-        "Đã lấy danh sách cách cục",
         "Đã gom phụ tinh theo nhóm",
         "Đã lấy Tràng Sinh",
         "Đã lấy context chính tinh tính cách",
