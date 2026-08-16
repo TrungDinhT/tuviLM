@@ -1,0 +1,481 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   Design tokens — the only file in this project allowed to contain a raw
+   colour value. Every value below is transcribed from the `:root` blocks of
+   docs/design/tu-vi-app-responsible.html.
+
+   Names live in Tailwind v4 namespaces so they generate utilities:
+   --color-* -> bg-/text-/border-, --radius-* -> rounded-, --font-* -> font-.
+   ========================================================================= */
+@theme {
+  /* Fixed twilight shell — never themed, never black. */
+  --color-bg-0: #1a1033;
+  --color-bg-1: #2e1a4a;
+  --color-bg-2: #3b2063;
+  --color-page: #120a24;
+
+  --color-ink: #f3effa;
+  --color-muted: #b9aed1;
+  --color-coral: #ff9e7d;
+  --color-fire: #ff5d6c;
+
+  --color-glass: rgba(255, 255, 255, 0.06);
+  --color-glass-line: rgba(243, 239, 250, 0.14);
+
+  /* Runtime accent. The literals here are only the pre-chart default;
+     ThemeProvider overwrites --accent/--accent-2/--accent-glow on :root. */
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-glow: var(--accent-glow);
+
+  --radius-card: 26px;
+
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;
+}
+
+/* ============================================================================
+   Runtime accent defaults + layout variables.
+
+   Kept out of @theme deliberately: these are not utility-generating tokens,
+   they are values that other rules compute against, and two of them change
+   per breakpoint tier.
+   ========================================================================= */
+:root {
+  color-scheme: dark;
+
+  /* --- Chính tinh palette -------------------------------------------------
+     Eight of the fourteen chính tinh carry a colour in the design. The other
+     six have portrait art but no assigned hue, so lib/theme.ts routes them to
+     the neutral pair rather than inventing one.
+
+     These stay CSS custom properties on purpose: lib/theme.ts resolves an
+     outcome to `var(--star-*)` references, never to a raw colour, which is
+     what keeps every literal in this file. */
+  --star-tuvi: #b98cff;
+  --star-tuvi-light: #e3d2ff;
+  --star-tuvi-glow: rgba(185, 140, 255, 0.5);
+
+  --star-thienphu: #ead9a0;
+  --star-thienphu-light: #f7efcf;
+  --star-thienphu-glow: rgba(234, 217, 160, 0.5);
+
+  --star-thatsat: #ff5d6c;
+  --star-thatsat-light: #ffb0a6;
+  --star-thatsat-glow: rgba(255, 93, 108, 0.5);
+
+  --star-phaquan: #7da4ff;
+  --star-phaquan-light: #c3d6ff;
+  --star-phaquan-glow: rgba(125, 164, 255, 0.5);
+
+  --star-thamlang: #ff7ec6;
+  --star-thamlang-light: #ffc2e4;
+  --star-thamlang-glow: rgba(255, 126, 198, 0.5);
+
+  --star-thaiduong: #ffb44f;
+  --star-thaiduong-light: #ffd9a0;
+  --star-thaiduong-glow: rgba(255, 180, 79, 0.5);
+
+  --star-thaiam: #c9d6ff;
+  --star-thaiam-light: #eaf0ff;
+  --star-thaiam-glow: rgba(201, 214, 255, 0.5);
+
+  --star-vukhuc: #4f9de0;
+  --star-vukhuc-light: #b9e0ff;
+  --star-vukhuc-glow: rgba(79, 157, 224, 0.5);
+
+  /* Vô chính diệu, and the fallback for any star without a hue. */
+  --star-neutral: #b9aed1;
+  --star-neutral-light: #f3effa;
+  --star-neutral-glow: rgba(185, 174, 209, 0.45);
+
+  /* Pre-chart default accent (Kim). */
+  --accent-default: #ead9a0;
+  --accent-2-default: #f5f7fa;
+  --accent-glow-default: rgba(234, 217, 160, 0.55);
+
+  --accent: var(--accent-default);
+  --accent-2: var(--accent-2-default);
+  --accent-glow: var(--accent-glow-default);
+
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+
+  /* Phone: one readable column, centred on wider screens. */
+  --col: 480px;
+  --tabbar-h: calc(74px + var(--safe-b));
+  --topbar-h: 0px;
+  --rail: 250px;
+  --shell: 1200px;
+  --deck-h: clamp(300px, calc(100dvh - 318px), 560px);
+}
+
+/* Tablet — same product, wider column. Prototype authored this at 700px. */
+@media (min-width: 768px) {
+  :root {
+    --col: 900px;
+  }
+}
+
+/* Desktop — bottom tab bar becomes a left rail, a top bar appears.
+   Prototype authored this at 1080px; see AGENTS.md for the accepted drift. */
+@media (min-width: 1024px) {
+  :root {
+    --tabbar-h: 0px;
+    --topbar-h: 78px;
+  }
+}
+
+/* ============================================================================
+   Custom utilities.
+
+   Colour *maths* belongs here even when the colour itself is a variable set by
+   a component. A component supplies the scope (`--t-hue`), this file decides
+   what 40% of it mixed with the hairline looks like.
+   ========================================================================= */
+
+/** Surface tinted by whatever `--t-hue` the subtree sets. */
+@utility hue-surface {
+  border-color: color-mix(in srgb, var(--t-hue) 40%, var(--color-glass-line));
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--t-hue) 18%, transparent);
+}
+
+/** The accent gradient used by primary pills and highlighted surfaces. */
+@utility accent-gradient {
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
+  box-shadow: 0 14px 40px var(--accent-glow);
+}
+
+/**
+ * The frosted surface every card, sheet and bar is built from. A utility
+ * rather than a component: it is four declarations that never vary, and
+ * wrapping it would only stand between a caller and its other classes.
+ */
+@utility glass {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-line);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(16px);
+}
+
+/** Primary pill: the accent gradient plus its inner highlight. */
+@utility pill-primary {
+  color: var(--color-bg-0);
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
+  box-shadow:
+    0 14px 40px var(--accent-glow),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+/** Ghost pill: a quiet outline on the twilight. */
+@utility pill-ghost {
+  color: var(--color-ink);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-glass-line);
+}
+
+/** Overlay card: opaque enough to read against a scrolling page behind it. */
+@utility overlay-card {
+  background: linear-gradient(155deg, rgba(59, 32, 99, 0.97), rgba(26, 16, 51, 0.98));
+  border: 1px solid var(--accent-glow);
+  box-shadow:
+    0 24px 70px rgba(8, 4, 20, 0.72),
+    0 0 30px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+@utility overlay-scrim {
+  background: rgba(10, 5, 24, 0.72);
+  backdrop-filter: blur(7px);
+}
+
+@utility toast-surface {
+  background: rgba(20, 12, 40, 0.92);
+  border: 1px solid var(--accent-glow);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hide every scrollbar while keeping every region scrollable. Both syntaxes
+     are needed: scrollbar-width for Firefox and modern Chrome, the pseudo
+     element for Safari/WebKit. */
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  body {
+    min-height: 100dvh;
+    overflow-x: hidden;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--color-bg-0);
+  }
+}
+
+/* ============================================================================
+   Ambient cosmos.
+
+   Gradients and nebulae are static and server-rendered. The star elements are
+   seeded client-side after mount (Math.random during render is a guaranteed
+   hydration mismatch), so these rules describe elements that may not exist
+   for the first frame.
+   ========================================================================= */
+@layer components {
+  .cosmos {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(80% 55% at 50% 108%, rgba(255, 158, 125, 0.22), transparent 60%),
+      radial-gradient(120% 90% at 50% 0%, #3b2063 0%, #2e1a4a 45%, #160d2c 100%);
+  }
+
+  .neb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    animation: breathe 12s ease-in-out infinite;
+  }
+
+  .neb-a {
+    width: 60vmax;
+    height: 60vmax;
+    left: -10vmax;
+    top: -15vmax;
+    background: radial-gradient(circle, rgba(123, 79, 166, 0.6), transparent 60%);
+  }
+
+  .neb-b {
+    width: 50vmax;
+    height: 50vmax;
+    right: -12vmax;
+    bottom: -10vmax;
+    background: radial-gradient(circle, rgba(79, 157, 224, 0.35), transparent 60%);
+    animation-delay: -4s;
+  }
+
+  /* The twilight canvas behind the content column, fixed so it never scrolls
+     away. Same gradient family as .cosmos but keyed to the column width. */
+  .column-sky {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: var(--col);
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background:
+      radial-gradient(90% 60% at 50% 106%, rgba(255, 158, 125, 0.16), transparent 60%),
+      radial-gradient(120% 80% at 50% -5%, var(--color-bg-2), var(--color-bg-1) 46%, var(--color-bg-0) 100%);
+  }
+
+  /* Each star gets its own drift distance, period and phase from the seeding
+     effect, so the sky actually moves rather than blinking in place. `translate`
+     rather than `transform` keeps it clear of any other transform. */
+  .sky-star {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--color-ink);
+    animation:
+      twinkle var(--twinkle, 4s) ease-in-out infinite,
+      drift var(--drift, 44s) ease-in-out infinite alternate;
+  }
+
+  .sky-star-bright {
+    box-shadow: 0 0 6px rgba(243, 239, 250, 0.6);
+  }
+
+  /* Transform origin sits at the head of the streak (right), so the tail
+     trails behind it during flight. */
+  .shooting-star {
+    position: absolute;
+    left: var(--sx);
+    top: var(--sy);
+    width: var(--slen, 110px);
+    height: 1.6px;
+    border-radius: 2px;
+    pointer-events: none;
+    transform-origin: 100% 50%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--accent-2) 42%, transparent) 58%,
+      #fff9e8
+    );
+    filter: drop-shadow(0 0 7px var(--accent-glow));
+    animation: shoot var(--sdur, 1.4s) cubic-bezier(0.3, 0.55, 0.35, 1) forwards;
+  }
+}
+
+/* ============================================================================
+   Shell chrome.
+
+   Layout lives in Tailwind utilities on the components; only the bespoke paint
+   — gradients, blurs, hairlines — lives here, because it needs colour values.
+   ========================================================================= */
+@layer components {
+  /* Bottom tab bar: a footer band that fades up into the content.
+     The three chrome surfaces below are deliberately sheer — the backdrop
+     blur, not opacity, is what keeps their content legible, so the sky stays
+     visible through them. */
+  .nav-surface {
+    background: linear-gradient(
+      0deg,
+      rgba(18, 10, 36, 0.82),
+      rgba(18, 10, 36, 0.58) 70%,
+      transparent
+    );
+    backdrop-filter: blur(14px);
+  }
+
+  .topbar-surface {
+    border-bottom: 1px solid var(--color-glass-line);
+    background: linear-gradient(
+      180deg,
+      rgba(28, 17, 54, 0.78) 62%,
+      rgba(28, 17, 54, 0.58) 88%,
+      transparent
+    );
+    backdrop-filter: blur(22px) saturate(130%);
+  }
+
+  /* Sticky screen header. The gradient uses the *top* of the page gradient
+     (--color-bg-2) rather than a darker tone: the header is pinned at y=0 and
+     the column sky is fixed, so that spot is always bg-2. Matching it exactly
+     is what stops the band reading as a dark smear. */
+  .stickhead-surface {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-bg-2) 70%, transparent) 58%,
+      color-mix(in srgb, var(--color-bg-2) 38%, transparent) 82%,
+      transparent
+    );
+    backdrop-filter: blur(22px) saturate(135%);
+  }
+
+  /* At the desktop tier the band becomes a full-height rail. */
+  @media (width >= 64rem) {
+    .nav-surface {
+      border-right: 1px solid var(--color-glass-line);
+      background: linear-gradient(180deg, rgba(20, 12, 40, 0.74), rgba(14, 8, 30, 0.88));
+    }
+
+    /* The rail owns the left edge, so the column sky spans the whole viewport
+       and drops the panel treatment it wears at narrower widths. */
+    .column-sky {
+      max-width: none;
+      box-shadow: none;
+    }
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes drift {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: var(--dx, 0px) var(--dy, 0px);
+  }
+}
+
+@keyframes shoot {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--sang, 22deg)) translate3d(0, 0, 0) scaleX(0.2);
+  }
+  14% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--sang, 22deg)) translate3d(var(--sdist, 340px), 0, 0) scaleX(1);
+  }
+}
+
+/* From the `sm` tier the column reads as a panel floating on the backdrop, so
+   it gains an edge highlight and a drop shadow. Nothing else changes here. */
+@media (width >= 40rem) {
+  .column-sky {
+    box-shadow:
+      0 0 0 1px rgba(243, 239, 250, 0.07),
+      0 30px 90px rgba(8, 4, 20, 0.55);
+  }
+}
+
+/* On phones the column is the whole page, so drop the desktop ambience.
+   Prototype cut this at 559px; Tailwind's sm tier puts it at 640px. */
+@media (width < 40rem) {
+  .neb {
+    display: none;
+  }
+
+  .cosmos .sky-star {
+    opacity: 0.35;
+  }
+}
+
+/* One global answer to reduced motion, so no component has to remember. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.15s !important;
+    scroll-behavior: auto !important;
+  }
+}
