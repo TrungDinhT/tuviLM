@@ -37,8 +37,38 @@ export interface RequestOptions<T> {
   signal?: AbortSignal;
 }
 
+/**
+ * The base URL to call, given the configured one and the host the page is
+ * being served from (null on the server).
+ *
+ * Dev on a phone: the default base URL is `localhost:8000`, and on the phone
+ * `localhost` is the phone. The backend runs on the same machine as `next
+ * dev`, so when the page arrives from a LAN address the API is at that address
+ * too — borrow the host rather than making everyone hardcode an IP that DHCP
+ * will change. Only a localhost base is ever rewritten, so a configured
+ * backend (any deployment) is left exactly as given.
+ *
+ * The backend must be listening on that interface for this to help:
+ * `uv run uvicorn api.main:app --reload --host 0.0.0.0`.
+ */
+export function resolveBaseUrl(configured: string, pageHostname: string | null): string {
+  const base = configured.replace(/\/$/, "");
+  if (pageHostname === null) return base;
+
+  const parsed = new URL(base);
+  const isLocal = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+  if (!isLocal || pageHostname === parsed.hostname) return base;
+
+  parsed.hostname = pageHostname;
+  return parsed.toString().replace(/\/$/, "");
+}
+
 function url(path: string): string {
-  return `${env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, "")}${path}`;
+  const pageHostname =
+    process.env.NODE_ENV === "development" && typeof window !== "undefined"
+      ? window.location.hostname
+      : null;
+  return `${resolveBaseUrl(env.NEXT_PUBLIC_API_BASE_URL, pageHostname)}${path}`;
 }
 
 /** A fresh key for one logical operation. Reuse it across retries. */

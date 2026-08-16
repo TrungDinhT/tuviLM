@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { isApiError } from "@/lib/http/errors";
 
 import fixture from "./__fixtures__/build-laso.json";
-import { newIdempotencyKey, request } from "./client";
+import { newIdempotencyKey, request, resolveBaseUrl } from "./client";
 import { OWNER_ID_KEY, resetOwnerIdCache } from "./owner";
 import { buildLasoResponseSchema } from "./schemas";
 
@@ -175,5 +175,31 @@ describe("headers", () => {
     await request("/api/v1/laso/build", { schema: buildLasoResponseSchema, withOwner: true });
 
     expect(localStorage.getItem(OWNER_ID_KEY)).toBe("anon_second");
+  });
+});
+
+describe("resolveBaseUrl", () => {
+  it("leaves the configured URL alone on the server", () => {
+    expect(resolveBaseUrl("http://localhost:8000", null)).toBe("http://localhost:8000");
+  });
+
+  it("leaves it alone when the page is on the same host", () => {
+    expect(resolveBaseUrl("http://localhost:8000", "localhost")).toBe("http://localhost:8000");
+  });
+
+  // Dev on a phone: the page came from the LAN, so localhost would be the phone.
+  it("borrows the page host when the base points at localhost", () => {
+    expect(resolveBaseUrl("http://localhost:8000", "192.168.1.23")).toBe(
+      "http://192.168.1.23:8000",
+    );
+    expect(resolveBaseUrl("http://127.0.0.1:8000/", "192.168.1.23")).toBe(
+      "http://192.168.1.23:8000",
+    );
+  });
+
+  it("never rewrites a real backend URL", () => {
+    expect(resolveBaseUrl("https://api.tuvi.example", "192.168.1.23")).toBe(
+      "https://api.tuvi.example",
+    );
   });
 });
