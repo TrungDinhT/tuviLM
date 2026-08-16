@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -9,6 +10,19 @@ from api.chat.models import BirthInfo, ChatSession, ChatSessionSummary
 
 class BuildLasoRequest(BirthInfo):
     pass
+
+
+class PreviewLasoRequest(BirthInfo):
+    # Cung Mệnh's chính tinh do not depend on gender, so the preview accepts
+    # birth data before the user has picked one. The value is ignored.
+    gender: Literal["M", "F"] | None = None
+
+
+class PreviewLasoResponse(BaseModel):
+    # Clean star names — no trạng thái suffix like "(Miếu)" — so clients can
+    # key content and theming off them directly. Empty for vô chính diệu.
+    chinh_tinh: list[str]
+    menh_position: str
 
 
 class BuildSaoLuuRequest(BaseModel):
