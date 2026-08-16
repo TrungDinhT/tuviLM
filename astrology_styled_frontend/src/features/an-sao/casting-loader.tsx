@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from "react";
 
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { cn } from "@/lib/utils";
+
+import { CRANE_LOADING_SRC } from "./loading-video";
+
 const LOAD_SUBS = [
   "Nghê Sao đang đọc vị trí các vì tinh tú…",
   "Đang xếp 12 cung mệnh của bạn…",
@@ -55,6 +60,12 @@ function Mascot({ size }: { size: number }) {
  */
 export function CastingLoader() {
   const [subIndex, setSubIndex] = useState(0);
+  const [craneFailed, setCraneFailed] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
+  // The crane is decoration over the orbit rings, which are the baseline: a
+  // missing file, an unplayable codec or a reduced-motion preference all fall
+  // back to the drawn mascot rather than to a hole.
+  const showCrane = !craneFailed && !reducedMotion;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -70,7 +81,20 @@ export function CastingLoader() {
         <div className="orbit-ring absolute inset-[22px] animate-[spin_14s_linear_infinite] rounded-full border-dashed" />
         <div className="orbit-planet absolute top-[-4px] left-1/2 ml-[-6px] h-[12px] w-[12px] animate-[spin_6s_linear_infinite] rounded-full" />
         <div className="absolute inset-0 grid place-items-center">
-          <Mascot size={96} />
+          {showCrane ? (
+            <video
+              src={CRANE_LOADING_SRC}
+              autoPlay
+              loop
+              muted
+              playsInline
+              aria-hidden="true"
+              onError={() => setCraneFailed(true)}
+              className="h-[172px] w-[172px] [mix-blend-mode:screen]"
+            />
+          ) : (
+            <Mascot size={96} />
+          )}
         </div>
       </div>
       <div className="text-center">
@@ -82,7 +106,24 @@ export function CastingLoader() {
             <span>.</span>
           </span>
         </div>
-        <p className="mt-[10px] text-[14px] font-light text-muted">{LOAD_SUBS[subIndex]}</p>
+        {/* Every line is stacked in one grid cell, so the block is always as
+            tall as the longest of them. A one-line line following a two-line
+            one used to shorten the column and drag the crane up with it. */}
+        <div className="mt-[10px] grid">
+          {LOAD_SUBS.map((sub, index) => (
+            <p
+              key={sub}
+              aria-hidden={index !== subIndex}
+              className={cn(
+                "col-start-1 row-start-1 text-[14px] font-light text-muted",
+                "transition-opacity duration-300",
+                index === subIndex ? "opacity-100" : "opacity-0",
+              )}
+            >
+              {sub}
+            </p>
+          ))}
+        </div>
       </div>
     </div>
   );
