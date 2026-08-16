@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 import logging
 
 from pydantic_ai import RunContext
 
+from src.agent.deps import TuviAgentDeps
 from src.agent.tool.cach_cuc.matcher import get_cach_cuc_tool_results
 from src.agent.tool.cach_cuc.models import CachCucToolResult, Role, SourceKind
-from src.agent.deps import TuviAgentDeps
 
 _logger = logging.getLogger(__name__)
 

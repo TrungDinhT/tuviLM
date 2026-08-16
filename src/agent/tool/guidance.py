@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from pydantic_ai import ModelRetry
 
 from src.agent.prompt.skill_analyze_cung import (
@@ -16,7 +18,9 @@ from src.agent.prompt.skill_analyze_cung import (
     CUNG_THIEN_DI_INSTRUCTION,
     CUNG_TU_TUC_INSTRUCTION,
 )
-from src.refactored.components.definitions.cung_role import Role
+
+
+_logger = logging.getLogger(__name__)
 
 
 _ROLE_INSTRUCTION_MAP: dict[str, str] = {
@@ -35,12 +39,19 @@ _ROLE_INSTRUCTION_MAP: dict[str, str] = {
 }
 
 
-def get_role_instruction(role: Role) -> str:
-    """Lấy hướng dẫn phân tích cho một cung dựa trên vai trò của nó."""
-    instruction = _ROLE_INSTRUCTION_MAP.get(role.value)
+def get_role_instruction(role: str) -> str:
+    """Lấy hướng dẫn phân tích cho một cung dựa trên vai trò của nó.
+
+    role phải là một trong các giá trị sau: menh, quan_loc, tai_bach, phu_mau, huynh_de, no_boc, phu_the, phuc_duc, thien_di, tat_ach, tu_tuc, dien_trach.
+    """
+    _logger.info("Lấy hướng dẫn luận cung: role=%s", role)
+    instruction = _ROLE_INSTRUCTION_MAP.get(role)
     if instruction is None:
         raise ModelRetry(
-            f"Vai trò '{role.value}' không hợp lệ. "
+            f"Vai trò '{role}' không hợp lệ. "
             f"Các vai trò hợp lệ là: {', '.join(_ROLE_INSTRUCTION_MAP.keys())}."
         )
+    _logger.info(
+        "Đã lấy hướng dẫn luận cung: role=%s, chars=%d", role, len(instruction)
+    )
     return instruction

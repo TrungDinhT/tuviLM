@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from pydantic_ai import Agent, ModelRetry
+from pydantic_ai.messages import ModelMessage
 
 from src.agent.book_index import BookIndex
 from src.refactored.la_so import LaSo
@@ -17,9 +18,11 @@ DEFAULT_BOOK_ROOT = (
 @dataclass(slots=True)
 class TuviAgentDeps:
     agent: Agent | None = None
+    personality_agent: Agent | None = None
     la_so: LaSo | None = None
     book: BookIndex | None = None
     book_root: Path = DEFAULT_BOOK_ROOT
+    message_history: list[ModelMessage] = field(default_factory=list)
 
     def require_agent(self) -> Agent:
         if self.agent is None:
@@ -30,6 +33,11 @@ class TuviAgentDeps:
         if self.la_so is None:
             raise ModelRetry("LaSo chưa được gán vào deps.")
         return self.la_so
+
+    def require_personality_agent(self) -> Agent:
+        if self.personality_agent is None:
+            raise ModelRetry("Agent luận tính cách chưa được gán vào deps.")
+        return self.personality_agent
 
     def require_book(self) -> BookIndex:
         if self.book is None:

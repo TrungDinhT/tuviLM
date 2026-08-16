@@ -56,7 +56,11 @@ def get_cung_by_position(ctx: RunContext[TuviAgentDeps], position: DiaChi) -> st
     """Lấy cung theo vị trí địa chi bằng mã DiaChi nội bộ."""
     _logger.info("Lấy cung theo vị trí: %s", position)
     la_so = get_laso(ctx)
-    return _format_cung_at(la_so, position)
+    result = _format_cung_at(la_so, position)
+    _logger.info(
+        "Đã lấy cung theo vị trí: position=%s, chars=%d", position, len(result)
+    )
+    return result
 
 
 def get_cung_by_role(ctx: RunContext[TuviAgentDeps], role: Role) -> str:
@@ -70,7 +74,14 @@ def get_cung_by_role(ctx: RunContext[TuviAgentDeps], role: Role) -> str:
     if position is None:
         raise ModelRetry(f"Không tìm thấy cung với vai trò '{role.value}'.")
 
-    return _format_cung_at(la_so, position)
+    result = _format_cung_at(la_so, position)
+    _logger.info(
+        "Đã lấy cung theo vai trò: role=%s, position=%s, chars=%d",
+        role,
+        position,
+        len(result),
+    )
+    return result
 
 
 def get_tam_hop(ctx: RunContext[TuviAgentDeps], position: DiaChi) -> str:
@@ -81,7 +92,14 @@ def get_tam_hop(ctx: RunContext[TuviAgentDeps], position: DiaChi) -> str:
         transform_tam_hop(position, CircleDirection.CW),
         transform_tam_hop(position, CircleDirection.CCW),
     )
-    return _format_related_cung_details(la_so, position, "tam hợp", tam_hop_positions)
+    result = _format_related_cung_details(la_so, position, "tam hợp", tam_hop_positions)
+    _logger.info(
+        "Đã lấy cung tam hợp: position=%s, related=%s, chars=%d",
+        position,
+        tam_hop_positions,
+        len(result),
+    )
+    return result
 
 
 def get_xung_chieu(ctx: RunContext[TuviAgentDeps], position: DiaChi) -> str:
@@ -89,9 +107,16 @@ def get_xung_chieu(ctx: RunContext[TuviAgentDeps], position: DiaChi) -> str:
     _logger.info("Lấy cung xung chiếu theo vị trí: %s", position)
     la_so = get_laso(ctx)
     xung_chieu_position = transform_xung_chieu(position)
-    return _format_related_cung_details(
+    result = _format_related_cung_details(
         la_so,
         position,
         "xung chiếu",
         (xung_chieu_position,),
     )
+    _logger.info(
+        "Đã lấy cung xung chiếu: position=%s, related=%s, chars=%d",
+        position,
+        xung_chieu_position,
+        len(result),
+    )
+    return result

@@ -1,21 +1,35 @@
 from __future__ import annotations
 
+import logging
+
 from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
+from src.agent.workflow.personality.agent import run_tinh_cach_workflow
+
+from .skills import (
+    get_cung_analyze_skill,
+    read_book_tuvi_tan_bien,
+)
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
+    get_laso_foundation,
     get_list_cach_cuc,
+    get_phu_tinh_tam_phuong_tu_chinh,
     get_role_instruction,
-    get_tam_hop,
-    get_xung_chieu,
     get_star_description,
-    get_star_role_interaction
+    get_star_role_interaction,
+    get_tam_hop,
+    get_tinh_cach_b3_b4_context,
+    get_trang_sinh,
+    get_vong_thai_tue,
+    get_xung_chieu,
 )
-from .skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
 
 DEFAULT_MODEL = "gpt-4.1-mini"
+
+_logger = logging.getLogger(__name__)
 
 TUVI_AGENT_INSTRUCTION = """
 Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của bạn là trả lời các câu hỏi liên quan đến lá số tử vi bao gồm :
@@ -25,7 +39,7 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 
 ## Kết cấu một lá số tử vi
 
-- Lá số tử vi được hình thành từ ngày tháng năm và giờ sinh của một người, được dùng để dự đoán tính cách, vận mệnh, sự nghiệp, tình duyên, sức khỏe, v.v. của người đó.
+- Lá số tử vi được hình thành từ ngày tháng năm và giờ sinh của một người, được dùng để dự đoán tính cách, cuộc đời, sự nghiệp, tình duyên, sức khỏe, v.v. của người đó.
 - Một lá số tử vi có 12 cung, mỗi cung đại diện cho một khía cạnh của đời người (tính cách, công danh, tài chính, hôn nhân, cha mẹ, con cái, sức khỏe, nhà cửa, quan hệ xã hội, phúc đức).
 - Cung trong lá số tử vi được sắp xếp theo vị trí, theo tên từ Tí Sử Dần đến Hợi.
 - Mỗi cung mang một vai trò nhất định bao gồm : Mệnh, Phụ Mẫu, Phúc Đức, Điền Trạch, Quan Lộc, Nô Bộc, Thiên Di, Tài Bạch, Tử Tức, Huynh Đệ, Thê Thiếp, Huynh Đệ.
@@ -58,10 +72,16 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 - Sau khi có thông tin, hãy tổng hợp, tưởng tượng và chọn lọc để trả lời, không liệt kê một cách máy móc thông tin trong sách.
 
 ## Tính cách
+- Khi người dùng hỏi luận tính cách, khí chất hoặc chân dung con người từ lá
+  số, luôn gọi run_tinh_cach_workflow và truyền nguyên văn yêu cầu của họ.
+- run_tinh_cach_workflow đã thu thập đầy đủ evidence và trả bài hoàn chỉnh.
+  Phải trả kết quả đó nguyên văn; không gọi lại các tool evidence và không luận
+  thêm.
 - Sử dụng giọng điềm đạm, rõ ràng, có chiều sâu.
 - Không phán chắc những điều tool không hỗ trợ.
 - Khi có những ý kiến trái chiều, cần xét đến độ ưu tiên : Chính tính > Tuần triệt > Tứ hóa > Phụ tinh > Tràng sinh > Xung chiếu > Tam hợp. Và luôn phải dựa trên vị trí của sao, chức vị của cung, sao đắc hay hãm để luận đoán.
 """
+
 
 def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
     return Agent(
@@ -69,27 +89,35 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
         deps_type=TuviAgentDeps,
         output_type=str,
         system_prompt=TUVI_AGENT_INSTRUCTION,
-        retries=2,
+        tool_retries=2,
+        output_retries=2,
         tools=[
+            get_laso_foundation,
+            get_vong_thai_tue,
             get_cung_by_position,
             get_cung_by_role,
             get_list_cach_cuc,
+            get_phu_tinh_tam_phuong_tu_chinh,
+            get_trang_sinh,
             get_tam_hop,
             get_xung_chieu,
             get_star_description,
             get_star_role_interaction,
+            get_tinh_cach_b3_b4_context,
             get_cung_analyze_skill,
+            run_tinh_cach_workflow,
             read_book_tuvi_tan_bien,
-            get_role_instruction
-        ]
+            get_role_instruction,
+        ],
     )
-
 
 
 async def run_tuvi_agent(
     ctx: RunContext[TuviAgentDeps],
     request: str,
 ) -> str:
+    _logger.info("Chạy Tử Vi agent: request_chars=%d", len(request))
     agent = ctx.deps.require_agent()
     result = await agent.run(request, deps=ctx.deps, usage=ctx.usage)
+    _logger.info("Tử Vi agent hoàn tất: output_chars=%d", len(result.output))
     return result.output
