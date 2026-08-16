@@ -1,0 +1,133 @@
+import { z } from "zod";
+
+/**
+ * Zod mirrors of the backend contract.
+ *
+ * Sources: `api/schemas.py` and `api/chat/models.py`. When either changes,
+ * change these — a drift shows up as a `parse` error carrying the issues,
+ * which is the point.
+ */
+
+// --- api/chat/models.py ----------------------------------------------------
+
+export const birthInfoSchema = z.object({
+  calendar: z.literal("solar").default("solar"),
+  year: z.number().int().min(1900).max(2099),
+  month: z.number().int().min(1).max(12),
+  day: z.number().int().min(1).max(31),
+  hour: z.number().int().min(0).max(23),
+  gender: z.enum(["M", "F"]),
+});
+
+export type BirthInfo = z.infer<typeof birthInfoSchema>;
+
+export const chatRoleSchema = z.enum(["user", "assistant"]);
+
+export const chatMessageStatusSchema = z.enum(["pending", "confirmed", "failed", "cancelled"]);
+
+export const chatMessageSchema = z.object({
+  id: z.string(),
+  role: chatRoleSchema,
+  content: z.string(),
+  status: chatMessageStatusSchema,
+  created_at: z.iso.datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
+});
+
+export const chatSessionSchema = z.object({
+  id: z.string(),
+  chart_profile_id: z.string(),
+  title: z.string().nullable().default(null),
+  messages: z.array(chatMessageSchema),
+  created_at: z.iso.datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
+});
+
+export const chatSessionSummarySchema = z.object({
+  id: z.string(),
+  chart_profile_id: z.string(),
+  title: z.string().nullable().default(null),
+  message_count: z.number().int(),
+  created_at: z.iso.datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
+});
+
+// --- api/schemas.py --------------------------------------------------------
+
+export const starSchema = z.object({
+  name: z.string(),
+  display: z.string(),
+  element: z.string(),
+});
+
+export const cungSchema = z.object({
+  position: z.string(),
+  role: z.string().nullable().default(null),
+  chinh_tinh: z.array(z.string()),
+  phu_tinh: z.array(starSchema),
+  tuhoa: z.array(z.string()),
+  trang_sinh: z.string().nullable().default(null),
+  is_tuan: z.boolean().default(false),
+  is_triet: z.boolean().default(false),
+  is_cung_than: z.boolean().default(false),
+  age_daivan: z.number().int().nullable().default(null),
+  saoLuu: z.array(starSchema),
+});
+
+export type Cung = z.infer<typeof cungSchema>;
+
+export const buildLasoResponseSchema = z.object({
+  id: z.string(),
+  summary: z.string(),
+  ban_menh_name: z.string(),
+  cuc_name: z.string(),
+  menh_cuc_relation_label: z.string(),
+  cung_by_position: z.record(z.string(), cungSchema),
+});
+
+export type BuildLasoResponse = z.infer<typeof buildLasoResponseSchema>;
+
+export const buildSaoLuuRequestSchema = z.object({
+  observation_time: birthInfoSchema,
+});
+
+export const buildSaoLuuResponseSchema = z.object({
+  cung_by_position: z.record(z.string(), cungSchema),
+});
+
+export const createAnonymousResponseSchema = z.object({
+  owner_id: z.string(),
+});
+
+export const chartProfileSchema = z.object({
+  id: z.string(),
+  display_name: z.string(),
+  birth_info: birthInfoSchema,
+  created_at: z.iso.datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
+});
+
+export const createChartProfileResponseSchema = z.object({
+  chart_profile: chartProfileSchema,
+});
+
+export const listChartProfilesResponseSchema = z.object({
+  chart_profiles: z.array(chartProfileSchema),
+});
+
+export const createSessionResponseSchema = z.object({
+  session: chatSessionSchema,
+});
+
+export const getSessionResponseSchema = z.object({
+  session: chatSessionSchema,
+});
+
+export const listSessionsResponseSchema = z.object({
+  sessions: z.array(chatSessionSummarySchema),
+});
+
+export const healthResponseSchema = z.object({
+  status: z.string(),
+  la_so_created: z.boolean(),
+});
