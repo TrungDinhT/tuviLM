@@ -45,53 +45,40 @@
 :root {
   color-scheme: dark;
 
-  /* --- Chính tinh palette -------------------------------------------------
-     Eight of the fourteen chính tinh carry a colour in the design. The other
-     six have portrait art but no assigned hue, so lib/theme.ts routes them to
-     the neutral pair rather than inventing one.
+  /* --- Ngũ hành palette ---------------------------------------------------
+     The accent is the ngũ hành of cung Mệnh's chính tinh, never a per-star
+     colour: đơn tinh tints with the element's own light shade, song tinh
+     pairs the two elements. Light and glow are mixed from the element, so
+     these five literals are the only colour values.
 
      These stay CSS custom properties on purpose: lib/theme.ts resolves an
-     outcome to `var(--star-*)` references, never to a raw colour, which is
+     outcome to `var(--element-*)` references, never to a raw colour, which is
      what keeps every literal in this file. */
-  --star-tuvi: #b98cff;
-  --star-tuvi-light: #e3d2ff;
-  --star-tuvi-glow: rgba(185, 140, 255, 0.5);
+  --element-kim: #ead9a0;
+  --element-moc: #63c79a;
+  --element-thuy: #79b7ff;
+  --element-hoa: #ff7e6b;
+  --element-tho: #c99c70;
 
-  --star-thienphu: #ead9a0;
-  --star-thienphu-light: #f7efcf;
-  --star-thienphu-glow: rgba(234, 217, 160, 0.5);
+  --element-kim-light: color-mix(in srgb, var(--element-kim) 45%, var(--color-ink));
+  --element-moc-light: color-mix(in srgb, var(--element-moc) 45%, var(--color-ink));
+  --element-thuy-light: color-mix(in srgb, var(--element-thuy) 45%, var(--color-ink));
+  --element-hoa-light: color-mix(in srgb, var(--element-hoa) 45%, var(--color-ink));
+  --element-tho-light: color-mix(in srgb, var(--element-tho) 45%, var(--color-ink));
 
-  --star-thatsat: #ff5d6c;
-  --star-thatsat-light: #ffb0a6;
-  --star-thatsat-glow: rgba(255, 93, 108, 0.5);
+  --element-kim-glow: color-mix(in srgb, var(--element-kim) 50%, transparent);
+  --element-moc-glow: color-mix(in srgb, var(--element-moc) 50%, transparent);
+  --element-thuy-glow: color-mix(in srgb, var(--element-thuy) 50%, transparent);
+  --element-hoa-glow: color-mix(in srgb, var(--element-hoa) 50%, transparent);
+  --element-tho-glow: color-mix(in srgb, var(--element-tho) 50%, transparent);
 
-  --star-phaquan: #7da4ff;
-  --star-phaquan-light: #c3d6ff;
-  --star-phaquan-glow: rgba(125, 164, 255, 0.5);
-
-  --star-thamlang: #ff7ec6;
-  --star-thamlang-light: #ffc2e4;
-  --star-thamlang-glow: rgba(255, 126, 198, 0.5);
-
-  --star-thaiduong: #ffb44f;
-  --star-thaiduong-light: #ffd9a0;
-  --star-thaiduong-glow: rgba(255, 180, 79, 0.5);
-
-  --star-thaiam: #c9d6ff;
-  --star-thaiam-light: #eaf0ff;
-  --star-thaiam-glow: rgba(201, 214, 255, 0.5);
-
-  --star-vukhuc: #4f9de0;
-  --star-vukhuc-light: #b9e0ff;
-  --star-vukhuc-glow: rgba(79, 157, 224, 0.5);
-
-  /* Vô chính diệu, and the fallback for any star without a hue. */
-  --star-neutral: #b9aed1;
-  --star-neutral-light: #f3effa;
-  --star-neutral-glow: rgba(185, 174, 209, 0.45);
+  /* Vô chính diệu, and the fallback for an unrecognised star. */
+  --accent-neutral: #b9aed1;
+  --accent-neutral-light: #f3effa;
+  --accent-neutral-glow: rgba(185, 174, 209, 0.45);
 
   /* Pre-chart default accent (Kim). */
-  --accent-default: #ead9a0;
+  --accent-default: var(--element-kim);
   --accent-2-default: #f5f7fa;
   --accent-glow-default: rgba(234, 217, 160, 0.55);
 

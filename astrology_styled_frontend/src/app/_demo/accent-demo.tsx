@@ -13,10 +13,13 @@ import type { ChartOutcome } from "@/lib/theme";
 
 const OUTCOMES: ReadonlyArray<{ label: string; outcome: ChartOutcome | null }> = [
   { label: "Chưa an sao (mặc định Kim)", outcome: null },
-  { label: "Đơn tinh · Tử Vi", outcome: { stars: ["tuvi"] } },
-  { label: "Song tinh · Vũ Khúc + Tham Lang", outcome: { stars: ["vukhuc", "thamlang"] } },
+  { label: "Đơn tinh · Tử Vi (Thổ)", outcome: { stars: ["tuvi"] } },
+  { label: "Đơn tinh · Liêm Trinh (Hỏa)", outcome: { stars: ["liemtrinh"] } },
+  {
+    label: "Song tinh · Vũ Khúc (Kim) + Tham Lang (Mộc)",
+    outcome: { stars: ["vukhuc", "thamlang"] },
+  },
   { label: "Vô chính diệu", outcome: { stars: [] } },
-  { label: "Sao chưa có màu · Liêm Trinh", outcome: { stars: ["liemtrinh"] } },
 ];
 
 /**
@@ -84,12 +87,12 @@ export function AccentDemo() {
         </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <TopicCard
-            hue="var(--star-thamlang)"
+            hue="var(--element-hoa)"
             title="Tình Duyên"
             body="Thẻ này dùng hue riêng, không đụng tới --accent."
           />
           <TopicCard
-            hue="var(--star-phaquan)"
+            hue="var(--element-thuy)"
             title="Học Đường"
             body="Thẻ bên cạnh dùng hue khác hẳn, hai bên không ảnh hưởng nhau."
           />
