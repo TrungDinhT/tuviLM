@@ -1,30 +1,15 @@
 import { ScreenPad } from "@/components/shell/app-shell";
-import { StickyHeader } from "@/components/shell/sticky-header";
-
-import { AccentDemo } from "./_demo/accent-demo";
-import { ApiDemo } from "./_demo/api-demo";
-import { ChartLockDemo } from "./_demo/chart-lock-demo";
-import { PrimitivesDemo } from "./_demo/primitives-demo";
+import { AnSaoScreen } from "@/features/an-sao/an-sao-screen";
 
 /**
- * Route stub for An sao. The shell around it is real; the casting machine —
- * pickers, the 12-chi clock, the constellation reward — lands as its own
- * change. Everything below the header is scaffolding for verifying the
- * foundation, and goes when the real screen arrives.
+ * An sao — the casting screen, and the only route that is never locked.
+ * The screen owns its form/loading phases; everything below the shell chrome
+ * here is client-side by nature.
  */
 export default function Page() {
   return (
     <ScreenPad>
-      <StickyHeader
-        eyebrow="An sao · lập lá số"
-        title="Chạm vào bầu trời ngày bạn sinh ra"
-        subtitle="Xoay các vòng sao để nhập ngày sinh — chòm sao mệnh của bạn sẽ dần hiện lên."
-      />
-
-      <PrimitivesDemo />
-      <ApiDemo />
-      <ChartLockDemo />
-      <AccentDemo />
+      <AnSaoScreen />
     </ScreenPad>
   );
 }

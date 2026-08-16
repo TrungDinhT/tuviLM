@@ -15,19 +15,36 @@ interface ChartState {
   hasChart: boolean;
   /** Drives the runtime accent. Null until a chart exists. */
   outcome: ChartOutcome | null;
+  /**
+   * The preview-endpoint outcome, resolved while the user is still entering
+   * birth data. Drives the accent only while `outcome` is null, and is never
+   * persisted — a reload before casting starts from the default accent.
+   */
+  previewOutcome: ChartOutcome | null;
+  /**
+   * The id of the cast chart — the deterministic id from the build response,
+   * which is also its key in the persisted query cache. Null until a cast.
+   */
+  chartId: string | null;
 
-  castChart: (outcome: ChartOutcome) => void;
+  castChart: (outcome: ChartOutcome, chartId: string) => void;
+  setPreviewOutcome: (outcome: ChartOutcome | null) => void;
   reset: () => void;
 }
 
-const EMPTY = { hasChart: false, outcome: null } as const;
+const EMPTY = { hasChart: false, outcome: null, previewOutcome: null, chartId: null } as const;
 
 export const useChartStore = create<ChartState>()(
   persist(
     (set) => ({
       ...EMPTY,
 
-      castChart: (outcome) => set({ hasChart: true, outcome }),
+      // The real outcome replaces any preview — a stale preview must never
+      // leak into the cast accent.
+      castChart: (outcome, chartId) =>
+        set({ hasChart: true, outcome, chartId, previewOutcome: null }),
+
+      setPreviewOutcome: (outcome) => set({ previewOutcome: outcome }),
 
       /**
        * Clears every chart-derived value at once.
@@ -56,7 +73,13 @@ export const useChartStore = create<ChartState>()(
       // client render matches the server's and hydration stays clean.
       // See components/providers/store-hydration.tsx.
       skipHydration: true,
-      partialize: (state) => ({ hasChart: state.hasChart, outcome: state.outcome }),
+      // previewOutcome is deliberately absent: a pre-cast preview is session
+      // atmosphere, not state worth restoring.
+      partialize: (state) => ({
+        hasChart: state.hasChart,
+        outcome: state.outcome,
+        chartId: state.chartId,
+      }),
     },
   ),
 );

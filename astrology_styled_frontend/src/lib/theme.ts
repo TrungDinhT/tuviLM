@@ -62,6 +62,27 @@ export interface ChartOutcome {
   readonly stars: readonly string[];
 }
 
+/**
+ * Normalise a backend star name to the key used by `CHINH_TINH_ELEMENT` and
+ * the content tables: strip the trạng thái suffix (`"Tử Vi (Miếu)"` →
+ * `"Tử Vi"`), drop diacritics, lowercase, remove spaces (`"Tử Vi"` →
+ * `"tuvi"`).
+ *
+ * `đ` survives NFD normalisation (it is not a composing mark), so it is
+ * folded by hand first.
+ */
+export function starKeyFromName(name: string): string {
+  return name
+    .replace(/\s*\([^)]*\)\s*$/, "")
+    .trim()
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/\s+/g, "");
+}
+
 interface Accent {
   readonly accent: string;
   readonly accent2: string;

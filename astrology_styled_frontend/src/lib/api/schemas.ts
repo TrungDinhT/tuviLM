@@ -95,6 +95,22 @@ export const buildSaoLuuResponseSchema = z.object({
   cung_by_position: z.record(z.string(), cungSchema),
 });
 
+/**
+ * `POST /laso/preview`. Gender is omitted: cung Mệnh's chính tinh do not
+ * depend on it, and the preview is meant to fire before the user picks one.
+ */
+export const previewLasoRequestSchema = birthInfoSchema.omit({ gender: true });
+
+export type PreviewLasoRequest = z.infer<typeof previewLasoRequestSchema>;
+
+export const previewLasoResponseSchema = z.object({
+  /** Clean star names — no trạng thái suffix. Empty for vô chính diệu. */
+  chinh_tinh: z.array(z.string()),
+  menh_position: z.string(),
+});
+
+export type PreviewLasoResponse = z.infer<typeof previewLasoResponseSchema>;
+
 export const createAnonymousResponseSchema = z.object({
   owner_id: z.string(),
 });

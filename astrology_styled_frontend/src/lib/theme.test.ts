@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_ACCENT, resolveAccent } from "./theme";
+import { DEFAULT_ACCENT, resolveAccent, starKeyFromName } from "./theme";
 
 describe("resolveAccent", () => {
   it("returns the pre-chart default when no chart has been cast", () => {
@@ -62,5 +62,20 @@ describe("resolveAccent", () => {
         expect(value).toMatch(/^var\(--[a-z0-9-]+\)$/);
       }
     }
+  });
+});
+
+describe("starKeyFromName", () => {
+  it("normalises display names to content keys", () => {
+    expect(starKeyFromName("Tử Vi")).toBe("tuvi");
+    expect(starKeyFromName("Thái Dương")).toBe("thaiduong");
+    expect(starKeyFromName("Thiên Đồng")).toBe("thiendong");
+    expect(starKeyFromName("Vũ Khúc")).toBe("vukhuc");
+    expect(starKeyFromName("Cự Môn")).toBe("cumon");
+  });
+
+  it("strips the trạng thái suffix the build payload carries", () => {
+    expect(starKeyFromName("Tử Vi (Miếu)")).toBe("tuvi");
+    expect(starKeyFromName("Thất Sát (V)")).toBe("thatsat");
   });
 });

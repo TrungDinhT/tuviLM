@@ -12,5 +12,8 @@ import { ThemeProvider } from "./theme-provider";
  */
 export function AccentTheme({ children }: { children: React.ReactNode }) {
   const outcome = useChartStore((state) => state.outcome);
-  return <ThemeProvider outcome={outcome}>{children}</ThemeProvider>;
+  const previewOutcome = useChartStore((state) => state.previewOutcome);
+  // Cast beats preview beats the :root default (a null prop clears the
+  // properties, letting globals.css decide).
+  return <ThemeProvider outcome={outcome ?? previewOutcome}>{children}</ThemeProvider>;
 }

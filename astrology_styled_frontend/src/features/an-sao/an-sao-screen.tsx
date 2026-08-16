@@ -1,0 +1,256 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { Pill } from "@/components/primitives/pill";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { useBuildLaso, useLasoPreview } from "@/lib/api/hooks";
+import { describe, isApiError } from "@/lib/http/errors";
+import { starKeyFromName } from "@/lib/theme";
+import { useChartStore } from "@/store/chart-store";
+import { usePreferencesStore } from "@/store/preferences-store";
+import { useToastStore } from "@/store/toast-store";
+
+import { BirthConfirmDialog } from "./birth-confirm-dialog";
+import {
+  type BirthDateInput,
+  type BirthTimeInput,
+  type Meridiem,
+  MERIDIEM,
+  canhGioOf,
+  toApiBirthTime,
+} from "./birth-time";
+import { CastingLoader } from "./casting-loader";
+import { ConstellationReward } from "./constellation-reward";
+import { outcomeFromChart } from "./outcome";
+import { SegmentedControl } from "./segmented-control";
+import { TimePicker } from "./time-picker";
+import { WheelPicker } from "./wheel-picker";
+
+/** The loading interlude's floor, from the design. */
+const MIN_LOADING_MS = 2600;
+/** Dial-spin settling before a preview fires. */
+const PREVIEW_DEBOUNCE_MS = 250;
+
+const DAY_RANGE = { min: 1, max: 31 } as const;
+const MONTH_RANGE = { min: 1, max: 12 } as const;
+const YEAR_RANGE = { min: 1990, max: 2099 } as const;
+
+const DEFAULT_DATE: BirthDateInput = { year: 2000, month: 1, day: 1 };
+
+function pad2(value: number): string {
+  return String(value).padStart(2, "0");
+}
+
+/**
+ * The casting screen at `/`: birth date wheels, the AM/PM toggle and hour
+ * clock, the giới tính selector, the constellation reward — then confirm,
+ * loading, and the cast that unlocks the four chart tabs.
+ */
+export function AnSaoScreen() {
+  const router = useRouter();
+  const [phase, setPhase] = useState<"form" | "loading">("form");
+  const [date, setDate] = useState<BirthDateInput>(DEFAULT_DATE);
+  // AM/PM is picked above the face, so it stands on its own and defaults to
+  // AM; the hour stays unpicked until touched, which is what the guard reads.
+  const [meridiem, setMeridiem] = useState<Meridiem>(MERIDIEM.AM);
+  const [hour12, setHour12] = useState<number | null>(null);
+  const [gender, setGender] = useState<"M" | "F" | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [clockPulse, setClockPulse] = useState(0);
+
+  const time = useMemo<BirthTimeInput | null>(
+    () => (hour12 === null ? null : { hour12, meridiem }),
+    [hour12, meridiem],
+  );
+
+  const clockRef = useRef<HTMLDivElement>(null);
+  const genderRef = useRef<HTMLDivElement>(null);
+
+  const showToast = useToastStore((state) => state.show);
+  const setPreviewOutcome = useChartStore((state) => state.setPreviewOutcome);
+  const castChart = useChartStore((state) => state.castChart);
+  const muteBirthConfirm = usePreferencesStore((state) => state.muteBirthConfirm);
+
+  // --- Reward preview: debounce the dials, map to the API tuple, fetch. ---
+  const previewInput = useMemo(() => (time === null ? null : { date, time }), [date, time]);
+  const debouncedInput = useDebouncedValue(previewInput, PREVIEW_DEBOUNCE_MS);
+  const previewBirth = useMemo(() => {
+    if (debouncedInput === null) return null;
+    const mapped = toApiBirthTime(debouncedInput.date, debouncedInput.time);
+    return mapped.ok ? ({ calendar: "solar", ...mapped.value } as const) : null;
+  }, [debouncedInput]);
+  const preview = useLasoPreview(previewBirth);
+
+  useEffect(() => {
+    if (preview.data === undefined) return;
+    setPreviewOutcome({ stars: preview.data.chinh_tinh.map(starKeyFromName) });
+  }, [preview.data, setPreviewOutcome]);
+
+  // --- Casting -------------------------------------------------------------
+  const buildLaso = useBuildLaso();
+
+  const requestCast = () => {
+    if (time === null) {
+      showToast("Chọn giờ sinh để an sao chính xác nhé ✦");
+      setClockPulse((count) => count + 1);
+      clockRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    if (gender === null) {
+      showToast("Cho Nghê Sao biết giới tính của bạn nhé ✦");
+      genderRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    if (muteBirthConfirm) {
+      void cast();
+    } else {
+      setConfirmOpen(true);
+    }
+  };
+
+  const cast = async () => {
+    if (time === null || gender === null) return;
+    const mapped = toApiBirthTime(date, time);
+    if (!mapped.ok) {
+      showToast("Ngày giờ này vượt quá phạm vi Nghê Sao an được (năm 1990 – 2099) nhé.");
+      return;
+    }
+
+    setConfirmOpen(false);
+    setPhase("loading");
+    try {
+      const [chart] = await Promise.all([
+        buildLaso.mutateAsync({ calendar: "solar", ...mapped.value, gender }),
+        new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS)),
+      ]);
+      castChart(outcomeFromChart(chart), chart.id);
+      router.push("/ban-menh");
+    } catch (error) {
+      setPhase("form");
+      showToast(
+        isApiError(error)
+          ? describe(error.error)
+          : "Có lỗi xảy ra khi an sao. Bạn thử lại nhé.",
+      );
+    }
+  };
+
+  if (phase === "loading") return <CastingLoader />;
+
+  const canhGio = time === null ? null : canhGioOf(time.hour12, time.meridiem);
+  const confirmSummary =
+    time === null || canhGio === null
+      ? ""
+      : `${pad2(date.day)} · ${pad2(date.month)} · ${date.year} · ${time.hour12} ${time.meridiem} · Giờ ${canhGio.chi}`;
+
+  return (
+    <div className="flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:content-center md:gap-x-10 md:gap-y-0">
+      {/* Head — story column on the left from md up. */}
+      <div className="text-center md:col-start-1 md:row-start-1 md:text-left">
+        <div className="text-[10px] font-bold tracking-[0.28em] text-accent uppercase [text-shadow:0_0_14px_var(--accent-glow)]">
+          An sao · lập lá số
+        </div>
+        <h1 className="mt-[9px] font-display text-[clamp(26px,7.4vw,31px)] leading-[1.08] font-semibold tracking-[-0.01em] md:text-[clamp(30px,4.4vw,38px)]">
+          Chạm vào bầu trời
+          <br />
+          ngày bạn sinh ra
+        </h1>
+        <p className="mt-[5px] text-[13.5px] font-light text-muted md:mt-[9px] md:max-w-[34ch] md:text-[15px]">
+          Xoay các vòng sao để nhập ngày sinh — chòm sao mệnh của bạn sẽ dần hiện lên.
+        </p>
+      </div>
+
+      <div className="md:col-start-1 md:row-start-2 md:mt-6 md:self-start">
+        <ConstellationReward
+          stars={preview.data?.chinh_tinh.map(starKeyFromName) ?? null}
+          names={preview.data?.chinh_tinh ?? []}
+        />
+      </div>
+
+      {/* The machine */}
+      <div className="glass mt-4 px-[14px] py-[12px] md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:self-center">
+        <div className="relative grid grid-cols-[1fr_1fr_1.15fr] gap-[10px]">
+          <div
+            aria-hidden="true"
+            className="dial-band pointer-events-none absolute right-[6px] bottom-[55px] left-[6px] z-2 h-[46px] rounded-[14px]"
+          />
+          <WheelPicker
+            label="Ngày"
+            min={DAY_RANGE.min}
+            max={DAY_RANGE.max}
+            pad
+            value={date.day}
+            onChange={(day) => setDate((current) => ({ ...current, day }))}
+          />
+          <WheelPicker
+            label="Tháng"
+            min={MONTH_RANGE.min}
+            max={MONTH_RANGE.max}
+            pad
+            value={date.month}
+            onChange={(month) => setDate((current) => ({ ...current, month }))}
+          />
+          <WheelPicker
+            label="Năm"
+            min={YEAR_RANGE.min}
+            max={YEAR_RANGE.max}
+            value={date.year}
+            onChange={(year) => setDate((current) => ({ ...current, year }))}
+          />
+        </div>
+
+        <div className="mt-[12px] text-center text-[11px] tracking-[0.24em] text-muted uppercase">
+          Giờ sinh <span className="text-accent">· bắt buộc</span>
+        </div>
+        <div className="mx-auto mt-[8px] w-[min(218px,66vw)]">
+          <SegmentedControl
+            label="Buổi trong ngày"
+            options={[
+              { value: MERIDIEM.AM, label: "AM" },
+              { value: MERIDIEM.PM, label: "PM" },
+            ]}
+            value={meridiem}
+            onChange={setMeridiem}
+          />
+        </div>
+        <TimePicker
+          ref={clockRef}
+          value={hour12}
+          meridiem={meridiem}
+          onChange={setHour12}
+          pulseKey={clockPulse}
+        />
+
+        <div ref={genderRef} className="mt-[14px]">
+          <div className="mb-[6px] text-center text-[11px] tracking-[0.24em] text-muted uppercase">
+            Giới tính <span className="text-accent">· bắt buộc</span>
+          </div>
+          <SegmentedControl
+            label="Giới tính"
+            options={[
+              { value: "M", label: "Nam" },
+              { value: "F", label: "Nữ" },
+            ]}
+            value={gender}
+            onChange={setGender}
+          />
+        </div>
+      </div>
+
+      <div className="mt-[22px] flex flex-col gap-[10px] md:col-start-2 md:row-start-3">
+        <Pill className="w-full" onClick={requestCast}>
+          ✦ Luận giải lá số của tôi
+        </Pill>
+      </div>
+
+      <BirthConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        summary={confirmSummary}
+        onConfirm={() => void cast()}
+      />
+    </div>
+  );
+}
