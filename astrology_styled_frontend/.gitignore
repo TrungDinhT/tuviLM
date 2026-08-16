@@ -1,5 +1,11 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# The repo-root .gitignore is a Python template whose rules are unanchored, so
+# `lib/` there matches at any depth and silently swallows our source directory.
+# Re-include it. (Other unanchored rules to watch for if a directory ever gets
+# one of these names: build/, dist/, downloads/, parts/, share/, var/, wheels/.)
+!src/lib/
+
 # dependencies
 /node_modules
 /.pnp
