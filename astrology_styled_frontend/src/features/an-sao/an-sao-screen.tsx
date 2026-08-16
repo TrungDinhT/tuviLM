@@ -88,6 +88,10 @@ export function AnSaoScreen() {
     setPreviewOutcome({ stars: preview.data.chinh_tinh.map(starKeyFromName) });
   }, [preview.data, setPreviewOutcome]);
 
+  // The preview accent belongs to this screen. Leaving without casting — or
+  // casting, which replaces it — must not leave it tinting the rest of the app.
+  useEffect(() => () => setPreviewOutcome(null), [setPreviewOutcome]);
+
   // --- Casting -------------------------------------------------------------
   const buildLaso = useBuildLaso();
 

@@ -17,7 +17,8 @@ interface ChartState {
   outcome: ChartOutcome | null;
   /**
    * The preview-endpoint outcome, resolved while the user is still entering
-   * birth data. Drives the accent only while `outcome` is null, and is never
+   * birth data. It outranks `outcome` in the accent, being the newer intent,
+   * and An sao clears it on unmount so it cannot outlive that screen. Never
    * persisted — a reload before casting starts from the default accent.
    */
   previewOutcome: ChartOutcome | null;

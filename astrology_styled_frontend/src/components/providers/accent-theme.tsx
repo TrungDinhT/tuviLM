@@ -13,7 +13,13 @@ import { ThemeProvider } from "./theme-provider";
 export function AccentTheme({ children }: { children: React.ReactNode }) {
   const outcome = useChartStore((state) => state.outcome);
   const previewOutcome = useChartStore((state) => state.previewOutcome);
-  // Cast beats preview beats the :root default (a null prop clears the
+  // Preview beats cast beats the :root default (a null prop clears the
   // properties, letting globals.css decide).
-  return <ThemeProvider outcome={outcome ?? previewOutcome}>{children}</ThemeProvider>;
+  //
+  // A preview only exists while An sao is on screen and the user is entering
+  // birth data — it is the newer intent, and after a cast the accent would
+  // otherwise stay frozen on the previous chart while the dials move. An sao
+  // clears the preview when it unmounts, so leaving without casting hands the
+  // accent straight back to the cast chart.
+  return <ThemeProvider outcome={previewOutcome ?? outcome}>{children}</ThemeProvider>;
 }
