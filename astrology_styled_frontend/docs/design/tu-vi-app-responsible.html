@@ -1,0 +1,2409 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- Mobile web, not a wrapped app: the browser keeps its own top bar and
+     Android nav bar; theme-color just tints them to match the page. -->
+<meta name="theme-color" content="#1A1033" />
+<meta name="color-scheme" content="dark" />
+<title>Tử Vi · An sao &amp; luận giải</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    /* Fixed twilight shell — never black */
+    --bg-0:#1A1033; --bg-1:#2E1A4A; --bg-2:#3B2063;
+    --coral:#FF9E7D; --fire:#FF5D6C;
+    --ink:#F3EFFA; --muted:#B9AED1;
+    --glass:rgba(255,255,255,.06);
+    --glass-line:rgba(243,239,250,.14);
+    --radius:26px;
+    /* Personal accent (ngũ hành) — themed at runtime. Default Kim */
+    --accent:#EAD9A0; --accent-2:#F5F7FA; --accent-glow:rgba(234,217,160,.55);
+    --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-t:env(safe-area-inset-top,0px);
+    /* mobile-first web: one readable column, centred on wider screens */
+    --col:480px;
+    --tabbar-h:calc(74px + var(--safe-b));
+    /* một chiều cao lá bài duy nhất cho cả màn hình an sao lẫn tab Bản mệnh */
+    --deck-h:clamp(300px, calc(100dvh - 318px), 560px);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  /* Ẩn thanh cuộn ở mọi vùng cuộn — trang/rail/picker/popup đều vẫn cuộn
+     bình thường, chỉ là không vẽ thanh ra. Cần cả hai cú pháp: `scrollbar-width`
+     cho Firefox và Chrome đời mới, `::-webkit-scrollbar` cho Safari/WebKit. */
+  *{scrollbar-width:none;-ms-overflow-style:none}
+  *::-webkit-scrollbar{display:none;width:0;height:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:"Be Vietnam Pro",system-ui,sans-serif;
+    color:var(--ink);
+    background:#120A24;
+    -webkit-font-smoothing:antialiased;
+    min-height:100dvh;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{font-family:"Fraunces",Georgia,serif}
+  ::selection{background:var(--accent);color:#1A1033}
+
+  /* ===================== Ambient cosmos (desktop backdrop) ===================== */
+  .cosmos{
+    position:fixed; inset:0; z-index:0; overflow:hidden;
+    background:
+      radial-gradient(80% 55% at 50% 108%, rgba(255,158,125,.22), transparent 60%),
+      radial-gradient(120% 90% at 50% 0%, #3B2063 0%, #2E1A4A 45%, #160D2C 100%);
+  }
+  .cosmos .neb{
+    position:absolute; border-radius:50%; filter:blur(60px); opacity:.5;
+    animation:breathe 12s ease-in-out infinite;
+  }
+  .cosmos .neb.a{width:60vmax;height:60vmax;left:-10vmax;top:-15vmax;
+    background:radial-gradient(circle,rgba(123,79,166,.6),transparent 60%)}
+  .cosmos .neb.b{width:50vmax;height:50vmax;right:-12vmax;bottom:-10vmax;
+    background:radial-gradient(circle,rgba(79,157,224,.35),transparent 60%);animation-delay:-4s}
+  .starlayer{position:absolute;inset:0}
+  /* Mỗi sao có quãng trôi (--dx/--dy) và chu kỳ (--drift) riêng do JS gieo, nên
+     bầu trời thực sự chuyển động chứ không chỉ nhấp nháy tại chỗ. Dùng thuộc
+     tính `translate` thay vì `transform` để không đụng các transform khác. */
+  .starlayer .s,.col-bg .s{position:absolute;border-radius:50%;background:#F3EFFA;
+    animation:twinkle var(--tw,4s) ease-in-out infinite,
+              drift var(--drift,44s) ease-in-out infinite alternate}
+  .starlayer .s{box-shadow:0 0 6px rgba(243,239,250,.6)}
+
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  @keyframes twinkle{0%,100%{opacity:.25}50%{opacity:.9}}
+  @keyframes drift{from{translate:0 0}to{translate:var(--dx,0px) var(--dy,0px)}}
+
+  /* Sao băng — JS thả vào nền theo nhịp ngẫu nhiên rồi tự gỡ khỏi DOM.
+     Gốc biến đổi đặt ở đầu vệt (phải) để đuôi kéo dài ra phía sau khi bay. */
+  .shootingstar{position:absolute;left:var(--sx);top:var(--sy);
+    width:var(--slen,110px);height:1.6px;border-radius:2px;pointer-events:none;
+    transform-origin:100% 50%;
+    background:linear-gradient(90deg,transparent,
+      color-mix(in srgb,var(--accent-2) 42%,transparent) 58%,#FFF9E8);
+    filter:drop-shadow(0 0 7px var(--accent-glow));
+    animation:shoot var(--sdur,1.4s) cubic-bezier(.3,.55,.35,1) forwards}
+  @keyframes shoot{
+    0%{opacity:0;transform:rotate(var(--sang,22deg)) translate3d(0,0,0) scaleX(.2)}
+    14%{opacity:1}
+    72%{opacity:1}
+    100%{opacity:0;transform:rotate(var(--sang,22deg)) translate3d(var(--sdist,340px),0,0) scaleX(1)}
+  }
+
+  /* ===================== Mobile-first web shell =====================
+     No simulated phone: the document itself scrolls, so the browser's own
+     URL bar / Android nav bar behave normally. On wider screens the same
+     layout is a centred single column. */
+  .stage{position:relative;z-index:1;width:100%;max-width:var(--col);margin:0 auto;min-height:100dvh}
+  .device{position:relative;width:100%;min-height:100dvh;isolation:isolate}
+  /* fixed twilight canvas behind the column so it never scrolls away */
+  .col-bg{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:var(--col);z-index:0;pointer-events:none;overflow:hidden;
+    background:
+      radial-gradient(90% 60% at 50% 106%, rgba(255,158,125,.16), transparent 60%),
+      radial-gradient(120% 80% at 50% -5%, var(--bg-2), var(--bg-1) 46%, var(--bg-0) 100%);}
+  @media (min-width:560px){
+    .col-bg{box-shadow:0 0 0 1px rgba(243,239,250,.07), 0 30px 90px rgba(8,4,20,.55)}
+  }
+
+  .viewport{position:relative;z-index:1}
+
+  /* screens */
+  .screens{position:relative;z-index:5}
+  .screen{display:none}
+  .screen.active{display:block;animation:screenin .38s ease both}
+  @keyframes screenin{from{opacity:0}to{opacity:1}}
+  .pad{padding:calc(10px + var(--safe-t)) 22px 130px}
+
+  /* tab bar — in-app navigation, sits above the browser chrome */
+  .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:var(--col);z-index:35;
+    padding:9px 8px calc(11px + var(--safe-b));
+    display:none;gap:2px;
+    background:linear-gradient(0deg, rgba(18,10,36,.97), rgba(18,10,36,.72) 70%, transparent);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .device[data-mode="app"] .tabbar{display:flex}
+  .tab{flex:1 1 0;min-width:0;background:none;border:0;cursor:pointer;color:var(--muted);
+    display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 1px;
+    font:inherit;font-size:10px;font-weight:500;letter-spacing:.01em;white-space:nowrap;
+    transition:color .25s}
+  .tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.5;
+    transition:transform .3s, filter .3s}
+  .tab.on{color:var(--accent)}
+  .tab.on svg{filter:drop-shadow(0 0 8px var(--accent-glow));transform:translateY(-1px)}
+  .tab .node{fill:currentColor;stroke:none}
+  .navbrand{display:none}
+  /* Tab bị khoá khi chưa có lá số. Chỉ nhìn thấy ở desktop, vì mobile ẩn hẳn
+     thanh điều hướng lúc chưa an sao (data-mode="onboarding"). */
+  .tab[disabled]{opacity:.34;cursor:not-allowed}
+  .tab[disabled]:hover{background:none;color:var(--muted)}
+  .tab[disabled] svg{filter:none;transform:none}
+  .topbar{display:none}
+  @media (max-width:349px){
+    .tabbar{padding-left:4px;padding-right:4px}
+    .tab{font-size:9px;letter-spacing:0}
+    .tab svg{width:21px;height:21px}
+  }
+
+  /* ===================== Reusable bits ===================== */
+  .glass{background:var(--glass);border:1px solid var(--glass-line);
+    border-radius:var(--radius);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+  .kicker{font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .muted{color:var(--muted)}
+  .pill{display:inline-flex;align-items:center;gap:9px;justify-content:center;
+    border-radius:999px;padding:15px 26px;font:inherit;font-weight:600;font-size:16px;cursor:pointer;
+    border:0;transition:transform .18s ease, box-shadow .25s ease}
+  .pill:active{transform:scale(.97)}
+  .pill-primary{color:#1A1033;background:linear-gradient(135deg,var(--accent-2),var(--accent));
+    box-shadow:0 14px 40px var(--accent-glow), inset 0 0 0 1px rgba(255,255,255,.3)}
+  .pill-ghost{color:var(--ink);background:rgba(255,255,255,.05);border:1px solid var(--glass-line)}
+  .row{display:flex;align-items:center;gap:12px}
+  .grow{flex:1}
+  .center{text-align:center}
+  .elbadge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;
+    font-size:13px;font-weight:600;color:var(--accent);
+    border:1px solid var(--accent-glow);background:color-mix(in srgb,var(--accent) 12%, transparent)}
+  .elbadge .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent-glow)}
+
+  /* ===================== Onboarding — cosmic machine ===================== */
+  .ob{min-height:100dvh;display:flex;flex-direction:column;
+    padding:calc(22px + var(--safe-t)) 22px calc(20px + var(--safe-b))}
+  .device[data-mode="app"] .ob{padding-bottom:calc(20px + var(--tabbar-h))}
+  .ob-head{text-align:center;margin:2px 0 2px}
+  .ob-head .eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;font-weight:700;
+    color:var(--accent);text-shadow:0 0 14px var(--accent-glow)}
+  .ob-head h1{font-size:clamp(26px,7.4vw,31px);font-weight:600;line-height:1.08;
+    margin-top:9px;letter-spacing:-.01em}
+  .ob-head p{color:var(--muted);font-weight:300;margin-top:5px;font-size:13.5px}
+
+  .reward{position:relative;height:154px;margin:6px 0 2px}
+  .reward svg{position:absolute;inset:0;width:100%;height:116px;overflow:visible;transition:opacity .35s ease}
+  .reward .cline{fill:none;stroke:var(--accent);stroke-width:1.2;opacity:0;stroke-linecap:round;
+    stroke-dasharray:600;stroke-dashoffset:600;transition:stroke-dashoffset 1.1s ease, opacity .6s}
+  .reward .cnode{fill:var(--accent);opacity:.25;transform-box:fill-box;transform-origin:center;transition:opacity .5s, transform .5s}
+  .reward.lit .cline{opacity:.7;stroke-dashoffset:0}
+  .reward.lit .cnode{opacity:1;filter:drop-shadow(0 0 6px var(--accent-glow))}
+  .reward-art{position:absolute;z-index:1;left:22px;right:22px;top:-5px;height:132px;
+    display:flex;align-items:center;justify-content:center;opacity:.24;transform:scale(.96);
+    transition:opacity .45s ease,transform .55s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+  .reward-art img{width:184px;height:136px;object-fit:cover;object-position:center 34%;mix-blend-mode:screen;
+    -webkit-mask-image:radial-gradient(ellipse at center,#000 45%,rgba(0,0,0,.92) 60%,transparent 82%);
+            mask-image:radial-gradient(ellipse at center,#000 45%,rgba(0,0,0,.92) 60%,transparent 82%);
+    filter:brightness(1.14) contrast(1.06) saturate(.9) drop-shadow(0 0 15px var(--accent-glow));user-select:none}
+  .reward-art.dual img{width:138px;height:126px}
+  .reward-art.dual img+img{margin-left:-14px}
+  .reward.has-art svg{opacity:0}
+  .reward.lit .reward-art{opacity:1;transform:none}
+  .reward .cap{position:absolute;z-index:2;bottom:4px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);letter-spacing:.2em}
+
+  .machine{margin-top:16px;padding:12px 14px}
+  .dials{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:10px;position:relative}
+  .dials::before{ /* selection band — anchored to picker centre (78px above dials bottom) */
+    content:"";position:absolute;left:6px;right:6px;top:auto;bottom:55px;height:46px;
+    border-radius:14px;border:1px solid var(--accent-glow);
+    background:linear-gradient(115deg, color-mix(in srgb,var(--accent) 16%,transparent), color-mix(in srgb,var(--accent-2) 16%,transparent));
+    pointer-events:none;z-index:2}
+  .dcol{position:relative}
+  .dcol .lbl{text-align:center;font-size:11px;letter-spacing:.24em;color:var(--muted);margin-bottom:6px;text-transform:uppercase}
+  .picker{height:156px;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 26%,#000 74%,transparent);
+            mask-image:linear-gradient(180deg,transparent,#000 26%,#000 74%,transparent)}
+  .picker::-webkit-scrollbar{width:0}
+  .picker .sp{height:55px}
+  .picker .opt{height:46px;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;
+    font-family:"Fraunces",serif;font-size:24px;font-weight:500;color:var(--muted);
+    transition:color .2s, transform .2s}
+  .picker .opt.sel{transform:scale(1.06);
+    background:linear-gradient(115deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent}
+
+  .hour-lbl{text-align:center;font-size:11px;letter-spacing:.24em;color:var(--muted);
+    text-transform:uppercase;margin-top:12px}
+  .hour-lbl .req{color:var(--accent)}
+  .birth-clock{--hand-angle:0deg;position:relative;width:min(218px,66vw);aspect-ratio:1;margin:9px auto 2px;
+    border-radius:50%;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;outline:none}
+  .birth-clock:active,.birth-clock.dragging{cursor:grabbing}
+  .clock-face{position:absolute;inset:0;border-radius:50%;overflow:hidden;
+    background:
+      radial-gradient(circle at 50% 45%,rgba(255,255,255,.09),transparent 42%),
+      radial-gradient(circle,color-mix(in srgb,var(--accent) 12%,transparent),rgba(26,16,51,.56) 68%);
+    border:1px solid var(--accent-glow);
+    box-shadow:inset 0 0 30px rgba(14,8,32,.58),0 0 24px color-mix(in srgb,var(--accent) 13%,transparent)}
+  .clock-face::before,.clock-face::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+  .clock-face::before{inset:10px;border:1px solid rgba(243,239,250,.12)}
+  .clock-face::after{inset:22%;border:1px solid rgba(243,239,250,.08)}
+  .clock-ticks{position:absolute;inset:4px;border-radius:50%;pointer-events:none;
+    background:repeating-conic-gradient(from -1deg,rgba(243,239,250,.34) 0 1.5deg,transparent 1.5deg 30deg);
+    -webkit-mask:radial-gradient(circle,transparent 0 88%,#000 88% 94%,transparent 94%);
+            mask:radial-gradient(circle,transparent 0 88%,#000 88% 94%,transparent 94%)}
+  .clock-hour{position:absolute;left:var(--x);top:var(--y);z-index:4;transform:translate(-50%,-50%);
+    width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:var(--muted);
+    font:600 13px "Fraunces",serif;cursor:pointer;transition:color .2s,background .2s,box-shadow .2s,transform .2s}
+  .clock-hour.on{color:#1A1033;background:linear-gradient(135deg,var(--accent-2),var(--accent));
+    box-shadow:0 0 16px var(--accent-glow);transform:translate(-50%,-50%) scale(1.08)}
+  .clock-hand{position:absolute;z-index:2;left:calc(50% - 1px);bottom:50%;width:2px;height:31%;
+    border-radius:2px;transform-origin:50% 100%;transform:rotate(var(--hand-angle));
+    background:linear-gradient(to top,var(--accent),var(--accent-2));opacity:.32;
+    box-shadow:0 0 9px var(--accent-glow);transition:transform .24s cubic-bezier(.2,.8,.2,1),opacity .2s;pointer-events:none}
+  .clock-hand::before{content:"";position:absolute;top:-4px;left:50%;width:8px;height:8px;border-radius:50%;
+    transform:translateX(-50%);background:var(--accent-2);box-shadow:0 0 10px var(--accent-glow)}
+  .birth-clock.dragging .clock-hand{transition:none}
+  .birth-clock.has-value .clock-hand{opacity:1}
+  .clock-pin{position:absolute;z-index:5;left:50%;top:50%;width:12px;height:12px;border-radius:50%;
+    transform:translate(-50%,-50%);background:var(--accent);border:3px solid #241443;
+    box-shadow:0 0 13px var(--accent-glow);pointer-events:none}
+  .clock-readout{position:absolute;z-index:3;left:50%;top:50%;width:104px;min-height:62px;
+    transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;pointer-events:none}
+  .clock-readout strong{font-family:"Fraunces",serif;font-size:20px;font-weight:600;color:var(--ink);line-height:1.1}
+  .clock-readout span{margin-top:23px;font-size:9px;line-height:1.25;color:var(--muted);white-space:nowrap}
+  .birth-clock.has-value .clock-readout strong{color:var(--accent);text-shadow:0 0 12px var(--accent-glow)}
+  .birth-clock:focus-visible{box-shadow:0 0 0 2px var(--accent-glow);border-radius:50%}
+  @keyframes needpulse{0%,100%{box-shadow:0 0 0 0 transparent}35%{box-shadow:0 0 0 2px var(--accent-glow)}}
+  .birth-clock.need{animation:needpulse .7s ease}
+  /* deck slider — main + phụ cards share one uniform slide size */
+  .rail>.destiny,.rail>.tarot{flex:0 0 min(340px,84%);width:auto;margin:0;scroll-snap-align:center}
+  .rail>.tarot{aspect-ratio:9/16;min-height:0}
+
+  /* Bản mệnh LÀ màn hình kết quả an sao — chỉ một layout duy nhất,
+     lá bài cao bằng --deck-h, ít peek lá kế tiếp. */
+  #s-home .rail{align-items:center;padding-top:2px;padding-bottom:2px}
+  #s-home .raildots{margin-top:8px}
+  /* Thứ bậc theo kích thước: lá bản mệnh cao hết --deck-h, lá phụ chỉ 82% và
+     được .rail căn giữa nên thấp hơn hẳn ở cả hai đầu — đây là tín hiệu phân
+     cấp mạnh nhất, đọc được ngay cả khi liếc qua. */
+  #s-home .rail>.destiny,#s-home .rail>.tarot{
+    flex:0 0 auto;width:auto;max-width:90%}
+  #s-home .rail>.destiny{height:var(--deck-h)}
+  #s-home .rail>.tarot{height:calc(var(--deck-h) * .82)}
+  /* Tab dùng .centered: toàn bộ nội dung căn giữa theo chiều dọc trong khoảng
+     từ mép trên khung nhìn tới mép trên thanh tab, khoảng thở trên = dưới.
+     Dùng margin auto thay cho justify-content:center — khi nội dung cao hơn
+     khung nhìn thì auto tự về 0 nên không phần nào bị đẩy khuất lên phía trên
+     (justify-content:center thì có). Tab chỉ có một khối .pad thì khối đó vừa
+     là :first-child vừa là :last-child nên nhận cả hai margin auto. */
+  .screen.centered.active{display:flex;flex-direction:column;min-height:100dvh}
+  .screen.centered>*{flex:0 0 auto}
+  .screen.centered>.pad:first-child{margin-top:auto;padding-top:calc(22px + var(--safe-t))}
+  .screen.centered>.pad:last-child{margin-bottom:auto;padding-bottom:calc(22px + var(--tabbar-h))}
+  /* CTA đi liền sau đồng hồ giờ sinh, không dính đáy màn hình */
+  .ob-cta{margin-top:22px;display:flex;flex-direction:column;gap:10px}
+  .skip{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+  /* ===================== Loading ===================== */
+  #s-loading .wrap{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:40px}
+  .orbit{position:relative;width:190px;height:190px}
+  .orbit .ring{position:absolute;inset:0;border-radius:50%;border:1px solid var(--accent-glow);opacity:.4}
+  .orbit .ring.r2{inset:22px;border-style:dashed;animation:spin 14s linear infinite}
+  .orbit .ring.r1{animation:spin 22s linear infinite reverse}
+  .orbit .planet{position:absolute;top:-4px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 16px var(--accent-glow);transform-origin:50% 99px;animation:spin 6s linear infinite}
+  .orbit .core{position:absolute;inset:0;display:grid;place-items:center}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loadtxt{text-align:center}
+  .loadtxt .t{font-family:"Fraunces",serif;font-size:26px;font-weight:500}
+  .loadtxt .d span{animation:dots 1.4s infinite}
+  .loadtxt .d span:nth-child(2){animation-delay:.2s}
+  .loadtxt .d span:nth-child(3){animation-delay:.4s}
+  @keyframes dots{0%,100%{opacity:.2}50%{opacity:1}}
+  .loadtxt p{color:var(--muted);margin-top:10px;font-size:14px;font-weight:300}
+
+  /* ===================== Destiny Card =====================
+     Một thiết kế duy nhất cho mọi cỡ màn hình. Nền là ảnh sinh bằng Nano
+     Banana 2 (assets/bg-la-bai-chinh.png, 768x1376 ~ 9:16) nên background-size
+     cover phủ kín gần như không cắt, quầng vàng rơi đúng dải giữa thẻ — nơi cố
+     ý để trống. Hai lớp scrim trên/dưới giữ chữ đọc được; lớp gradient cuối là
+     dự phòng khi ảnh không tải. */
+  .destiny{position:relative;margin:6px auto 0;width:min(340px,86%);aspect-ratio:9/16;
+    border-radius:22px;padding:26px 24px 24px;display:flex;flex-direction:column;overflow:hidden;
+    background:
+      linear-gradient(180deg, rgba(13,7,28,.88) 0%, rgba(13,7,28,.54) 20%, transparent 36%),
+      linear-gradient(0deg, rgba(13,7,28,.92) 0%, rgba(13,7,28,.66) 13%, transparent 31%),
+      url("assets/bg-la-bai-chinh.png") center/cover no-repeat,
+      linear-gradient(168deg,#3B2569 0%,#2B1B4E 44%,#1D1136 100%);
+    border:1px solid color-mix(in srgb,var(--accent) 40%, transparent);
+    box-shadow:0 34px 92px rgba(12,6,28,.7), 0 0 60px color-mix(in srgb,var(--accent) 26%, transparent),
+      inset 0 1px 0 rgba(255,255,255,.14)}
+  .destiny .dtitle{font-family:"Fraunces",serif;font-size:19px;font-weight:600;letter-spacing:.06em}
+  .destiny .dsub{margin-top:5px;font-size:13.5px;color:var(--muted)}
+  .destiny .dsub b{color:var(--ink);font-weight:600}
+  .destiny .dchip{margin-top:14px;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
+    padding:8px 16px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink);
+    border:1px solid color-mix(in srgb,var(--accent) 52%, transparent);background:rgba(255,255,255,.05)}
+  .destiny .dchip i{font-style:normal;color:var(--accent)}
+  .destiny .dluck{margin-top:11px;display:flex;align-items:center;gap:11px;padding:8px 14px 8px 9px;
+    border-radius:999px;background:rgba(255,255,255,.055);border:1px solid var(--glass-line);
+    font-size:13px;color:var(--muted)}
+  .destiny .dluck .orb{width:26px;height:26px;border-radius:50%;flex:0 0 auto;
+    background:radial-gradient(circle at 34% 28%, #FFFFFF, var(--accent-2) 26%, var(--accent) 70%,
+      color-mix(in srgb,var(--accent) 60%, #000) 100%);
+    box-shadow:0 0 14px var(--accent-glow), inset 0 -2px 5px rgba(0,0,0,.35)}
+  .destiny .dluck b{color:var(--ink);font-weight:600;margin-left:auto;font-size:14px}
+  /* dải giữa để trống: quầng sáng của ảnh nền chính là tiêu điểm của thẻ */
+  .destiny .dstage{flex:1 1 auto;min-height:0}
+  .destiny .dmantra{font-family:"Fraunces",serif;font-style:italic;font-size:18px;line-height:1.42;
+    padding-top:14px;border-top:1px solid color-mix(in srgb,var(--accent) 22%, transparent)}
+  .destiny.reveal{animation:cardin 1s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes cardin{from{opacity:0;transform:translateY(30px) scale(.9)}to{opacity:1;transform:none}}
+  .share-row{display:flex;gap:10px;margin:18px auto 0;width:min(340px,86%)}
+  .share-row .pill{flex:1;font-size:14px;padding:13px 10px}
+
+  /* story rail */
+  .rail{display:flex;gap:14px;overflow-x:auto;padding:6px 22px 8px;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .rail::-webkit-scrollbar{height:0}
+  .story{scroll-snap-align:center;flex:0 0 78%;padding:22px 20px;min-height:190px;display:flex;flex-direction:column}
+  .story .n{font-size:11px;letter-spacing:.3em;color:var(--accent);font-weight:600}
+  .story h3{font-size:24px;font-weight:600;margin-top:8px}
+  .story p{color:var(--muted);margin-top:10px;font-size:14.5px;line-height:1.55;font-weight:300}
+  .raildots{display:flex;gap:6px;justify-content:center;margin-top:12px}
+  .raildots i{width:6px;height:6px;border-radius:50%;background:var(--glass-line)}
+  .raildots i.on{background:var(--accent);width:18px;border-radius:3px;transition:.3s}
+
+  /* extra "lá bài" (topic cards) */
+  /* Lá phụ cố tình lép hơn: viền mảnh theo hue riêng thay vì viền accent, và
+     bỏ hẳn quầng sáng accent — trước đây chính quầng này khiến bốn lá bài nhìn
+     ngang hàng nhau. Chỉ còn bóng đổ phẳng để vẫn tách khỏi nền. */
+  /* Lá phụ giữ nguyên chất kính mờ như cũ: viền mảnh theo hue riêng thay vì
+     viền accent, bỏ quầng sáng accent — chính quầng đó từng khiến bốn lá bài
+     nhìn ngang hàng nhau. Chỉ còn bóng đổ phẳng để vẫn tách khỏi nền. */
+  .tarot{scroll-snap-align:center;flex:0 0 76%;min-height:322px;padding:22px 20px;display:flex;flex-direction:column;
+    position:relative;overflow:hidden;
+    border:1px solid color-mix(in srgb,var(--t-hue) 24%, var(--glass-line));
+    box-shadow:0 14px 34px rgba(12,6,28,.42)}
+  .tarot::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.38;
+    background:radial-gradient(120% 70% at 100% 0%, var(--t-hue-glow), transparent 55%)}
+  .tarot .top{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+  .tarot .g{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+    background:color-mix(in srgb,var(--t-hue) 18%,transparent);border:1px solid color-mix(in srgb,var(--t-hue) 45%,transparent)}
+  .tarot .g svg{width:20px;height:20px;stroke:var(--t-hue);fill:none;stroke-width:1.6}
+  .tarot .k{font-size:10px;letter-spacing:.34em;color:var(--muted);font-weight:600}
+  .tarot h3{font-family:"Fraunces",serif;font-size:13.5px;font-weight:500;color:var(--muted);margin-top:13px;letter-spacing:.02em}
+  /* 42px (lá chính) so với 24px (lá phụ) — bậc chữ đủ xa để mắt biết đâu là
+     nhân vật chính, thay vì 42 với 30 gần như ngang nhau như trước. */
+  .tarot .key{font-family:"Fraunces",serif;font-weight:600;font-size:24px;line-height:1.06;margin-top:4px;color:var(--ink);
+    text-shadow:0 0 18px var(--t-hue-glow);position:relative;z-index:1}
+  .tarot p{color:var(--muted);font-size:12.5px;line-height:1.55;margin-top:10px;font-weight:300;position:relative;z-index:1}
+  .tarot .tag{margin-top:auto;align-self:flex-start;font-size:11px;font-weight:500;color:var(--t-hue);
+    padding:6px 12px;border-radius:999px;border:1px solid color-mix(in srgb,var(--t-hue) 40%,transparent);
+    background:color-mix(in srgb,var(--t-hue) 10%,transparent);position:relative;z-index:1}
+
+  /* section headers */
+  .shead{display:flex;align-items:baseline;justify-content:space-between;margin:26px 2px 12px}
+  .shead h2{font-size:22px;font-weight:600}
+  .shead .lnk{color:var(--accent);font-size:13px;font-weight:500;background:none;border:0;cursor:pointer;font-family:inherit}
+
+  /* shortcuts */
+  .shorts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .short{padding:18px;text-align:left;cursor:pointer;border:0;color:var(--ink);font:inherit;display:flex;flex-direction:column;gap:10px}
+  .short svg{width:30px;height:30px;stroke:var(--accent);fill:none;stroke-width:1.4}
+  .short b{font-size:16px;font-weight:600}
+  .short span{font-size:12.5px;color:var(--muted)}
+
+  /* ===================== Vận hạn ===================== */
+  .catlist{display:flex;flex-direction:column;gap:14px}
+  .cat{position:relative;padding:22px;display:flex;align-items:center;gap:16px;overflow:hidden;cursor:pointer}
+  .cat .ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;flex:0 0 auto;
+    background:color-mix(in srgb,var(--accent) 14%, transparent);border:1px solid var(--accent-glow)}
+  .cat .ic svg{width:26px;height:26px;stroke:var(--accent);fill:none;stroke-width:1.5}
+  .cat h3{font-size:18px;font-weight:600}
+  .cat p{font-size:13px;color:var(--muted);margin-top:3px}
+  .cat .free{font-size:11px;font-weight:700;letter-spacing:.1em;color:#3FBF8F}
+  .cat.locked{border-style:solid}
+  .cat.locked::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(120% 80% at 100% 50%, var(--accent-glow), transparent 55%);opacity:.16;pointer-events:none;
+    animation:tease 4.5s ease-in-out infinite}
+  @keyframes tease{0%,100%{opacity:.08}50%{opacity:.24}}
+  .cat .lock{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right;z-index:2}
+  .cat .lock .star{font-size:16px;color:var(--accent);filter:drop-shadow(0 0 8px var(--accent-glow))}
+  .cat .lock small{font-size:11px;color:var(--muted);max-width:96px;line-height:1.3}
+  .unlock-banner{margin-top:18px;padding:20px;text-align:center}
+  .unlock-banner h3{font-family:"Fraunces",serif;font-size:20px;font-weight:600}
+  .unlock-banner p{color:var(--muted);font-size:13.5px;margin:8px 0 16px}
+
+  /* ===================== Hỏi AI ===================== */
+  /* Chừa đủ chỗ cho ô soạn tin (14 + 58 + 10 = 82px) cộng khoảng thở, để thẻ
+     "Mở khoá Hỏi AI" cuộn hết lên trên ô soạn tin chứ không chui xuống dưới. */
+  #s-hoiai .pad{display:flex;flex-direction:column;min-height:100dvh;
+    padding-bottom:calc(96px + var(--tabbar-h))}
+  .chat-hero{text-align:center;padding:6px 0 14px}
+  .chat-hero .mm{width:96px;height:96px;margin:0 auto}
+  .chat-hero h2{font-family:"Fraunces",serif;font-size:22px;font-weight:600;margin-top:6px}
+  .chat-hero p{color:var(--muted);font-size:13px;margin-top:4px}
+  .chat{display:flex;flex-direction:column;gap:12px;flex:1}
+  .msg{max-width:82%;padding:13px 16px;border-radius:20px;font-size:14.5px;line-height:1.5}
+  .msg.ai{align-self:flex-start;background:var(--glass);border:1px solid var(--glass-line);border-bottom-left-radius:6px}
+  .msg.me{align-self:flex-end;color:#1A1033;border-bottom-right-radius:6px;font-weight:500;
+    background:linear-gradient(135deg,var(--accent-2),var(--accent))}
+  .msg.ai .who{font-size:11px;letter-spacing:.16em;color:var(--accent);font-weight:600;margin-bottom:5px}
+  .limit{margin-top:14px;padding:16px 18px;text-align:center}
+  .limit .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin:10px 0}
+  .limit .bar i{display:block;height:100%;width:33%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--coral))}
+  .limit p{font-size:13px;color:var(--muted)}
+  .limit b{color:var(--ink)}
+  /* Ô soạn tin nằm đè lên luồng chat đang cuộn phía dưới, nên nó phải là một
+     bề mặt đục thật — .glass (trắng 6%) để lộ nguyên nội dung xuyên qua.
+     Dải nền của .composer nối liền với dải nền thanh tab thành một chân trang. */
+  .composer{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-width:var(--col);
+    bottom:var(--tabbar-h);z-index:34;padding:14px 18px 10px}
+  /* Vùng nhòe nằm ở lớp riêng phía sau ô soạn tin: nhờ vậy mới mask được cho
+     mép trên tan dần (mask đặt thẳng trên .composer sẽ ăn cả vào ô nhập).
+     Lớp này cao hơn .composer 30px để chuyển tiếp đủ mềm. */
+  .composer::before{content:"";position:absolute;inset:-30px 0 0;z-index:-1;pointer-events:none;
+    background:linear-gradient(0deg, rgba(18,10,36,.98) 46%, rgba(18,10,36,.82) 74%, transparent);
+    backdrop-filter:blur(30px) saturate(118%);
+    -webkit-backdrop-filter:blur(30px) saturate(118%);
+    -webkit-mask-image:linear-gradient(0deg,#000 52%,rgba(0,0,0,.62) 78%,transparent);
+            mask-image:linear-gradient(0deg,#000 52%,rgba(0,0,0,.62) 78%,transparent)}
+  .composer .box{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 18px;border-radius:999px;
+    background:rgba(48,29,80,.97);border-color:rgba(243,239,250,.18);
+    box-shadow:0 8px 24px rgba(8,4,20,.5), inset 0 1px 0 rgba(243,239,250,.06)}
+  .composer input{flex:1;background:none;border:0;color:var(--ink);font:inherit;font-size:15px;outline:none}
+  .composer input::placeholder{color:var(--muted)}
+  .composer .send{width:42px;height:42px;border-radius:50%;border:0;cursor:pointer;flex:0 0 auto;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent-2),var(--accent))}
+  .composer .send svg{width:20px;height:20px;stroke:#1A1033;fill:none;stroke-width:2}
+
+  /* ===================== Hồ sơ ===================== */
+  .list{display:flex;flex-direction:column;gap:2px;overflow:hidden;padding:6px}
+  .li{display:flex;align-items:center;gap:14px;padding:15px 14px;border-radius:16px;cursor:pointer;transition:background .2s}
+  .li:hover{background:rgba(255,255,255,.04)}
+  .li svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.5;flex:0 0 auto}
+  .li .t{flex:1}
+  .li .t b{font-weight:500;font-size:15px}
+  .li .t small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .li .chev{color:var(--muted)}
+  .saved{display:flex;gap:12px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
+  .saved::-webkit-scrollbar{height:0}
+  .savecard{flex:0 0 130px;padding:16px;border-radius:20px;
+    background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 18%,transparent),rgba(46,26,74,.5));
+    border:1px solid var(--accent-glow)}
+  .savecard .dt{font-size:11px;color:var(--muted)}
+  .savecard b{font-family:"Fraunces",serif;font-size:17px;font-weight:600;display:block;margin-top:8px;line-height:1.15}
+
+  /* ===================== An Sao — swipeable thematic lens ===================== */
+  .ansao-view{padding:calc(10px + var(--safe-t)) 18px calc(76px + var(--tabbar-h));min-height:100dvh}
+  .ansao-head{display:flex;align-items:flex-end;justify-content:space-between;padding:4px 2px 8px}
+  /* 9px quá nhỏ bên cạnh tiêu đề 26px của khuôn header chung — nâng lên cho cân */
+  .source-chip{border:1px solid var(--glass-line);background:rgba(255,255,255,.055);color:var(--muted);border-radius:999px;padding:8px 13px;font-size:11px;cursor:pointer;font-family:inherit}
+  .signature-intro{text-align:center;margin:6px auto 10px;max-width:345px}
+  .signature-intro .k{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .signature-intro h3{font-size:25px;line-height:1.05;margin-top:5px}
+  .signature-intro p{font-size:10.5px;line-height:1.45;color:var(--muted);margin-top:6px}
+  .signature-stage{position:relative;border-radius:26px;overflow:hidden;background:linear-gradient(155deg,rgba(255,255,255,.075),rgba(255,255,255,.022));
+    border:1px solid var(--glass-line);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 22px 54px rgba(8,4,20,.28)}
+  .signature-stage::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.28;background-image:
+    radial-gradient(circle at 20% 20%,#fff 0 1px,transparent 1.4px),radial-gradient(circle at 74% 31%,#fff 0 1px,transparent 1.4px),radial-gradient(circle at 46% 72%,#fff 0 1px,transparent 1.4px);background-size:91px 83px,113px 101px,137px 127px}
+  .signature-svg{width:100%;height:auto;display:block;position:relative;z-index:2}
+  .sig-hot{cursor:pointer;transition:opacity .3s,filter .3s}.signature-stage.has-selection .sig-hot:not(.on){opacity:.48;filter:saturate(.58)}
+  .sig-hot.on{filter:drop-shadow(0 0 9px var(--theme))}
+  .signature-panel{margin-top:10px;padding:14px 15px;border-radius:21px;background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+    border:1px solid var(--glass-line);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+  .signature-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .signature-panel .role{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--theme);font-weight:700}
+  .signature-panel h3{font-size:21px;margin-top:3px}.signature-panel .source{font-size:8px;color:var(--muted);margin-top:3px}
+  .morph-tag{padding:6px 8px;border-radius:99px;border:1px solid color-mix(in srgb,var(--theme) 35%,transparent);color:var(--theme);font-size:7.5px;white-space:nowrap}
+  .facet-tabs{display:flex;gap:5px;margin-top:10px}.facet-tabs button{flex:1;padding:8px 5px;border:1px solid var(--glass-line);border-radius:10px;background:rgba(255,255,255,.025);color:var(--muted);font-size:8px;cursor:pointer}
+  .facet-tabs button.on{color:#1A1033;background:var(--theme);border-color:transparent}
+  .signature-copy{font-size:11.5px;line-height:1.5;color:var(--muted);margin-top:9px;min-height:34px}
+  .signature-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:7px;margin-top:10px}
+  .signature-actions button{padding:10px 5px;border-radius:11px;border:1px solid var(--glass-line);background:rgba(255,255,255,.035);color:var(--ink);font-size:8.5px;cursor:pointer}
+  .signature-actions .traditional{background:color-mix(in srgb,var(--theme) 10%,transparent);border-color:color-mix(in srgb,var(--theme) 35%,transparent)}
+  .theme-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:9px 1px 1px}.theme-chips::-webkit-scrollbar{height:0}
+  .theme-chip{flex:0 0 auto;border:1px solid var(--glass-line);background:rgba(255,255,255,.035);color:var(--muted);border-radius:999px;padding:7px 9px;font-size:8px;cursor:pointer}
+  .theme-chip.on{color:#1A1033;background:var(--theme);border-color:transparent;box-shadow:0 5px 15px color-mix(in srgb,var(--theme) 25%,transparent)}
+
+  /* Thiên bàn ánh quang — inactive glass, active light. */
+  .lens-stage{background:radial-gradient(circle at 50% 43%,rgba(125,164,255,.14),transparent 35%),radial-gradient(circle at 50% 45%,rgba(234,217,160,.065),transparent 56%),linear-gradient(155deg,#291944,#0d071e);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+  .lens-stage::before{content:"";position:absolute;inset:8% 10%;border-radius:50%;background:conic-gradient(from 20deg,transparent,rgba(185,140,255,.065),transparent 28%,rgba(125,164,255,.055),transparent 60%);filter:blur(18px);animation:lensAura 18s linear infinite;pointer-events:none}
+  .lens-stage.has-selection .sig-hot:not(.on){opacity:.62;filter:none}
+  .lens-shell{fill:rgba(8,4,21,.72);stroke:rgba(234,217,160,.34);stroke-width:1.2;filter:drop-shadow(0 0 20px rgba(125,164,255,.18))}
+  .lens-sky-ring{fill:none;stroke:rgba(234,217,160,.22);stroke-width:1;stroke-dasharray:2 5;transform-box:view-box;transform-origin:180px 214px;animation:lensSky 45s linear infinite}
+  .lens-inner-ring{fill:none;stroke:rgba(243,239,250,.13);stroke-width:1;stroke-dasharray:1 4}
+  .lens-blade{fill:rgba(255,255,255,.018);stroke:rgba(247,232,184,.18);stroke-width:.9;transition:fill .35s,filter .35s,stroke .35s;shape-rendering:geometricPrecision}
+  .sig-hot.on .lens-blade{fill:color-mix(in srgb,var(--theme) 21%,rgba(255,255,255,.035));stroke:#FFF2BE;stroke-width:1.55;filter:drop-shadow(0 0 15px color-mix(in srgb,var(--theme) 75%,transparent));animation:lensPulse 3.2s ease-in-out infinite}
+  .lens-theme-icon{color:#B5A8C8;opacity:.48;pointer-events:none;transition:color .35s,opacity .35s,filter .35s}.lens-theme-icon *{fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}.lens-theme-icon .solid{fill:currentColor;stroke:none}
+  .sig-hot.on .lens-theme-icon{color:#FFF2BE;opacity:1;filter:drop-shadow(0 0 7px var(--theme))}
+  .lens-center-icon{color:#F8EDBF;pointer-events:none;filter:drop-shadow(0 0 9px rgba(248,237,191,.55))}.lens-center-icon *{fill:none;stroke:currentColor;stroke-width:1.45;stroke-linecap:round;stroke-linejoin:round}.lens-center-icon .solid{fill:currentColor;stroke:none}
+  .lens-wheel{transform-box:view-box;transform-origin:180px 214px}.lens-wheel.turn-next{animation:lensTurnNext .58s cubic-bezier(.2,.8,.2,1)}.lens-wheel.turn-prev{animation:lensTurnPrev .58s cubic-bezier(.2,.8,.2,1)}
+  .lens-source-ripple{fill:none;stroke:var(--focus);stroke-width:1;transform-box:view-box;transform-origin:180px 214px;pointer-events:none;animation:sourceRipple 1s cubic-bezier(.15,.7,.2,1) both}
+  .lens-source-tick{fill:none;stroke:var(--focus);stroke-linecap:round;pointer-events:none;animation:sourceTick .65s calc(.28s + var(--catch-delay)) ease-out both}.lens-source-tick.primary{stroke-width:2;filter:drop-shadow(0 0 7px var(--focus))}.lens-source-tick.secondary{stroke-width:1;opacity:.7}
+  .lens-core{fill:url(#lensCore);stroke:#F8EDBF;stroke-width:1.45;filter:drop-shadow(0 0 20px rgba(234,217,160,.38));cursor:pointer}
+  .lens-core-orbit{fill:none;stroke:rgba(248,237,191,.34);stroke-width:.75;stroke-dasharray:2 4;transform-box:fill-box;transform-origin:center;animation:lensSky 22s linear infinite}
+  .lens-core-awake{fill:none;stroke:var(--focus);stroke-width:.8;transform-box:view-box;transform-origin:180px 214px;pointer-events:none;animation:coreAwake 1.15s ease-out both}
+  .lens-core-stars{pointer-events:none}.lens-core-star{fill:#FFF9DA;opacity:.28;transform-box:fill-box;transform-origin:center;animation:coreTwinkle 3.2s ease-in-out infinite}.lens-core-star.s2{animation-delay:-1.1s;animation-duration:4.1s}.lens-core-star.s3{animation-delay:-2.3s;animation-duration:3.7s}.lens-core-star.s4{animation-delay:-.6s;animation-duration:4.6s}.lens-core-star.s5{animation-delay:-3s;animation-duration:3.4s}.lens-core-star.s6{animation-delay:-1.7s;animation-duration:4.4s}
+  .lens-core-comet{transform-box:view-box;transform-origin:180px 214px;pointer-events:none;animation:coreOrbit 10s linear infinite}.lens-core-comet circle{fill:var(--focus);filter:drop-shadow(0 0 5px var(--focus))}
+  .lens-core-title{fill:#F8EDBF;font:700 9px "Be Vietnam Pro";letter-spacing:.14em;text-anchor:middle;pointer-events:none}
+  .lens-core-copy{fill:#C8BCD8;font:6.5px "Be Vietnam Pro";text-anchor:middle;pointer-events:none}
+  .lens-core-meta{fill:var(--focus);font:600 5.8px "Be Vietnam Pro";letter-spacing:.1em;text-anchor:middle;pointer-events:none}
+  .lens-palace-node{cursor:default}.lens-palace-node .palace-dot{fill:#17102a;stroke:rgba(234,217,160,.38);stroke-width:1;transition:.35s;transform-box:fill-box;transform-origin:center}.lens-palace-node .palace-halo{fill:none;stroke:var(--focus);stroke-width:1;opacity:0;pointer-events:none;transform-box:fill-box;transform-origin:center}.lens-palace-node .palace-name{fill:#B9AED1;font:600 6px "Be Vietnam Pro";letter-spacing:.06em;dominant-baseline:middle;opacity:0;transition:.35s;pointer-events:none}.lens-palace-node.source{cursor:pointer}.lens-palace-node.source .palace-dot{fill:var(--focus);stroke:#FFF2BE;filter:drop-shadow(0 0 8px var(--focus));animation:sourceCatch .72s calc(.32s + var(--catch-delay)) cubic-bezier(.2,.9,.2,1) both,sourceBreathe 2.8s calc(1.05s + var(--catch-delay)) ease-in-out infinite}.lens-palace-node.source .palace-halo{opacity:.72;filter:drop-shadow(0 0 6px var(--focus));animation:sourceHalo 1.1s calc(.28s + var(--catch-delay)) ease-out both}.lens-palace-node.source .palace-name{fill:#F8EDBF;opacity:1;filter:drop-shadow(0 0 5px rgba(8,4,20,.8));animation:sourceLabel .55s calc(.42s + var(--catch-delay)) ease-out both}.lens-palace-node.primary .palace-dot{stroke-width:2;filter:drop-shadow(0 0 13px var(--focus))}.lens-palace-node.primary .palace-halo{stroke-width:1.4}
+  .lens-focus{fill:none;stroke:var(--focus);stroke-width:1.3;filter:drop-shadow(0 0 7px var(--focus));animation:lensFocus 2.4s ease-in-out infinite}
+  .lens-focus-label{fill:var(--focus);font:700 8px "Be Vietnam Pro";letter-spacing:.16em;text-anchor:middle}
+  .lens-guide{fill:#B9AED1;font:7px "Be Vietnam Pro";letter-spacing:.12em;text-anchor:middle}
+  .lens-step{position:absolute;z-index:5;top:46%;width:38px;height:38px;border-radius:50%;border:1px solid rgba(234,217,160,.42);background:rgba(15,8,34,.82);color:#F8EDBF;cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(8px);box-shadow:0 0 14px rgba(234,217,160,.12);font-size:15px}
+  .lens-step.prev{left:9px}.lens-step.next{right:9px}.lens-step:active{transform:scale(.92);background:rgba(234,217,160,.16)}
+  @keyframes lensTurnNext{from{transform:rotate(60deg);opacity:.68}to{transform:none;opacity:1}}
+  @keyframes lensTurnPrev{from{transform:rotate(-60deg);opacity:.68}to{transform:none;opacity:1}}
+  @keyframes lensSky{to{transform:rotate(360deg)}}
+  @keyframes lensAura{to{transform:rotate(360deg)}}
+  @keyframes lensPulse{50%{filter:drop-shadow(0 0 21px color-mix(in srgb,var(--theme) 78%,transparent))}}
+  @keyframes lensFocus{50%{opacity:.45}}
+  @keyframes sourceRipple{0%{opacity:.65;transform:scale(.48)}100%{opacity:0;transform:scale(2.08)}}
+  @keyframes sourceTick{from{opacity:0;stroke-dasharray:0 20}to{opacity:1;stroke-dasharray:20 0}}
+  @keyframes sourceCatch{from{opacity:.15;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+  @keyframes sourceHalo{0%{opacity:0;transform:scale(.5)}55%{opacity:1}100%{opacity:.68;transform:scale(1)}}
+  @keyframes sourceLabel{from{opacity:0}to{opacity:1}}
+  @keyframes sourceBreathe{50%{opacity:.55}}
+  @keyframes coreTwinkle{0%,100%{opacity:.18;transform:scale(.75)}50%{opacity:.9;transform:scale(1.3)}}
+  @keyframes coreOrbit{to{transform:rotate(360deg)}}
+  @keyframes coreAwake{0%{opacity:0;transform:scale(.72)}50%{opacity:.8}100%{opacity:0;transform:scale(1.16)}}
+
+  /* Drill-down story for the source palaces of each theme. */
+  .theme-story{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--col);z-index:32;padding:calc(20px + var(--safe-t)) 18px calc(30px + var(--tabbar-h));overflow-y:auto;overscroll-behavior:contain;background:radial-gradient(circle at 50% 12%,color-mix(in srgb,var(--theme) 22%,transparent),transparent 36%),linear-gradient(180deg,rgba(31,18,58,.985),rgba(14,8,31,.99));backdrop-filter:blur(20px)}
+  .theme-story::-webkit-scrollbar{width:0}
+  .story-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .story-close{width:38px;height:38px;border-radius:50%;border:1px solid var(--glass-line);background:rgba(255,255,255,.05);color:var(--ink);font-size:18px;cursor:pointer}
+  .story-context{text-align:right}.story-context small{display:block;color:var(--theme);font-size:8px;letter-spacing:.16em;text-transform:uppercase}.story-context b{font-family:"Fraunces";font-size:17px;font-weight:600}
+  .story-palaces{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:18px 0 12px}.story-palaces::-webkit-scrollbar{height:0}
+  .story-palaces button{flex:0 0 auto;padding:8px 11px;border-radius:99px;border:1px solid var(--glass-line);background:rgba(255,255,255,.035);color:var(--muted);font-size:9px;cursor:pointer}
+  .story-palaces button.on{background:var(--theme);border-color:transparent;color:#1A1033}
+  .palace-story{position:relative;overflow:hidden;min-height:505px;padding:24px 22px;border-radius:28px;background:linear-gradient(155deg,color-mix(in srgb,var(--theme) 15%,rgba(255,255,255,.07)),rgba(255,255,255,.025));border:1px solid color-mix(in srgb,var(--theme) 36%,var(--glass-line));box-shadow:0 24px 55px rgba(6,3,16,.45),inset 0 1px 0 rgba(255,255,255,.08)}
+  .palace-story::before{content:"";position:absolute;width:250px;height:250px;border-radius:50%;right:-110px;top:-100px;border:1px solid color-mix(in srgb,var(--theme) 35%,transparent);box-shadow:0 0 70px color-mix(in srgb,var(--theme) 15%,transparent)}
+  .palace-count{font-size:9px;letter-spacing:.22em;color:var(--theme);font-weight:700;text-transform:uppercase}
+  .palace-story h2{font-size:38px;line-height:1;margin-top:12px}.palace-story .palace-role{font-size:11px;color:var(--muted);margin-top:7px}
+  .palace-orbit{height:126px;display:grid;place-items:center;position:relative;margin:18px 0}.palace-orbit::before,.palace-orbit::after{content:"";position:absolute;border-radius:50%;border:1px solid color-mix(in srgb,var(--theme) 35%,transparent)}.palace-orbit::before{width:112px;height:112px}.palace-orbit::after{width:76px;height:76px;border-style:dashed;animation:spin 12s linear infinite}.palace-orbit span{width:45px;height:45px;border-radius:50%;display:grid;place-items:center;background:var(--theme);color:#1A1033;font:700 20px "Fraunces";box-shadow:0 0 25px color-mix(in srgb,var(--theme) 55%,transparent)}
+  .palace-insight{font-family:"Fraunces";font-size:20px;line-height:1.35}.palace-why{font-size:11.5px;line-height:1.55;color:var(--muted);margin-top:12px}
+  .palace-source{display:inline-flex;margin-top:14px;padding:7px 10px;border-radius:99px;border:1px solid color-mix(in srgb,var(--theme) 35%,transparent);font-size:8px;color:var(--theme)}
+  .story-nav{display:grid;grid-template-columns:42px 1fr 42px;gap:7px;margin-top:12px}.story-nav button{height:42px;border-radius:13px;border:1px solid var(--glass-line);background:rgba(255,255,255,.04);color:var(--ink);cursor:pointer}.story-nav .story-deep{color:#1A1033;background:var(--theme);border-color:transparent;font-size:9px;font-weight:700}
+
+  /* ===================== Lá số gốc (full chart) ===================== */
+  .starmap-wrap{padding:10px 8px 0}
+  .starmap{width:100%;aspect-ratio:1;max-width:360px;margin:0 auto;display:block}
+  .sm-ring{fill:none;stroke:var(--glass-line);stroke-width:1}
+  .sm-spoke{stroke:var(--glass-line);stroke-width:.6}
+  .sm-link{stroke:var(--accent);stroke-width:1;opacity:.5}
+  .sm-cusp{fill:var(--accent);filter:drop-shadow(0 0 6px var(--accent-glow))}
+  .sm-point{cursor:pointer;outline:none}
+  .sm-hit{fill:transparent;stroke:transparent;stroke-width:1}
+  .sm-point .sm-cusp{transform-box:fill-box;transform-origin:center;transition:transform .2s,filter .2s}
+  .sm-point:hover .sm-cusp,.sm-point:focus-visible .sm-cusp,.sm-point.on .sm-cusp{transform:scale(1.65);filter:drop-shadow(0 0 10px var(--accent-glow))}
+  .sm-point:focus-visible .sm-hit{stroke:var(--accent-glow)}
+  .sm-lbl{fill:var(--muted);font-size:11px;font-family:"Be Vietnam Pro";text-anchor:middle}
+  .sm-core{fill:var(--ink);font-family:"Fraunces",serif;font-size:15px;text-anchor:middle;font-weight:600}
+
+  .an-sao-bar h2{white-space:nowrap}
+  .backbar .chart-open{width:auto;height:34px;margin-left:auto;padding:0 12px;border-radius:999px;
+    color:var(--ink);font:inherit;font-size:11.5px;font-weight:600;line-height:1;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+  .backbar .chart-open svg{width:15px;height:15px;stroke:var(--accent);fill:none;stroke-width:1.7;flex:0 0 auto}
+  .chart-intro{margin:0 18px 112px;padding:18px 19px 20px;border-radius:20px}
+  .chart-intro .kicker{color:var(--accent);font-size:10px;letter-spacing:.26em}
+  .chart-intro h3{margin-top:7px;font-size:21px;font-weight:600}
+  .chart-intro p{margin-top:8px;color:var(--muted);font-size:13.5px;line-height:1.7;font-weight:300}
+
+  /* Full 12-palace chart: compact overview with details in a shared popup. */
+  .chart-detail{padding:2px 14px calc(34px + var(--tabbar-h))}
+  .chart-summary{padding:4px 4px 16px}
+  .chart-summary .kicker{color:var(--accent)}
+  .chart-summary h1{font-size:29px;font-weight:600;margin-top:5px;line-height:1.1}
+  .chart-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:16px;
+    border-top:1px solid var(--glass-line);border-bottom:1px solid var(--glass-line)}
+  .chart-fact{padding:11px 6px;text-align:center;min-width:0}
+  .chart-fact+.chart-fact{border-left:1px solid var(--glass-line)}
+  .chart-fact small{display:block;color:var(--muted);font-size:8px;text-transform:uppercase;line-height:1.25}
+  .chart-fact b{display:block;color:var(--ink);font-size:11px;font-weight:600;line-height:1.3;margin-top:4px;overflow-wrap:anywhere}
+
+  .full-chart{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,112px);
+    margin-top:14px;border:1px solid var(--glass-line);border-radius:8px;overflow:hidden;
+    background:rgba(14,8,32,.34);box-shadow:0 18px 42px rgba(8,4,20,.28)}
+  .palace{position:relative;min-width:0;padding:7px 5px 18px;border:0;color:var(--ink);font:inherit;text-align:left;
+    cursor:pointer;background:rgba(255,255,255,.025);box-shadow:inset -1px -1px 0 var(--glass-line);overflow:hidden;
+    transition:background .2s,box-shadow .2s}
+  .palace:hover{background:rgba(255,255,255,.055)}
+  .palace.on{z-index:2;background:color-mix(in srgb,var(--accent) 11%,rgba(26,16,51,.78));
+    box-shadow:inset 0 0 0 1.5px var(--accent),inset 0 0 24px color-mix(in srgb,var(--accent) 9%,transparent)}
+  .palace-head{display:flex;align-items:flex-start;justify-content:space-between;gap:3px;min-height:25px}
+  .palace-role{font-size:9px;line-height:1.2;font-weight:700;color:var(--ink);text-transform:uppercase;overflow-wrap:anywhere}
+  .palace-branch{font-family:"Fraunces",serif;font-size:12px;line-height:1;color:var(--muted);flex:0 0 auto}
+  .palace-main{display:flex;flex-direction:column;gap:1px;margin-top:2px;min-height:28px}
+  .palace-main span{font-family:"Fraunces",serif;font-size:11px;font-weight:600;line-height:1.15;color:var(--accent);overflow-wrap:anywhere}
+  .palace-main .empty{color:var(--muted);font-size:9px;font-style:italic;font-weight:500}
+  .palace-aux{margin-top:4px;color:var(--muted);font-size:7.5px;line-height:1.35;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .palace-flags{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;color:var(--coral);font-size:7px;font-weight:700;text-transform:uppercase}
+  .palace-age{position:absolute;left:5px;right:5px;bottom:5px;display:flex;justify-content:space-between;gap:3px;
+    color:var(--muted);font-size:7px;line-height:1;text-transform:uppercase}
+  .chart-core{grid-column:2/4;grid-row:2/4;padding:18px 12px;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;text-align:center;background:
+      radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 52%),
+      rgba(26,16,51,.76);box-shadow:inset -1px -1px 0 var(--glass-line)}
+  .chart-core .mark{font-size:22px;color:var(--accent);filter:drop-shadow(0 0 8px var(--accent-glow))}
+  .chart-core h3{font-size:20px;font-weight:600;margin-top:5px}
+  .chart-core p{font-size:9px;line-height:1.5;color:var(--muted);margin-top:7px;text-transform:uppercase}
+
+  .palace-popup[hidden]{display:none}
+  .palace-popup{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--col);
+    z-index:55;display:grid;place-items:center;padding:calc(24px + var(--safe-t)) 16px calc(24px + var(--tabbar-h))}
+  .popup-scrim{position:absolute;inset:0;background:rgba(10,5,24,.72);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+  .palace-popup-card{position:relative;z-index:1;width:100%;max-width:370px;max-height:100%;overflow-y:auto;padding:22px 20px 9px;
+    border-radius:8px;background:linear-gradient(155deg,rgba(59,32,99,.97),rgba(26,16,51,.98));
+    border:1px solid var(--accent-glow);box-shadow:0 24px 70px rgba(8,4,20,.72),0 0 30px color-mix(in srgb,var(--accent) 12%,transparent);
+    animation:popupIn .24s cubic-bezier(.2,.8,.2,1) both;scrollbar-width:none}
+  .palace-popup-card::-webkit-scrollbar{width:0}
+  @keyframes popupIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+  .popup-close{position:absolute;z-index:2;right:13px;top:13px;width:34px;height:34px;border-radius:50%;
+    display:grid;place-items:center;border:1px solid var(--glass-line);background:rgba(255,255,255,.06);color:var(--ink);cursor:pointer}
+  .popup-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .palace-popup-content{padding-top:28px}
+  .pd-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:14px}
+  .pd-head>div:first-child{padding-right:36px}
+  .pd-branch{font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase}
+  .pd-head h3{font-family:"Fraunces",serif;font-size:26px;font-weight:600;line-height:1.1;margin-top:3px}
+  .pd-cycle{text-align:right;color:var(--muted);font-size:10px;line-height:1.5;flex:0 0 auto}
+  .pd-cycle b{display:block;color:var(--ink);font-size:12px;font-weight:600}
+  .pd-flags{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;font-size:9px;font-weight:700;color:var(--coral);text-transform:uppercase}
+  .star-section{padding:13px 0;border-top:1px solid var(--glass-line)}
+  .star-section h4{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:10px}
+  .star-list{display:flex;flex-wrap:wrap;gap:8px 13px}
+  .star-item{display:inline-flex;align-items:center;gap:6px;padding:0;border:0;background:none;color:var(--ink);
+    font:inherit;font-size:11px;line-height:1.3;cursor:pointer;touch-action:pan-y;user-select:none;-webkit-user-select:none;
+    -webkit-touch-callout:none;transition:color .18s,transform .18s}
+  .star-item::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--star-color,var(--muted));
+    box-shadow:0 0 7px color-mix(in srgb,var(--star-color,var(--muted)) 65%,transparent);flex:0 0 auto}
+  .star-item.major{font-family:"Fraunces",serif;font-size:15px;font-weight:600}
+  .star-item:active{color:var(--accent);transform:scale(.96)}
+  .star-item:focus-visible{outline:1px solid var(--accent-glow);outline-offset:4px;border-radius:2px}
+  .star-empty{color:var(--muted);font-family:"Fraunces",serif;font-size:14px;font-style:italic}
+  .transform-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px;color:var(--accent);font-size:10px;font-weight:600}
+  .transform-list b{width:100%;color:var(--muted);font-size:8px;text-transform:uppercase}
+
+  .star-info-layer[hidden]{display:none}
+  .star-info-layer{position:absolute;inset:0;z-index:4;display:grid;place-items:center;padding:70px 22px 94px}
+  .star-info-scrim{position:absolute;inset:0;background:rgba(10,5,24,.42);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+  .star-info-card{position:relative;isolation:isolate;overflow:hidden;display:flex;width:100%;max-width:340px;
+    height:min(450px,52vh);padding:22px;border-radius:12px;
+    color:var(--ink);background:rgba(31,18,58,.98);border:1px solid var(--star-info-color,var(--accent));
+    box-shadow:0 20px 55px rgba(8,4,20,.68),0 0 24px color-mix(in srgb,var(--star-info-color,var(--accent)) 18%,transparent);
+    animation:popupIn .2s cubic-bezier(.2,.8,.2,1) both}
+  .star-info-card.has-star-art::before,.star-info-card.has-star-art::after{
+    content:"";position:absolute;inset:0;pointer-events:none}
+  .star-info-card.has-star-art::before{z-index:0;background-image:var(--star-info-art);background-size:cover;
+    background-position:center 28%;opacity:.64;filter:brightness(.88) saturate(.76);transform:scale(1.025)}
+  .star-info-card.has-star-art::after{z-index:1;background:
+    linear-gradient(110deg,rgba(22,12,44,.80),rgba(22,12,44,.38) 58%,rgba(14,8,32,.68)),
+    linear-gradient(180deg,rgba(14,8,32,.16),rgba(14,8,32,.58))}
+  #star-info-content{position:relative;z-index:2;width:100%;min-height:0;overflow-y:auto;scrollbar-width:none}
+  #star-info-content::-webkit-scrollbar{width:0}
+  .star-info-card.has-star-art #star-info-content{text-shadow:0 1px 7px rgba(6,3,16,.9)}
+  .star-info-head{display:flex;align-items:center;gap:12px}
+  .star-info-orb{width:24px;height:24px;border-radius:50%;background:var(--star-info-color);flex:0 0 auto;
+    box-shadow:0 0 18px color-mix(in srgb,var(--star-info-color) 70%,transparent)}
+  .star-info-kind{display:block;color:var(--muted);font-size:8px;font-weight:700;text-transform:uppercase}
+  .star-info-head h4{font-family:"Fraunces",serif;font-size:26px;font-weight:600;line-height:1.1;margin-top:2px}
+  .star-info-facts{margin-top:17px;border-top:1px solid var(--glass-line)}
+  .star-info-fact{display:grid;grid-template-columns:76px 1fr;gap:10px;padding:12px 0}
+  .star-info-fact+.star-info-fact{border-top:1px solid rgba(243,239,250,.09)}
+  .star-info-fact>span{color:var(--muted);font-size:9px;font-weight:600;text-transform:uppercase}
+  .star-info-fact b,.star-info-fact p{font-size:12px;line-height:1.5;font-weight:500}
+  .star-info-fact p{color:var(--ink);font-weight:400}
+  .star-info-dismiss{text-align:center;color:var(--muted);font-size:9px;letter-spacing:.12em;margin-top:13px}
+
+  @media(max-width:360px){
+    .chart-detail{padding-left:8px;padding-right:8px}
+    .full-chart{grid-template-rows:repeat(4,104px)}
+    .palace{padding-left:3px;padding-right:3px}
+    .palace-role{font-size:8px}.palace-branch{font-size:10px}
+    .palace-main span{font-size:9.5px}.palace-aux{font-size:7px}
+    .chart-core{padding:12px 7px}.chart-core h3{font-size:17px}
+  }
+
+  .backbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;
+    padding:calc(10px + var(--safe-t)) 20px 12px;
+    background:linear-gradient(180deg,rgba(26,16,51,.96) 60%,transparent);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .backbar button{background:rgba(255,255,255,.06);border:1px solid var(--glass-line);color:var(--ink);
+    width:38px;height:38px;border-radius:12px;cursor:pointer;display:grid;place-items:center}
+  .backbar button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+  .backbar h2{font-size:18px;font-weight:600}
+  @media(max-width:360px){
+    .an-sao-bar{gap:8px;padding-left:16px;padding-right:16px}
+    .an-sao-bar h2{font-size:16px}
+    .backbar .chart-open{padding:0 9px;font-size:10.5px;gap:0}
+    .backbar .chart-open svg{display:none}
+  }
+
+  .fade-up{animation:fadeUp .6s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  /* ===================== Hộp xác nhận an sao lại ===================== */
+  .confirm[hidden]{display:none}
+  .confirm{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:24px}
+  .confirm-scrim{position:absolute;inset:0;background:rgba(10,5,24,.74);
+    backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+  .confirm-card{position:relative;z-index:1;width:100%;max-width:380px;padding:28px 26px 24px;
+    border-radius:24px;text-align:center;
+    background:linear-gradient(155deg,rgba(59,32,99,.97),rgba(26,16,51,.98));
+    border:1px solid var(--accent-glow);
+    box-shadow:0 28px 72px rgba(8,4,20,.72),0 0 40px color-mix(in srgb,var(--accent) 16%,transparent);
+    animation:popupIn .24s cubic-bezier(.2,.8,.2,1) both}
+  .confirm-mark{font-size:26px;color:var(--accent);filter:drop-shadow(0 0 14px var(--accent-glow))}
+  .confirm-card h3{font-family:"Fraunces",serif;font-size:23px;font-weight:600;margin-top:10px;
+    line-height:1.15}
+  .confirm-card p{color:var(--muted);font-size:13.5px;line-height:1.6;margin-top:11px}
+  .confirm-data{font-family:"Fraunces",serif;font-size:21px;font-weight:600;color:var(--accent);
+    margin-top:13px;letter-spacing:.02em;line-height:1.25}
+  .confirm-check{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    margin-top:18px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+  .confirm-check input{width:17px;height:17px;flex:0 0 auto;cursor:pointer;
+    accent-color:var(--accent)}
+  .confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+  .confirm-actions .pill{width:100%;font-size:14.5px;padding:13px 10px}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:calc(22px + var(--tabbar-h));transform:translateX(-50%) translateY(20px);z-index:60;
+    padding:12px 20px;border-radius:999px;font-size:13.5px;font-weight:500;white-space:nowrap;
+    background:rgba(20,12,40,.92);border:1px solid var(--accent-glow);color:var(--ink);
+    opacity:0;pointer-events:none;transition:.35s;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ===================== Header dính đỉnh khung nhìn =====================
+     Đặt cuối bảng style để thắng padding/margin của từng component theo thứ tự
+     nguồn. Margin ngang âm để header tràn hết bề rộng khối cha có padding —
+     không có nó thì nội dung cuộn qua sẽ lộ ra ở hai rãnh lề. Margin trên âm
+     triệt tiêu padding-top của khối cha (--padtop) để lúc chưa cuộn không bị
+     dồn hai lớp khoảng trắng. Nền mờ dần ở mép dưới nên không cắt ngang nội
+     dung đang trôi phía sau.
+     Nền lấy đúng màu ĐỈNH gradient của trang (--bg-2) chứ không phải một màu
+     tối riêng: header luôn dính ở y=0, mà .col-bg lại cố định, nên chỗ đó bao
+     giờ cũng là --bg-2 — tô cùng màu thì dải header hoà vào bầu trời. Bản cũ
+     dùng rgba(21,13,42) tối hơn nền thật nhiều nên nhìn thành vệt đen.
+     Bản mệnh: khối .pad đầu chính là header và vốn đã là con trực tiếp của
+     section, nên dính được suốt màn hình mà không cần margin âm. */
+  .stickhead,#s-home>.pad:first-child{
+    position:sticky;top:0;z-index:14;
+    background:linear-gradient(180deg,
+      color-mix(in srgb,var(--bg-2) 86%,transparent) 58%,
+      color-mix(in srgb,var(--bg-2) 48%,transparent) 82%,
+      transparent);
+    backdrop-filter:blur(22px) saturate(135%);
+    -webkit-backdrop-filter:blur(22px) saturate(135%)}
+  .stickhead{--gut:22px;--padtop:calc(10px + var(--safe-t));
+    margin:calc(var(--padtop) * -1) calc(var(--gut) * -1) 12px;
+    padding:calc(12px + var(--safe-t)) var(--gut) 12px}
+  .screen.centered .stickhead{--padtop:calc(22px + var(--safe-t))}
+  .ob .stickhead{--padtop:calc(22px + var(--safe-t))}
+  .ansao-view .stickhead{--gut:18px}
+
+  /* ===================== Khuôn header dùng chung =====================
+     Bốn tab Bản mệnh · Vận hạn · Thiên bàn · Hồ sơ trước đây mỗi nơi tự đặt
+     inline style nên lệch nhau cả cỡ chữ tiêu đề (30/24/26px) lẫn màu và cỡ
+     nhãn (.kicker 12px muted vs .eyebrow 9px accent). Giờ dùng chung một khuôn:
+     nhãn nhỏ chữ hoa -> tiêu đề Fraunces -> dòng phụ, cộng một khe phải cho
+     badge hoặc chip. */
+  .headline{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+  .headline .eyebrow{font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--accent);font-weight:700}
+  .headline h2{font-family:"Fraunces",serif;font-size:26px;font-weight:600;line-height:1.06;
+    margin-top:7px;letter-spacing:-.01em}
+  .headline .headsub{color:var(--muted);font-size:13.5px;line-height:1.5;margin-top:7px;
+    max-width:54ch}
+  /* khe phải xếp dọc để trên màn hẹp không ăn mất bề ngang của tiêu đề */
+  .headline .head-aside{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;
+    gap:9px;margin-top:2px}
+  .headline .head-aside .av{width:46px;height:46px;border-radius:14px;display:grid;
+    place-items:center;background:color-mix(in srgb,var(--accent) 16%, transparent);
+    border:1px solid var(--accent-glow)}
+  .headline .head-aside .av svg{width:30px;height:30px}
+  /* .ansao-head chỉ còn là móc cho lưới desktop, phần bố cục do .headline lo.
+     TUYỆT ĐỐI không đặt padding ở đây: luật này nằm SAU .stickhead nên sẽ ghi
+     đè padding của nó, trong khi margin âm của .stickhead vẫn giữ nguyên —
+     header sẽ bị kéo ra ngoài mép khung và chữ dính sát cạnh. */
+  .ansao-head{display:block}
+
+  /* On phones the column is the whole page — drop the desktop ambience. */
+  @media (max-width:559px){
+    .cosmos .neb{display:none}
+    .cosmos .starlayer{opacity:.35}
+  }
+
+  /* ===================== Tablet =====================
+     Same product, wider column. Three things change: the column stops
+     being phone-width, the landing splits into two panes, and the cards
+     drop the 9:16 phone proportion so they stop reading as tall banners. */
+  @media (min-width:700px){
+    /* Cột tràn hết bề ngang màn hình, chỉ chặn trên ở 900px. Các thành phần
+       dùng --col đều đã là width:100% + max-width:var(--col), nên chỉ cần đặt
+       giá trị chặn — không trừ lề, không min() với 100vw. */
+    :root{--col:900px}
+    .pad{padding-left:30px;padding-right:30px}
+    .headline h2{font-size:29px}
+    .tab{font-size:11px;gap:5px}
+    .tab svg{width:25px;height:25px}
+
+    /* Landing: câu chuyện bên trái, cỗ máy nhập liệu bên phải */
+    .ob{display:grid;align-content:center;column-gap:40px;row-gap:0;
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+      padding-left:30px;padding-right:30px}
+    /* Landing hai pane: tiêu đề nằm gọn trong cột trái nên bỏ sticky — dải nền
+       full-bleed chỉ rộng bằng nửa cột sẽ trông như lỗi. */
+    .ob-head{grid-column:1;grid-row:1;text-align:left;margin:0;padding:0;
+      position:static;background:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+    .ob-head h1{font-size:clamp(30px,4.4vw,38px);margin-top:11px}
+    .ob-head p{font-size:15px;max-width:34ch;margin-top:9px}
+    .reward{grid-column:1;grid-row:2;margin:24px 0 0;align-self:start}
+    .machine{grid-column:2;grid-row:1/span 2;margin:0;align-self:center}
+    .ob-cta{grid-column:2;grid-row:3;margin-top:22px}
+
+    /* Deck: hai lá bài cùng lúc, tỉ lệ 3:4 thay vì 9:16 */
+    .rail{gap:20px;padding-left:30px;padding-right:30px}
+    .destiny,.rail>.tarot{aspect-ratio:3/4}
+    .rail>.destiny,.rail>.tarot{flex:0 0 min(322px,46%)}
+    /* Ở khổ này chiều cao do aspect-ratio quyết định, nên phân cấp bằng
+       flex-basis: lá chính rộng hơn lá phụ một bậc rõ rệt. */
+    #s-home .rail>.destiny,#s-home .rail>.tarot{
+      height:auto;width:auto;max-width:none;max-height:100%}
+    #s-home .rail>.destiny{flex:0 0 min(340px,48%)}
+    #s-home .rail>.tarot{flex:0 0 min(268px,38%)}
+    .destiny{padding:28px 24px 24px}
+    .destiny .dtitle{font-size:20px}
+    .destiny .dsub{font-size:14px}
+    .destiny .dmantra{font-size:17px}
+    .share-row{width:min(560px,92%)}
+
+    /* Thiên bàn: vòng luận giải giữ kích thước đọc được, không kéo dài cả cột */
+    .signature-intro,.signature-stage,.signature-panel,.theme-chips{
+      max-width:520px;margin-left:auto;margin-right:auto}
+    .ansao-view{padding-left:30px;padding-right:30px}
+    .palace-story{max-width:560px;margin-left:auto;margin-right:auto}
+    .story-palaces{justify-content:center}
+    .story-nav{max-width:560px;margin-left:auto;margin-right:auto}
+
+    /* Vận hạn: danh sách một cột quá thưa ở khổ này */
+    .catlist{display:grid;grid-template-columns:1fr 1fr}
+    .unlock-banner{max-width:560px;margin-left:auto;margin-right:auto}
+
+    /* Chat: dòng thoại dài quá 75 ký tự thì khó đọc */
+    .msg{max-width:min(78%,520px)}
+    .chat-hero .mm{width:110px;height:110px}
+    .stickhead,.ansao-view .stickhead{--gut:30px}
+
+    /* Lá số 12 cung: ô rộng ra thì cao theo, chữ mới không bị chèn */
+    .full-chart{grid-template-rows:repeat(4,132px)}
+    .palace{padding:9px 8px 20px}
+    .palace-role{font-size:10px}
+    .palace-main span{font-size:12.5px}
+    .palace-aux{font-size:8.5px}
+    .palace-age{font-size:8px}
+    .chart-fact small{font-size:9px}
+    .chart-fact b{font-size:12.5px}
+    .palace-popup-card{max-width:440px}
+    .star-info-card{max-width:400px}
+  }
+  /* ===================== DESKTOP >=1080px =====================
+     Cùng một bộ HTML, chỉ xoay lại bằng CSS. Thanh tab đáy biến thành sidebar
+     trái; mỗi màn hình thành lưới hai cột; các lớp phủ toàn màn (story, popup
+     cung) chuyển thành panel neo phải. Chỉ .navbrand là thành phần thêm mới. */
+  @media (min-width:1080px){
+    :root{--rail:250px;--shell:1200px;--tabbar-h:0px;--topbar-h:78px}
+    body{padding-left:var(--rail)}
+
+    /* --- navbar trên: dải nền trải hết bề ngang, chữ khoá vào cột --shell --- */
+    .topbar{display:block;position:sticky;top:0;z-index:30;
+      border-bottom:1px solid var(--glass-line);
+      background:linear-gradient(180deg,rgba(28,17,54,.94) 62%,rgba(28,17,54,.72) 88%,transparent);
+      backdrop-filter:blur(22px) saturate(130%);-webkit-backdrop-filter:blur(22px) saturate(130%)}
+    .topbar-inner{display:flex;align-items:center;gap:18px;width:100%;min-height:var(--topbar-h);
+      max-width:var(--shell);margin-inline:auto;padding:18px 40px 16px}
+    .topbar .crumb{font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+      color:var(--muted);font-weight:700}
+    .topbar h1{font-size:22px;font-weight:600;margin-top:3px;line-height:1.1}
+    .topbar .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+    /* mọi thứ dính đỉnh phải tụt xuống dưới navbar, nếu không sẽ chui vào dưới nó */
+    .stickhead,.backbar{top:var(--topbar-h)}
+    .col-bg{max-width:none;box-shadow:none}
+    .stage{max-width:none}
+
+    /* --- thanh tab đáy -> sidebar trái --- */
+    .tabbar{top:0;bottom:0;left:0;height:100dvh;width:var(--rail);max-width:none;
+      transform:none;flex-direction:column;justify-content:flex-start;gap:4px;
+      padding:22px 16px calc(20px + var(--safe-b));
+      background:linear-gradient(180deg,rgba(20,12,40,.74),rgba(14,8,30,.88));
+      border-right:1px solid var(--glass-line)}
+    /* desktop luôn thấy điều hướng, kể cả khi chưa an sao */
+    .device[data-mode="onboarding"] .tabbar{display:flex}
+    .navbrand{display:flex;align-items:center;gap:11px;padding:2px 8px 20px}
+    .navbrand .mark{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+      flex:0 0 auto;font-size:17px;color:#1A1033;
+      background:linear-gradient(140deg,var(--accent-2),var(--accent));
+      box-shadow:0 6px 18px var(--accent-glow)}
+    .navbrand b{font-family:"Fraunces",serif;font-size:17px;font-weight:600;letter-spacing:.18em}
+    .navbrand small{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+      color:var(--muted);font-weight:600;margin-top:2px}
+    .tab{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;
+      padding:11px 13px;border-radius:12px;font-size:14px;letter-spacing:0;
+      transition:background .18s,color .18s}
+    .tab svg{width:20px;height:20px}
+    .tab:hover{background:rgba(255,255,255,.055);color:var(--ink)}
+    .tab.on{color:#1A1033;background:linear-gradient(135deg,var(--accent-2),var(--accent));
+      box-shadow:0 8px 22px var(--accent-glow)}
+    .tab.on svg{filter:none;transform:none}
+
+    /* --- màn hình: cột nội dung căn giữa, bỏ căn giữa dọc kiểu mobile --- */
+    .screen.active,.screen.centered.active{display:block;width:100%;
+      max-width:var(--shell);margin-inline:auto;min-height:0}
+    .screen.centered>.pad:first-child{margin-top:0}
+    .screen.centered>.pad:last-child{margin-bottom:0}
+    .pad{padding:calc(18px + var(--safe-t)) 40px 56px}
+    .screen.centered>.pad:first-child{padding-top:calc(18px + var(--safe-t))}
+    .screen.centered>.pad:last-child{padding-bottom:56px}
+    .stickhead,.screen.centered .stickhead,.ob .stickhead{--gut:40px;--padtop:calc(18px + var(--safe-t))}
+
+    /* --- An sao: giữ hai pane của tablet, chỉ nới rộng --- */
+    .ob{max-width:var(--shell);margin-inline:auto;padding-left:40px;padding-right:40px;
+      column-gap:56px}
+    .ob-head h1{font-size:clamp(34px,3.2vw,44px)}
+
+    /* --- Bản mệnh: lá chính cột trái, ba lá phụ xếp dọc cột phải --- */
+    #s-home .rail{display:grid;grid-template-columns:364px minmax(0,1fr);gap:20px;
+      overflow:visible;padding:8px 40px 10px;align-items:start;scroll-snap-type:none}
+    #s-home .rail>.destiny{grid-column:1;grid-row:1/span 3;flex:none;
+      width:100%;height:auto;max-width:none;aspect-ratio:9/16}
+    #s-home .rail>.tarot{grid-column:2;flex:none;width:auto;height:auto;max-width:none;
+      aspect-ratio:auto;min-height:0}
+    #s-home .rail>.tarot p{max-width:64ch}
+    #s-home .rail>.tarot .tag{margin-top:14px}
+    #s-home .raildots{display:none}
+    #s-home .shorts{grid-template-columns:repeat(4,1fr)}
+
+    /* --- Vận hạn: danh sách trái, banner mời bạn thành rail phải --- */
+    #s-vanhan>.pad{display:grid;grid-template-columns:minmax(0,1fr) 340px;
+      column-gap:28px;align-items:start}
+    #s-vanhan>.pad>.stickhead{grid-column:1/-1}
+    #s-vanhan>.pad>.catlist{grid-column:1}
+    #s-vanhan>.pad>.unlock-banner{grid-column:2;margin-top:18px;position:sticky;top:150px}
+
+    /* --- Hỏi AI: một cột chat hẹp căn giữa vùng làm việc --- */
+    #s-hoiai>.pad{max-width:780px;margin-inline:auto;min-height:0;
+      padding-bottom:120px}
+    #s-hoiai .composer{left:calc(var(--rail) + (100vw - var(--rail))/2);
+      transform:translateX(-50%);width:min(780px, calc(100vw - var(--rail) - 80px));
+      max-width:none;bottom:0;padding:14px 0 18px}
+    #s-hoiai .composer::before{inset:-30px 0 0}
+
+    /* --- Hồ sơ: lá số đã lưu bên trái, cài đặt bên phải --- */
+    #s-hoso>.pad{display:grid;grid-template-columns:minmax(0,1fr) 380px;
+      column-gap:30px;align-items:start}
+    /* đặt theo thứ tự con: 1 header · 2-3 lá số đã lưu · 4-6 cài đặt */
+    #s-hoso>.pad>:nth-child(1){grid-column:1/-1}
+    #s-hoso>.pad>:nth-child(2),#s-hoso>.pad>:nth-child(3){grid-column:1}
+    #s-hoso>.pad>:nth-child(4),#s-hoso>.pad>:nth-child(5),#s-hoso>.pad>:nth-child(6){grid-column:2}
+    #s-hoso .saved{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;overflow:visible}
+    #s-hoso .savecard{flex:none}
+
+    /* --- Thiên bàn: vòng luận giải trái, chip + panel phải --- */
+    #s-lasogoc .ansao-view{display:grid;grid-template-columns:minmax(0,1fr) 400px;
+      column-gap:30px;align-items:start;padding:calc(10px + var(--safe-t)) 40px 56px}
+    /* .ansao-head giữ nguyên margin âm của .stickhead để dải nền vẫn phủ hết
+       hai rãnh lề 40px; chỉ .signature-intro mới cần bỏ căn giữa của tablet. */
+    #s-lasogoc .ansao-head{grid-column:1/-1}
+    #s-lasogoc .signature-intro{grid-column:1/-1;max-width:none;text-align:left;
+      margin-left:0;margin-right:0}
+    #s-lasogoc .signature-stage{grid-column:1;max-width:none;margin:0}
+    #s-lasogoc .theme-chips{grid-column:2;max-width:none;margin:0}
+    #s-lasogoc .signature-panel{grid-column:2;max-width:none;margin:12px 0 0}
+    /* story cung: từ lớp phủ toàn màn -> ngăn kéo neo phải */
+    #s-lasogoc .theme-story{left:auto;right:0;top:var(--topbar-h);transform:none;width:min(520px,42vw);
+      max-width:none;border-left:1px solid var(--glass-line);padding-bottom:40px}
+
+    /* --- Lá số 12 cung: lưới trái, chi tiết cung neo phải, bỏ lớp che --- */
+    #s-lasochitiet .chart-detail{padding:2px 40px 56px}
+    #s-lasochitiet .full-chart{max-width:760px;margin-right:auto;
+      grid-template-rows:repeat(4,150px)}
+    #s-lasochitiet .chart-summary{max-width:760px}
+    .palace-popup{left:auto;right:28px;transform:none;width:376px;max-width:none;
+      top:calc(var(--topbar-h) + 18px);bottom:28px;padding:0;display:block}
+    .popup-scrim{display:none}
+    .palace-popup-card{max-width:none;height:100%;border-radius:18px}
+    .star-info-layer{padding:40px 20px}
+
+    /* --- backbar bám đỉnh vùng làm việc --- */
+    .backbar{padding-left:40px;padding-right:40px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.15s!important}
+  }
+</style>
+</head>
+<body>
+  <div class="cosmos" aria-hidden="true">
+    <div class="neb a"></div><div class="neb b"></div>
+    <div class="starlayer" id="bgstars"></div>
+  </div>
+
+  <div class="stage">
+    <div class="device" id="device" data-mode="onboarding">
+      <div class="col-bg" id="vpstars" aria-hidden="true"></div>
+
+      <div class="viewport">
+        <!-- Navbar trên — chỉ hiện từ 1080px. Mobile không có chỗ cho nó và đã
+             có sticky header riêng trong từng màn, nên ẩn hoàn toàn. -->
+        <header class="topbar" data-od-id="topbar">
+          <div class="topbar-inner">
+            <div>
+              <div class="crumb" id="top-crumb">Lá số của bạn</div>
+              <h1 id="top-title">An sao</h1>
+            </div>
+            <div class="right">
+              <span class="elbadge" id="top-elbadge"><span class="dot"></span>Hành —</span>
+              <button class="pill pill-ghost" style="padding:9px 17px;font-size:13px" data-share>⇪ Chia sẻ</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="screens">
+
+          <!-- ============ ONBOARDING ============ -->
+          <section class="screen active" id="s-onboard" data-od-id="screen-an-sao">
+            <div class="ob">
+              <div class="ob-head stickhead" data-od-id="an-sao-head">
+                <div class="eyebrow">An sao · lập lá số</div>
+                <h1>Chạm vào bầu trời<br>ngày bạn sinh ra</h1>
+                <p>Xoay các vòng sao để nhập ngày sinh — chòm sao mệnh của bạn sẽ dần hiện lên.</p>
+              </div>
+
+              <div class="reward" id="reward" aria-hidden="true">
+                <div class="reward-art" id="reward-art"></div>
+                <svg id="reward-svg" viewBox="0 0 320 100" preserveAspectRatio="xMidYMid meet"></svg>
+                <div class="cap" id="rewardcap">CHÒM SAO MỆNH ĐANG NGỦ</div>
+              </div>
+
+              <div class="machine glass">
+                <div class="dials">
+                  <div class="dcol"><div class="lbl">Ngày</div><div class="picker" id="pk-day" data-min="1"></div></div>
+                  <div class="dcol"><div class="lbl">Tháng</div><div class="picker" id="pk-month" data-min="1"></div></div>
+                  <div class="dcol"><div class="lbl">Năm</div><div class="picker" id="pk-year" data-min="2005"></div></div>
+                </div>
+                <div class="hour-lbl">Giờ sinh <span class="req">· bắt buộc</span></div>
+                <div class="birth-clock" id="birth-clock" role="slider" tabindex="0"
+                  aria-label="Giờ sinh" aria-valuemin="0" aria-valuemax="11" aria-valuenow="0" aria-valuetext="Chưa chọn giờ sinh">
+                  <div class="clock-face">
+                    <div class="clock-ticks" aria-hidden="true"></div>
+                    <div class="clock-hand" aria-hidden="true"></div>
+                    <div class="clock-pin" aria-hidden="true"></div>
+                    <div id="clock-hours"></div>
+                    <div class="clock-readout" aria-live="polite">
+                      <strong id="clock-chi">Chọn giờ</strong>
+                      <span id="clock-range">--:--</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ob-cta">
+                <button class="pill pill-primary" id="btn-divine">✦ Luận giải lá số của tôi</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ LOADING ============ -->
+          <section class="screen" id="s-loading">
+            <div class="wrap">
+              <div class="orbit">
+                <div class="ring r1"></div>
+                <div class="ring r2"></div>
+                <div class="planet"></div>
+                <div class="core" id="loadmascot"></div>
+              </div>
+              <div class="loadtxt">
+                <div class="t">đang luận giải<span class="d"><span>.</span><span>.</span><span>.</span></span></div>
+                <p id="loadsub">Nghê Sao đang đọc vị trí các vì tinh tú…</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ TAB: BẢN MỆNH (cũng là màn hình kết quả an sao) ============ -->
+          <section class="screen centered" id="s-home" data-od-id="screen-ban-menh">
+            <div class="pad" style="padding-bottom:10px">
+              <div class="headline" data-od-id="ban-menh-head">
+                <div>
+                  <div class="eyebrow">Chào buổi tối</div>
+                  <h2 id="greet-name">Bạn Sao Trẻ</h2>
+                  <p class="headsub">Lá Bài Bản Mệnh ở đầu — vuốt sang để lật 3 lá bài phụ.</p>
+                </div>
+                <div class="head-aside">
+                  <span class="elbadge" id="home-elbadge"><span class="dot"></span>Hành —</span>
+                </div>
+              </div>
+            </div>
+            <div class="rail" id="deck-h">
+              <div class="destiny" id="destiny-home"></div>
+            </div>
+            <div class="raildots" id="deck-dots-h"></div>
+            <div class="pad" style="padding-top:10px">
+              <div class="share-row" style="margin-top:2px">
+                <button class="pill pill-ghost" data-share>⇪ Lưu ảnh</button>
+                <button class="pill pill-primary" data-share>Chia sẻ story</button>
+              </div>
+              <div class="shead"><h2>Khám phá thêm</h2></div>
+              <div class="shorts">
+                <button class="short glass" data-goto="vanhan">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="2.5"/></svg>
+                  <div><b>Vận hạn</b></div><span>Tình cảm, công danh, tiền tài</span>
+                </button>
+                <button class="short glass" data-goto="hoiai">
+                  <svg viewBox="0 0 24 24"><path d="M4 6h16v10H9l-4 4V6z"/><path d="M9 11h6M9 8h4"/></svg>
+                  <div><b>Hỏi AI</b></div><span>Trò chuyện cùng Nghê Sao</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ TAB: VẬN HẠN ============ -->
+          <section class="screen centered" id="s-vanhan" data-od-id="screen-van-han">
+            <div class="pad">
+              <div class="stickhead" data-od-id="van-han-head"><div class="headline">
+                <div>
+                  <div class="eyebrow">Vận hạn 2026</div>
+                  <h2>Đường sao năm nay</h2>
+                  <p class="headsub">Mở từng lĩnh vực để xem tinh tú đang xoay vần thế nào.</p>
+                </div>
+              </div></div>
+              <div class="catlist" style="margin-top:18px">
+                <div class="cat glass" data-open="Tình cảm">
+                  <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9.5A3.5 3.5 0 0 1 12 8a3.5 3.5 0 0 1 7 2.5C19 15.5 12 20 12 20z"/></svg></div>
+                  <div class="grow"><span class="free">MIỄN PHÍ</span><h3>Tình cảm</h3><p>Rung động, tri kỷ &amp; những ngã rẽ trái tim.</p></div>
+                  <div class="row" style="color:var(--accent)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></div>
+                </div>
+                <div class="cat glass locked" data-lock="Công danh">
+                  <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 20h16M6 20V9l6-4 6 4v11"/><path d="M10 20v-5h4v5"/></svg></div>
+                  <div class="grow"><h3>Công danh</h3><p>Vị thế, tiếng nói &amp; con đường bạn dẫn đầu.</p></div>
+                  <div class="lock"><span class="star">✦</span><small>Mời 1 người bạn để mở</small></div>
+                </div>
+                <div class="cat glass locked" data-lock="Sự nghiệp">
+                  <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M4 13h16"/></svg></div>
+                  <div class="grow"><h3>Sự nghiệp</h3><p>Học hành, chọn ngành &amp; bứt phá sớm.</p></div>
+                  <div class="lock"><span class="star">✦</span><small>Gói Thiên Cơ</small></div>
+                </div>
+                <div class="cat glass locked" data-lock="Tiền tài">
+                  <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/></svg></div>
+                  <div class="grow"><h3>Tiền tài</h3><p>Lộc trời, tay hòm chìa khoá &amp; may mắn bất ngờ.</p></div>
+                  <div class="lock"><span class="star">✦</span><small>Gói Thiên Cơ</small></div>
+                </div>
+              </div>
+
+              <div class="unlock-banner glass">
+                <h3>Mở khoá bằng ánh sao của bạn bè</h3>
+                <p>Mời 1 người bạn cùng xem tử vi — bạn được mở <b>Công danh</b> miễn phí, cả hai cùng có thêm 1 câu hỏi AI.</p>
+                <button class="pill pill-primary" style="width:100%" data-toast="Đã sao chép lời mời ✦ Gửi cho hội bạn thân nào!">Mời bạn &amp; mở khoá</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ TAB: HỎI AI ============ -->
+          <section class="screen" id="s-hoiai">
+            <div class="pad">
+              <div class="chat-hero stickhead" data-od-id="hoi-ai-head">
+                <div class="mm" id="chat-mascot"></div>
+                <h2>Nghê Sao</h2>
+                <p>Tinh linh dẫn đường · luôn thành thật, luôn dịu dàng</p>
+              </div>
+              <div class="chat">
+                <div class="msg ai"><div class="who">NGHÊ SAO</div>Chào bạn nhỏ ✦ Mình đã đọc lá số của bạn rồi. Hôm nay có điều gì trong lòng muốn hỏi các vì sao không?</div>
+                <div class="msg me">Tuần này con crush có để ý em không ạ 🥺</div>
+                <div class="msg ai"><div class="who">NGHÊ SAO</div>Sao Đào Hoa đang chiếu nhẹ vào cuối tuần của bạn đó. Cứ là chính mình, một tin nhắn đúng lúc còn linh hơn cả trăm lần đoán già đoán non nha.</div>
+              </div>
+              <div class="limit glass">
+                <p>Hôm nay bạn còn <b>2 / 3 câu hỏi</b> miễn phí</p>
+                <div class="bar"><i></i></div>
+                <p style="font-size:12.5px;margin-bottom:12px">Nâng cấp <b>Thiên Cơ</b> để hỏi Nghê Sao không giới hạn.</p>
+                <button class="pill pill-primary" style="width:100%" data-toast="Gói Thiên Cơ sắp ra mắt ✦">Mở khoá Hỏi AI không giới hạn</button>
+              </div>
+            </div>
+            <div class="composer">
+              <div class="box glass">
+                <input id="chat-input" placeholder="Hỏi Nghê Sao điều gì đó…" />
+                <button class="send" id="chat-send" aria-label="Gửi"><svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ TAB: HỒ SƠ ============ -->
+          <section class="screen centered" id="s-hoso" data-od-id="screen-ho-so">
+            <div class="pad">
+              <div class="stickhead" data-od-id="ho-so-head"><div class="headline">
+                <div>
+                  <div class="eyebrow">Hồ sơ</div>
+                  <h2 id="prof-name">Bạn Sao Trẻ</h2>
+                  <p class="headsub">Lá số đã lưu, giao diện và nhắc nhở của bạn.</p>
+                </div>
+                <div class="head-aside">
+                  <span class="av" id="prof-mascot"></span>
+                  <span class="elbadge" id="prof-elbadge"><span class="dot"></span>Hành —</span>
+                </div>
+              </div></div>
+
+              <div class="shead"><h2>Lá số đã lưu</h2></div>
+              <div class="saved">
+                <div class="savecard"><span class="dt">16 · 07 · 2026</span><b>Vì Sao Dẫn Lối</b></div>
+                <div class="savecard"><span class="dt">Bạn thân · Minh</span><b>Ngọn Lửa Rực Rỡ</b></div>
+                <div class="savecard"><span class="dt">Bạn thân · An</span><b>Dòng Chảy Thiên Hà</b></div>
+              </div>
+
+              <div class="shead"><h2>Cài đặt</h2></div>
+              <div class="list glass">
+                <div class="li"><svg viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M5 12H3M21 12h-2"/><circle cx="12" cy="12" r="4"/></svg><div class="t"><b>Giao diện</b><small>Luminous Twilight · theo hành mệnh</small></div><span class="chev">›</span></div>
+                <div class="li"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><div class="t"><b>Nhắc nhở vận hạn</b><small>Mỗi sáng một lời từ Nghê Sao</small></div><span class="chev">›</span></div>
+                <div class="li"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H4z"/><path d="m4 16 5-5 3 3 4-4 4 4"/></svg><div class="t"><b>Ảnh chia sẻ</b><small>Xuất lá bài dạng story 9:16</small></div><span class="chev">›</span></div>
+                <div class="li" data-goto="onboard"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg><div class="t"><b>Nhập lại ngày sinh</b><small>Xoay lại cỗ máy vũ trụ</small></div><span class="chev">›</span></div>
+              </div>
+              <div class="center" style="margin-top:20px">
+                <button class="skip" data-goto="onboard">Bắt đầu lại từ đầu</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============ AN SAO: swipeable thematic lens ============ -->
+          <section class="screen" id="s-lasogoc">
+            <div class="ansao-view" id="ansao-view"></div>
+          </section>
+
+          <!-- ============ CHI TIẾT LÁ SỐ ============ -->
+          <section class="screen" id="s-lasochitiet">
+            <div class="backbar">
+              <button type="button" data-goto="lasogoc" aria-label="Quay lại Thiên Bàn"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+              <h2>Chi tiết lá số</h2>
+            </div>
+            <div class="chart-detail">
+              <header class="chart-summary">
+                <div class="kicker">Lá số gốc</div>
+                <h1 id="chart-birth-date">04 · 04 · 2009</h1>
+                <div class="chart-facts">
+                  <div class="chart-fact"><small>Giờ sinh</small><b id="chart-birth-hour">Giờ Mão</b></div>
+                  <div class="chart-fact"><small>Âm dương</small><b>Dương Nam</b></div>
+                  <div class="chart-fact"><small>Cục</small><b>Kim Tứ Cục</b></div>
+                </div>
+              </header>
+              <div class="full-chart" id="full-chart" aria-label="Lá số 12 cung"></div>
+            </div>
+          </section>
+
+        </div><!-- /screens -->
+
+        <div class="palace-popup" id="palace-popup" role="dialog" aria-modal="true" aria-labelledby="palace-popup-title" hidden>
+          <div class="popup-scrim" data-close-palace></div>
+          <article class="palace-popup-card">
+            <button class="popup-close" type="button" data-close-palace aria-label="Đóng chi tiết cung">
+              <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
+            <div class="palace-popup-content" id="palace-popup-content"></div>
+          </article>
+          <div class="star-info-layer" id="star-info-layer" role="dialog" aria-modal="false" aria-labelledby="star-info-title" hidden>
+            <div class="star-info-scrim" data-close-star></div>
+            <aside class="star-info-card">
+              <div id="star-info-content"></div>
+            </aside>
+          </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <div class="confirm" id="confirm-birth" role="dialog" aria-modal="true"
+             aria-labelledby="cb-title" aria-describedby="cb-desc" hidden>
+          <div class="confirm-scrim" data-birth-no></div>
+          <div class="confirm-card">
+            <div class="confirm-mark" aria-hidden="true">✦</div>
+            <h3 id="cb-title">Xác nhận ngày sinh</h3>
+            <p class="confirm-data" id="cb-data">—</p>
+            <p id="cb-desc">Lá số sẽ được an theo đúng ngày giờ này. Sau này muốn đổi,
+              bạn vào tab <b>Hồ sơ</b> → <b>Nhập lại ngày sinh</b>.</p>
+            <label class="confirm-check">
+              <input type="checkbox" id="cb-mute"><span>Không nhắc lại</span></label>
+            <div class="confirm-actions">
+              <button class="pill pill-ghost" type="button" data-birth-no>Sửa lại</button>
+              <button class="pill pill-primary" type="button" data-birth-yes>Đúng rồi, an sao</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="confirm" id="confirm-reset" role="dialog" aria-modal="true"
+             aria-labelledby="confirm-title" aria-describedby="confirm-desc" hidden>
+          <div class="confirm-scrim" data-confirm-no></div>
+          <div class="confirm-card">
+            <div class="confirm-mark" aria-hidden="true">✦</div>
+            <h3 id="confirm-title">An sao lại từ đầu?</h3>
+            <p id="confirm-desc">Toàn bộ lá số hiện tại sẽ bị xoá — lá bài bản mệnh, vận hạn,
+              thiên bàn, lá số 12 cung và cuộc trò chuyện với Nghê Sao đều trở lại từ đầu.</p>
+            <div class="confirm-actions">
+              <button class="pill pill-ghost" type="button" data-confirm-no>Ở lại</button>
+              <button class="pill pill-primary" type="button" data-confirm-yes>An sao lại</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- tab bar -->
+        <nav class="tabbar" data-od-id="tabbar" aria-label="Điều hướng chính">
+          <!-- Thành phần desktop duy nhất phải thêm: thanh tab đáy không có chỗ
+               cho tên app, còn sidebar thì bắt buộc. Ẩn ở mọi cỡ dưới desktop. -->
+          <div class="navbrand" aria-hidden="true"><span class="mark">✦</span>
+            <span><b>TỬ VI</b><small>An sao &amp; luận giải</small></span></div>
+          <button class="tab on" data-goto="home" data-od-id="tab-ban-menh" data-needs-chart>
+            <svg viewBox="0 0 24 24"><path d="M12 3l2.4 5.3L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.6-.7z"/></svg>Bản mệnh</button>
+          <button class="tab" data-goto="vanhan" data-od-id="tab-van-han" data-needs-chart>
+            <svg viewBox="0 0 24 24"><circle class="node" cx="5" cy="8" r="1.6"/><circle class="node" cx="12" cy="5" r="1.6"/><circle class="node" cx="19" cy="9" r="1.6"/><circle class="node" cx="9" cy="16" r="1.6"/><circle class="node" cx="16" cy="19" r="1.6"/><path d="M5 8l7-3 7 4-10 7 3 3" stroke-width="1.2"/></svg>Vận hạn</button>
+          <button class="tab" data-goto="hoiai" data-od-id="tab-hoi-ai" data-needs-chart>
+            <svg viewBox="0 0 24 24"><path d="M12 4c4 0 7 2.6 7 6 0 1.7-1 3.2-2 4 .2 2 1 3 1 3-2 0-3.4-.8-4.2-1.4-.6.1-1.2.2-1.8.2-4 0-7-2.6-7-6s3-6 7-6z"/><circle class="node" cx="12" cy="9.5" r="1"/></svg>Hỏi AI</button>
+          <button class="tab" data-goto="lasogoc" data-od-id="tab-nang-cao" data-needs-chart>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="3.2"/><path d="M12 3.4v3.4M12 17.2v3.4M3.4 12h3.4M17.2 12h3.4"/><path d="m6.6 6.6 2.2 2.2M15.2 15.2l2.2 2.2M17.4 6.6l-2.2 2.2M8.8 15.2l-2.2 2.2" stroke-width="1"/></svg>Nâng cao</button>
+          <button class="tab" data-goto="hoso" data-od-id="tab-ho-so">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/><path d="M12 2v1.5M18.5 5.5l-1 1" stroke-width="1"/></svg>Hồ sơ</button>
+        </nav>
+
+      </div><!-- /viewport -->
+    </div><!-- /device -->
+  </div><!-- /stage -->
+
+<script>
+(function(){
+  "use strict";
+  var device = document.getElementById('device');
+
+  /* ---------- star fields ---------- */
+  function rnd(a,b){return a+Math.random()*(b-a);}
+  /* Mỗi sao được gieo một quãng trôi, một chu kỳ và một pha riêng — hai
+     animation (twinkle, drift) nên có hai animation-delay ngăn bởi dấu phẩy.
+     Delay âm để bầu trời đã đang chuyển động sẵn ngay khi trang mở. */
+  function seedStars(el, n, sizes){
+    if(!el) return;
+    var h='';
+    for(var i=0;i<n;i++){
+      var s=rnd(sizes[0],sizes[1]);
+      h+='<span class="s" style="width:'+s.toFixed(1)+'px;height:'+s.toFixed(1)+'px'
+        +';left:'+rnd(0,100).toFixed(2)+'%;top:'+rnd(0,100).toFixed(2)+'%'
+        +';--tw:'+rnd(3.2,7).toFixed(2)+'s'
+        +';--drift:'+rnd(26,62).toFixed(1)+'s'
+        +';--dx:'+rnd(-46,46).toFixed(1)+'px'
+        +';--dy:'+rnd(-34,34).toFixed(1)+'px'
+        +';animation-delay:'+(-rnd(0,7)).toFixed(2)+'s,'+(-rnd(0,60)).toFixed(2)+'s"></span>';
+    }
+    el.innerHTML=h;
+  }
+  seedStars(document.getElementById('bgstars'),70,[1,3]);
+  seedStars(document.getElementById('vpstars'),46,[1,2.6]);
+
+  /* ---------- sao băng ---------- */
+  var skyLayer=document.getElementById('vpstars');
+  var calmSky=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function shootingStar(){
+    if(!skyLayer||document.hidden) return;
+    var dur=rnd(1.05,1.9), el=document.createElement('i');
+    el.className='shootingstar';
+    el.style.cssText='--sx:'+rnd(-6,52).toFixed(1)+'%;--sy:'+rnd(2,44).toFixed(1)+'%'
+      +';--sang:'+rnd(14,42).toFixed(1)+'deg'
+      +';--slen:'+rnd(74,148).toFixed(0)+'px'
+      +';--sdist:'+rnd(240,460).toFixed(0)+'px'
+      +';--sdur:'+dur.toFixed(2)+'s';
+    skyLayer.appendChild(el);
+    setTimeout(function(){el.remove();},dur*1000+180);
+  }
+  (function nextShootingStar(){
+    if(calmSky) return;                       // tôn trọng prefers-reduced-motion
+    setTimeout(function(){shootingStar();nextShootingStar();},rnd(5200,15000));
+  })();
+
+  /* ---------- mascot (celestial Nghê / star-spirit) ---------- */
+  function mascotSVG(size){
+    return '<svg viewBox="0 0 120 120" width="'+size+'" height="'+size+'" style="overflow:visible">'
+      +'<g fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 8px var(--accent-glow))">'
+      +'<path d="M30 86 C24 66 34 52 50 50 C40 40 44 26 58 24 C54 32 60 38 68 36 C66 30 72 24 80 26 C76 32 80 38 86 40" opacity=".9"/>'
+      +'<path d="M50 50 C64 48 78 56 84 70 C88 80 84 92 74 96 C80 86 74 74 64 74 C70 82 64 92 54 90" opacity=".9"/>'
+      +'<path d="M30 86 C36 90 46 92 54 90"/>'
+      +'<path d="M80 26 C86 22 92 24 94 30" opacity=".8"/>'
+      +'<path d="M86 40 C92 40 96 44 96 50" opacity=".7"/>'
+      +'</g>'
+      +'<g fill="var(--accent)" style="filter:drop-shadow(0 0 6px var(--accent-glow))">'
+      +'<circle cx="82" cy="34" r="2.6"/><circle cx="50" cy="50" r="2.4"/>'
+      +'<circle cx="64" cy="74" r="2.2"/><circle cx="30" cy="86" r="2.2"/>'
+      +'<circle cx="94" cy="30" r="1.8"/><circle cx="86" cy="40" r="1.6"/>'
+      +'<circle cx="74" cy="96" r="1.8"/>'
+      +'</g>'
+      +'<circle cx="82" cy="34" r="5.5" fill="none" stroke="var(--accent)" stroke-width="1" opacity=".5"/>'
+      +'</svg>';
+  }
+  var lm=document.getElementById('loadmascot'); if(lm) lm.innerHTML=mascotSVG(96);
+  var cm=document.getElementById('chat-mascot'); if(cm) cm.innerHTML=mascotSVG(92);
+  var pm=document.getElementById('prof-mascot'); if(pm) pm.innerHTML=mascotSVG(40);
+
+  /* ---------- chính tinh model (main-star destiny) ----------
+     Mệnh có thể: 1 chính tinh (một màu), 2 chính tinh = sao đôi
+     (hai màu khác nhau), hoặc vô chính diệu (một màu trung tính). */
+  var STARS={
+    tuvi:      {name:'Tử Vi',      color:'#B98CFF', light:'#E3D2FF', glow:'rgba(185,140,255,.5)', image:'images/tu_vi_zeus.png'},
+    thienphu:  {name:'Thiên Phủ',  color:'#EAD9A0', light:'#F7EFCF', glow:'rgba(234,217,160,.5)', image:'images/hera_thien_phu.png'},
+    thatsat:   {name:'Thất Sát',   color:'#FF5D6C', light:'#FFB0A6', glow:'rgba(255,93,108,.5)', image:'images/ares_that_sat.png'},
+    phaquan:   {name:'Phá Quân',   color:'#7DA4FF', light:'#C3D6FF', glow:'rgba(125,164,255,.5)', image:'images/prometheus_pha_quan.png'},
+    thamlang:  {name:'Tham Lang',  color:'#FF7EC6', light:'#FFC2E4', glow:'rgba(255,126,198,.5)', image:'images/aphodite_tham_lang.png'},
+    thaiduong: {name:'Thái Dương', color:'#FFB44F', light:'#FFD9A0', glow:'rgba(255,180,79,.5)', image:'images/apolo_thai_duong.png'},
+    thaiam:    {name:'Thái Âm',    color:'#C9D6FF', light:'#EAF0FF', glow:'rgba(201,214,255,.5)', image:'images/atemis_thai_am.png'},
+    vukhuc:    {name:'Vũ Khúc',    color:'#4F9DE0', light:'#B9E0FF', glow:'rgba(79,157,224,.5)', image:'images/hermes_vu_khuc.png'}
+  };
+  var NEUTRAL={color:'#B9AED1', light:'#F3EFFA', glow:'rgba(185,174,209,.45)'};
+  var OUTCOMES=[
+    {stars:['tuvi'],      archetype:'Đế Tinh Dẫn Lối',    luck:'Tím Đế Vương',
+      mantra:'Sinh ra để đứng đầu —\\ncứ điềm tĩnh, thiên hạ tự nghiêng mình.'},
+    {stars:['thienphu'],  archetype:'Kho Trời Sung Túc',  luck:'Vàng Champagne',
+      mantra:'Giàu không ở trong túi,\\nmà ở tấm lòng rộng như kho trời.'},
+    {stars:['thatsat'],   archetype:'Tướng Quân Phá Vây', luck:'Đỏ Chiến Bào',
+      mantra:'Đường càng gai góc,\\ngan bạn càng lì để phá vòng vây.'},
+    {stars:['phaquan'],   archetype:'Sóng Thần Đổi Vận',  luck:'Chàm Điện',
+      mantra:'Dám đập bỏ cái cũ,\\nvì bạn luôn dựng lại đẹp hơn.'},
+    {stars:['thamlang'],  archetype:'Đào Hoa Bất Bại',    luck:'Hồng Tham Lang',
+      mantra:'Duyên là trời cho,\\nnhưng chân thành mới giữ người ở lại.'},
+    {stars:['thaiduong'], archetype:'Vầng Dương Rực Rỡ',  luck:'Hổ Phách',
+      mantra:'Cứ toả sáng hết mình,\\nai ở gần bạn cũng thấy ấm.'},
+    {stars:['thaiam'],    archetype:'Nguyệt Quang Dịu Dàng', luck:'Bạc Nguyệt',
+      mantra:'Dịu như ánh trăng,\\nnhưng chính bạn kéo cả thuỷ triều.'},
+    {stars:['vukhuc'],    archetype:'Kim Tài Cương Nghị',  luck:'Lam Vũ Khúc',
+      mantra:'Bản lĩnh là gốc,\\ntiền tài chỉ là quả ngọt theo sau.'},
+    /* ── sao đôi (song tinh) → hai màu ── */
+    {stars:['tuvi','thienphu'],   archetype:'Đế Phủ Song Toàn', luck:'Tím · Vàng',
+      mantra:'Vừa có uy vừa có phúc —\\nngười khác vừa nể vừa thương.'},
+    {stars:['tuvi','thatsat'],    archetype:'Đế Sát Uy Nghi',   luck:'Tím · Đỏ',
+      mantra:'Quyền trong tay, gươm bên mình —\\nbạn không đợi thời, bạn tạo thời.'},
+    {stars:['tuvi','thamlang'],   archetype:'Đế Đào Phong Lưu', luck:'Tím · Hồng',
+      mantra:'Vừa sang vừa duyên —\\ncả phòng sáng lên khi bạn bước vào.'},
+    {stars:['vukhuc','thamlang'], archetype:'Vũ Tham Đắc Lộc',  luck:'Lam · Hồng',
+      mantra:'Bản lĩnh cộng sức hút,\\ncơ hội và tài lộc tự tìm đến.'},
+    /* ── vô chính diệu ── */
+    {stars:[], archetype:'Trời Rộng Thênh Thang', luck:'Ánh Bạc Trung Hoà',
+      mantra:'Không sao chiếu mệnh,\\nnghĩa là cả bầu trời là của bạn.'}
+  ];
+  function outcomeFromBirth(s){
+    var hi=0;
+    for(var i=0;i<HOURS.length;i++){if(HOURS[i].chi===s.hour){hi=i+1;break;}}
+    var n=(s.day*7 + s.month*11 + s.year*3 + hi*5);
+    return OUTCOMES[((n%OUTCOMES.length)+OUTCOMES.length)%OUTCOMES.length];
+  }
+  function starLabel(o){
+    if(!o.stars.length) return 'Vô Chính Diệu';
+    return o.stars.map(function(k){return STARS[k].name;}).join(' · ');
+  }
+  var state={day:6,month:9,year:2009,hour:null,outcome:OUTCOMES[0]};
+
+  function applyTheme(o){
+    var r=document.documentElement.style, a, b;
+    if(!o.stars.length){ a=NEUTRAL; b=NEUTRAL; }                       // vô chính diệu → trung tính
+    else if(o.stars.length===1){ a=STARS[o.stars[0]]; b={color:a.light}; } // đơn tinh → một màu
+    else { a=STARS[o.stars[0]]; b=STARS[o.stars[1]]; }                 // sao đôi → hai màu
+    r.setProperty('--accent',a.color);
+    r.setProperty('--accent-2',b.color);
+    r.setProperty('--accent-glow',a.glow);
+    state.outcome=o;
+  }
+  function renderDestiny(node){
+    if(!node) return;
+    var o=state.outcome, two=o.stars.length===2;
+    node.innerHTML=
+      '<div class="dtitle">TỬ VI CÁ NHÂN</div>'+
+      '<div class="dsub">'+(o.stars.length
+          ? 'Chính tinh chiếu mệnh: <b>'+starLabel(o)+'</b>'+(two?' · sao đôi':'')
+          : 'Mệnh <b>vô chính diệu</b> — cả bầu trời soi chiếu')+'</div>'+
+      '<div class="dchip"><i>✦</i> '+o.archetype+'</div>'+
+      '<div class="dluck"><span class="orb"></span>Màu may mắn<b>'+o.luck+'</b></div>'+
+      '<div class="dstage"></div>'+
+      '<div class="dmantra">'+o.mantra.replace('\\n',' ')+'</div>';
+  }
+  function refreshElementUI(){
+    var lbl=starLabel(state.outcome);
+    renderDestiny(document.getElementById('destiny-home'));
+    document.querySelectorAll('#home-elbadge,#prof-elbadge,#top-elbadge').forEach(function(b){
+      b.innerHTML='<span class="dot"></span>'+lbl;
+    });
+  }
+
+  /* ---------- per-star constellation shapes (normalised 0..1) ---------- */
+  var SHAPES={
+    tuvi:      {pts:[[0,.72],[.26,.24],[.5,.6],[.74,.2],[1,.66]], lines:[[0,1],[1,2],[2,3],[3,4]]},           // vương miện
+    thienphu:  {pts:[[.5,0],[1,.5],[.5,1],[0,.5]], lines:[[0,1],[1,2],[2,3],[3,0]]},                          // kho báu (thoi)
+    thatsat:   {pts:[[0,.2],[.28,.36],[.54,.3],[.7,.56],[.86,.82],[1,.56]], lines:[[0,1],[1,2],[2,3],[3,4],[4,5]]}, // lưỡi kiếm
+    phaquan:   {pts:[[.5,.5],[0,.18],[.92,0],[1,.72],[.28,1]], lines:[[0,1],[0,2],[0,3],[0,4]]},               // bùng nổ
+    thamlang:  {pts:[[.5,0],[.92,.36],[.76,.92],[.24,.92],[.08,.36]], lines:[[0,1],[1,2],[2,3],[3,4],[4,0]]},  // ngũ giác
+    thaiduong: {pts:[[.5,.5],[.5,0],[1,.5],[.5,1],[0,.5]], lines:[[0,1],[0,2],[0,3],[0,4]]},                   // mặt trời
+    thaiam:    {pts:[[0,.5],[.2,.16],[.5,.06],[.8,.16],[1,.5]], lines:[[0,1],[1,2],[2,3],[3,4]]},              // trăng khuyết
+    vukhuc:    {pts:[[.5,0],[1,1],[0,1]], lines:[[0,1],[1,2],[2,0]]}                                           // tam giác
+  };
+  function drawShape(sh,box){
+    var x0=box[0],y0=box[1],w=box[2],h=box[3];
+    function P(i){return [x0+sh.pts[i][0]*w, y0+sh.pts[i][1]*h];}
+    var s='';
+    sh.lines.forEach(function(ln){var a=P(ln[0]),b=P(ln[1]);
+      s+='<line class="cline" style="stroke:url(#rg)" x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'"/>';});
+    sh.pts.forEach(function(p,i){var pt=P(i);
+      s+='<circle class="cnode" style="fill:url(#rg)" cx="'+pt[0].toFixed(1)+'" cy="'+pt[1].toFixed(1)+'" r="'+(i===0?3.4:2.8)+'"/>';});
+    return s;
+  }
+  function renderReward(o){
+    var svg=document.getElementById('reward-svg'),art=document.getElementById('reward-art'),rewardNode=document.getElementById('reward');
+    if(!svg||!art||!rewardNode) return;
+    var hasArt=o.stars.length&&o.stars.every(function(k){return STARS[k]&&STARS[k].image;});
+    rewardNode.classList.toggle('has-art',!!hasArt);
+    art.className='reward-art'+(o.stars.length===2?' dual':'');
+    art.innerHTML=hasArt?o.stars.map(function(k){
+      return '<img src="'+STARS[k].image+'" alt="" draggable="false" decoding="async">';
+    }).join(''):'';
+    art.querySelectorAll('img').forEach(function(img){
+      img.addEventListener('error',function(){rewardNode.classList.remove('has-art');art.innerHTML='';});
+    });
+    if(!o.stars.length){ // vô chính diệu → bầu trời rải rác, màu trung tính
+      var xs=[26,66,108,150,192,232,272,300,90,210], ys=[34,62,40,72,34,66,46,56,80,22], dots='';
+      for(var i=0;i<xs.length;i++){dots+='<circle class="cnode" style="fill:'+NEUTRAL.color+'" cx="'+xs[i]+'" cy="'+ys[i]+'" r="2.4"/>';}
+      svg.innerHTML=dots; return;
+    }
+    var g='<defs><linearGradient id="rg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="320" y2="0">';
+    if(o.stars.length===1){ g+='<stop offset="0" stop-color="'+STARS[o.stars[0]].color+'"/><stop offset="1" stop-color="'+STARS[o.stars[0]].light+'"/>'; }
+    else { g+='<stop offset="0" stop-color="'+STARS[o.stars[0]].color+'"/><stop offset="1" stop-color="'+STARS[o.stars[1]].color+'"/>'; }
+    g+='</linearGradient></defs>';
+    // sao đôi → hai hộp (hai chòm) trải trái–phải theo gradient; đơn tinh → một chòm ở giữa
+    var boxes = o.stars.length===1 ? [[92,16,136,66]] : [[18,14,128,70],[176,14,128,70]];
+    var body='';
+    o.stars.forEach(function(k,idx){ body+=drawShape(SHAPES[k], boxes[idx]); });
+    svg.innerHTML=g+body;
+  }
+
+  /* ---------- pickers ---------- */
+  var HOURS=[
+    {chi:'Tý',range:'23:00 – 01:00'},{chi:'Sửu',range:'01:00 – 03:00'},{chi:'Dần',range:'03:00 – 05:00'},{chi:'Mão',range:'05:00 – 07:00'},
+    {chi:'Thìn',range:'07:00 – 09:00'},{chi:'Tỵ',range:'09:00 – 11:00'},{chi:'Ngọ',range:'11:00 – 13:00'},{chi:'Mùi',range:'13:00 – 15:00'},
+    {chi:'Thân',range:'15:00 – 17:00'},{chi:'Dậu',range:'17:00 – 19:00'},{chi:'Tuất',range:'19:00 – 21:00'},{chi:'Hợi',range:'21:00 – 23:00'}
+  ];
+  var ROW=46;
+  function buildPicker(el,min,max,pad){
+    var h='<div class="sp"></div>';
+    for(var v=min;v<=max;v++){h+='<div class="opt" data-v="'+v+'">'+(pad&&v<10?'0'+v:v)+'</div>';}
+    h+='<div class="sp"></div>';
+    el.innerHTML=h;
+  }
+  function pickerValue(el){
+    var idx=Math.round(el.scrollTop/ROW);
+    var opts=el.querySelectorAll('.opt');
+    opts.forEach(function(o,i){o.classList.toggle('sel',i===idx);});
+    var sel=opts[Math.max(0,Math.min(opts.length-1,idx))];
+    return sel?parseInt(sel.getAttribute('data-v'),10):parseInt(el.dataset.min,10);
+  }
+  function setPicker(el,val,min){el.scrollTop=(val-min)*ROW;}
+
+  var pkDay=document.getElementById('pk-day'),
+      pkMonth=document.getElementById('pk-month'),
+      pkYear=document.getElementById('pk-year');
+  buildPicker(pkDay,1,31,true);
+  buildPicker(pkMonth,1,12,true);
+  buildPicker(pkYear,2005,2012,false);
+
+  var reward=document.getElementById('reward'),
+      rewardcap=document.getElementById('rewardcap'),
+      touched=false, scrollT;
+  function previewOutcome(){
+    var o=outcomeFromBirth(state);
+    applyTheme(o);
+    renderReward(o);
+    rewardcap.textContent = o.stars.length
+      ? ('CHÒM SAO '+starLabel(o).toUpperCase()+' ĐÃ THỨC')
+      : 'MỆNH VÔ CHÍNH DIỆU · TRỜI RỘNG MỞ';
+  }
+  function onPickerScroll(){
+    if(!touched){touched=true; reward.classList.add('lit');}
+    state.day=pickerValue(pkDay);
+    state.month=pickerValue(pkMonth);
+    state.year=pickerValue(pkYear);
+    clearTimeout(scrollT);
+    scrollT=setTimeout(previewOutcome,120);
+  }
+  [pkDay,pkMonth,pkYear].forEach(function(p){p.addEventListener('scroll',onPickerScroll,{passive:true});});
+
+  /* zodiac birth clock — drag around the dial or swipe sideways to change hour */
+  var birthClock=document.getElementById('birth-clock'),
+      clockHours=document.getElementById('clock-hours'),
+      clockChi=document.getElementById('clock-chi'),
+      clockRange=document.getElementById('clock-range'),
+      clockIndex=0,
+      clockAngle=0,
+      clockDrag=null;
+  clockHours.innerHTML=HOURS.map(function(h,i){
+    var a=i*Math.PI/6;
+    return '<button type="button" class="clock-hour" tabindex="-1" data-i="'+i+'" aria-label="Giờ '+h.chi+', '+h.range+'" style="--x:'+
+      (50+Math.sin(a)*39).toFixed(2)+'%;--y:'+(50-Math.cos(a)*39).toFixed(2)+'%">'+h.chi+'</button>';
+  }).join('');
+
+  function normaliseHourIndex(i){return (i%HOURS.length+HOURS.length)%HOURS.length;}
+  function setClockHour(i,commit){
+    i=normaliseHourIndex(i);
+    var shouldPreview=i!==clockIndex||!state.hour;
+    var targetAngle=i*30;
+    clockAngle+=((targetAngle-clockAngle+540)%360)-180;
+    clockIndex=i;
+    birthClock.style.setProperty('--hand-angle',clockAngle+'deg');
+    birthClock.setAttribute('aria-valuenow',String(i));
+    clockHours.querySelectorAll('.clock-hour').forEach(function(b,j){b.classList.toggle('on',commit&&j===i);});
+    if(!commit) return;
+    state.hour=HOURS[i].chi;
+    birthClock.classList.add('has-value');
+    birthClock.classList.remove('need');
+    birthClock.setAttribute('aria-valuetext','Giờ '+HOURS[i].chi+', '+HOURS[i].range);
+    clockChi.textContent=HOURS[i].chi;
+    clockRange.textContent=HOURS[i].range;
+    if(!touched){touched=true;}
+    reward.classList.add('lit');
+    if(shouldPreview) previewOutcome();
+  }
+  function indexAtPointer(e){
+    var r=birthClock.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;
+    if(Math.hypot(x,y)<r.width*.22) return clockIndex;
+    return normaliseHourIndex(Math.round(Math.atan2(x,-y)*6/Math.PI));
+  }
+  function finishClockDrag(e){
+    if(!clockDrag || e.pointerId!==clockDrag.id) return;
+    if(!clockDrag.moved){
+      var button=e.target.closest&&e.target.closest('.clock-hour');
+      setClockHour(button?parseInt(button.dataset.i,10):indexAtPointer(e),true);
+    }
+    birthClock.classList.remove('dragging');
+    clockDrag=null;
+  }
+  birthClock.addEventListener('pointerdown',function(e){
+    if(e.pointerType==='mouse' && e.button!==0) return;
+    clockDrag={id:e.pointerId,startX:e.clientX,startY:e.clientY,startIndex:clockIndex,mode:null,moved:false};
+    birthClock.classList.add('dragging');
+    birthClock.setPointerCapture(e.pointerId);
+  });
+  birthClock.addEventListener('pointermove',function(e){
+    if(!clockDrag || e.pointerId!==clockDrag.id) return;
+    var dx=e.clientX-clockDrag.startX,dy=e.clientY-clockDrag.startY;
+    if(!clockDrag.mode && Math.hypot(dx,dy)>8){
+      clockDrag.mode=Math.abs(dx)>Math.abs(dy)*1.35?'swipe':'rotate';
+      clockDrag.moved=true;
+    }
+    if(clockDrag.mode==='swipe') setClockHour(clockDrag.startIndex+Math.round(-dx/38),true);
+    if(clockDrag.mode==='rotate') setClockHour(indexAtPointer(e),true);
+  });
+  birthClock.addEventListener('pointerup',finishClockDrag);
+  birthClock.addEventListener('pointercancel',function(){birthClock.classList.remove('dragging');clockDrag=null;});
+  birthClock.addEventListener('keydown',function(e){
+    var next=null;
+    if(e.key==='ArrowRight'||e.key==='ArrowUp') next=clockIndex+1;
+    if(e.key==='ArrowLeft'||e.key==='ArrowDown') next=clockIndex-1;
+    if(e.key==='Home') next=0;
+    if(e.key==='End') next=HOURS.length-1;
+    if(next===null) return;
+    e.preventDefault(); setClockHour(next,true);
+  });
+
+  // init default positions
+  setPicker(pkDay,state.day,1); setPicker(pkMonth,state.month,1); setPicker(pkYear,state.year,2005);
+  applyTheme(outcomeFromBirth(state));
+  renderReward(state.outcome);
+
+  /* ---------- An Sao: swipeable thematic lens + palace stories ---------- */
+  var resetLens=null;   /* buildAnSao gán vào đây để ngoài reset được thiên bàn */
+  (function buildAnSao(){
+    var root=document.getElementById('ansao-view');if(!root)return;
+    var THEMES={
+      core:{n:'Bản thân',role:'Lõi bản mệnh',c:'#EAD9A0',source:'Mệnh · Tử Vi · Thiên Phủ',
+        gift:'Bạn có khả năng tạo trật tự và giữ một nền tảng vững khi mọi thứ đang biến động.',
+        shadow:'Bạn dễ gắn giá trị bản thân với việc phải luôn mạnh, đúng và kiểm soát được tình hình.'},
+      relate:{n:'Kết nối',role:'Cách đi cùng người khác',c:'#FF91C7',source:'Phu Thê · Nô Bộc · Phúc Đức',
+        gift:'Bạn tạo ra sự gắn bó sâu khi cả hai vừa gần gũi vừa tôn trọng không gian riêng.',
+        shadow:'Bạn có thể im lặng quá lâu rồi mới nhận ra mình đã chờ người khác tự hiểu.'},
+      build:{n:'Tạo dựng',role:'Cách tạo chỗ đứng',c:'#7DA4FF',source:'Quan Lộc · Tài Bạch · Thân cư',
+        gift:'Bạn phát triển mạnh khi được nhận bài toán khó và nhìn thấy thứ mình xây có giá trị lâu dài.',
+        shadow:'Tham vọng dễ biến thành áp lực phải chứng minh bản thân hoặc không cho phép mình nghỉ.'},
+      restore:{n:'Điểm tựa',role:'Nơi hồi phục',c:'#79D8C1',source:'Phúc Đức · Điền Trạch · Thiên Lương',
+        gift:'Sự yên tĩnh, tổ ấm và những quan hệ không đòi hỏi bạn phải gồng là nguồn hồi phục sâu.',
+        shadow:'Bạn thường chỉ tìm về điểm tựa sau khi đã cố chịu đựng quá lâu.'},
+      joy:{n:'Niềm vui',role:'Điều làm đời sống nở hoa',c:'#FFC76B',source:'Thiên Di · Nô Bộc · Tham Lang',
+        gift:'Trải nghiệm mới, con người thú vị và sự tự do khám phá đánh thức phần sống động nhất trong bạn.',
+        shadow:'Bạn dễ tìm cảm giác mới để né một sự nhàm chán hoặc bất an chưa được gọi tên.'},
+      potential:{n:'Chưa mở',role:'Tiềm năng đang ngủ',c:'#9B8BCB',source:'Tử Tức · Tài Bạch · các thế tam hợp',
+        gift:'Một năng lực sáng tạo và tích lũy đang lớn dần, đặc biệt khi bạn kiên nhẫn với nhịp riêng.',
+        shadow:'Tiêu chuẩn cao có thể khiến bạn trì hoãn việc bắt đầu cho đến khi cảm thấy đủ hoàn hảo.'}
+    };
+    var PALACES={
+      core:[
+        {n:'Mệnh',role:'Trục khí chất',g:'◆',insight:'Bạn tự nhiên bước vào vai người giữ nhịp và tạo trật tự.',why:'Cung Mệnh làm nổi nhu cầu xây một nền vững trước khi tiến xa.',stars:'Thái Dương · Ân Quang'},
+        {n:'Phúc Đức',role:'Nền tâm lý',g:'✦',insight:'Sự vững vàng của bạn bắt đầu từ khả năng quay về bên trong.',why:'Phúc Đức bổ sung chiều sâu nội tâm cho cách Mệnh biểu hiện ra bên ngoài.',stars:'Thiên Cơ · Thái Âm'},
+        {n:'Quan Lộc',role:'Nơi tạo dấu ấn',g:'△',insight:'Bạn hiểu mình rõ hơn khi trực tiếp tạo ra một thứ có ích và nhìn thấy nó đứng vững.',why:'Quan Lộc khiến cách bạn hiện diện ngoài đời trở thành một phần quan trọng của câu chuyện Bản thân.',stars:'Cự Môn · Đà La'}
+      ],
+      relate:[
+        {n:'Phu Thê',role:'Gắn bó thân mật',g:'∞',insight:'Bạn cần một mối quan hệ vừa sâu vừa không làm mất không gian riêng.',why:'Cung Phu Thê cho biết cách bạn đi vào cam kết và điều cần học khi ở rất gần một người.',stars:'Thiên Đồng · Thai Phụ'},
+        {n:'Nô Bộc',role:'Bạn bè và cộng sự',g:'◇',insight:'Những kết nối tốt nhất đến từ người có thể cùng bạn làm một điều có ý nghĩa.',why:'Nô Bộc mở rộng câu chuyện quan hệ ra bạn bè, nhóm và người đồng hành.',stars:'Thiên Tướng · Lộc Tồn'},
+        {n:'Phúc Đức',role:'Mẫu cảm xúc sâu',g:'✦',insight:'Bạn thường gắn bó bền khi cảm thấy mình được hiểu mà không phải giải thích quá nhiều.',why:'Phúc Đức cho thấy mô thức cảm xúc âm thầm đứng sau cách bạn gần gũi.',stars:'Thiên Cơ · Thái Âm'}
+      ],
+      build:[
+        {n:'Quan Lộc',role:'Cách tạo chỗ đứng',g:'△',insight:'Bạn phát triển mạnh khi được trao một bài toán khó và quyền xây cách giải của riêng mình.',why:'Quan Lộc là nguồn chính của mảnh Tạo dựng, cho thấy nhịp nghề nghiệp và kiểu thành tựu hợp với bạn.',stars:'Cự Môn · Đà La'},
+        {n:'Tài Bạch',role:'Cách tạo giá trị',g:'◈',insight:'Tiền bạc bền hơn khi đi sau năng lực tích lũy, không đi trước nó.',why:'Tài Bạch giải thích cách năng lực được chuyển thành giá trị vật chất và cảm giác đủ đầy.',stars:'Văn Khúc · Hóa Khoa'}
+      ],
+      restore:[
+        {n:'Phúc Đức',role:'Nguồn hồi phục',g:'✦',insight:'Bạn hồi phục tốt nhất trong những khoảng lặng không cần phải chứng minh điều gì.',why:'Phúc Đức giữ vai trò nền vì cho biết sức bền tinh thần và khả năng tự cân bằng.',stars:'Thiên Cơ · Thái Âm'},
+        {n:'Điền Trạch',role:'Không gian nuôi dưỡng',g:'⌂',insight:'Một góc sống có trật tự và riêng tư ảnh hưởng trực tiếp đến năng lượng của bạn.',why:'Điền Trạch biến cảm giác an toàn thành một nơi chốn cụ thể mà bạn có thể quay về.',stars:'Tử Vi · Tham Lang'}
+      ],
+      joy:[
+        {n:'Thiên Di',role:'Niềm vui khi mở rộng',g:'↗',insight:'Phần sống động nhất của bạn xuất hiện khi bước ra khỏi quỹ đạo quen thuộc.',why:'Thiên Di cho thấy trải nghiệm bên ngoài kích hoạt sự tò mò và cảm giác tự do.',stars:'Thiên Lương · Thiên Mã'},
+        {n:'Nô Bộc',role:'Niềm vui có người chia sẻ',g:'◇',insight:'Bạn vui hơn khi có một nhóm nhỏ đủ hợp để cùng thử điều mới.',why:'Nô Bộc bổ sung yếu tố cộng hưởng xã hội cho mảnh Niềm vui.',stars:'Thiên Tướng · Lộc Tồn'}
+      ],
+      potential:[
+        {n:'Tử Tức',role:'Điều muốn sinh thành',g:'◌',insight:'Một năng lực sáng tạo đang lớn lên nhưng cần được thử ở quy mô nhỏ trước.',why:'Tử Tức không chỉ nói về con cái; nó còn gợi những gì bạn nuôi dưỡng và đưa vào đời.',stars:'Tướng Quân · Long Đức'},
+        {n:'Tài Bạch',role:'Năng lực chưa khai thác',g:'◈',insight:'Một kỹ năng có thể tạo giá trị vẫn đang nằm ngoài cách bạn định nghĩa bản thân.',why:'Tài Bạch xuất hiện lần hai với vai trò phụ, cho thấy một cung có thể góp vào nhiều chủ đề.',stars:'Văn Khúc · Hóa Khoa'}
+      ]
+    };
+    var PALACE_RING=['Mệnh','Phụ Mẫu','Phúc Đức','Điền Trạch','Quan Lộc','Nô Bộc','Thiên Di','Tật Ách','Tài Bạch','Tử Tức','Phu Thê','Huynh Đệ'];
+    var LENS_SUMMARY={core:'Giữ nhịp và tạo nền',relate:'Gần gũi mà vẫn tự do',build:'Xây điều có giá trị',restore:'Trở về nơi không phải gồng',joy:'Sống động khi được khám phá',potential:'Năng lực đang chờ mở'};
+    var storyParam=new URLSearchParams(location.search).get('story');
+    var selected=PALACES[storyParam]?storyParam:'core',facet='gift',storyOpen=!!PALACES[storyParam],storyIndex=0,touchX=0,touchY=0,touchLastX=0,touchLastY=0,lensPointer=0,lensDragging=false,lensTurn=0;
+    function header(){return '<div class="ansao-head stickhead" data-od-id="advanced-head">'
+      +'<div class="headline"><div>'
+      +'<div class="eyebrow">Tính năng nâng cao</div><h2>Thiên Bàn</h2>'
+      +'<p class="headsub">Sáu mảnh chủ đề rút ra từ mười hai cung của lá số.</p></div>'
+      +'<div class="head-aside">'
+      +'<button class="source-chip" type="button" data-goto="lasochitiet">Lá số gốc ↗</button>'
+      +'</div></div></div>';}
+    function intro(){return '<div class="signature-intro"><div class="k">Bản đồ luận giải</div><h3>Sáu mảnh làm nên bạn</h3><p>Vuốt trái hoặc phải để chọn một chủ đề. Chạm cung bắt sáng để đọc câu chuyện phía sau.</p></div>';}
+    function chips(){var h='';Object.keys(THEMES).forEach(function(k){var t=THEMES[k];h+='<button type="button" class="theme-chip '+(selected===k?'on':'')+'" data-theme="'+k+'" aria-pressed="'+(selected===k)+'" style="--theme:'+t.c+'">'+t.n+'</button>';});return '<div class="theme-chips" aria-label="Chủ đề luận giải">'+h+'</div>';}
+    function panel(){var t=THEMES[selected],count=PALACES[selected].length;return '<article class="signature-panel" style="--theme:'+t.c+'"><div class="signature-panel-head"><div><div class="role">'+t.role+'</div><h3>'+t.n+'</h3><div class="source">'+t.source+'</div></div><span class="morph-tag">Đang vào tiêu điểm</span></div><div class="facet-tabs"><button type="button" data-facet="gift" class="'+(facet==='gift'?'on':'')+'">Món quà</button><button type="button" data-facet="shadow" class="'+(facet==='shadow'?'on':'')+'">Khi mắc kẹt</button></div><p class="signature-copy">'+t[facet]+'</p><div class="signature-actions"><button type="button" data-open-story>Mở story · '+count+' cung</button><button type="button" class="traditional" data-goto="lasochitiet">Xem nguồn trên lá số →</button></div></article>';}
+    function cls(k){return 'sig-hot '+(selected===k?'on':'');}
+    function point(cx,cy,r,a){var rad=(a-90)*Math.PI/180;return{x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)};}
+    function ringArc(cx,cy,inner,outer,start,end){var a=point(cx,cy,outer,end),b=point(cx,cy,outer,start),c=point(cx,cy,inner,start),d=point(cx,cy,inner,end);return 'M'+a.x.toFixed(2)+' '+a.y.toFixed(2)+'A'+outer+' '+outer+' 0 0 0 '+b.x.toFixed(2)+' '+b.y.toFixed(2)+'L'+c.x.toFixed(2)+' '+c.y.toFixed(2)+'A'+inner+' '+inner+' 0 0 1 '+d.x.toFixed(2)+' '+d.y.toFixed(2)+'Z';}
+    function themeIcon(k,x,y,scale,center){var shapes={
+      core:'<path d="M12 3.5l2.6 3-2.6 3-2.6-3Z"/><path d="M12 10.5v5.2"/><path d="M6 19c1.5-3.5 3.5-5.2 6-5.2s4.5 1.7 6 5.2"/><path d="M4.5 11a8 8 0 0 1 15 0"/>',
+      relate:'<path d="M3 12c3-5 6-5 9 0s6 5 9 0"/><path d="M3 12c3 5 6 5 9 0s6-5 9 0"/><circle class="solid" cx="4.5" cy="12" r="1.5"/><circle class="solid" cx="19.5" cy="12" r="1.5"/>',
+      build:'<path d="M12 4L7 20M12 4l5 16M6 16h12M9.2 12h5.6"/><circle class="solid" cx="12" cy="4" r="1.6"/>',
+      restore:'<path d="M4 12l8-7 8 7v8H4z"/><path d="M8 20v-5c2.5-2.2 5.5-2.2 8 0v5"/><circle class="solid" cx="12" cy="13" r="1.5"/>',
+      joy:'<path d="M12 20v-7M12 13L6 7M12 13l6-6M12 13V4M5 14l3-1M19 14l-3-1M5 6l2 1M19 6l-2 1"/><circle class="solid" cx="12" cy="13" r="1.6"/>',
+      potential:'<path d="M12 21v-9M12 14c-5 0-7-3-7-7 4 0 7 2 7 7ZM12 12c5 0 7-3 7-7-4 0-7 2-7 7Z"/><path d="M8 21h8"/>'
+    };return '<g class="'+(center?'lens-center-icon':'lens-theme-icon')+'" transform="translate('+(x-12*scale).toFixed(1)+' '+(y-12*scale).toFixed(1)+') scale('+scale+')">'+shapes[k]+'</g>';}
+    function palaceNodes(t){var sources=PALACES[selected].map(function(p){return p.n;}),h='';PALACE_RING.forEach(function(n,i){var a=i*30,p=point(180,214,156,a),si=sources.indexOf(n),source=si>-1,primary=si===0,anchor='middle',tx=p.x,ty=p.y+13;if(p.x<76){anchor='start';tx+=7;ty=p.y+2;}else if(p.x>284){anchor='end';tx-=7;ty=p.y+2;}else if(p.y<90){ty=p.y+13;}else if(p.y>338){ty=p.y-12;}h+='<g class="lens-palace-node '+(source?'source ':'')+(primary?'primary':'')+'" '+(source?'data-source-story="'+si+'" role="button" tabindex="0"':'')+' style="--focus:'+t.c+';--catch-delay:'+(si>-1?si*.1:0)+'s">'+(source?'<circle class="palace-halo" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(primary?10:7.5)+'"/>':'')+'<circle class="palace-dot" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(primary?5.2:source?3.8:2.1)+'"/><text class="palace-name" x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" text-anchor="'+anchor+'">'+n.toUpperCase()+'</text></g>';});return h;}
+    function sourceTicks(t){var h='';PALACES[selected].forEach(function(s,i){var pi=PALACE_RING.indexOf(s.n);if(pi<0)return;var a=pi*30,start=point(180,214,140,a),end=point(180,214,149,a);h+='<path class="lens-source-tick '+(i===0?'primary':'secondary')+'" style="--focus:'+t.c+';--catch-delay:'+i*.1+'s" d="M'+start.x.toFixed(1)+' '+start.y.toFixed(1)+'L'+end.x.toFixed(1)+' '+end.y.toFixed(1)+'"/>';});return h;}
+    function centerSky(){return '<g class="lens-core-stars"><circle class="lens-core-star s1" cx="151" cy="188" r="1"/><circle class="lens-core-star s2" cx="207" cy="185" r=".75"/><circle class="lens-core-star s3" cx="218" cy="218" r=".9"/><circle class="lens-core-star s4" cx="146" cy="224" r=".7"/><circle class="lens-core-star s5" cx="158" cy="250" r=".85"/><circle class="lens-core-star s6" cx="207" cy="248" r=".65"/></g><g class="lens-core-comet"><circle cx="180" cy="156" r="1.45"/></g>';}
+    function renderLens(){
+      var ring=['core','relate','build','restore','joy','potential'],fi=ring.indexOf(selected),t=THEMES[selected],blades='';
+      ring.forEach(function(k,i){var slot=(i-fi+ring.length)%ring.length,mid=slot*60,g=point(180,214,105,mid),theme=THEMES[k];blades+='<g class="'+cls(k)+'" data-theme="'+k+'" style="--theme:'+theme.c+'"><path class="lens-blade" d="'+ringArc(180,214,73,136,mid-30.15,mid+30.15)+'"/>'+themeIcon(k,g.x,g.y,.72,false)+'</g>';});
+      var turnClass=lensTurn>0?' turn-next':lensTurn<0?' turn-prev':'';
+      var svg='<svg class="signature-svg" viewBox="0 0 360 450" aria-label="Thiên bàn luận mệnh có thể vuốt ngang"><defs><radialGradient id="lensCore"><stop stop-color="#3B2B52"/><stop offset=".64" stop-color="#211431"/><stop offset="1" stop-color="#0E081D"/></radialGradient></defs><circle class="lens-shell" cx="180" cy="214" r="168"/><circle class="lens-sky-ring" cx="180" cy="214" r="158"/><circle class="lens-inner-ring" cx="180" cy="214" r="140"/><circle class="lens-source-ripple" style="--focus:'+t.c+'" cx="180" cy="214" r="72"/><g class="lens-wheel'+turnClass+'">'+blades+'</g>'+sourceTicks(t)+'<path class="lens-focus" style="--focus:'+t.c+'" d="M166 48L180 37L194 48"/><text class="lens-focus-label" style="--focus:'+t.c+'" x="180" y="22">ĐANG LUẬN · '+t.n.toUpperCase()+'</text><g data-open-story role="button" tabindex="0" style="--focus:'+t.c+'"><circle class="lens-core" cx="180" cy="214" r="69"/><circle class="lens-core-awake" cx="180" cy="214" r="61"/><circle class="lens-core-orbit" cx="180" cy="214" r="58"/>'+centerSky()+themeIcon(selected,180,178,.82,true)+'<text class="lens-core-title" x="180" y="211">'+t.n.toUpperCase()+'</text><text class="lens-core-copy" x="180" y="227">'+LENS_SUMMARY[selected]+'</text><text class="lens-core-meta" style="--focus:'+t.c+'" x="180" y="243">'+PALACES[selected].length+' CUNG HỘI CHIẾU · CHẠM ĐỂ MỞ</text></g>'+palaceNodes(t)+'<text class="lens-guide" x="180" y="410">VUỐT TRÁI / PHẢI · CHẠM CUNG BẮT SÁNG ĐỂ ĐỌC</text><text class="lens-guide" x="180" y="427">12 CUNG GIỮ NGUỒN · 6 MẢNH GIỮ CÂU HỎI</text></svg>';
+      return intro()+'<div class="signature-stage lens-stage has-selection">'+svg+'<button class="lens-step prev" type="button" data-lens-step="-1" aria-label="Chủ đề trước">↶</button><button class="lens-step next" type="button" data-lens-step="1" aria-label="Chủ đề sau">↷</button></div>'+chips()+panel();
+    }
+    function story(){
+      var t=THEMES[selected],items=PALACES[selected],p=items[storyIndex%items.length],tabs='';
+      items.forEach(function(x,i){tabs+='<button type="button" data-story-index="'+i+'" class="'+(i===storyIndex?'on':'')+'">'+(i+1)+' · '+x.n+'</button>';});
+      return '<section class="theme-story" style="--theme:'+t.c+'" aria-label="Story các cung của '+t.n+'"><div class="story-top"><button type="button" class="story-close" data-close-story aria-label="Đóng story">×</button><div class="story-context"><small>Mảnh đang đọc</small><b>'+t.n+'</b></div></div><div class="story-palaces">'+tabs+'</div><article class="palace-story"><div class="palace-count">Cung '+(storyIndex+1)+' / '+items.length+' · '+p.role+'</div><h2>'+p.n+'</h2><div class="palace-role">Một nguồn tạo nên “'+t.n+'” — không phải ánh xạ một-một</div><div class="palace-orbit"><span>'+p.g+'</span></div><p class="palace-insight">“'+p.insight+'”</p><p class="palace-why">'+p.why+'</p><span class="palace-source">✦ '+p.stars+'</span></article><div class="story-nav"><button type="button" data-story-step="-1" aria-label="Cung trước">←</button><button type="button" class="story-deep" data-open-full-palace="'+p.n+'">Xem đầy đủ cung '+p.n+'</button><button type="button" data-story-step="1" aria-label="Cung sau">→</button></div></section>';
+    }
+    function render(){root.innerHTML=header()+renderLens()+(storyOpen?story():'');lensTurn=0;}
+    function stepLens(delta){var all=['core','relate','build','restore','joy','potential'],i=all.indexOf(selected);lensTurn=delta;selected=all[(Math.max(i,0)+delta+all.length)%all.length];storyIndex=0;if(navigator.vibrate)navigator.vibrate(8);render();}
+    function stepStory(delta){var n=PALACES[selected].length;storyIndex=(storyIndex+delta+n)%n;render();}
+    function setStoryUrl(k){var u=new URL(location.href);if(k)u.searchParams.set('story',k);else u.searchParams.delete('story');history.replaceState({},'',u);}
+    function openStory(index){storyOpen=true;storyIndex=index||0;setStoryUrl(selected);window.scrollTo(0,0);render();}
+    function openFullPalace(name){
+      storyOpen=false;setStoryUrl('');render();show('lasochitiet');
+      var palace=SAMPLE_PALACES.find(function(item){return item.role===name;});
+      if(palace) openPalacePopup(palace.branch,null);
+    }
+    root.addEventListener('click',function(e){
+      if(e.target.closest('[data-close-story]')){storyOpen=false;setStoryUrl('');render();return;}
+      var full=e.target.closest('[data-open-full-palace]');if(full){openFullPalace(full.dataset.openFullPalace);return;}
+      if(e.target.closest('[data-open-story]')){openStory(0);return;}
+      var si=e.target.closest('[data-story-index]');if(si){storyIndex=+si.dataset.storyIndex;render();return;}
+      var ss=e.target.closest('[data-story-step]');if(ss){stepStory(+ss.dataset.storyStep);return;}
+      var ps=e.target.closest('[data-source-story]');if(ps){openStory(+ps.dataset.sourceStory);return;}
+      var ls=e.target.closest('[data-lens-step]');if(ls){stepLens(+ls.dataset.lensStep);return;}
+      var t=e.target.closest('[data-theme]');if(t){if(t.dataset.theme!==selected)lensTurn=1;selected=t.dataset.theme;storyIndex=0;render();return;}
+      var f=e.target.closest('[data-facet]');if(f){facet=f.dataset.facet;render();return;}
+    });
+    root.addEventListener('keydown',function(e){
+      var action=e.target.closest('[data-open-story],[data-source-story]');
+      if(action&&(e.key==='Enter'||e.key===' ')){e.preventDefault();action.dispatchEvent(new MouseEvent('click',{bubbles:true}));}
+    });
+    function finishLensDrag(x,y){if(!lensDragging)return false;var dx=x-touchX,dy=y-touchY;lensDragging=false;if(Math.abs(dx)>28&&Math.abs(dx)>Math.abs(dy)*1.15){stepLens(dx<0?1:-1);return true;}return false;}
+    root.addEventListener('pointerdown',function(e){if(e.pointerType==='touch')return;var stage=e.target.closest('.lens-stage');if(!stage)return;touchX=e.clientX;touchY=e.clientY;lensPointer=e.pointerId;lensDragging=true;});
+    document.addEventListener('pointerup',function(e){if(e.pointerType==='touch'||e.pointerId!==lensPointer)return;finishLensDrag(e.clientX,e.clientY);});
+    document.addEventListener('pointercancel',function(e){if(e.pointerType!=='touch'&&e.pointerId===lensPointer)lensDragging=false;});
+    root.addEventListener('touchstart',function(e){var stage=e.target.closest('.lens-stage');if(!stage||!e.touches.length)return;var p=e.touches[0];touchX=touchLastX=p.clientX;touchY=touchLastY=p.clientY;lensDragging=true;},{passive:true});
+    root.addEventListener('touchmove',function(e){if(!lensDragging||!e.touches.length)return;touchLastX=e.touches[0].clientX;touchLastY=e.touches[0].clientY;},{passive:true});
+    root.addEventListener('touchend',function(e){if(!lensDragging)return;var p=e.changedTouches[0];finishLensDrag(p?p.clientX:touchLastX,p?p.clientY:touchLastY);},{passive:true});
+    root.addEventListener('touchcancel',function(){finishLensDrag(touchLastX,touchLastY);},{passive:true});
+    document.addEventListener('keydown',function(e){if(!document.getElementById('s-lasogoc').classList.contains('active'))return;if(/INPUT|TEXTAREA/.test(document.activeElement.tagName)||document.activeElement.isContentEditable)return;if(storyOpen){if(e.key==='ArrowLeft')stepStory(-1);if(e.key==='ArrowRight')stepStory(1);if(e.key==='Escape'){storyOpen=false;setStoryUrl('');render();}return;}if(e.key==='ArrowLeft')stepLens(-1);if(e.key==='ArrowRight')stepLens(1);});
+    resetLens=function(){selected='core';facet='gift';storyOpen=false;storyIndex=0;
+      setStoryUrl('');render();};
+    render();
+    var startParams=new URLSearchParams(location.search);if(startParams.get('screen')==='ansao'||startParams.has('story'))setTimeout(function(){show('lasogoc');},0);
+  })();
+
+  /* ---------- star map (lá số gốc) ---------- */
+  (function buildStarMap(){
+    var svg=document.getElementById('starmap'); if(!svg) return;
+    var cx=180,cy=180,
+        cusps=['Mệnh','Phụ Mẫu','Phúc Đức','Điền Trạch','Quan Lộc','Nô Bộc','Thiên Di','Tật Ách','Tài Bạch','Tử Tức','Phu Thê','Huynh Đệ'],
+        branches=['Tý','Sửu','Dần','Mão','Thìn','Tị','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi'];
+    var R=[150,120], parts='';
+    // rings
+    parts+='<circle class="sm-ring" cx="180" cy="180" r="150"/><circle class="sm-ring" cx="180" cy="180" r="120"/><circle class="sm-ring" cx="180" cy="180" r="58"/>';
+    var pts=[];
+    for(var i=0;i<12;i++){
+      var a=(-90 + i*30)*Math.PI/180;
+      var x=cx+R[0]*Math.cos(a), y=cy+R[0]*Math.sin(a);
+      var lx=cx+R[1]*Math.cos(a), ly=cy+R[1]*Math.sin(a);
+      pts.push({x:x,y:y,lx:lx,ly:ly});
+      parts+='<line class="sm-spoke" x1="'+cx+'" y1="'+cy+'" x2="'+x.toFixed(1)+'" y2="'+y.toFixed(1)+'"/>';
+    }
+    // connect cusps into a constellation polygon
+    var poly='';
+    pts.forEach(function(p,i){poly+=(i?' ':'')+p.x.toFixed(1)+','+p.y.toFixed(1);});
+    parts+='<polygon class="sm-link" points="'+poly+'" fill="none"/>';
+    pts.forEach(function(p,i){
+      parts+='<g class="sm-point" data-branch="'+branches[i]+'" role="button" tabindex="0" aria-label="Cung '+cusps[i]+' tại '+branches[i]+'">'+
+        '<circle class="sm-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="17"/>'+
+        '<circle class="sm-cusp" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(i===0?5:3.4)+'"/></g>';
+      parts+='<text class="sm-lbl" x="'+p.lx.toFixed(1)+'" y="'+(p.ly+4).toFixed(1)+'">'+cusps[i]+'</text>';
+    });
+    parts+='<text class="sm-core" x="180" y="176">Bản</text><text class="sm-core" x="180" y="194">Mệnh</text>';
+    svg.innerHTML=parts;
+    svg.addEventListener('click',function(e){
+      var point=e.target.closest('.sm-point'); if(point) openPalacePopup(point.getAttribute('data-branch'),point);
+    });
+    svg.addEventListener('keydown',function(e){
+      var point=e.target.closest('.sm-point');
+      if(point&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openPalacePopup(point.getAttribute('data-branch'),point);}
+    });
+  })();
+
+  /* ---------- detailed 12-palace sample chart ---------- */
+  function samplePalace(branch,role,polarity,main,aux,transforms,cycle,age,flags){
+    flags=flags||{};
+    return {branch:branch,role:role,polarity:polarity,main:main,aux:aux,transforms:transforms,
+      cycle:cycle,age:age,tuan:!!flags.tuan,triet:!!flags.triet,than:!!flags.than};
+  }
+  var SAMPLE_PALACES=[
+    samplePalace('Tý','Mệnh','Dương', [['Thái Dương','Hỏa']],
+      [['Ân Quang','Mộc'],['Hỷ Thần','Hỏa'],['Điếu Khách','Hỏa']], [],'Tử',4,{triet:true}),
+    samplePalace('Sửu','Phụ Mẫu','Âm', [['Thiên Phủ','Thổ']],
+      [['Tam Thai','Thủy'],['Bát Toạ','Mộc'],['Bệnh Phù','Thổ'],['Quốc Ấn','Thổ'],['Thiên Khôi','Hỏa'],['Trực Phù','Kim'],['Hồng Loan','Thủy'],['Quả Tú','Thổ']], [],'Mộ',14,{triet:true}),
+    samplePalace('Dần','Phúc Đức','Dương', [['Thiên Cơ','Mộc'],['Thái Âm','Thủy']],
+      [['Thiên Tài','Thổ'],['Thiên Quý','Thổ'],['Đại Hao','Hỏa'],['Thái Tuế','Hỏa']], ['Hóa Quyền','Hóa Kỵ'],'Tuyệt',24),
+    samplePalace('Mão','Điền Trạch','Âm', [['Tử Vi','Thổ'],['Tham Lang','Thủy']],
+      [['Thiên Diêu','Thủy'],['Thiên Y','Thủy'],['Địa Kiếp','Hỏa'],['Phục Binh','Hỏa'],['Thiên Quan','Hỏa'],['Thiên Phúc','Thổ'],['Thiếu Dương','Hỏa'],['Thiên Không','Hỏa'],['Đào Hoa','Mộc']], ['Hóa Lộc'],'Thai',34),
+    samplePalace('Thìn','Quan Lộc','Dương', [['Cự Môn','Thủy']],
+      [['Đà La','Kim'],['Quan Phủ','Hỏa'],['Tang Môn','Mộc'],['Thiên Khốc','Thủy'],['Thiên La','Kim'],['Đẩu Quân','Hỏa']], [],'Dưỡng',44),
+    samplePalace('Tị','Nô Bộc','Âm', [['Thiên Tướng','Thủy']],
+      [['Thiên Thuơng','Thổ'],['Lộc Tồn','Thổ'],['Bác Sĩ','Thủy'],['Lưu Hà','Thủy'],['Thiếu Âm','Thủy'],['Hỏa Tinh','Hỏa'],['Cô Thần','Thổ']], [],'Tràng Sinh',54),
+    samplePalace('Ngọ','Thiên Di','Dương', [['Thiên Lương','Mộc']],
+      [['Tả Phù','Thổ'],['Văn Xương','Kim'],['Phong Cáo','Thổ'],['Kình Dương','Kim'],['Lực Sĩ','Thủy'],['Thiên Trù','Thổ'],['Quan Phù','Hỏa'],['Long Trì','Thủy']], [],'Mộc Dục',64),
+    samplePalace('Mùi','Tật Ách','Âm', [['Liêm Trinh','Hỏa'],['Thất Sát','Kim']],
+      [['Thiên Sứ','Thủy'],['Địa Không','Hỏa'],['Thanh Long','Thủy'],['Thiên Việt','Hỏa'],['Tử Phù','Kim'],['Nguyệt Đức','Hỏa'],['Thiên Hỉ','Hỏa']], [],'Quan Đới',74),
+    samplePalace('Thân','Tài Bạch','Dương', [],
+      [['Hữu Bật','Thủy'],['Văn Khúc','Thủy'],['Tiểu Hao','Hỏa'],['LN Văn Tinh','Hỏa'],['Tuế Phá','Hỏa'],['Thiên Hư','Thủy'],['Thiên Mã','Hỏa'],['Giải Thần','Mộc'],['Phượng Các','Thổ']], ['Hóa Khoa'],'Lâm Quan',84,{tuan:true,than:true}),
+    samplePalace('Dậu','Tử Tức','Âm', [],
+      [['Địa Giải','Thổ'],['Tướng Quân','Mộc'],['Long Đức','Thủy'],['Phá Toái','Hỏa']], [],'Đế Vương',94,{tuan:true}),
+    samplePalace('Tuất','Phu Thê','Dương', [['Thiên Đồng','Thủy']],
+      [['Thiên Thọ','Thổ'],['Thiên Giải','Hỏa'],['Thai Phụ','Kim'],['Tấu Thư','Kim'],['Đường Phù','Mộc'],['Bạch Hổ','Kim'],['Hỏa Cái','Kim'],['Địa Võng','Kim']], [],'Suy',104),
+    samplePalace('Hợi','Huynh Đệ','Âm', [['Vũ Khúc','Kim'],['Phá Quân','Thủy']],
+      [['Thiên Hình','Hỏa'],['Phi Liêm','Hỏa'],['Phúc Đức','Thổ'],['Thiên Đức','Hỏa'],['Linh Tinh','Hỏa'],['Kiếp Sát','Hỏa']], [],'Bệnh',114)
+  ];
+  var CHART_POS={
+    'Tị':[1,1],'Ngọ':[2,1],'Mùi':[3,1],'Thân':[4,1],
+    'Thìn':[1,2],'Dậu':[4,2],'Mão':[1,3],'Tuất':[4,3],
+    'Dần':[1,4],'Sửu':[2,4],'Tý':[3,4],'Hợi':[4,4]
+  };
+  var ELEMENT_COLORS={'Kim':'#EAD9A0','Mộc':'#63C79A','Thủy':'#79B7FF','Hỏa':'#FF7E6B','Thổ':'#C99C70'};
+  var MAIN_STAR_ART={
+    'Tử Vi':'images/tu_vi_zeus.png',
+    'Thiên Phủ':'images/hera_thien_phu.png',
+    'Thất Sát':'images/ares_that_sat.png',
+    'Phá Quân':'images/prometheus_pha_quan.png',
+    'Tham Lang':'images/aphodite_tham_lang.png',
+    'Thái Dương':'images/apolo_thai_duong.png',
+    'Thái Âm':'images/atemis_thai_am.png',
+    'Vũ Khúc':'images/hermes_vu_khuc.png',
+    'Thiên Cơ':'images/athena_thien_co.png',
+    'Thiên Lương':'images/demeter_thien_luong.png',
+    'Thiên Đồng':'images/dionysos_thien_dong.png',
+    'Thiên Tướng':'images/hades_thien_tuong.png',
+    'Cự Môn':'images/iris_cu_mon.png',
+    'Liêm Trinh':'images/nemesis_liem_trinh.png'
+  };
+  var MAIN_STAR_DETAILS={
+    'Tử Vi':['Lãnh đạo · Quy tụ · Tự trọng','Nhìn được toàn cục và tạo cảm giác vững tâm để mọi người cùng tiến về một hướng.','Bớt tự gánh mọi việc; uy tín bền nhất khi đi cùng lắng nghe và trao quyền.'],
+    'Thiên Phủ':['Ổn định · Bao dung · Tích lũy','Giỏi gìn giữ nguồn lực, sắp xếp cuộc sống và tạo một nơi chốn an toàn cho người khác.','Đừng để sự an toàn trở thành trì hoãn hoặc mong muốn kiểm soát mọi thay đổi.'],
+    'Thất Sát':['Quyết đoán · Độc lập · Phá vây','Bình tĩnh trong tình huống khó và dám đưa ra quyết định khi người khác còn chần chừ.','Học cách kiên nhẫn và mềm lại; không phải thử thách nào cũng cần giải bằng sức mạnh.'],
+    'Phá Quân':['Đổi mới · Dấn thân · Tái thiết','Nhìn ra cấu trúc đã cũ và có can đảm mở một con đường hoàn toàn khác.','Phân biệt đổi mới có chủ đích với phá bỏ vì bốc đồng hoặc chán nản nhất thời.'],
+    'Tham Lang':['Sức hút · Khám phá · Tham vọng','Kết nối nhanh, khơi gợi cảm hứng và biến trải nghiệm mới thành cơ hội phát triển.','Nhận ra điều mình thật sự cần để ham muốn không kéo năng lượng đi quá nhiều hướng.'],
+    'Thái Dương':['Quang minh · Rộng rãi · Truyền cảm hứng','Mang lại sự rõ ràng, ấm áp và động lực để những người xung quanh tự tin bước tới.','Cho phép mình nghỉ ngơi và tỏa sáng mà không phải luôn chờ người khác ghi nhận.'],
+    'Thái Âm':['Tinh tế · Nội tâm · Nuôi dưỡng','Lắng nghe điều chưa được nói ra và tạo nên sự an toàn bằng trực giác rất nhạy.','Nói rõ nhu cầu của mình thay vì lặng lẽ chịu đựng rồi mong người khác tự hiểu.'],
+    'Vũ Khúc':['Kỷ luật · Thực tế · Thành quả','Biến kế hoạch thành kết quả cụ thể, đặc biệt trong công việc, nguồn lực và tài chính.','Đừng đo mọi giá trị bằng hiệu suất; sự mềm mại cũng là một dạng sức mạnh.'],
+    'Thiên Cơ':['Mưu trí · Linh hoạt · Tiên liệu','Nhanh chóng nhìn thấy nhiều phương án và điều chỉnh chiến lược khi hoàn cảnh đổi thay.','Bớt phân tích quá lâu; đôi khi câu trả lời chỉ xuất hiện sau bước đi đầu tiên.'],
+    'Thiên Lương':['Nhân hậu · Bảo hộ · Chính trực','Xoa dịu xung đột, giữ nguyên tắc và giúp người khác tìm lại điểm tựa khi khó khăn.','Giữ ranh giới để lòng tốt không biến thành việc gánh thay hành trình của người khác.'],
+    'Thiên Đồng':['Hồn nhiên · Thích nghi · Kết nối','Mang sự nhẹ nhõm vào tập thể và dễ tìm thấy niềm vui trong những hoàn cảnh mới.','Rèn tính nhất quán để sự linh hoạt không trở thành né tránh trách nhiệm dài hạn.'],
+    'Thiên Tướng':['Trách nhiệm · Bảo vệ · Trật tự','Điều phối con người công bằng, giữ lời và đứng ra bảo vệ điều mình tin là đúng.','Tự chọn điều mình muốn thay vì chỉ sống theo vai trò và kỳ vọng của tập thể.'],
+    'Cự Môn':['Ngôn từ · Phản biện · Khai mở','Nhìn ra điểm chưa hợp lý và diễn đạt những vấn đề người khác thường né tránh.','Dùng lời nói để mở đường cho hiểu biết, không chỉ để chứng minh mình đúng.'],
+    'Liêm Trinh':['Nguyên tắc · Cuốn hút · Ranh giới','Thiết lập chuẩn mực rõ ràng và giữ được khí chất riêng ngay trong môi trường phức tạp.','Nới lỏng cách nhìn đúng–sai tuyệt đối và học cách tha thứ cho chính mình.']
+  };
+  var MAIN_STAR_EXTRA={
+    'Tử Vi':['Biểu tượng của khả năng làm chủ, định vị bản thân và quy tụ những nguồn lực xung quanh.','Tôn · khí chất chủ quản, danh vị và uy tín.'],
+    'Thiên Phủ':['Đại diện cho năng lực tích lũy, gìn giữ thành quả và tạo sự sung túc bền vững.','Lệnh · quyền điều phối, kho tàng và sự che chở.'],
+    'Thất Sát':['Mang ý nghĩa đối mặt thử thách, trưởng thành qua áp lực và tự mở đường bằng bản lĩnh.','Tướng · quyết đoán, chinh phục và kỷ luật.'],
+    'Phá Quân':['Đánh dấu chu kỳ kết thúc cái cũ để tái cấu trúc cuộc sống theo một trật tự mới.','Hao · phá bỏ, biến động và tái sinh sau mất mát.'],
+    'Tham Lang':['Thể hiện khát vọng trải nghiệm, sức hút cá nhân và khả năng tận hưởng sắc màu cuộc sống.','Đào Hoa · ham muốn, giao tế và sức hấp dẫn.'],
+    'Thái Dương':['Tượng trưng cho ánh sáng của lý tưởng, tinh thần cho đi và mong muốn tạo ảnh hưởng tích cực.','Quý · danh tiếng, quang minh và tinh thần phụng sự.'],
+    'Thái Âm':['Đại diện cho thế giới nội tâm, trực giác, sự nuôi dưỡng và những giá trị được tích lũy âm thầm.','Phú · nội lực, tài sản và năng lượng nuôi dưỡng.'],
+    'Vũ Khúc':['Cho thấy năng lực biến công sức thành giá trị hữu hình bằng kỷ luật và sự thực tế.','Tài · tiền bạc, quản trị và thành quả lao động.'],
+    'Thiên Cơ':['Biểu hiện trí tuệ chuyển động, khả năng tính toán và thích nghi trước mọi thay đổi.','Thiện · mưu lược, linh động và dịch chuyển.'],
+    'Thiên Lương':['Mang tinh thần bảo hộ, chữa lành và giữ gìn chuẩn mực tốt đẹp trong hoàn cảnh khó khăn.','Ấm · phúc đức, che chở và hóa giải tai ách.'],
+    'Thiên Đồng':['Đại diện cho niềm vui sống, sự hòa hợp và khả năng tìm thấy cơ hội trong hoàn cảnh mới.','Phúc · hòa khí, hưởng thụ và sự an nhiên.'],
+    'Thiên Tướng':['Thể hiện trách nhiệm với tập thể, năng lực bảo vệ và giữ cho mọi việc vận hành đúng trật tự.','Ấn · quyền hành, trách nhiệm và sự bảo hộ.'],
+    'Cự Môn':['Gắn với lời nói, tranh biện và quá trình đưa những điều ẩn khuất ra ánh sáng.','Ám · thị phi, bí ẩn và sức mạnh của ngôn từ.'],
+    'Liêm Trinh':['Biểu tượng của ranh giới, nguyên tắc và hành trình làm chủ những ham muốn mạnh mẽ.','Tù · ràng buộc, phép tắc và thử thách nội tâm.']
+  };
+  var ELEMENT_STAR_DETAILS={
+    'Kim':['Rõ ràng · Kỷ luật · Quyết đoán','Cắt bỏ điều thừa và đưa mọi việc về một cấu trúc dễ hành động.','Mềm lại trước những khác biệt không thể giải quyết chỉ bằng lý trí.'],
+    'Mộc':['Sinh trưởng · Kết nối · Bền bỉ','Nuôi dưỡng ý tưởng và giúp tiềm năng phát triển theo thời gian.','Chọn một hướng đủ lâu thay vì liên tục vươn sang quá nhiều phía.'],
+    'Thủy':['Linh hoạt · Trực giác · Chiều sâu','Thích nghi nhanh và cảm nhận được dòng chảy cảm xúc bên dưới bề mặt.','Giữ ranh giới để sự linh hoạt không trở thành thiếu lập trường.'],
+    'Hỏa':['Nhiệt thành · Hành động · Lan tỏa','Khởi động năng lượng và khiến điều đang trì trệ nhanh chóng chuyển động.','Chậm lại một nhịp trước khi phản ứng để ngọn lửa đi đúng hướng.'],
+    'Thổ':['Ổn định · Tin cậy · Nuôi dưỡng','Tạo nền móng chắc chắn và giúp người khác cảm thấy được nâng đỡ.','Đón nhận thay đổi mà không xem nó như mối đe dọa với sự an toàn.']
+  };
+  var ELEMENT_STAR_EXTRA={
+    'Kim':['Mang ý nghĩa kết tinh, sàng lọc và định hình mọi thứ thành một cấu trúc rõ ràng.','Khí Thu · cô đọng và quyết liệt.'],
+    'Mộc':['Mang ý nghĩa sinh trưởng, mở rộng và kết nối những tiềm năng đang hình thành.','Khí Sinh · nảy nở và vươn lên.'],
+    'Thủy':['Mang ý nghĩa lưu chuyển, cảm nhận và thích nghi theo chiều sâu của hoàn cảnh.','Khí Nhuận · thấm sâu và chuyển hóa.'],
+    'Hỏa':['Mang ý nghĩa soi sáng, khởi động và lan truyền nguồn năng lượng mạnh mẽ.','Khí Minh · bừng sáng và thúc đẩy.'],
+    'Thổ':['Mang ý nghĩa nâng đỡ, ổn định và tạo nền móng cho những chu kỳ dài lâu.','Khí Trấn · vững vàng và quy tụ.']
+  };
+  var STAR_IMAGES={
+    'Thái Dương':'Vầng mặt trời giữa chính ngọ — rực sáng, thẳng thắn và luôn muốn soi đường cho người khác.',
+    'Thiên Phủ':'Kho báu có người canh giữ — điềm tĩnh, sung túc và biết gom điều quý giá về đúng chỗ.',
+    'Thiên Cơ':'Cỗ máy trời với những bánh răng không ngừng chuyển — mưu trí, linh hoạt và luôn nhìn trước một bước.',
+    'Thái Âm':'Vầng trăng soi mặt nước — dịu dàng, sâu kín và mạnh mẽ theo cách không cần phô bày.',
+    'Tử Vi':'Vương miện giữa trời sao — khí chất dẫn dắt, lòng tự trọng và năng lực quy tụ mọi người.',
+    'Tham Lang':'Khu vườn đêm đầy hương sắc — ham khám phá, giàu sức hút và không chịu sống một đời nhạt màu.',
+    'Cự Môn':'Cánh cổng lớn vọng tiếng nói — lời lẽ sắc bén, khả năng tranh biện và những điều cần được nói ra.',
+    'Thiên Tướng':'Vị tướng cầm ấn đứng trước quân doanh — chính trực, bảo hộ và giỏi giữ trật tự.',
+    'Thiên Lương':'Chiếc lọng của bậc lương y — nhân hậu, che chở và có duyên hóa giải chuyện khó.',
+    'Liêm Trinh':'Ngọn lửa đỏ trong cung cấm — nguyên tắc, cuốn hút và luôn thử thách ranh giới của chính mình.',
+    'Thất Sát':'Thanh kiếm dựng giữa gió lớn — quyết liệt, độc lập và càng gian nan càng bộc lộ bản lĩnh.',
+    'Thiên Đồng':'Đứa trẻ ngồi bên dòng suối — hồn nhiên, dễ thích nghi và mang niềm vui đến nơi mình đi qua.',
+    'Vũ Khúc':'Thỏi vàng đặt cạnh cây kiếm — thực tế, cứng cỏi và có tài biến công sức thành thành quả.',
+    'Phá Quân':'Con sóng phá vỡ bức thành cũ — táo bạo, thích đổi mới và luôn muốn làm lại theo cách tốt hơn.',
+    'Đào Hoa':'Một cành đào vừa nở — duyên gặp gỡ, vẻ đẹp tự nhiên và sức hút khiến người khác muốn đến gần.',
+    'Hồng Loan':'Sợi chỉ đỏ dưới ánh trăng — rung động, duyên lành và những cuộc gặp khó gọi tên là ngẫu nhiên.',
+    'Văn Xương':'Cây bút sáng đặt trên án thư — học vấn, chữ nghĩa và khả năng biến ý tưởng thành lời rõ ràng.',
+    'Văn Khúc':'Khúc đàn vang trên mặt nước — tài hoa, cảm thụ tinh tế và lối biểu đạt giàu cảm xúc.',
+    'Thiên Mã':'Tuấn mã phi qua đường chân trời — dịch chuyển, cơ hội và vận may chỉ đến khi chịu bước đi.',
+    'Lộc Tồn':'Hũ lộc được niêm kín — khả năng tích lũy, gìn giữ và hưởng thành quả bền lâu.',
+    'Thiên Khôi':'Ngọn đèn trên đỉnh tháp — trí tuệ nổi bật và quý nhân xuất hiện đúng lúc.',
+    'Thiên Việt':'Chiếc thang ánh sáng nối lên trời — sự nâng đỡ, thanh nhã và cơ hội vượt khỏi giới hạn cũ.',
+    'Kình Dương':'Mũi giáo đang lao tới — sức công phá, cạnh tranh và bài học về cách dùng sự quyết liệt.',
+    'Đà La':'Bánh xe sắt quay chậm — bền bỉ, vướng mắc kéo dài và sức mạnh của người không bỏ cuộc.',
+    'Hỏa Tinh':'Tia lửa bật khỏi đá — phản ứng nhanh, bộc phát và năng lượng có thể đổi cục diện trong chớp mắt.',
+    'Linh Tinh':'Ngọn lửa xanh trong đêm — trực giác khác thường, mãnh liệt và khó đoán.',
+    'Địa Không':'Khoảng trời rỗng sau cơn bão — mất rồi lại dựng, buông cũ để mở ra một lối hoàn toàn mới.',
+    'Địa Kiếp':'Vết nứt đỏ trên mặt đất — biến động, thử thách và khả năng trưởng thành sau va đập.',
+    'Tả Phù':'Bàn tay nâng bên trái ngai — trợ lực kín đáo, tổ chức và sự đồng hành đáng tin.',
+    'Hữu Bật':'Bàn tay đỡ bên phải ngai — cộng tác, ứng biến và người bạn xuất hiện khi cần nhất.'
+  };
+  var ELEMENT_IMAGES={
+    'Kim':'Một khí cụ ánh bạc được mài sắc — gọn ghẽ, kiên định và mang sức mạnh của sự kết tinh.',
+    'Mộc':'Một nhánh cây đang vươn về phía sáng — sinh trưởng, kết nối và bền bỉ tìm đường đi lên.',
+    'Thủy':'Một dòng nước đổi hình theo lòng đất — linh hoạt, sâu sắc và luôn tìm được lối để tiếp tục.',
+    'Hỏa':'Một đốm lửa bừng lên trong đêm — nhanh, rõ, nhiều sinh lực và có khả năng đánh thức mọi thứ.',
+    'Thổ':'Một phiến núi đứng yên giữa gió — ổn định, bao dung và là nơi những điều khác có thể nương tựa.'
+  };
+
+  function palaceFlags(p){
+    var flags=[];
+    if(p.than) flags.push('Cung Thân');
+    if(p.tuan) flags.push('Tuần');
+    if(p.triet) flags.push('Triệt');
+    return flags;
+  }
+  function renderStarItems(stars,major){
+    if(!stars.length) return '<span class="star-empty">Vô chính diệu</span>';
+    return stars.map(function(s){
+      return '<button type="button" class="star-item'+(major?' major':'')+'" style="--star-color:'+ELEMENT_COLORS[s[1]]+'" data-star="'+s[0]+'" data-element="'+s[1]+'" data-kind="'+(major?'Chính tinh':'Phụ tinh')+'" aria-haspopup="dialog" aria-label="'+s[0]+', chạm để xem thông tin">'+s[0]+'</button>';
+    }).join('');
+  }
+  var palacePopup=document.getElementById('palace-popup'),
+      palacePopupContent=document.getElementById('palace-popup-content'),
+      palacePopupCard=palacePopup.querySelector('.palace-popup-card'),
+      palacePopupClose=palacePopup.querySelector('.popup-close'),
+      palacePopupReturnFocus=null,
+      starInfoLayer=document.getElementById('star-info-layer'),
+      starInfoCard=starInfoLayer.querySelector('.star-info-card'),
+      starInfoContent=document.getElementById('star-info-content'),
+      starInfoReturnFocus=null;
+  function starImage(name,element){return STAR_IMAGES[name]||ELEMENT_IMAGES[element];}
+  function showStarInfo(button){
+    var name=button.getAttribute('data-star'),element=button.getAttribute('data-element'),kind=button.getAttribute('data-kind'),
+        color=ELEMENT_COLORS[element]||'#B9AED1',art=kind==='Chính tinh'?MAIN_STAR_ART[name]:null,
+        details=MAIN_STAR_DETAILS[name]||ELEMENT_STAR_DETAILS[element]||['Khám phá · Quan sát · Trưởng thành','Mang đến một sắc thái riêng cho cung đang tọa thủ.','Quan sát cách nguồn năng lượng này biểu hiện trong từng hoàn cảnh.'],
+        extra=MAIN_STAR_EXTRA[name]||ELEMENT_STAR_EXTRA[element]||['Gợi mở một lớp ý nghĩa cần được quan sát trong từng hoàn cảnh.','Khí Biến · vận động theo thời điểm.'];
+    starInfoReturnFocus=button;
+    starInfoCard.style.setProperty('--star-info-color',color);
+    starInfoCard.classList.toggle('has-star-art',!!art);
+    if(art) starInfoCard.style.setProperty('--star-info-art','url("'+art+'")');
+    else starInfoCard.style.removeProperty('--star-info-art');
+    starInfoContent.innerHTML=
+      '<div class="star-info-head"><span class="star-info-orb"></span><div><span class="star-info-kind">'+kind+'</span><h4 id="star-info-title">'+name+'</h4></div></div>'+
+      '<div class="star-info-facts"><div class="star-info-fact"><span>Ngũ hành</span><b>'+element+'</b></div>'+
+      '<div class="star-info-fact"><span>Hình tượng</span><p>'+starImage(name,element)+'</p></div>'+
+      '<div class="star-info-fact"><span>Ý nghĩa</span><p>'+extra[0]+'</p></div>'+
+      '<div class="star-info-fact"><span>Hóa khí</span><b>'+extra[1]+'</b></div>'+
+      '<div class="star-info-fact"><span>Từ khóa</span><b>'+details[0]+'</b></div>'+
+      '<div class="star-info-fact"><span>Thế mạnh</span><p>'+details[1]+'</p></div>'+
+      '<div class="star-info-fact"><span>Bài học</span><p>'+details[2]+'</p></div></div>'+
+      '<div class="star-info-dismiss">CHẠM RA NGOÀI ĐỂ ĐÓNG</div>';
+    starInfoContent.scrollTop=0;
+    starInfoLayer.hidden=false;
+  }
+  function closeStarInfo(restoreFocus){
+    if(starInfoLayer.hidden) return;
+    starInfoLayer.hidden=true;
+    if(restoreFocus!==false&&starInfoReturnFocus&&starInfoReturnFocus.isConnected) starInfoReturnFocus.focus({preventScroll:true});
+    starInfoReturnFocus=null;
+  }
+  function openPalacePopup(branch,source){
+    var p=SAMPLE_PALACES.find(function(item){return item.branch===branch;});
+    if(!p) return;
+    closeStarInfo(false);
+    palacePopupReturnFocus=source||document.activeElement;
+    document.querySelectorAll('#full-chart .palace').forEach(function(b){
+      var selected=b.getAttribute('data-branch')===branch;
+      b.classList.toggle('on',selected); b.setAttribute('aria-pressed',String(selected));
+    });
+    document.querySelectorAll('#starmap .sm-point').forEach(function(point){
+      point.classList.toggle('on',point.getAttribute('data-branch')===branch);
+    });
+    var flags=palaceFlags(p);
+    palacePopupContent.innerHTML=
+      '<div class="pd-head"><div><span class="pd-branch">'+p.branch+' · '+p.polarity+'</span><h3 id="palace-popup-title">Cung '+p.role+'</h3>'+
+      (flags.length?'<div class="pd-flags">'+flags.join(' · ')+'</div>':'')+'</div>'+
+      '<div class="pd-cycle"><b>'+p.cycle+'</b>Đại vận '+p.age+'–'+(p.age+9)+'</div></div>'+
+      '<section class="star-section"><h4>Chính tinh</h4><div class="star-list">'+renderStarItems(p.main,true)+'</div>'+
+      (p.transforms.length?'<div class="transform-list"><b>Tứ Hóa</b>'+p.transforms.map(function(t){return '<span>✦ '+t+'</span>';}).join('')+'</div>':'')+'</section>'+
+      '<section class="star-section"><h4>Phụ tinh</h4><div class="star-list">'+renderStarItems(p.aux,false)+'</div></section>';
+    palacePopup.hidden=false;
+    palacePopupCard.scrollTop=0;
+    palacePopupClose.focus({preventScroll:true});
+  }
+  function closePalacePopup(restoreFocus){
+    if(palacePopup.hidden) return;
+    closeStarInfo(false);
+    palacePopup.hidden=true;
+    document.querySelectorAll('#full-chart .palace').forEach(function(b){b.classList.remove('on');b.setAttribute('aria-pressed','false');});
+    document.querySelectorAll('#starmap .sm-point').forEach(function(point){point.classList.remove('on');});
+    if(restoreFocus!==false&&palacePopupReturnFocus&&palacePopupReturnFocus.isConnected) palacePopupReturnFocus.focus({preventScroll:true});
+    palacePopupReturnFocus=null;
+  }
+  palacePopupContent.addEventListener('click',function(e){
+    var button=e.target.closest('.star-item');
+    if(!button) return;
+    e.preventDefault();
+    showStarInfo(button);
+  });
+  starInfoLayer.addEventListener('click',function(e){if(e.target.closest('[data-close-star]')) closeStarInfo(true);});
+  palacePopup.addEventListener('click',function(e){if(e.target.closest('[data-close-palace]')) closePalacePopup(true);});
+  palacePopup.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      e.preventDefault();
+      if(!starInfoLayer.hidden) closeStarInfo(true); else closePalacePopup(true);
+    }
+    if(e.key==='Tab'){
+      e.preventDefault();
+      if(!starInfoLayer.hidden) closeStarInfo(false);
+      palacePopupClose.focus();
+    }
+  });
+  (function buildFullChart(){
+    var grid=document.getElementById('full-chart'); if(!grid) return;
+    var cells=SAMPLE_PALACES.map(function(p){
+      var pos=CHART_POS[p.branch],preview=p.aux.slice(0,2).map(function(s){return s[0];}).join(' · ');
+      if(p.aux.length>2) preview+=' · +'+(p.aux.length-2);
+      var flags=palaceFlags(p);
+      return '<button class="palace" type="button" data-branch="'+p.branch+'" aria-label="Cung '+p.role+' tại '+p.branch+'" aria-pressed="false" style="grid-column:'+pos[0]+';grid-row:'+pos[1]+'">'+
+        '<span class="palace-head"><span class="palace-role">'+p.role+'</span><span class="palace-branch">'+p.branch+'</span></span>'+
+        '<span class="palace-main">'+(p.main.length?p.main.map(function(s){return '<span>'+s[0]+'</span>';}).join(''):'<span class="empty">Vô chính diệu</span>')+'</span>'+
+        '<span class="palace-aux">'+preview+'</span>'+(flags.length?'<span class="palace-flags">'+flags.join(' · ')+'</span>':'')+
+        '<span class="palace-age"><span>'+p.cycle+'</span><span>'+p.age+'–'+(p.age+9)+'</span></span></button>';
+    }).join('');
+    grid.innerHTML=cells+'<div class="chart-core"><span class="mark">✦</span><h3>Kim Tứ Cục</h3><p>Dương Nam<br>Thân cư Tài Bạch</p></div>';
+    grid.addEventListener('click',function(e){
+      var cell=e.target.closest('.palace'); if(cell) openPalacePopup(cell.getAttribute('data-branch'),cell);
+    });
+  })();
+
+  /* ---------- extra "lá bài" (topic cards) ---------- */
+  var LABAI=[
+    {t:'Tình Duyên',key:'Đào Hoa Chớm Nở',
+     p:'Nửa sau năm, có người đã âm thầm để ý bạn từ lâu mà bạn chưa nhận ra. Đừng vội — cứ để mọi thứ tự nhiên nở.',
+     tag:'Sao Hồng Loan chiếu mệnh', hue:'#FF7E9D', glow:'rgba(255,126,157,.42)',
+     ic:'<path d="M12 20s-7-4.5-7-9.5A3.5 3.5 0 0 1 12 8a3.5 3.5 0 0 1 7 2.5C19 15.5 12 20 12 20z"/>'},
+    {t:'Học Đường',key:'Bứt Tốc Cuối Kỳ',
+     p:'Trí tuệ hanh thông đúng mùa thi. Môn bạn ngại nhất lại thành điểm sáng khiến ai cũng bất ngờ.',
+     tag:'Sao Văn Xương trợ lực', hue:'#6FB6FF', glow:'rgba(111,182,255,.42)',
+     ic:'<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5z"/>'},
+    {t:'Vận May',key:'Lộc Đến Bất Ngờ',
+     p:'Tháng 9 và tháng 12 là hai cột mốc may mắn. Giữ lòng rộng mở, quà của vũ trụ sẽ tự tìm đến bạn.',
+     tag:'Ngày cát: Thứ Sáu', hue:'#EAD9A0', glow:'rgba(234,217,160,.42)',
+     ic:'<path d="M12 3l2.4 5.3L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.6-.7z"/>'}
+  ];
+  function renderDeck(railId,dotsId){
+    var rail=document.getElementById(railId), dots=document.getElementById(dotsId);
+    if(!rail) return;
+    // main destiny card is already the first child — append the 3 phụ cards after it
+    rail.insertAdjacentHTML('beforeend', LABAI.map(function(c){
+      return '<article class="tarot glass" style="--t-hue:'+c.hue+';--t-hue-glow:'+c.glow+'">'
+        +'<div class="top"><span class="g"><svg viewBox="0 0 24 24" fill="none">'+c.ic+'</svg></span><span class="k">LÁ BÀI PHỤ</span></div>'
+        +'<h3>'+c.t+'</h3><div class="key">'+c.key+'</div><p>'+c.p+'</p>'
+        +'<span class="tag">✦ '+c.tag+'</span></article>';
+    }).join(''));
+    if(dots){
+      var n=rail.children.length, dh='';
+      for(var i=0;i<n;i++){dh+='<i'+(i===0?' class="on"':'')+'></i>';}
+      dots.innerHTML=dh;
+      rail.addEventListener('scroll',function(){
+        var idx=Math.round(rail.scrollLeft/(rail.scrollWidth/n));
+        dots.querySelectorAll('i').forEach(function(d,i){d.classList.toggle('on',i===idx);});
+      },{passive:true});
+    }
+  }
+  renderDeck('deck-h','deck-dots-h');
+
+  /* ---------- router ---------- */
+  /* "An sao" is the landing flow itself (nhập ngày sinh → luận giải);
+     luận giải xong đổ thẳng vào tab Bản mệnh, không còn màn hình kết quả
+     riêng nên hai nơi không thể trình bày lệch nhau nữa.
+     Thiên bàn là tính năng nâng cao, nằm ở tab cuối. */
+  function $t(id){return document.getElementById(id);}
+  /* Nhãn cho navbar trên: [nhóm, tên màn hình] — cùng cách chia nhóm với sidebar */
+  var TOPBAR={
+    onboard:['Lá số của bạn','An sao'],
+    loading:['Lá số của bạn','Đang luận giải…'],
+    home:['Lá số của bạn','Bản mệnh'],
+    vanhan:['Lá số của bạn','Vận hạn 2026'],
+    hoiai:['Lá số của bạn','Hỏi AI · Nghê Sao'],
+    lasogoc:['Tra cứu chuyên sâu','Thiên bàn'],
+    lasochitiet:['Tra cứu chuyên sâu','Lá số gốc · 12 cung'],
+    hoso:['Tra cứu chuyên sâu','Hồ sơ']
+  };
+  var TAB_SCREENS={onboard:'onboard',loading:'onboard',
+    home:'home',vanhan:'vanhan',hoiai:'hoiai',hoso:'hoso',
+    lasogoc:'lasogoc',lasochitiet:'lasogoc'};
+  var entered=false;
+  function syncChartSummary(){
+    var date=document.getElementById('chart-birth-date'),hour=document.getElementById('chart-birth-hour');
+    if(date) date.textContent=String(state.day).padStart(2,'0')+' · '+String(state.month).padStart(2,'0')+' · '+state.year;
+    if(hour){
+      var h=HOURS.find(function(item){return item.chi===state.hour;});
+      hour.textContent=h?'Giờ '+h.chi+' · '+h.range:'Chưa chọn';
+    }
+  }
+  /* Khoá/mở các tab cần lá số. Điều khiển bằng chính cờ `entered` nên chỉ có
+     một nguồn sự thật: an sao xong thì mở, reset thì khoá lại. */
+  function syncNavLock(){
+    document.querySelectorAll('.tab[data-needs-chart]').forEach(function(b){
+      b.disabled=!entered;
+      b.setAttribute('aria-disabled',String(!entered));
+      if(entered) b.removeAttribute('title');
+      else b.setAttribute('title','Hãy an sao trước để mở phần này');
+    });
+  }
+  function show(id){
+    var target=document.getElementById('s-'+id);
+    if(!target) return;
+    if(id==='lasochitiet'){
+      syncChartSummary();
+      /* Desktop có panel chi tiết neo cố định bên phải nên không được để trống:
+         mở sẵn một cung nếu chưa chọn cung nào. Mobile vẫn là popup, giữ nguyên. */
+      if(window.matchMedia&&window.matchMedia('(min-width:1080px)').matches
+         &&!document.querySelector('.palace.on')){
+        var firstCell=document.querySelector('.palace[data-branch]');
+        if(firstCell) openPalacePopup(firstCell.getAttribute('data-branch'),firstCell);
+      }
+    }
+    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+    target.classList.add('active');
+    window.scrollTo(0,0);
+    // once the chart has been cast, the app nav stays available
+    if(id==='home') entered=true;
+    // the loading screen and the very first landing view run full-bleed
+    device.setAttribute('data-mode',
+      (id==='loading'||(id==='onboard'&&!entered)) ? 'onboarding' : 'app');
+    syncNavLock();
+    // tab highlight
+    // navbar trên (chỉ hiện ở desktop) — cập nhật cả khi đang ẩn, khỏi phải
+    // kiểm tra bề rộng và khỏi lệch nếu người dùng phóng to cửa sổ giữa chừng
+    var t=TOPBAR[id];
+    if(t){ $t('top-crumb').textContent=t[0]; $t('top-title').textContent=t[1]; }
+    var tabKey=TAB_SCREENS[id]||null;
+    document.querySelectorAll('.tab').forEach(function(t){
+      t.classList.toggle('on', t.getAttribute('data-goto')===tabKey);
+    });
+    // fade content sections
+    target.querySelectorAll('.pad').forEach(function(p){p.classList.remove('fade-up');void p.offsetWidth;p.classList.add('fade-up');});
+  }
+
+  /* ---------- toast ---------- */
+  var toast=document.getElementById('toast'),toastT;
+  function showToast(msg){
+    toast.textContent=msg; toast.classList.add('show');
+    clearTimeout(toastT); toastT=setTimeout(function(){toast.classList.remove('show');},2200);
+  }
+
+  /* ---------- flow: divine ---------- */
+  var LOADSUBS=['Nghê Sao đang đọc vị trí các vì tinh tú…','Đang xếp 12 cung mệnh của bạn…','Chòm sao bản mệnh đang dần hiện hình…'];
+  function divine(){
+    refreshElementUI();
+    show('loading');
+    var i=0, sub=document.getElementById('loadsub');
+    var iv=setInterval(function(){i=(i+1)%LOADSUBS.length;sub.textContent=LOADSUBS[i];},900);
+    setTimeout(function(){
+      clearInterval(iv);
+      var rail=document.getElementById('deck-h');
+      if(rail) rail.scrollLeft=0;           // luôn mở ra ở Lá Bài Bản Mệnh
+      show('home');
+      var d=document.getElementById('destiny-home'); // lật bài như lúc vừa an sao xong
+      if(d){d.classList.remove('reveal'); void d.offsetWidth; d.classList.add('reveal');}
+    },2600);
+  }
+  /* ---------- xác nhận ngày sinh trước khi an sao ---------- */
+  var birthBox=document.getElementById('confirm-birth'),MUTE_KEY='tuvi.muteBirthConfirm';
+  /* localStorage có thể bị chặn trong khung nhúng -> bọc try/catch, hỏng thì
+     coi như chưa tắt nhắc, chứ không được để văng lỗi chặn cả luồng an sao. */
+  function birthMuted(){try{return localStorage.getItem(MUTE_KEY)==='1';}catch(e){return false;}}
+  function setBirthMuted(v){try{localStorage.setItem(MUTE_KEY,v?'1':'0');}catch(e){}}
+  function birthSummary(){
+    var hr=HOURS.find(function(x){return x.chi===state.hour;});
+    return String(state.day).padStart(2,'0')+' · '+String(state.month).padStart(2,'0')
+      +' · '+state.year+(hr?'  ·  Giờ '+hr.chi:'');
+  }
+  function openBirthConfirm(){
+    document.getElementById('cb-data').textContent=birthSummary();
+    document.getElementById('cb-mute').checked=false;
+    birthBox.hidden=false;
+    var yes=birthBox.querySelector('[data-birth-yes]');if(yes) yes.focus({preventScroll:true});
+  }
+  function closeBirthConfirm(){
+    if(birthBox.hidden) return;
+    birthBox.hidden=true;
+    var d=document.getElementById('btn-divine');if(d) d.focus({preventScroll:true});
+  }
+  function castChart(){applyTheme(outcomeFromBirth(state));divine();}
+
+  document.getElementById('btn-divine').addEventListener('click',function(){
+    if(!state.hour){
+      showToast('Chọn giờ sinh để an sao chính xác nhé ✦');
+      var c=document.getElementById('birth-clock');
+      c.classList.remove('need'); void c.offsetWidth; c.classList.add('need');
+      var top=c.getBoundingClientRect().top+window.pageYOffset-(window.innerHeight-c.offsetHeight)/2;
+      window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+      return;
+    }
+    if(birthMuted()) castChart(); else openBirthConfirm();
+  });
+
+  /* ---------- xác nhận: về An sao là an sao lại từ đầu ---------- */
+  var confirmBox=document.getElementById('confirm-reset'),confirmReturn=null;
+  function openConfirm(trigger){
+    confirmReturn=trigger||null;
+    confirmBox.hidden=false;
+    var yes=confirmBox.querySelector('[data-confirm-yes]');
+    if(yes) yes.focus({preventScroll:true});
+  }
+  function closeConfirm(){
+    if(confirmBox.hidden) return;
+    confirmBox.hidden=true;
+    if(confirmReturn&&confirmReturn.isConnected) confirmReturn.focus({preventScroll:true});
+    confirmReturn=null;
+  }
+  /* Xoá lá số ở MỌI tab chứ không chỉ màn An sao: chỉ reset `state` thì deck,
+     thiên bàn, lá số 12 cung và khung chat vẫn còn dữ liệu của lá số cũ. */
+  function resetChart(){
+    state.day=6;state.month=9;state.year=2009;state.hour=null;
+    setPicker(pkDay,state.day,1);setPicker(pkMonth,state.month,1);setPicker(pkYear,state.year,2005);
+    var bc=document.getElementById('birth-clock');
+    if(bc){
+      bc.classList.remove('has-value','need','dragging');
+      bc.setAttribute('aria-valuenow','0');
+      bc.setAttribute('aria-valuetext','Chưa chọn giờ sinh');
+    }
+    var cc=document.getElementById('clock-chi');if(cc) cc.textContent='Chọn giờ';
+    var cr=document.getElementById('clock-range');if(cr) cr.textContent='--:--';
+    document.querySelectorAll('#clock-hours .clock-hour').forEach(function(b){b.classList.remove('on');});
+    if(reward) reward.classList.remove('lit');
+    applyTheme(outcomeFromBirth(state));
+    refreshElementUI();
+    renderReward(state.outcome);
+    var deck=document.getElementById('deck-h');if(deck) deck.scrollLeft=0;
+    if(resetLens) resetLens();
+    closePalacePopup(false);
+    if(chatBox&&chatSeed) chatBox.innerHTML=chatSeed;
+    entered=false;
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Escape') return;
+    if(birthBox&&!birthBox.hidden){e.stopPropagation();closeBirthConfirm();return;}
+    if(confirmBox&&!confirmBox.hidden){e.stopPropagation();closeConfirm();}
+  },true);
+  /* ---------- global click delegation ---------- */
+  document.addEventListener('click',function(e){
+    if(e.target.closest('[data-birth-no]')){closeBirthConfirm();return;}
+    if(e.target.closest('[data-birth-yes]')){
+      if(document.getElementById('cb-mute').checked) setBirthMuted(true);
+      closeBirthConfirm();castChart();return;
+    }
+    if(e.target.closest('[data-confirm-no]')){closeConfirm();return;}
+    if(e.target.closest('[data-confirm-yes]')){closeConfirm();resetChart();show('onboard');return;}
+    var g=e.target.closest('[data-goto]');
+    if(g){
+      var to=g.getAttribute('data-goto');
+      /* Về An sao nghĩa là an sao lại -> hỏi trước. Bỏ qua khi đang ở chính
+         màn An sao/loading, hoặc khi chưa từng luận giải (không có gì để mất). */
+      var cur=document.querySelector('.screen.active');
+      var curId=cur?cur.id.replace(/^s-/,''):'';
+      if(to==='onboard'&&entered&&curId!=='onboard'&&curId!=='loading'){openConfirm(g);return;}
+      show(to);return;
+    }
+    var t=e.target.closest('[data-toast]');
+    if(t){showToast(t.getAttribute('data-toast'));return;}
+    var sh=e.target.closest('[data-share]');
+    if(sh){showToast('Đã tạo ảnh story ✦ lá bài của bạn đã sẵn sàng để đăng!');return;}
+    var lk=e.target.closest('[data-lock]');
+    if(lk){showToast('✦ '+lk.getAttribute('data-lock')+' đang khoá — mời 1 người bạn để mở nhé!');return;}
+    var op=e.target.closest('[data-open]');
+    if(op){showToast('Đang mở luận giải '+op.getAttribute('data-open')+'…');return;}
+  });
+
+  /* ---------- chat mock ---------- */
+  var chatInput=document.getElementById('chat-input'),
+      chatSend=document.getElementById('chat-send'),
+      chatBox=document.querySelector('#s-hoiai .chat');
+  var chatSeed=chatBox?chatBox.innerHTML:'';
+  function scrollChatToEnd(){
+    window.scrollTo(0,document.documentElement.scrollHeight);
+  }
+  function sendChat(){
+    var v=(chatInput.value||'').trim(); if(!v) return;
+    var me=document.createElement('div'); me.className='msg me'; me.textContent=v; chatBox.appendChild(me);
+    chatInput.value='';
+    setTimeout(function(){
+      var ai=document.createElement('div'); ai.className='msg ai';
+      ai.innerHTML='<div class="who">NGHÊ SAO</div>Các vì sao vừa khẽ nghiêng mình… Câu này để dành cho lượt hỏi hôm nay của bạn nhé — hãy nâng cấp Thiên Cơ nếu muốn mình đọc sâu hơn ✦';
+      chatBox.appendChild(ai);
+      scrollChatToEnd();
+    },520);
+    setTimeout(scrollChatToEnd,10);
+  }
+  chatSend.addEventListener('click',sendChat);
+  chatInput.addEventListener('keydown',function(e){if(e.key==='Enter')sendChat();});
+
+  // prime cards
+  refreshElementUI();
+  syncNavLock();
+})();
+</script>
+</body>
+</html>
