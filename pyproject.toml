@@ -21,6 +21,7 @@ dependencies = [
     "pydantic-ai>=1.96.0",
     "fastapi>=0.136.1",
     "beanie>=2.0.1",
+    "uvicorn[standard]>=0.30.0",
 ]
 
 ## TODO: proper packaging
