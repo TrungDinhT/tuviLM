@@ -166,13 +166,6 @@ export function AnSaoScreen() {
         </p>
       </div>
 
-      <div className="md:col-start-1 md:row-start-2 md:mt-6 md:self-start">
-        <ConstellationReward
-          stars={preview.data?.chinh_tinh.map(starKeyFromName) ?? null}
-          names={preview.data?.chinh_tinh ?? []}
-        />
-      </div>
-
       {/* The machine */}
       <div className="glass mt-4 px-[14px] py-[12px] md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:self-center">
         <div className="relative grid grid-cols-[1fr_1fr_1.15fr] gap-[10px]">
@@ -243,7 +236,17 @@ export function AnSaoScreen() {
         </div>
       </div>
 
-      <div className="mt-[22px] flex flex-col gap-[10px] md:col-start-2 md:row-start-3">
+      {/* Right above the cast button on phone: the reward has to be in view at
+          the moment the dials are being turned, and by then the head of the
+          page has scrolled away. From md up it sits under the story column. */}
+      <div className="mt-2 md:col-start-1 md:row-start-2 md:mt-6 md:self-start">
+        <ConstellationReward
+          stars={preview.data?.chinh_tinh.map(starKeyFromName) ?? null}
+          names={preview.data?.chinh_tinh ?? []}
+        />
+      </div>
+
+      <div className="mt-[10px] flex flex-col gap-[10px] md:col-start-2 md:row-start-3 md:mt-[22px]">
         <Pill className="w-full" onClick={requestCast}>
           ✦ Luận giải lá số của tôi
         </Pill>
