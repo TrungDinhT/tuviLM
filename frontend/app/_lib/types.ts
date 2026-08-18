@@ -33,6 +33,48 @@ export interface BuildLasoRequest {
   gender: "M" | "F";
 }
 
+export type StrengthWeaknessEvidenceKind =
+  | "menh_than"
+  | "chinh_tinh"
+  | "phu_tinh"
+  | "tu_hoa"
+  | "cach_cuc"
+  | "tuan_triet"
+  | "tam_phuong_tu_chinh"
+  | "cung";
+
+export type WeaknessKind = "han_che_truc_tiep" | "qua_da" | "xung_dot";
+
+export interface ConclusionEvidence {
+  evidence_id: string;
+  loai: StrengthWeaknessEvidenceKind;
+  ten: string;
+  mo_ta_ngan: string | null;
+}
+
+export interface StrengthFinding {
+  nang_luc_id: string;
+  nang_luc: string;
+  mo_ta: string;
+  giai_thich: string;
+  can_cu: ConclusionEvidence[];
+}
+
+export interface WeaknessFinding {
+  ten: string;
+  loai: WeaknessKind;
+  mo_ta: string;
+  giai_thich: string;
+  lien_quan_diem_manh: string[];
+  can_cu: ConclusionEvidence[];
+}
+
+export interface StrengthWeaknessResponse {
+  tong_quan: string;
+  diem_manh: StrengthFinding[];
+  diem_yeu: WeaknessFinding[];
+}
+
 export type Calendar = "duong" | "am";
 
 export interface UserProfile {

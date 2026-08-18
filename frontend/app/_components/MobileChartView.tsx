@@ -19,6 +19,7 @@ import { LichSuDrawer } from "./LichSuDrawer";
 import { useResponsiveSize } from "./useResponsiveSize";
 import { useIsMobile } from "./useIsMobile";
 import { DefaultPanels } from "./DefaultPanels";
+import { StrengthWeaknessPanel } from "./StrengthWeaknessPanel";
 
 const TIEU_VAN_POSITION = "Ngọ";
 
@@ -266,7 +267,7 @@ export function MobileChartView() {
       <div className="flex-1 overflow-auto min-h-0">
         {isMobile ? (
           <div
-            className="border-b border-[rgba(26,22,17,0.14)] px-3 py-2 grid place-items-center"
+            className="border-b border-[rgba(26,22,17,0.14)] px-3 py-2 flex flex-col items-center gap-3"
             style={{ background: "rgba(255,252,245,0.4)" }}
           >
             <Chart
@@ -277,6 +278,9 @@ export function MobileChartView() {
               tieuVanPosition={TIEU_VAN_POSITION}
               onCungClick={(role) => setSelectedRole((prev) => (prev === role ? null : role))}
             />
+            <div className="w-full max-w-[620px] pb-2">
+              <StrengthWeaknessPanel profile={stash.profile} compact />
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-[1fr_320px] gap-6 px-4 py-4 min-h-full">
@@ -294,7 +298,7 @@ export function MobileChartView() {
               />
             </div>
             <div className="overflow-auto">
-              <DefaultPanels />
+              <DefaultPanels profile={stash.profile} />
             </div>
           </div>
         )}

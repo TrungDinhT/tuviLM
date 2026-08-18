@@ -270,6 +270,7 @@ export function ChartView() {
           />
         </div>
         <RightRail
+          profile={profile}
           selectedCung={selectedCung}
           selectedSao={selectedSao}
           onCloseCung={() => setSelectedRole(null)}
