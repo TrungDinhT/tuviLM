@@ -7,6 +7,7 @@ from pydantic_ai import RunContext
 from src.agent.deps import TuviAgentDeps
 from src.agent.tool.cach_cuc.matcher import get_cach_cuc_tool_results
 from src.agent.tool.cach_cuc.models import CachCucToolResult, Role, SourceKind
+from src.agent.tool.json_compatible import JsonCompatible
 
 _logger = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ _logger = logging.getLogger(__name__)
 def get_list_cach_cuc(
     ctx: RunContext[TuviAgentDeps],
     source_kind: SourceKind = SourceKind.TUVITANBIEN,
-    filtered_roles: list[Role] | None = None,
+    filtered_roles: JsonCompatible[list[Role] | None] = None,
 ) -> list[CachCucToolResult]:
     """Lấy các cách cục đang ứng với lá số hiện tại.
 

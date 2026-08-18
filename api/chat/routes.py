@@ -19,7 +19,12 @@ from pydantic_ai import (
     TextPart,
     TextPartDelta,
 )
-from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, UserPromptPart
+from pydantic_ai.messages import (
+    ModelMessage,
+    ModelRequest,
+    ModelResponse,
+    UserPromptPart,
+)
 
 from api.chat.contracts import ConversationHistoryStore
 from api.chat.models import (
@@ -372,6 +377,8 @@ async def _stream_session_chat_events(
             msg = _serialize_agent_event(event)
             if msg is not None:
                 yield msg
+
+
 def _build_la_so(birth_info: BirthInfo) -> LaSo:
     solar_dt = datetime(
         year=birth_info.year,
