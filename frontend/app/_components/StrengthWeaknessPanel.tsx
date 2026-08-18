@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import type {
-  ConclusionEvidence,
   StrengthFinding,
   UserProfile,
   WeaknessFinding,
@@ -125,8 +124,8 @@ export function StrengthWeaknessPanel({
           Chân dung năng lực
         </h2>
         <p className="mt-2 text-[12.5px] leading-[1.55] text-[var(--color-ink-2)]">
-          Xem nhanh những điểm mạnh nổi bật, mặt trái và căn cứ Tử Vi trong một
-          hồ sơ riêng.
+          Xem nhanh những điểm mạnh nổi bật, mặt trái và cách các khuynh hướng
+          liên hệ với nhau trong một hồ sơ riêng.
         </p>
         <Btn
           type="button"
@@ -156,7 +155,7 @@ export function StrengthWeaknessPanel({
         )}
         {analysis.isFetching && (
           <p className="text-[11px] text-[var(--color-ink-3)] mt-2 text-center">
-            Đang đọc các căn cứ nổi bật, quá trình này có thể mất một lúc.
+            Đang tổng hợp các khuynh hướng, quá trình này có thể mất một lúc.
           </p>
         )}
         {analysis.error && (
@@ -557,39 +556,6 @@ function CapabilityDetail(props: CapabilityDetailProps) {
           </div>
         </section>
       )}
-
-      <Evidence evidence={props.finding.can_cu} />
     </article>
-  );
-}
-
-function Evidence({ evidence }: { evidence: ConclusionEvidence[] }) {
-  if (evidence.length === 0) return null;
-  return (
-    <details className="mt-4 pt-3 border-t border-[rgba(26,22,17,0.12)] group/evidence">
-      <summary className="flex items-center justify-between gap-2 cursor-pointer list-none text-[10.5px] text-[var(--color-ink-2)] hover:text-[var(--color-crimson)]">
-        <span className="uppercase tracking-[0.8px]">Căn cứ Tử Vi</span>
-        <span className="text-[var(--color-ink-3)]">
-          {evidence.length} căn cứ&nbsp;＋
-        </span>
-      </summary>
-      <ul className="mt-2.5 flex flex-col gap-2.5">
-        {evidence.map((item, index) => (
-          <li
-            key={`${item.evidence_id}-${index}`}
-            className="border-l border-[rgba(139,42,31,0.32)] pl-2.5"
-          >
-            <div className="font-serif text-[12.5px] leading-[1.35] text-[var(--color-ink)]">
-              {item.ten}
-            </div>
-            {item.mo_ta_ngan && (
-              <p className="text-[10.5px] leading-[1.5] mt-0.5 text-[var(--color-ink-3)]">
-                {item.mo_ta_ngan}
-              </p>
-            )}
-          </li>
-        ))}
-      </ul>
-    </details>
   );
 }

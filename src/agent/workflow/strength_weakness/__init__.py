@@ -33,8 +33,6 @@ from .ontology import (
 )
 from .output import (
     CapabilityProfile,
-    ConclusionEvidence,
-    EvidenceKind,
     StrengthFinding,
     WeaknessFinding,
     WeaknessKind,
@@ -55,8 +53,6 @@ __all__ = [
     "CapabilityGroup",
     "CapabilityMeaningEvidence",
     "CapabilityProfile",
-    "ConclusionEvidence",
-    "EvidenceKind",
     "StrengthFinding",
     "StrengthWeaknessAgentConfig",
     "WeaknessFinding",

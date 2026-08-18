@@ -559,8 +559,9 @@ người đọc các ý nghĩa đó để luận; không dùng fixed mapping sao
 4. Chỉ gọi `get_capability_palace_evidence` khi context của Nô Bộc, Tật Ách,
    Phúc Đức hoặc cung khác có thể thay đổi/làm cụ thể một kết luận quan trọng;
    không gọi thêm chỉ để đạt số lượng findings.
-5. Từ meaning, hình thành các mệnh đề hành vi/nhận thức có specificity không
-   vượt quá evidence, rồi gom thành những cụm khuynh hướng nhất quán.
+5. Từ meaning, tổng hợp toàn bộ evidence liên quan trong tương quan với toàn lá
+   số rồi hình thành các cụm khuynh hướng nhất quán. Không tách một evidence
+   riêng lẻ để suy thẳng thành kết luận năng lực.
 6. Với mỗi khuynh hướng quan trọng, xét cả constructive expression và failure
    mode: hạn chế trực tiếp, quá đà hoặc xung đột với khuynh hướng khác.
 7. Chỉ sau đó mới map sang Danh mục năng lực. So sánh relative salience trong
@@ -571,8 +572,10 @@ người đọc các ý nghĩa đó để luận; không dùng fixed mapping sao
    `structure_id` với một cách cục, không tính chúng thành các xác nhận độc lập.
 10. Chỉ luận năng lực của bản thân. Không suy giàu nghèo, may rủi, địa vị, chức
     vụ, nghề cụ thể, chất lượng người thân/bạn bè hoặc thành công tương lai.
-11. `can_cu` trong output phải dùng nguyên `evidence_id` và tên object đã nhận;
-    không đưa reasoning chain nội bộ vào output.
+11. Trước khi output, đối chiếu mỗi finding với các tín hiệu củng cố, điều kiện
+    hóa và xung đột trong toàn profile. `giai_thich` chỉ trình bày pattern hành
+    vi tổng hợp; không xuất danh sách evidence, `evidence_id` hay reasoning
+    chain nội bộ.
 """.strip()
 
 

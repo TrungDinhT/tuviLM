@@ -20,35 +20,16 @@ from src.agent.workflow.strength_weakness.ontology import (
 )
 
 
-class EvidenceKind(StrEnum):
-    MENH_THAN = "menh_than"
-    CHINH_TINH = "chinh_tinh"
-    PHU_TINH = "phu_tinh"
-    TU_HOA = "tu_hoa"
-    CACH_CUC = "cach_cuc"
-    TUAN_TRIET = "tuan_triet"
-    TAM_PHUONG_TU_CHINH = "tam_phuong_tu_chinh"
-    CUNG = "cung"
-
-
 class WeaknessKind(StrEnum):
     HAN_CHE_TRUC_TIEP = "han_che_truc_tiep"
     QUA_DA = "qua_da"
     XUNG_DOT = "xung_dot"
 
 
-class ConclusionEvidence(BaseModel):
-    evidence_id: str = Field(min_length=1)
-    loai: EvidenceKind
-    ten: str = Field(min_length=1)
-    mo_ta_ngan: str | None = None
-
-
 class StrengthFinding(BaseModel):
     nang_luc_id: str
     mo_ta: str = Field(min_length=1)
     giai_thich: str = Field(min_length=1)
-    can_cu: list[ConclusionEvidence] = Field(default_factory=list)
 
     @field_validator("nang_luc_id")
     @classmethod
@@ -68,7 +49,6 @@ class WeaknessFinding(BaseModel):
     mo_ta: str = Field(min_length=1)
     giai_thich: str = Field(min_length=1)
     lien_quan_diem_manh: list[str] = Field(default_factory=list)
-    can_cu: list[ConclusionEvidence] = Field(default_factory=list)
 
     @field_validator("lien_quan_diem_manh")
     @classmethod
@@ -108,16 +88,19 @@ CAPABILITY_PROFILE_OUTPUT_INSTRUCTION = """
 Trả kết quả theo đúng output type `CapabilityProfile`.
 
 - `tong_quan` mô tả shape chung của profile, không lặp lại danh sách findings.
-- Chọn tối đa 5 điểm mạnh và tối đa 4 điểm yếu; ưu tiên ít findings nhưng có
-  căn cứ rõ hơn một danh sách dài và generic.
+- Chọn tối đa 5 điểm mạnh và tối đa 4 điểm yếu; ưu tiên ít findings nhưng được
+  nâng đỡ bởi pattern tổng hợp rõ ràng hơn một danh sách dài và generic.
 - Cố gắng có ít nhất 2 điểm mạnh và 2 điểm yếu, nhưng tuyệt đối không bịa để đủ
   số lượng khi evidence không hỗ trợ.
 - `nang_luc_id` phải lấy nguyên văn từ Danh mục năng lực trong instruction.
 - Mỗi capability chỉ xuất hiện một lần trong `diem_manh`.
 - Điểm yếu `qua_da` hoặc `xung_dot` nên dùng `lien_quan_diem_manh` để tham chiếu
   đúng capability ID đã chọn trong `diem_manh`.
-- `can_cu` chỉ chứa structured references ngắn gọn. Không đưa mệnh đề suy luận
-  nội bộ, chain-of-thought hoặc trích đoạn sách dài vào output.
+- Mỗi finding phải là kết quả tổng hợp các evidence liên quan trong tương quan
+  với toàn profile, bao gồm cả tín hiệu củng cố, điều kiện hóa và xung đột.
+- Không tách một sao, cung, cách cục hay evidence riêng lẻ rồi xem đó là nguyên
+  nhân đủ cho kết luận. `giai_thich` diễn đạt pattern hành vi đã tổng hợp, không
+  liệt kê evidence, evidence ID, chain-of-thought hoặc trích đoạn sách.
 - Viết tiếng Việt tự nhiên, điềm đạm, dùng ngôn ngữ có điều kiện và nói trực
   tiếp với người dùng bằng "bạn".
 """.strip()
@@ -137,13 +120,6 @@ _WEAKNESS_LABELS = {
 }
 
 
-def _render_evidence(evidence: list[ConclusionEvidence]) -> str | None:
-    names = list(dict.fromkeys(item.ten for item in evidence))
-    if not names:
-        return None
-    return "Căn cứ: " + "; ".join(names) + "."
-
-
 def render_capability_profile(profile: CapabilityProfile) -> str:
     """Render structured output without adding or changing any conclusion."""
     lines = ["## Tổng quan", "", profile.tong_quan, "", "## Điểm mạnh"]
@@ -160,10 +136,6 @@ def render_capability_profile(profile: CapabilityProfile) -> str:
                 finding.giai_thich,
             ]
         )
-        evidence = _render_evidence(finding.can_cu)
-        if evidence:
-            lines.extend(["", evidence])
-
     lines.extend(["", "## Điểm yếu và mặt trái"])
     if not profile.diem_yeu:
         lines.extend(["", "Chưa có đủ căn cứ để chọn hạn chế nổi bật."])
@@ -186,9 +158,6 @@ def render_capability_profile(profile: CapabilityProfile) -> str:
                 for capability_id in finding.lien_quan_diem_manh
             ]
             lines.extend(["", "Liên quan điểm mạnh: " + "; ".join(labels) + "."])
-        evidence = _render_evidence(finding.can_cu)
-        if evidence:
-            lines.extend(["", evidence])
     return "\n".join(lines).strip()
 
 
@@ -196,8 +165,6 @@ __all__ = [
     "CAPABILITY_PROFILE_OUTPUT",
     "CAPABILITY_PROFILE_OUTPUT_INSTRUCTION",
     "CapabilityProfile",
-    "ConclusionEvidence",
-    "EvidenceKind",
     "StrengthFinding",
     "WeaknessFinding",
     "WeaknessKind",
