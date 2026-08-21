@@ -149,8 +149,12 @@ export function AnSaoScreen() {
       ? ""
       : `${pad2(date.day)} · ${pad2(date.month)} · ${date.year} · ${time.hour12} ${time.meridiem} · Giờ ${canhGio.chi}`;
 
+  // The min-heights let `content-center` do its job: they give the grid the
+  // vertical room left over after the shell chrome, so the two panes centre
+  // instead of hugging the top. (ScreenPad top + bottom + tab bar at md;
+  // top bar + ScreenPad at lg.)
   return (
-    <div className="flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:content-center md:gap-x-10 md:gap-y-0">
+    <div className="flex flex-col md:grid md:min-h-[calc(100dvh-140px-var(--safe-t)-var(--safe-b))] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:content-center md:gap-x-10 md:gap-y-0 lg:min-h-[calc(100dvh-152px-var(--safe-t))]">
       {/* Head — story column on the left from md up. */}
       <div className="text-center md:col-start-1 md:row-start-1 md:text-left">
         <div className="text-[10px] font-bold tracking-[0.28em] text-accent uppercase [text-shadow:0_0_14px_var(--accent-glow)]">
