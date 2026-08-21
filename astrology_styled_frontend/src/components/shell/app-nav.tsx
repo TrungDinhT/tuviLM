@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { isActive, NAV_ITEMS, type NavItem } from "@/config/site";
+import { AN_SAO_ROUTE, isActive, NAV_ITEMS, type NavItem } from "@/config/site";
 import { useChartStore } from "@/store/chart-store";
 
 import { NavIconGlyph } from "./nav-icons";
@@ -26,9 +26,11 @@ export function AppNav() {
   const pathname = usePathname();
   const hasChart = useChartStore((state) => state.hasChart);
 
-  // Before a chart exists the phone/tablet tab bar is hidden entirely, while
-  // the desktop rail stays visible with its locked items dimmed.
-  const hiddenBelowDesktop = !hasChart;
+  // The casting screen is a full-bleed flow: the bottom tab bar never shows
+  // there, chart or no chart — it appears once the cast lands on Bản mệnh.
+  // Before a chart exists it is hidden on every other screen too, while the
+  // desktop rail stays visible with its locked items dimmed.
+  const hiddenBelowDesktop = pathname === AN_SAO_ROUTE || !hasChart;
 
   return (
     <nav
