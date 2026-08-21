@@ -14,17 +14,23 @@
  * Colours that vary per subtree get their own custom property, set inline on
  * that subtree, and nest *beneath* the global accent rather than replacing it:
  *
- * | Property             | Scope                                 |
- * | -------------------- | ------------------------------------- |
- * | `--theme`            | one of the six Thiên Bàn topics       |
- * | `--t-hue`            | one topic card in the Bản mệnh deck   |
- * | `--focus`            | the highlighted source cung           |
- * | `--star-color`       | one star in a cung list               |
- * | `--star-info-color`  | the star currently open in its popup  |
+ * | Property             | Scope                                    |
+ * | -------------------- | ---------------------------------------- |
+ * | `--theme`            | one of the six Thiên Bàn topics          |
+ * | `--t-hue`            | one lá bài phụ in the Bản mệnh deck      |
+ * | `--luck-hue`         | the lucky colour on the Vận May card     |
+ * | `--focus`            | the highlighted source cung              |
+ * | `--star-color`       | one star in a cung list                  |
+ * | `--star-info-color`  | the star currently open in its popup     |
  *
  * Any new per-subtree colour follows the same shape. Reassigning `--accent`
  * locally is never the answer: every descendant glow, border and gradient
  * would silently inherit the wrong hue.
+ *
+ * `--luck-hue` deserves a note: it is the ngũ hành of the nạp âm bản mệnh,
+ * which genuinely differs from the global accent's ngũ hành of the chính
+ * tinh in cung Mệnh for most charts. Both are correct; the scoped property
+ * keeps them from reading as one contradictory value.
  */
 
 /** The five ngũ hành, keyed as the `--element-*` custom properties. */
