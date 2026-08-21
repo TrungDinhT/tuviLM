@@ -13,7 +13,6 @@ import { DestinyCard } from "./destiny-card";
 import { LuckCard } from "./luck-card";
 import { displayStarName, menhChinhTinh } from "./selectors";
 
-const CARD_COUNT = 3;
 const COMING_SOON = "Tính năng sẽ sớm được cập nhật ✦";
 
 /** The greeting follows the clock, so it is gated on hydration. */
@@ -41,6 +40,42 @@ export function BanMenhScreen() {
 
   if (chart === undefined) return null;
 
+  /**
+   * Scroll-linked focus: each card's `--card-focus` is how close its centre
+   * is to the rail's visible centre, normalised by the distance to its
+   * nearest neighbour — so the leaving card shrinks and the incoming card
+   * grows linearly through the swipe, meeting at 0.5 halfway. Written
+   * imperatively per frame; React state only tracks the active dot.
+   */
+  const updateFocus = (rail: HTMLDivElement) => {
+    const cards = [...rail.children] as HTMLElement[];
+    const centers = cards.map((card) => card.offsetLeft + card.offsetWidth / 2);
+    const viewCenter = rail.scrollLeft + rail.clientWidth / 2;
+
+    let active = 0;
+    let closest = Infinity;
+    cards.forEach((card, index) => {
+      const center = centers[index]!;
+      const previous = centers[index - 1];
+      const next = centers[index + 1];
+      const spacing = Math.min(
+        previous === undefined ? Infinity : center - previous,
+        next === undefined ? Infinity : next - center,
+      );
+      const range = spacing === Infinity ? rail.clientWidth / 2 : spacing;
+      const distance = Math.abs(center - viewCenter);
+      card.style.setProperty(
+        "--card-focus",
+        Math.min(1, Math.max(0, 1 - distance / range)).toFixed(3),
+      );
+      if (distance < closest) {
+        closest = distance;
+        active = index;
+      }
+    });
+    setActiveDot(active);
+  };
+
   const stars = menhChinhTinh(chart).map(displayStarName);
   const badge = stars.length > 0 ? stars.join(" · ") : "Vô Chính Diệu";
 
@@ -64,30 +99,10 @@ export function BanMenhScreen() {
         </div>
       </div>
 
-      <div
-        className="deck"
-        onScroll={(event) => {
-          // The focused card is whichever center is closest to the rail's
-          // visible center — the cards have unequal widths, so a
-          // scrollLeft/scrollWidth ratio misfires.
-          const rail = event.currentTarget;
-          const center = rail.scrollLeft + rail.clientWidth / 2;
-          let focused = 0;
-          let closest = Infinity;
-          rail.childNodes.forEach((child, index) => {
-            const card = child as HTMLElement;
-            const distance = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center);
-            if (distance < closest) {
-              closest = distance;
-              focused = index;
-            }
-          });
-          setActiveDot(focused);
-        }}
-      >
-        <DestinyCard chart={chart} active={activeDot === 0} />
-        <LuckCard chart={chart} active={activeDot === 1} />
-        <AdviceCard chart={chart} active={activeDot === 2} />
+      <div className="deck" onScroll={(event) => updateFocus(event.currentTarget)}>
+        <DestinyCard chart={chart} active={activeDot === 0} initialFocus={1} />
+        <LuckCard chart={chart} active={activeDot === 1} initialFocus={0} />
+        <AdviceCard chart={chart} active={activeDot === 2} initialFocus={0} />
       </div>
       <div className="deck-dots" aria-hidden="true">
         {[0, 1, 2].map((index) => (

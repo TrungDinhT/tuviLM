@@ -24,10 +24,13 @@ import { cungRoleHolding } from "./selectors";
 export function LuckCard({
   chart,
   active = true,
+  initialFocus = 0,
 }: {
   chart: BuildLasoResponse;
-  /** Whether this card is the rail's focused one — the rest rest face-down. */
+  /** Whether this card opens focused — it paints above its neighbours. */
   active?: boolean;
+  /** The `--card-focus` before the first scroll frame; see DestinyCard. */
+  initialFocus?: number;
 }) {
   const hoaLocRole = cungRoleHolding(chart, "Hóa Lộc");
   const locTonRole = cungRoleHolding(chart, "Lộc Tồn");
@@ -43,38 +46,43 @@ export function LuckCard({
   return (
     <article
       className={cn("tarot glass luck-card", active && "is-active")}
-      style={{ "--luck-hue": luck.hue } as CSSProperties}
+      style={{ "--luck-hue": luck.hue, "--card-focus": initialFocus } as CSSProperties}
     >
-      <div className="top">
-        <span className="g">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 3l2.4 5.3L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.6-.7z" />
-          </svg>
-        </span>
-        <span className="k">LÁ BÀI PHỤ</span>
+      <div className="card-back" aria-hidden="true">
+        <span className="card-back-sigil">✦</span>
       </div>
-      <h3>Vận May</h3>
-      <div className="key">
-        {hoaLocRole !== null && hoaLocRole === locTonRole
-          ? `Lộc tụ tại ${hoaLocRole}`
-          : "Hai nguồn lộc"}
-      </div>
-      {locs.map((loc) => (
-        <p key={loc.star}>
-          <b>
-            {loc.star} tại {loc.role}.
-          </b>{" "}
-          {locRoleBlurb(loc.role ?? "")}
+      <div className="card-face">
+        <div className="top">
+          <span className="g">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 3l2.4 5.3L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.6-.7z" />
+            </svg>
+          </span>
+          <span className="k">LÁ BÀI PHỤ</span>
+        </div>
+        <h3>Vận May</h3>
+        <div className="key">
+          {hoaLocRole !== null && hoaLocRole === locTonRole
+            ? `Lộc tụ tại ${hoaLocRole}`
+            : "Hai nguồn lộc"}
+        </div>
+        {locs.map((loc) => (
+          <p key={loc.star}>
+            <b>
+              {loc.star} tại {loc.role}.
+            </b>{" "}
+            {locRoleBlurb(loc.role ?? "")}
+          </p>
+        ))}
+        <div className="luck-row">
+          <span className="luck-orb" aria-hidden="true" />
+          Màu may mắn<b>{luck.name}</b>
+        </div>
+        <p>
+          Theo nạp âm bản mệnh <b>{chart.ban_menh_name}</b>.
         </p>
-      ))}
-      <div className="luck-row">
-        <span className="luck-orb" aria-hidden="true" />
-        Màu may mắn<b>{luck.name}</b>
+        <span className="tag">✦ Tháng cát: {months.join(" · ")} (âm lịch)</span>
       </div>
-      <p>
-        Theo nạp âm bản mệnh <b>{chart.ban_menh_name}</b>.
-      </p>
-      <span className="tag">✦ Tháng cát: {months.join(" · ")} (âm lịch)</span>
     </article>
   );
 }
