@@ -666,3 +666,519 @@
   50% {
     opacity: 1;
   }
+}
+
+/* ============================================================================
+   Bản mệnh deck — the destiny card, the lá bài phụ, and their rail.
+
+   Ported from the design's `#s-home` block. All colour maths lives here;
+   components supply layout and the scoped hues (`--t-hue`, `--luck-hue`).
+   ========================================================================= */
+@layer components {
+  /* Screen headline — the shared mold: eyebrow → Fraunces title → sub,
+     plus an aside slot for the hành badge. */
+  .headline {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .headline .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .headline h2 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.06;
+    margin-top: 7px;
+    letter-spacing: -0.01em;
+  }
+
+  .headline .headsub {
+    color: var(--color-muted);
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin-top: 7px;
+    max-width: 54ch;
+  }
+
+  .headline .head-aside {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 9px;
+    margin-top: 2px;
+  }
+
+  /* Hành badge beside the headline. */
+  .elbadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    border: 1px solid var(--accent-glow);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .elbadge .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+
+  /* The deck rail: a horizontal scroll-snap below lg; from lg up, a grid —
+     the main card fills the left column, the two lá bài phụ stack right. */
+  .deck {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 6px 22px 8px;
+    scroll-snap-type: x mandatory;
+    align-items: center;
+  }
+
+  /* Hierarchy by size: the main card takes the full deck height, the lá bài
+     phụ only 82% of it — the strongest rank signal, readable at a glance. */
+  .deck > .destiny,
+  .deck > .tarot {
+    flex: 0 0 auto;
+    max-width: 90%;
+    scroll-snap-align: center;
+  }
+
+  .deck > .destiny {
+    height: var(--deck-h);
+  }
+
+  .deck > .tarot {
+    height: calc(var(--deck-h) * 0.82);
+    aspect-ratio: 9/16;
+  }
+
+  .deck-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 12px;
+  }
+
+  .deck-dots i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-glass-line);
+  }
+
+  .deck-dots i.on {
+    background: var(--accent);
+    width: 18px;
+    border-radius: 3px;
+    transition: 0.3s;
+  }
+
+  /* Destiny card. Nền là ảnh sinh bằng Nano Banana (public/assets/, chưa có
+     trong repo) nên hai lớp scrim giữ chữ đọc được và lớp gradient cuối là
+     dự phòng khi ảnh không tải — trình duyệt tự bỏ qua lớp ảnh 404. */
+  .destiny {
+    position: relative;
+    aspect-ratio: 9/16;
+    border-radius: 22px;
+    padding: 26px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(13, 7, 28, 0.88) 0%, rgba(13, 7, 28, 0.54) 20%, transparent 36%),
+      linear-gradient(0deg, rgba(13, 7, 28, 0.92) 0%, rgba(13, 7, 28, 0.66) 13%, transparent 31%),
+      url("/assets/bg-la-bai-chinh.png") center/cover no-repeat,
+      linear-gradient(168deg, #3b2569 0%, #2b1b4e 44%, #1d1136 100%);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    box-shadow:
+      0 34px 92px rgba(12, 6, 28, 0.7),
+      0 0 60px color-mix(in srgb, var(--accent) 26%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .destiny .dtitle {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .destiny .dsub {
+    margin-top: 5px;
+    font-size: 13.5px;
+    color: var(--color-muted);
+  }
+
+  .destiny .dsub b {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .destiny .dchip {
+    margin-top: 14px;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--color-ink);
+    border: 1px solid color-mix(in srgb, var(--accent) 52%, transparent);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .destiny .dchip i {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  /* The card's middle is the constellation stage — the centrepiece. */
+  .destiny .dstage {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    place-items: center;
+  }
+
+  .destiny .dmantra {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.42;
+    padding-top: 14px;
+    border-top: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+
+  .destiny.reveal {
+    animation: cardin 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  /* Lá bài phụ: quiet outline, no accent glow — the flat shadow alone lifts
+     it off the sky, so the deck never reads as four equal cards. The glow is
+     derived from --t-hue here, so a component sets one property only. */
+  .tarot {
+    --t-hue-glow: color-mix(in srgb, var(--t-hue) 42%, transparent);
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--t-hue) 24%, var(--color-glass-line));
+    box-shadow: 0 14px 34px rgba(12, 6, 28, 0.42);
+  }
+
+  .tarot::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.38;
+    background: radial-gradient(120% 70% at 100% 0%, var(--t-hue-glow), transparent 55%);
+  }
+
+  .tarot .top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tarot .g {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--t-hue) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--t-hue) 45%, transparent);
+  }
+
+  .tarot .g svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--t-hue);
+    fill: none;
+    stroke-width: 1.6;
+  }
+
+  .tarot .k {
+    font-size: 10px;
+    letter-spacing: 0.34em;
+    color: var(--color-muted);
+    font-weight: 600;
+  }
+
+  .tarot h3 {
+    font-family: var(--font-display);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-muted);
+    margin-top: 13px;
+    letter-spacing: 0.02em;
+  }
+
+  /* 42px (lá chính) vs 24px (lá phụ) — the type gap marks the protagonist. */
+  .tarot .key {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 1.06;
+    margin-top: 4px;
+    color: var(--color-ink);
+    text-shadow: 0 0 18px var(--t-hue-glow);
+    position: relative;
+    z-index: 1;
+  }
+
+  .tarot p {
+    color: var(--color-muted);
+    font-size: 12.5px;
+    line-height: 1.55;
+    margin-top: 10px;
+    font-weight: 300;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tarot p b {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .tarot .tag {
+    margin-top: auto;
+    align-self: flex-start;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--t-hue);
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--t-hue) 40%, transparent);
+    background: color-mix(in srgb, var(--t-hue) 10%, transparent);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* The Vận May card: its hue is the lucky colour, exposed as the scoped
+     --luck-hue (never the global accent) and folded into --t-hue here, so
+     the component writes exactly one custom property. */
+  .luck-card {
+    --t-hue: var(--luck-hue);
+  }
+
+  .luck-row {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 8px 14px 8px 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid var(--color-glass-line);
+    font-size: 13px;
+    color: var(--color-muted);
+    position: relative;
+    z-index: 1;
+  }
+
+  .luck-orb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    background: radial-gradient(
+      circle at 34% 28%,
+      #ffffff,
+      color-mix(in srgb, var(--luck-hue) 55%, #ffffff) 26%,
+      var(--luck-hue) 70%,
+      color-mix(in srgb, var(--luck-hue) 60%, #000000) 100%
+    );
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--luck-hue) 55%, transparent),
+      inset 0 -2px 5px rgba(0, 0, 0, 0.35);
+  }
+
+  .luck-row b {
+    color: var(--color-ink);
+    font-weight: 600;
+    margin-left: auto;
+    font-size: 14px;
+  }
+
+  /* Share row + discovery shortcuts. */
+  .share-row {
+    display: flex;
+    gap: 10px;
+    margin: 18px auto 0;
+    width: min(340px, 86%);
+  }
+
+  .shead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 26px 2px 12px;
+  }
+
+  .shead h2 {
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .shorts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .short {
+    padding: 18px;
+    text-align: left;
+    cursor: pointer;
+    border: 0;
+    color: var(--color-ink);
+    font: inherit;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .short svg {
+    width: 30px;
+    height: 30px;
+    stroke: var(--accent);
+    fill: none;
+    stroke-width: 1.4;
+  }
+
+  .short b {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .short span {
+    font-size: 12.5px;
+    color: var(--color-muted);
+  }
+}
+
+@keyframes cardin {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Tablet: two cards at a time, 3:4 instead of 9:16 — height follows width
+   here, so hierarchy comes from flex-basis instead. */
+@media (width >= 48rem) {
+  .deck {
+    gap: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .deck > .destiny,
+  .deck > .tarot {
+    aspect-ratio: 3/4;
+    height: auto;
+    max-height: 100%;
+  }
+
+  .deck > .destiny {
+    flex: 0 0 min(340px, 48%);
+  }
+
+  .deck > .tarot {
+    flex: 0 0 min(268px, 38%);
+  }
+
+  .destiny {
+    padding: 28px 24px 24px;
+  }
+
+  .destiny .dtitle {
+    font-size: 20px;
+  }
+
+  .destiny .dsub {
+    font-size: 14px;
+  }
+
+  .destiny .dmantra {
+    font-size: 17px;
+  }
+
+  .share-row {
+    width: min(560px, 92%);
+  }
+}
+
+/* Desktop: the rail stops scrolling — main card in the left column, the two
+   lá bài phụ stacked right, and the dots are gone. */
+@media (width >= 64rem) {
+  .deck {
+    display: grid;
+    grid-template-columns: 364px minmax(0, 1fr);
+    gap: 20px;
+    overflow: visible;
+    padding: 8px 40px 10px;
+    align-items: start;
+    scroll-snap-type: none;
+  }
+
+  .deck > .destiny {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 100%;
+    height: auto;
+    max-width: none;
+    aspect-ratio: 9/16;
+  }
+
+  .deck > .tarot {
+    grid-column: 2;
+    width: auto;
+    height: auto;
+    max-width: none;
+    aspect-ratio: auto;
+    min-height: 0;
+  }
+
+  .deck > .tarot p {
+    max-width: 64ch;
+  }
+
+  .deck > .tarot .tag {
+    margin-top: 14px;
+  }
+
+  .deck-dots {
+    display: none;
+  }
+}

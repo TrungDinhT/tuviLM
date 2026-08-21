@@ -22,6 +22,11 @@ export function menhChinhTinh(chart: BuildLasoResponse): readonly string[] {
   return cungMenh(chart)?.chinh_tinh ?? [];
 }
 
+/** A star name for display: trạng thái suffix stripped, diacritics kept. */
+export function displayStarName(name: string): string {
+  return name.replace(/\s*\([^)]*\)\s*$/, "").trim();
+}
+
 /**
  * The deck's main-card key: the normalised chính tinh keys of cung Mệnh,
  * sorted and joined (`"tuvi"`, `"thienphu+tuvi"`). An empty Mệnh — vô chính
