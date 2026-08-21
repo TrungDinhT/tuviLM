@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { useChartStore } from "@/store/chart-store";
 
+import fixture from "./__fixtures__/build-laso.json";
 import {
   bindChartResetClearing,
   reconcileChartState,
@@ -12,7 +13,12 @@ import { queryKeys } from "./queryKeys";
 
 const CHART_ID = "1996041510M";
 
-function seedChart(client: QueryClient, payload: unknown = { id: CHART_ID }) {
+/**
+ * The default seed is a real captured response: reconciliation rejects
+ * payloads that fail the current schema, so a bare `{ id }` is no longer a
+ * chart it will keep.
+ */
+function seedChart(client: QueryClient, payload: unknown = fixture) {
   client.setQueryData(queryKeys.laso.chart(CHART_ID), payload);
 }
 
@@ -70,6 +76,24 @@ describe("reconcileChartState", () => {
     reconcileChartState(client);
 
     expect(useChartStore.getState().hasChart).toBe(true);
+  });
+
+  it("resets a persisted chart that fails the current schema", () => {
+    // A chart persisted before the foundation fields existed parses no
+    // better than a missing one — the deck could not render from it.
+    const client = new QueryClient();
+    const preChange = { ...fixture } as Record<string, unknown>;
+    delete preChange["menh_cuc_relation"];
+    delete preChange["am_duong_relation"];
+    delete preChange["dia_chi_natal_year"];
+    delete preChange["ban_menh_ngu_hanh"];
+    seedChart(client, preChange);
+    useChartStore.setState({ hasChart: true, outcome: { stars: ["tuvi"] }, chartId: CHART_ID });
+
+    reconcileChartState(client);
+
+    expect(useChartStore.getState().hasChart).toBe(false);
+    expect(useChartStore.getState().chartId).toBeNull();
   });
 
   it("does nothing when no chart was cast", () => {

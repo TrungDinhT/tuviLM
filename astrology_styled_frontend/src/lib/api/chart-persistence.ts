@@ -3,6 +3,7 @@ import type { Query, QueryClient } from "@tanstack/react-query";
 import { useChartStore } from "@/store/chart-store";
 
 import { isPersistedQueryKey } from "./queryKeys";
+import { buildLasoResponseSchema } from "./schemas";
 
 /**
  * The bridge between the persisted query cache and the chart store.
@@ -27,11 +28,15 @@ export function shouldPersistQuery(query: Query): boolean {
 export function reconcileChartState(queryClient: QueryClient): void {
   if (!useChartStore.getState().hasChart) return;
 
-  const hasPersistedChart = queryClient
+  // A persisted payload that fails the current schema — one written by an
+  // older build, say — is not a usable chart: the screens reading it would
+  // render half a deck. It reconciles to the empty state exactly like a
+  // missing one.
+  const hasUsableChart = queryClient
     .getQueriesData({ predicate: (query) => isPersistedQueryKey(query.queryKey) })
-    .some(([, data]) => data !== undefined);
+    .some(([, data]) => buildLasoResponseSchema.safeParse(data).success);
 
-  if (!hasPersistedChart) useChartStore.getState().reset();
+  if (!hasUsableChart) useChartStore.getState().reset();
 }
 
 /**

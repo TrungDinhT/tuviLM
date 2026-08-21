@@ -76,12 +76,54 @@ export const cungSchema = z.object({
 
 export type Cung = z.infer<typeof cungSchema>;
 
+/**
+ * Foundation fields — stable keys the deck keys content off. Required, never
+ * optional: a chart missing them cannot render the deck, and a half-rendered
+ * screen is worse than a recast. Mirrors the `Literal` unions in
+ * `api/schemas.py`.
+ */
+export const menhCucRelationSchema = z.enum([
+  "sinh_xuat",
+  "sinh_nhap",
+  "khac_xuat",
+  "khac_nhap",
+  "binh_hoa",
+]);
+
+export const amDuongRelationSchema = z.enum(["thuan_ly", "nghich_ly"]);
+
+export const diaChiSchema = z.enum([
+  "ty",
+  "suu",
+  "dan",
+  "meo",
+  "thin",
+  "ti",
+  "ngo",
+  "mui",
+  "than",
+  "dau",
+  "tuat",
+  "hoi",
+]);
+
+export const nguHanhSchema = z.enum(["Kim", "Mộc", "Thủy", "Hỏa", "Thổ"]);
+
+export type MenhCucRelation = z.infer<typeof menhCucRelationSchema>;
+export type AmDuongRelation = z.infer<typeof amDuongRelationSchema>;
+export type DiaChi = z.infer<typeof diaChiSchema>;
+export type NguHanh = z.infer<typeof nguHanhSchema>;
+
 export const buildLasoResponseSchema = z.object({
   id: z.string(),
   summary: z.string(),
   ban_menh_name: z.string(),
   cuc_name: z.string(),
   menh_cuc_relation_label: z.string(),
+  menh_cuc_relation: menhCucRelationSchema,
+  am_duong_relation: amDuongRelationSchema,
+  dia_chi_natal_year: diaChiSchema,
+  ban_menh_ngu_hanh: nguHanhSchema,
   cung_by_position: z.record(z.string(), cungSchema),
 });
 

@@ -11,6 +11,10 @@ function chartWith(cung: { position: string; role: string | null; chinh_tinh: st
     ban_menh_name: "",
     cuc_name: "",
     menh_cuc_relation_label: "",
+    menh_cuc_relation: "binh_hoa",
+    am_duong_relation: "thuan_ly",
+    dia_chi_natal_year: "ty",
+    ban_menh_ngu_hanh: "Kim",
     cung_by_position: Object.fromEntries(
       cung.map((entry) => [
         entry.position,

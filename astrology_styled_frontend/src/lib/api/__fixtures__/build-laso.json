@@ -4,6 +4,10 @@
   "ban_menh_name": "Tích Lịch Hỏa",
   "cuc_name": "Thủy Nhị cục",
   "menh_cuc_relation_label": "Cục khắc mệnh",
+  "menh_cuc_relation": "khac_nhap",
+  "am_duong_relation": "thuan_ly",
+  "dia_chi_natal_year": "suu",
+  "ban_menh_ngu_hanh": "Hỏa",
   "cung_by_position": {
     "Tý": {
       "position": "Tý",
