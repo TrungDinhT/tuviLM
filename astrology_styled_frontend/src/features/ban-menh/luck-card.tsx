@@ -6,6 +6,7 @@ import { locRoleBlurb } from "@/content/loc-roles";
 import { luckColourFor } from "@/content/luck-colour";
 import { thangCatFor } from "@/content/thang-cat";
 import type { BuildLasoResponse } from "@/lib/api/schemas";
+import { cn } from "@/lib/utils";
 
 import { cungRoleHolding } from "./selectors";
 
@@ -20,7 +21,14 @@ import { cungRoleHolding } from "./selectors";
  * The lucky colour is written to the scoped `--luck-hue` on this card alone;
  * CSS folds it into `--t-hue`. The global accent is never touched.
  */
-export function LuckCard({ chart }: { chart: BuildLasoResponse }) {
+export function LuckCard({
+  chart,
+  active = true,
+}: {
+  chart: BuildLasoResponse;
+  /** Whether this card is the rail's focused one — the rest rest face-down. */
+  active?: boolean;
+}) {
   const hoaLocRole = cungRoleHolding(chart, "Hóa Lộc");
   const locTonRole = cungRoleHolding(chart, "Lộc Tồn");
   const luck = luckColourFor(chart.ban_menh_ngu_hanh);
@@ -34,7 +42,7 @@ export function LuckCard({ chart }: { chart: BuildLasoResponse }) {
 
   return (
     <article
-      className="tarot glass luck-card"
+      className={cn("tarot glass luck-card", active && "is-active")}
       style={{ "--luck-hue": luck.hue } as CSSProperties}
     >
       <div className="top">

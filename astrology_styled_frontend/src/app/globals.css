@@ -741,32 +741,44 @@
   }
 
   /* The deck rail: a horizontal scroll-snap below lg; from lg up, a grid —
-     the main card fills the left column, the two lá bài phụ stack right. */
+     the main card fills the left column, the two lá bài phụ stack right.
+     Cards bottom-align, so the focused card grows *up* out of the row. */
   .deck {
     display: flex;
     gap: 14px;
     overflow-x: auto;
     padding: 6px 22px 8px;
     scroll-snap-type: x mandatory;
-    align-items: center;
+    align-items: flex-end;
   }
 
-  /* Hierarchy by size: the main card takes the full deck height, the lá bài
-     phụ only 82% of it — the strongest rank signal, readable at a glance. */
+  /* Hierarchy follows focus: every card rests at 82% of the deck height, and
+     the centred one rises to the full height. */
   .deck > .destiny,
   .deck > .tarot {
     flex: 0 0 auto;
     max-width: 90%;
     scroll-snap-align: center;
+    aspect-ratio: 9/16;
+    height: calc(var(--deck-h) * 0.82);
+    transition: height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  .deck > .destiny {
+  .deck > .is-active {
     height: var(--deck-h);
   }
 
-  .deck > .tarot {
-    height: calc(var(--deck-h) * 0.82);
-    aspect-ratio: 9/16;
+  /* Face-down: below the desktop tier only the focused card shows its
+     reading; the others keep their surface but hide the content. At lg the
+     grid shows all three at once, so the fade never applies there. */
+  @media (width < 64rem) {
+    .deck > :is(.destiny, .tarot) > * {
+      transition: opacity 0.3s;
+    }
+
+    .deck > :is(.destiny, .tarot):not(.is-active) > * {
+      opacity: 0;
+    }
   }
 
   .deck-dots {
@@ -1095,7 +1107,7 @@
 }
 
 /* Tablet: two cards at a time, 3:4 instead of 9:16 — height follows width
-   here, so hierarchy comes from flex-basis instead. */
+   here, so focus grows the flex-basis instead of the height. */
 @media (width >= 48rem) {
   .deck {
     gap: 20px;
@@ -1108,14 +1120,12 @@
     aspect-ratio: 3/4;
     height: auto;
     max-height: 100%;
-  }
-
-  .deck > .destiny {
-    flex: 0 0 min(340px, 48%);
-  }
-
-  .deck > .tarot {
     flex: 0 0 min(268px, 38%);
+    transition: flex-basis 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .deck > .is-active {
+    flex-basis: min(340px, 48%);
   }
 
   .destiny {

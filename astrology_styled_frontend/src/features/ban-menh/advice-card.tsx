@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 
 import { adviceFor } from "@/content/advice";
 import type { BuildLasoResponse } from "@/lib/api/schemas";
+import { cn } from "@/lib/utils";
 
 /**
  * Lá bài phụ 2 — Lời Khuyên.
@@ -15,13 +16,20 @@ import type { BuildLasoResponse } from "@/lib/api/schemas";
  * Its hue is the accent's own second shade: close to the deck's chrome, and
  * deliberately not the lucky colour — that one belongs to Vận May alone.
  */
-export function AdviceCard({ chart }: { chart: BuildLasoResponse }) {
+export function AdviceCard({
+  chart,
+  active = true,
+}: {
+  chart: BuildLasoResponse;
+  /** Whether this card is the rail's focused one — the rest rest face-down. */
+  active?: boolean;
+}) {
   const entry = adviceFor(chart.menh_cuc_relation, chart.am_duong_relation);
   const polarityLabel = chart.am_duong_relation === "thuan_ly" ? "Thuận lý" : "Nghịch lý";
 
   return (
     <article
-      className="tarot glass"
+      className={cn("tarot glass", active && "is-active")}
       style={{ "--t-hue": "var(--accent-2)" } as CSSProperties}
     >
       <div className="top">

@@ -67,13 +67,27 @@ export function BanMenhScreen() {
       <div
         className="deck"
         onScroll={(event) => {
+          // The focused card is whichever center is closest to the rail's
+          // visible center — the cards have unequal widths, so a
+          // scrollLeft/scrollWidth ratio misfires.
           const rail = event.currentTarget;
-          setActiveDot(Math.round(rail.scrollLeft / (rail.scrollWidth / CARD_COUNT)));
+          const center = rail.scrollLeft + rail.clientWidth / 2;
+          let focused = 0;
+          let closest = Infinity;
+          rail.childNodes.forEach((child, index) => {
+            const card = child as HTMLElement;
+            const distance = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center);
+            if (distance < closest) {
+              closest = distance;
+              focused = index;
+            }
+          });
+          setActiveDot(focused);
         }}
       >
-        <DestinyCard chart={chart} />
-        <LuckCard chart={chart} />
-        <AdviceCard chart={chart} />
+        <DestinyCard chart={chart} active={activeDot === 0} />
+        <LuckCard chart={chart} active={activeDot === 1} />
+        <AdviceCard chart={chart} active={activeDot === 2} />
       </div>
       <div className="deck-dots" aria-hidden="true">
         {[0, 1, 2].map((index) => (

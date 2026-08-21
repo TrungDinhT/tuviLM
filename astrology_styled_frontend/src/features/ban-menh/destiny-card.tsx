@@ -11,6 +11,7 @@ import { destinyFor } from "@/content/destiny";
 import { STAR_SHAPES } from "@/content/star-shapes";
 import type { BuildLasoResponse } from "@/lib/api/schemas";
 import { starKeyFromName } from "@/lib/theme";
+import { cn } from "@/lib/utils";
 
 import { displayStarName, menhChinhTinh, menhStarKey } from "./selectors";
 
@@ -22,7 +23,14 @@ import { displayStarName, menhChinhTinh, menhStarKey } from "./selectors";
  * stage. Vô chính diệu gets its authored reading and the scattered sky —
  * a reading in its own right, never an empty stage.
  */
-export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
+export function DestinyCard({
+  chart,
+  active = true,
+}: {
+  chart: BuildLasoResponse;
+  /** Whether this card is the rail's focused one — the rest rest face-down. */
+  active?: boolean;
+}) {
   const gradientId = useId().replace(/:/g, "");
 
   const names = menhChinhTinh(chart);
@@ -39,7 +47,7 @@ export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
     : [[60, 26, 200, 168]];
 
   return (
-    <article className="destiny reveal">
+    <article className={cn("destiny reveal", active && "is-active")}>
       <div className="dtitle">TỬ VI CÁ NHÂN</div>
       <div className="dsub">
         {names.length > 0 ? (
