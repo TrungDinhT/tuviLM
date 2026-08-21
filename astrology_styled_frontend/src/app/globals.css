@@ -570,8 +570,9 @@
     box-shadow: 0 0 0 0 transparent;
   }
 
-  /* Constellation reward strokes. */
-  .reward-line {
+  /* Constellation strokes — shared by the An sao reward and the Bản mệnh
+     main card (components/shared/constellation-art.tsx). */
+  .constel-line {
     fill: none;
     stroke: var(--accent);
     stroke-width: 1.2;
@@ -584,7 +585,7 @@
     opacity: 0;
   }
 
-  .reward-node {
+  .constel-node {
     fill: var(--accent);
     opacity: 0.25;
     transform-box: fill-box;
@@ -594,24 +595,24 @@
       transform 0.5s;
   }
 
-  .reward-node-neutral {
+  .constel-node-neutral {
     fill: var(--color-muted);
   }
 
-  .reward-stop-a {
+  .constel-stop-a {
     stop-color: var(--accent);
   }
 
-  .reward-stop-b {
+  .constel-stop-b {
     stop-color: var(--accent-2);
   }
 
-  .reward-lit .reward-line {
+  .constel-lit .constel-line {
     opacity: 0.7;
     stroke-dashoffset: 0;
   }
 
-  .reward-lit .reward-node {
+  .constel-lit .constel-node {
     opacity: 1;
     filter: drop-shadow(0 0 6px var(--accent-glow));
   }
@@ -665,4 +666,3 @@
   50% {
     opacity: 1;
   }
-}

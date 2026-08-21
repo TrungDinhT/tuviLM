@@ -2,23 +2,13 @@
 
 import { useId } from "react";
 
+import {
+  CONSTELLATION_SCATTER,
+  ConstellationGradientDefs,
+  ConstellationShape,
+} from "@/components/shared/constellation-art";
+import { STAR_SHAPES } from "@/content/star-shapes";
 import { cn } from "@/lib/utils";
-
-import { STAR_SHAPES, type StarShape } from "./star-shapes";
-
-/** Scattered-sky dots for the sleeping and vô chính diệu states. */
-const SCATTER: readonly (readonly [number, number])[] = [
-  [26, 34],
-  [66, 62],
-  [108, 40],
-  [150, 72],
-  [192, 34],
-  [232, 66],
-  [272, 46],
-  [300, 56],
-  [90, 80],
-  [210, 22],
-];
 
 interface ConstellationRewardProps {
   /**
@@ -28,54 +18,6 @@ interface ConstellationRewardProps {
   stars: readonly string[] | null;
   /** Backend display names, for the caption ("Thái Dương · …"). */
   names: readonly string[];
-}
-
-function ShapeLines({
-  shape,
-  box,
-  gradientId,
-}: {
-  shape: StarShape;
-  box: readonly [number, number, number, number];
-  gradientId: string;
-}) {
-  const [x0, y0, w, h] = box;
-  const point = (index: number) => {
-    const p = shape.pts[index];
-    return p === undefined ? ([0, 0] as const) : ([x0 + p[0] * w, y0 + p[1] * h] as const);
-  };
-  return (
-    <>
-      {shape.lines.map(([a, b]) => {
-        const [x1, y1] = point(a);
-        const [x2, y2] = point(b);
-        return (
-          <line
-            key={`${a}-${b}`}
-            className="reward-line"
-            style={{ stroke: `url(#${gradientId})` }}
-            x1={x1.toFixed(1)}
-            y1={y1.toFixed(1)}
-            x2={x2.toFixed(1)}
-            y2={y2.toFixed(1)}
-          />
-        );
-      })}
-      {shape.pts.map((_, index) => {
-        const [cx, cy] = point(index);
-        return (
-          <circle
-            key={index}
-            className="reward-node"
-            style={{ fill: `url(#${gradientId})` }}
-            cx={cx.toFixed(1)}
-            cy={cy.toFixed(1)}
-            r={index === 0 ? 3.4 : 2.8}
-          />
-        );
-      })}
-    </>
-  );
 }
 
 /**
@@ -109,7 +51,7 @@ export function ConstellationReward({ stars, names }: ConstellationRewardProps) 
       : [[92, 16, 136, 66]];
 
   return (
-    <div className={cn("relative mt-[6px] mb-[2px] h-[154px]", lit && "reward-lit")} aria-hidden="true">
+    <div className={cn("relative mt-[6px] mb-[2px] h-[154px]", lit && "constel-lit")} aria-hidden="true">
       <svg
         viewBox="0 0 320 100"
         preserveAspectRatio="xMidYMid meet"
@@ -117,24 +59,19 @@ export function ConstellationReward({ stars, names }: ConstellationRewardProps) 
       >
         {drawable ? (
           <>
-            <defs>
-              <linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="320" y2="0">
-                <stop offset="0" className="reward-stop-a" />
-                <stop offset="1" className="reward-stop-b" />
-              </linearGradient>
-            </defs>
+            <ConstellationGradientDefs id={gradientId} />
             {stars.map((key, index) => {
               const shape = STAR_SHAPES[key];
               const box = boxes[index];
               if (shape === undefined || box === undefined) return null;
-              return <ShapeLines key={key} shape={shape} box={box} gradientId={gradientId} />;
+              return <ConstellationShape key={key} shape={shape} box={box} gradientId={gradientId} />;
             })}
           </>
         ) : (
-          SCATTER.map(([cx, cy], index) => (
+          CONSTELLATION_SCATTER.map(([cx, cy], index) => (
             <circle
               key={index}
-              className={cn("reward-node", lit && stars.length === 0 && "reward-node-neutral")}
+              className={cn("constel-node", lit && stars.length === 0 && "constel-node-neutral")}
               cx={cx}
               cy={cy}
               r="2.4"
