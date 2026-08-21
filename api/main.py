@@ -28,11 +28,16 @@ from api.schemas import (
     BuildLasoResponse,
     BuildSaoLuuRequest,
     BuildSaoLuuResponse,
+    CauPhuResponse,
 )
 from api.settings import get_settings
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
 from src.agent.workflow.personality.agent import build_personality_agent
+from src.refactored.cau_phu import (
+    CauPhuNotFoundError,
+    get_cau_phu,
+)
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.view.builder import build_laso_view
@@ -184,6 +189,32 @@ def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse
         cuc_name=la_so_view.cuc_name,
         menh_cuc_relation_label=la_so_view.menh_cuc_relation_label,
         cung_by_position=cung_by_position,
+    )
+
+
+@app.get("/api/v1/laso/cau-phu", response_model=CauPhuResponse)
+def read_cau_phu(request: Request) -> CauPhuResponse:
+    api_state = get_api_state(request)
+    if not api_state.has_la_so:
+        raise HTTPException(
+            status_code=409,
+            detail="Chưa an lá số. Hãy gọi POST /api/v1/laso/build trước.",
+        )
+
+    try:
+        entry = get_cau_phu(api_state.require_la_so())
+    except CauPhuNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    return CauPhuResponse(
+        vi_tri=entry.vi_tri,
+        chinh_tinh=list(entry.chinh_tinh),
+        co_tuan=entry.co_tuan,
+        co_triet=entry.co_triet,
+        tuan_triet=entry.tuan_triet,
+        tieu_de=entry.tieu_de,
+        cau_phu=entry.cau_phu,
+        cac_cau=list(entry.cac_cau),
     )
 
 
