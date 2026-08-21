@@ -1,5 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+
+import { AN_SAO_ROUTE } from "@/config/site";
 import { useChartStore } from "@/store/chart-store";
 
 import { ThemeProvider } from "./theme-provider";
@@ -11,15 +14,18 @@ import { ThemeProvider } from "./theme-provider";
  * its `outcome` prop and can be tested without a store.
  */
 export function AccentTheme({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const outcome = useChartStore((state) => state.outcome);
   const previewOutcome = useChartStore((state) => state.previewOutcome);
   // Preview beats cast beats the :root default (a null prop clears the
   // properties, letting globals.css decide).
   //
-  // A preview only exists while An sao is on screen and the user is entering
-  // birth data — it is the newer intent, and after a cast the accent would
-  // otherwise stay frozen on the previous chart while the dials move. An sao
-  // clears the preview when it unmounts, so leaving without casting hands the
-  // accent straight back to the cast chart.
-  return <ThemeProvider outcome={previewOutcome ?? outcome}>{children}</ThemeProvider>;
+  // On the casting screen the persisted cast outcome must not apply: An sao is
+  // where a *new* chart is entered, so its accent comes from the live preview
+  // alone, or falls back to the default. A cached chart would otherwise tint
+  // the screen with a reading the user is about to replace. An sao clears the
+  // preview when it unmounts, so it cannot leak onto the other tabs.
+  const effective =
+    pathname === AN_SAO_ROUTE ? previewOutcome : (previewOutcome ?? outcome);
+  return <ThemeProvider outcome={effective}>{children}</ThemeProvider>;
 }
