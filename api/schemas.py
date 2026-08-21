@@ -80,6 +80,21 @@ class StarPayload(BaseModel):
     element: str
 
 
+# Stable keys for the build response's foundation fields. These mirror the
+# domain enums (`MenhCucRelationType`, `DiaChi`, `NguHanh`) and the agent
+# tool's polarity relation, so clients key content off them rather than off
+# the display labels.
+MenhCucRelationKey = Literal[
+    "sinh_xuat", "sinh_nhap", "khac_xuat", "khac_nhap", "binh_hoa"
+]
+AmDuongRelationKey = Literal["thuan_ly", "nghich_ly"]
+DiaChiKey = Literal[
+    "ty", "suu", "dan", "meo", "thin", "ti",
+    "ngo", "mui", "than", "dau", "tuat", "hoi",
+]
+NguHanhKey = Literal["Kim", "Mộc", "Thủy", "Hỏa", "Thổ"]
+
+
 # TODO : Need to adapt with new view
 class CungPayload(BaseModel):
     position: str
@@ -101,6 +116,10 @@ class BuildLasoResponse(BaseModel):
     ban_menh_name: str
     cuc_name: str
     menh_cuc_relation_label: str
+    menh_cuc_relation: MenhCucRelationKey
+    am_duong_relation: AmDuongRelationKey
+    dia_chi_natal_year: DiaChiKey
+    ban_menh_ngu_hanh: NguHanhKey
     cung_by_position: dict[str, CungPayload]
 
 

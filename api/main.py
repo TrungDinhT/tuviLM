@@ -5,6 +5,7 @@ import logging
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
+from typing import cast
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exception_handlers import http_exception_handler
@@ -24,16 +25,21 @@ from api.chat.contracts import (
 from api.chat.routes import router as chat_router
 from api.chat.storage.store import MongoConversationHistoryStore
 from api.schemas import (
+    AmDuongRelationKey,
     BuildLasoRequest,
     BuildLasoResponse,
     BuildSaoLuuRequest,
     BuildSaoLuuResponse,
+    DiaChiKey,
+    MenhCucRelationKey,
+    NguHanhKey,
     PreviewLasoRequest,
     PreviewLasoResponse,
 )
 from api.settings import get_settings
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
+from src.agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
 from src.agent.workflow.personality.agent import build_personality_agent
 from src.refactored.components.definitions.sao import ChinhPhuTinh
 from src.refactored.la_so import LaSo
@@ -42,6 +48,13 @@ from src.refactored.view.builder import build_laso_view
 
 
 logger = logging.getLogger(__name__)
+
+# The foundation payload's polarity relation is a Vietnamese phrase; the API
+# exposes it as a stable slug so clients can key content off it.
+_AM_DUONG_RELATION_KEYS: dict[str, AmDuongRelationKey] = {
+    "thuận lý": "thuan_ly",
+    "nghịch lý": "nghich_ly",
+}
 
 logging.basicConfig(
     level=logging.INFO,
@@ -212,6 +225,13 @@ def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse
 
     cung_by_position = to_cung_payload_map(la_so_view)
 
+    # Foundation fields are values the domain already computes — no new
+    # derivation here (see laso-build-foundation).
+    foundation = build_laso_foundation_payload(la_so)
+    am_duong_relation = _AM_DUONG_RELATION_KEYS[
+        cast(dict[str, str], foundation["am_duong_thuan_nghich"])["relation"]
+    ]
+
     # TODO : How to use view to extract general summary about the LaSo?
     summary = f"Sinh dương lịch: {payload.day:02d}/{payload.month:02d}/{payload.year} {payload.hour:02d}:00"
 
@@ -223,6 +243,12 @@ def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse
         ban_menh_name=la_so_view.ban_menh_name,
         cuc_name=la_so_view.cuc_name,
         menh_cuc_relation_label=la_so_view.menh_cuc_relation_label,
+        menh_cuc_relation=cast(
+            MenhCucRelationKey, la_so.menh_cuc_relation().relation_type.value
+        ),
+        am_duong_relation=am_duong_relation,
+        dia_chi_natal_year=cast(DiaChiKey, la_so_view.dia_chi_natal_year.value),
+        ban_menh_ngu_hanh=cast(NguHanhKey, la_so.ban_menh.ngu_hanh.value),
         cung_by_position=cung_by_position,
     )
 
