@@ -41,16 +41,17 @@ export function BanMenhScreen() {
   if (chart === undefined) return null;
 
   /**
-   * Scroll-linked focus: each card's `--card-focus` is how close its centre
-   * is to the rail's visible centre, normalised by the distance to its
-   * nearest neighbour — so the leaving card shrinks and the incoming card
-   * grows linearly through the swipe, meeting at 0.5 halfway. Written
-   * imperatively per frame; React state only tracks the active dot.
+   * Tracks which card is centred, for the dots and the focused card's
+   * z-index. The focus *visuals* (scale, face/back fades) are scroll-driven
+   * CSS (`animation-timeline: view()` in globals.css) where supported; only
+   * browsers without it get the imperative `--card-focus` writes below —
+   * main-thread per-frame style writes are what made the rail judder.
    */
   const updateFocus = (rail: HTMLDivElement) => {
     const cards = [...rail.children] as HTMLElement[];
     const centers = cards.map((card) => card.offsetLeft + card.offsetWidth / 2);
     const viewCenter = rail.scrollLeft + rail.clientWidth / 2;
+    const needsJsFocus = !CSS.supports("animation-timeline: view()");
 
     let active = 0;
     let closest = Infinity;
@@ -64,10 +65,12 @@ export function BanMenhScreen() {
       );
       const range = spacing === Infinity ? rail.clientWidth / 2 : spacing;
       const distance = Math.abs(center - viewCenter);
-      card.style.setProperty(
-        "--card-focus",
-        Math.min(1, Math.max(0, 1 - distance / range)).toFixed(3),
-      );
+      if (needsJsFocus) {
+        card.style.setProperty(
+          "--card-focus",
+          Math.min(1, Math.max(0, 1 - distance / range)).toFixed(3),
+        );
+      }
       if (distance < closest) {
         closest = distance;
         active = index;
@@ -81,15 +84,9 @@ export function BanMenhScreen() {
 
   return (
     <div className="pb-[calc(56px+var(--tabbar-h))] lg:pb-14">
-      <div className="px-[22px] pt-[calc(10px+var(--safe-t))] md:px-[30px] lg:px-10 lg:pt-[calc(18px+var(--safe-t))]">
+      <div className="bm-header px-[22px] pt-[calc(10px+var(--safe-t))] md:px-[30px] lg:px-10 lg:pt-[calc(18px+var(--safe-t))]">
         <div className="headline">
-          <div>
-            <div className="eyebrow">{hydrated ? greeting() : "Chào bạn"}</div>
-            <h2>Bạn Sao Trẻ</h2>
-            <p className="headsub">
-              Lá Bài Bản Mệnh ở đầu — vuốt sang để lật hai lá bài phụ.
-            </p>
-          </div>
+          <div className="eyebrow">{hydrated ? greeting() : "Chào bạn"}</div>
           <div className="head-aside">
             <span className="elbadge">
               <span className="dot" />
@@ -97,6 +94,10 @@ export function BanMenhScreen() {
             </span>
           </div>
         </div>
+        <h2>Bạn Sao Trẻ</h2>
+        <p className="headsub">
+          Lá Bài Bản Mệnh ở đầu — vuốt sang để lật hai lá bài phụ.
+        </p>
       </div>
 
       <div className="deck" onScroll={(event) => updateFocus(event.currentTarget)}>

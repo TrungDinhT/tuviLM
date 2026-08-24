@@ -95,7 +95,10 @@
   --topbar-h: 0px;
   --rail: 250px;
   --shell: 1200px;
-  --deck-h: clamp(300px, calc(100dvh - 318px), 560px);
+  /* Deck height is svh on purpose, against the house dvh rule: dvh grows
+     when the mobile URL bar hides on scroll, which made the cards breathe
+     in and out while reading. svh stays put. */
+  --deck-h: clamp(300px, calc(100svh - 318px), 560px);
 }
 
 /* Tablet — same product, wider column. Prototype authored this at 700px. */
@@ -675,11 +678,12 @@
    components supply layout and the scoped hues (`--t-hue`, `--luck-hue`).
    ========================================================================= */
 @layer components {
-  /* Screen headline — the shared mold: eyebrow → Fraunces title → sub,
-     plus an aside slot for the hành badge. */
+  /* Screen headline: the eyebrow and the hành badge share the first row;
+     the Fraunces title and sub take their own full-width rows below, so a
+     song-tinh badge can never squeeze them into a skinny column. */
   .headline {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 14px;
   }
@@ -692,16 +696,16 @@
     font-weight: 700;
   }
 
-  .headline h2 {
+  .bm-header h2 {
     font-family: var(--font-display);
     font-size: 26px;
     font-weight: 600;
     line-height: 1.06;
-    margin-top: 7px;
+    margin-top: 10px;
     letter-spacing: -0.01em;
   }
 
-  .headline .headsub {
+  .bm-header .headsub {
     color: var(--color-muted);
     font-size: 13.5px;
     line-height: 1.5;
@@ -715,7 +719,6 @@
     flex-direction: column;
     align-items: flex-end;
     gap: 9px;
-    margin-top: 2px;
   }
 
   /* Hành badge beside the headline. */
@@ -749,28 +752,35 @@
      reflows the page — the share row below no longer jumps while cards
      resize — and the rail's own height is fixed for the same reason. The
      side padding (50% − half a card) is what lets the first and last card
-     actually reach the centre snap point. */
+     actually reach the centre snap point.
+
+     Cards are width-driven with a 240px floor (--card-w): sizing from the
+     viewport height made them too small on short screens. The rail height
+     fits the fully-grown card (width × 1.7 × focus-scale). */
   .deck {
+    --focus-scale: 1.2195;
+    --card-w: max(240px, calc(var(--deck-h) * 0.82 / 1.7));
     display: flex;
     gap: 14px;
     overflow-x: auto;
     padding-block: 6px 8px;
-    padding-inline: calc(50% - var(--deck-h) * 0.82 * 9 / 32);
+    padding-inline: calc(50% - var(--card-w) / 2);
     scroll-snap-type: x mandatory;
     align-items: flex-end;
-    height: calc(var(--deck-h) + 14px);
+    height: calc(var(--card-w) * 1.7 * var(--focus-scale) + 14px);
   }
 
-  /* Every card rests at 82% of the deck height and scales up to it as its
-     focus approaches 1: 0.82 · (1 + 0.2195t) = 0.82 + 0.18t — linear. */
+  /* Aspect 1:1.7 — the resting card is --card-w wide and grows toward the
+     full rail height as its focus approaches 1. The transform consumes
+     --card-focus, which is driven by the scroll-driven animation where
+     supported and by JS elsewhere. */
   .deck > .destiny,
   .deck > .tarot {
     flex: 0 0 auto;
-    max-width: 90%;
+    width: var(--card-w);
     scroll-snap-align: center;
-    aspect-ratio: 9/16;
-    height: calc(var(--deck-h) * 0.82);
-    transform: scale(calc(1 + 0.2195 * var(--card-focus, 0)));
+    aspect-ratio: 1 / 1.7;
+    transform: scale(calc(1 + (var(--focus-scale) - 1) * var(--card-focus, 0)));
     transform-origin: 50% 100%;
   }
 
@@ -788,6 +798,11 @@
   }
 
   @media (width < 64rem) {
+    /* The face only reads once its card is nearly focused — the ramp keeps
+       half-focused cards from ghosting text through the back. Opacity clamps
+       out-of-range values, which is what makes these thresholds work.
+       Content taller than the card scrolls inside the face instead of being
+       clipped (the global rule hides the scrollbar). */
     .deck .card-face {
       position: relative;
       z-index: 1;
@@ -795,7 +810,8 @@
       flex-direction: column;
       flex: 1 1 auto;
       min-height: 0;
-      opacity: var(--card-focus, 1);
+      overflow-y: auto;
+      opacity: calc((var(--card-focus, 1) - 0.55) / 0.35);
     }
 
     /* The back: a small star field behind the deck's sigil, tinted by the
@@ -807,7 +823,7 @@
       z-index: 1;
       display: grid;
       place-items: center;
-      opacity: calc(1 - var(--card-focus, 1));
+      opacity: calc((0.9 - var(--card-focus, 1)) / 0.35);
       background:
         radial-gradient(2px 2px at 22% 24%, color-mix(in srgb, var(--t-hue, var(--accent)) 75%, transparent), transparent),
         radial-gradient(1.6px 1.6px at 74% 18%, color-mix(in srgb, var(--t-hue, var(--accent)) 55%, transparent), transparent),
@@ -879,14 +895,14 @@
 
   .destiny .dtitle {
     font-family: var(--font-display);
-    font-size: 19px;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.06em;
   }
 
   .destiny .dsub {
     margin-top: 5px;
-    font-size: 13.5px;
+    font-size: 12px;
     color: var(--color-muted);
   }
 
@@ -901,9 +917,9 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
+    padding: 7px 14px;
     border-radius: 999px;
-    font-size: 13.5px;
+    font-size: 12.5px;
     font-weight: 600;
     color: var(--color-ink);
     border: 1px solid color-mix(in srgb, var(--accent) 52%, transparent);
@@ -926,7 +942,7 @@
   .destiny .dmantra {
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 18px;
+    font-size: 15px;
     line-height: 1.42;
     padding-top: 14px;
     border-top: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
@@ -1001,11 +1017,11 @@
     letter-spacing: 0.02em;
   }
 
-  /* 42px (lá chính) vs 24px (lá phụ) — the type gap marks the protagonist. */
+  /* 42px (lá chính) vs 21px (lá phụ) — the type gap marks the protagonist. */
   .tarot .key {
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1.06;
     margin-top: 4px;
     color: var(--color-ink);
@@ -1016,7 +1032,7 @@
 
   .tarot p {
     color: var(--color-muted);
-    font-size: 12.5px;
+    font-size: 12px;
     line-height: 1.55;
     margin-top: 10px;
     font-weight: 300;
@@ -1161,24 +1177,23 @@
   }
 }
 
-/* Tablet: two cards at a time, 3:4 instead of 9:16. Height follows width
-   here, so the resting card is fixed at 268px and focus scales it toward
-   340px (×1.269) — the same scroll-linked transform as on phone. The rail
-   is 472px so the grown card never overflows it. */
+/* Tablet: same 1:1.7 cards, taller — the resting card is 268×456 and focus
+   scales it toward 340×578 (×1.269), the same scroll-linked transform as on
+   phone. The rail is 594px so the grown card never overflows it. */
 @media (width >= 48rem) {
   .deck {
     gap: 20px;
     padding-inline: calc(50% - 134px);
-    height: 472px;
+    height: 594px;
   }
 
   .deck > .destiny,
   .deck > .tarot {
-    aspect-ratio: 3/4;
+    --focus-scale: 1.269;
+    aspect-ratio: 1 / 1.7;
     height: auto;
     max-height: 100%;
     flex: 0 0 268px;
-    transform: scale(calc(1 + 0.269 * var(--card-focus, 0)));
   }
 
   .destiny {
@@ -1223,7 +1238,7 @@
     width: 100%;
     height: auto;
     max-width: none;
-    aspect-ratio: 9/16;
+    aspect-ratio: 1 / 1.7;
     transform: none;
   }
 
@@ -1247,5 +1262,61 @@
 
   .deck-dots {
     display: none;
+  }
+}
+
+/* ============================================================================
+   Scroll-driven deck focus — the smooth path.
+
+   Where `animation-timeline: view()` is supported (Chromium 115+, Safari
+   18+), each card's focus is driven by its own traversal through the rail's
+   scrollport: 50% of the timeline is the centred snap point, 0%/100% are
+   fully off-centre. The timeline animates a registered `--card-focus`
+   custom property on the card; the card's transform and its face/back
+   opacities are plain rules consuming that (inherited) variable, so the
+   scroll-driven and the JS-fallback paths share one consumption site. No
+   JavaScript per frame, no scroll-event lag — which is what made the pure-JS
+   version judder. The keyframes are linear on purpose: the user's scroll is
+   already the easing curve.
+
+   Browsers without support (Firefox) keep the JS-written `--card-focus`
+   fallback — see ban-menh-screen.tsx.
+   ========================================================================= */
+@property --card-focus {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@media (width < 64rem) {
+  @supports (animation-timeline: view()) {
+    @keyframes focus-track {
+      0%,
+      100% {
+        --card-focus: 0;
+      }
+      50% {
+        --card-focus: 1;
+      }
+    }
+
+    /* The timeline is read on the card itself: an inner element's view()
+     * would resolve against the card's own overflow:hidden box instead of
+     * the rail. The var then flows to the children by inheritance. */
+    .deck > .destiny,
+    .deck > .tarot {
+      animation: focus-track linear both;
+      animation-timeline: view(inline);
+    }
+
+    /* The entrance reveal is time-based (translate, so it never fights the
+       var-driven transform); the focus track is scroll-based. Two
+       animations, two timelines, one element. */
+    .deck > .destiny.reveal {
+      animation:
+        cardin 1s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+        focus-track linear both;
+      animation-timeline: auto, view(inline);
+    }
   }
 }
