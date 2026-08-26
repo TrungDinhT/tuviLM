@@ -25,14 +25,13 @@ from src.refactored.components.definitions.cung_role import Role
 from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
 from src.refactored.components.definitions.sao import (
     ChinhPhuTinh,
-    TuHoa,
     TuanTriet,
+    TuHoa,
 )
 from src.refactored.la_so import LaSo
 from src.refactored.model.elementary import DiaChi
 from src.refactored.model.layer import NATAL_LAYER_ID
 from src.refactored.placement.rules.loader import load_tu_hoa_target_mapping
-
 
 _logger = logging.getLogger(__name__)
 _BOOK_NAME = "Tử Vi Đẩu Số Tân Biên"
@@ -362,9 +361,7 @@ def _build_palace_evidence(
             )
             (chinh_tinh if component.is_chinh_tinh else phu_tinh).append(evidence)
         elif isinstance(component, TuHoa):
-            tu_hoa_evidence_ids.append(
-                f"tu_hoa:{component_id}:{position.value}"
-            )
+            tu_hoa_evidence_ids.append(f"tu_hoa:{component_id}:{position.value}")
         elif isinstance(component, TuanTriet):
             tuan_triet.append(
                 TuanTrietEvidence(
@@ -467,9 +464,7 @@ def get_strength_weakness_evidence(
             tam_hop_palace_evidence_ids=[
                 _palace_evidence_id(position) for position in tam_hop_positions
             ],
-            xung_chieu_palace_evidence_id=_palace_evidence_id(
-                xung_chieu_position
-            ),
+            xung_chieu_palace_evidence_id=_palace_evidence_id(xung_chieu_position),
         ),
         cach_cuc=cach_cuc,
         tu_hoa=tu_hoa,
@@ -562,30 +557,42 @@ người đọc các ý nghĩa đó để luận; không dùng fixed mapping sao
 5. Từ meaning, tổng hợp toàn bộ evidence liên quan trong tương quan với toàn lá
    số rồi hình thành các cụm khuynh hướng nhất quán. Không tách một evidence
    riêng lẻ để suy thẳng thành kết luận năng lực.
-6. Với mỗi khuynh hướng quan trọng, xét cả constructive expression và failure
-   mode: hạn chế trực tiếp, quá đà hoặc xung đột với khuynh hướng khác.
+6. Đánh giá ứng viên điểm mạnh và ứng viên điểm yếu độc lập trên toàn profile.
+   Không lấy một điểm mạnh đã chọn rồi đảo dấu hoặc kéo quá đà để sản xuất điểm
+   yếu tương ứng; không ép hai danh sách thành các cặp một-một. Một cấu trúc có
+   thể đóng góp cho cả hai phía chỉ khi mỗi kết luận tự có pattern tổng hợp đủ
+   rõ. Điểm yếu có thể là hạn chế trực tiếp, biểu hiện quá đà hoặc xung đột giữa
+   các khuynh hướng, không cần gắn với một điểm mạnh trong output.
 7. Chỉ sau đó mới map sang Danh mục năng lực. So sánh relative salience trong
-   toàn profile, không chấm điểm tuyệt đối.
+   toàn profile, không chấm điểm tuyệt đối. Mức độ phải được diễn tả qua độ nổi
+   trội, ổn định, phạm vi bối cảnh và điều kiện phát huy, không qua thang mức.
 8. Không coi cát tinh = điểm mạnh, hung/sát/Kỵ = điểm yếu. Một cấu trúc khó có
    thể chứa năng lực hữu ích; một cấu trúc thuận có thể tạo blind spot.
-9. Deduplicate theo meaning và evidence family. Nếu sao thành phần có cùng
+9. Deduplicate nguồn theo meaning và evidence family. Nếu sao thành phần có cùng
    `structure_id` với một cách cục, không tính chúng thành các xác nhận độc lập.
-10. Chỉ luận năng lực của bản thân. Không suy giàu nghèo, may rủi, địa vị, chức
+10. Deduplicate kết luận theo ngữ nghĩa, riêng trong danh sách điểm mạnh và riêng
+    trong danh sách điểm yếu. Với mỗi cặp finding, thử phát biểu khác biệt về
+    hành vi cốt lõi, kết quả tạo ra hoặc bối cảnh phát huy. Nếu không có khác
+    biệt thực chất thì giữ finding chính xác/nổi trội hơn và gộp sắc thái còn
+    lại vào `mo_ta`. Không dùng category làm luật cứng: cùng category vẫn có thể
+    khác, khác category vẫn có thể gần nghĩa.
+11. Chỉ luận năng lực của bản thân. Không suy giàu nghèo, may rủi, địa vị, chức
     vụ, nghề cụ thể, chất lượng người thân/bạn bè hoặc thành công tương lai.
-11. Trước khi output, đối chiếu mỗi finding với các tín hiệu củng cố, điều kiện
-    hóa và xung đột trong toàn profile. `giai_thich` chỉ trình bày pattern hành
-    vi tổng hợp; không xuất danh sách evidence, `evidence_id` hay reasoning
+12. Trước khi output, đối chiếu mỗi finding với các tín hiệu củng cố, điều kiện
+    hóa và xung đột trong toàn profile. `mo_ta` chốt biểu hiện đời thường cùng
+    mức độ ở người này; `giai_thich` luận chuyên sâu cấu trúc Tử Vi tạo nên biểu
+    hiện và mức độ đó. Không xuất danh sách evidence, `evidence_id` hay reasoning
     chain nội bộ.
 """.strip()
 
 
 __all__ = [
+    "STRENGTH_WEAKNESS_REASONING_INSTRUCTION",
+    "CachCucEvidence",
     "CapabilityEvidence",
     "CapabilityMeaningEvidence",
-    "CachCucEvidence",
     "MeaningContent",
     "PalaceEvidence",
-    "STRENGTH_WEAKNESS_REASONING_INSTRUCTION",
     "SupplementalPalaceEvidence",
     "get_capability_meaning",
     "get_capability_palace_evidence",
