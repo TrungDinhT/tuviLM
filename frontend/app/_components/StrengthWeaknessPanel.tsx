@@ -15,7 +15,7 @@ import { Eyebrow } from "./Eyebrow";
 
 const WEAKNESS_LABELS: Record<WeaknessKind, string> = {
   han_che_truc_tiep: "Hạn chế trực tiếp",
-  qua_da: "Mặt trái của thế mạnh",
+  qua_da: "Biểu hiện quá đà",
   xung_dot: "Xung đột khuynh hướng",
 };
 
@@ -102,13 +102,6 @@ export function StrengthWeaknessPanel({
     setPanelState({ view: "detail", findingType: "strength", findingIndex: index });
   const openWeakness = (index: number) =>
     setPanelState({ view: "detail", findingType: "weakness", findingIndex: index });
-  const openRelatedStrength = (capabilityId: string) => {
-    const index = result?.diem_manh.findIndex(
-      (finding) => finding.nang_luc_id === capabilityId,
-    );
-    if (index !== undefined && index >= 0) openStrength(index);
-  };
-
   return (
     <>
       <section
@@ -124,8 +117,8 @@ export function StrengthWeaknessPanel({
           Chân dung năng lực
         </h2>
         <p className="mt-2 text-[12.5px] leading-[1.55] text-[var(--color-ink-2)]">
-          Xem nhanh những điểm mạnh nổi bật, mặt trái và cách các khuynh hướng
-          liên hệ với nhau trong một hồ sơ riêng.
+          Xem nhanh những điểm mạnh, điểm cần lưu ý và cách các khuynh hướng
+          được tổng hợp trong một hồ sơ riêng.
         </p>
         <Btn
           type="button"
@@ -196,21 +189,11 @@ export function StrengthWeaknessPanel({
             )}
 
             {selectedStrength && (
-              <CapabilityDetail
-                kind="strength"
-                finding={selectedStrength}
-                strengths={result.diem_manh}
-                onOpenRelatedStrength={openRelatedStrength}
-              />
+              <CapabilityDetail kind="strength" finding={selectedStrength} />
             )}
 
             {selectedWeakness && (
-              <CapabilityDetail
-                kind="weakness"
-                finding={selectedWeakness}
-                strengths={result.diem_manh}
-                onOpenRelatedStrength={openRelatedStrength}
-              />
+              <CapabilityDetail kind="weakness" finding={selectedWeakness} />
             )}
           </CapabilityModal>,
           document.body,
@@ -483,20 +466,15 @@ type CapabilityDetailProps =
   | {
       kind: "strength";
       finding: StrengthFinding;
-      strengths: StrengthFinding[];
-      onOpenRelatedStrength: (capabilityId: string) => void;
     }
   | {
       kind: "weakness";
       finding: WeaknessFinding;
-      strengths: StrengthFinding[];
-      onOpenRelatedStrength: (capabilityId: string) => void;
     };
 
 function CapabilityDetail(props: CapabilityDetailProps) {
   const isStrength = props.kind === "strength";
   const title = isStrength ? props.finding.nang_luc : props.finding.ten;
-  const relatedIds = isStrength ? [] : props.finding.lien_quan_diem_manh;
 
   return (
     <article className="max-w-[780px] mx-auto mt-6 pb-2 anim-fade-in">
@@ -532,30 +510,6 @@ function CapabilityDetail(props: CapabilityDetailProps) {
         </p>
       </section>
 
-      {relatedIds.length > 0 && (
-        <section className="mt-4 pt-3 border-t border-[rgba(26,22,17,0.12)]">
-          <h4 className="text-[9px] uppercase tracking-[1px] text-[var(--color-ink-3)]">
-            Mặt trái của
-          </h4>
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {relatedIds.map((capabilityId) => {
-              const strength = props.strengths.find(
-                (finding) => finding.nang_luc_id === capabilityId,
-              );
-              return (
-                <button
-                  key={capabilityId}
-                  type="button"
-                  className="border border-[rgba(26,22,17,0.18)] bg-[rgba(255,252,245,0.9)] px-2 py-1 text-[10.5px] text-[var(--color-ink-2)] cursor-pointer hover:border-[var(--color-crimson)] hover:text-[var(--color-crimson)]"
-                  onClick={() => props.onOpenRelatedStrength(capabilityId)}
-                >
-                  ✦ {strength?.nang_luc ?? "Điểm mạnh liên quan"}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      )}
     </article>
   );
 }

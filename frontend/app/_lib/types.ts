@@ -47,7 +47,6 @@ export interface WeaknessFinding {
   loai: WeaknessKind;
   mo_ta: string;
   giai_thich: string;
-  lien_quan_diem_manh: string[];
 }
 
 export interface StrengthWeaknessResponse {
