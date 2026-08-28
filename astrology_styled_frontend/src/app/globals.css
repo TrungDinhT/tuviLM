@@ -1269,54 +1269,106 @@
    Scroll-driven deck focus — the smooth path.
 
    Where `animation-timeline: view()` is supported (Chromium 115+, Safari
-   18+), each card's focus is driven by its own traversal through the rail's
-   scrollport: 50% of the timeline is the centred snap point, 0%/100% are
-   fully off-centre. The timeline animates a registered `--card-focus`
-   custom property on the card; the card's transform and its face/back
-   opacities are plain rules consuming that (inherited) variable, so the
-   scroll-driven and the JS-fallback paths share one consumption site. No
-   JavaScript per frame, no scroll-event lag — which is what made the pure-JS
-   version judder. The keyframes are linear on purpose: the user's scroll is
-   already the easing curve.
+   18+), each card's scale, face fade and back fade run on the compositor,
+   driven by the card's traversal through the rail's scrollport: 50% of the
+   timeline is the centred snap point, 0%/100% are fully off-centre. No
+   JavaScript per frame, no scroll-event lag — which is what made the JS
+   fallback below judder. Only `transform` and `opacity` are animated, and
+   the keyframes are linear on purpose: the user's scroll is already the
+   easing curve.
+
+   The face/back subscribe to their card's *named* view timeline: their own
+   `view()` would resolve against the card's overflow:hidden box instead of
+   the rail. Descendants see an ancestor's timeline name without
+   `timeline-scope`.
 
    Browsers without support (Firefox) keep the JS-written `--card-focus`
    fallback — see ban-menh-screen.tsx.
    ========================================================================= */
-@property --card-focus {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
 @media (width < 64rem) {
   @supports (animation-timeline: view()) {
-    @keyframes focus-track {
+    @keyframes deck-focus {
       0%,
       100% {
-        --card-focus: 0;
+        transform: scale(1);
       }
       50% {
-        --card-focus: 1;
+        transform: scale(var(--focus-scale));
       }
     }
 
-    /* The timeline is read on the card itself: an inner element's view()
-     * would resolve against the card's own overflow:hidden box instead of
-     * the rail. The var then flows to the children by inheritance. */
+    @keyframes deck-face {
+      0%,
+      35% {
+        opacity: 0;
+      }
+      45%,
+      55% {
+        opacity: 1;
+      }
+      65%,
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes deck-back {
+      0%,
+      35% {
+        opacity: 1;
+      }
+      45%,
+      55% {
+        opacity: 0;
+      }
+      65%,
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .deck > article:nth-child(1) {
+      --card-tl: --card-1;
+      view-timeline-name: --card-1;
+      view-timeline-axis: inline;
+    }
+
+    .deck > article:nth-child(2) {
+      --card-tl: --card-2;
+      view-timeline-name: --card-2;
+      view-timeline-axis: inline;
+    }
+
+    .deck > article:nth-child(3) {
+      --card-tl: --card-3;
+      view-timeline-name: --card-3;
+      view-timeline-axis: inline;
+    }
+
     .deck > .destiny,
     .deck > .tarot {
-      animation: focus-track linear both;
+      animation: deck-focus linear both;
       animation-timeline: view(inline);
     }
 
     /* The entrance reveal is time-based (translate, so it never fights the
-       var-driven transform); the focus track is scroll-based. Two
-       animations, two timelines, one element. */
+       focus transform); the focus track is scroll-based. Two animations,
+       two timelines, one element. */
     .deck > .destiny.reveal {
       animation:
         cardin 1s cubic-bezier(0.2, 0.8, 0.2, 1) both,
-        focus-track linear both;
+        deck-focus linear both;
       animation-timeline: auto, view(inline);
+    }
+
+    .deck .card-face {
+      animation: deck-face linear both;
+      animation-timeline: var(--card-tl);
+    }
+
+    .deck .card-back {
+      animation: deck-back linear both;
+      animation-timeline: var(--card-tl);
     }
   }
 }

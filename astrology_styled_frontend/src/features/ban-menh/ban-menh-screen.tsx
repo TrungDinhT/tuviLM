@@ -15,6 +15,16 @@ import { displayStarName, menhChinhTinh } from "./selectors";
 
 const COMING_SOON = "Tính năng sẽ sớm được cập nhật ✦";
 
+/**
+ * Browsers with scroll-driven animations get the focus visuals from CSS
+ * (`animation-timeline: view()` in globals.css); the rest get imperative
+ * `--card-focus` writes on scroll — main-thread per-frame style writes are
+ * what made the rail judder, so they are the fallback, not the default.
+ * Evaluated once: support never flips at runtime.
+ */
+const HAS_SCROLL_TIMELINES =
+  typeof CSS !== "undefined" && CSS.supports("animation-timeline: view()");
+
 /** The greeting follows the clock, so it is gated on hydration. */
 function greeting(): string {
   const hour = new Date().getHours();
@@ -42,16 +52,12 @@ export function BanMenhScreen() {
 
   /**
    * Tracks which card is centred, for the dots and the focused card's
-   * z-index. The focus *visuals* (scale, face/back fades) are scroll-driven
-   * CSS (`animation-timeline: view()` in globals.css) where supported; only
-   * browsers without it get the imperative `--card-focus` writes below —
-   * main-thread per-frame style writes are what made the rail judder.
+   * z-index. Writes `--card-focus` only on the fallback path.
    */
   const updateFocus = (rail: HTMLDivElement) => {
     const cards = [...rail.children] as HTMLElement[];
     const centers = cards.map((card) => card.offsetLeft + card.offsetWidth / 2);
     const viewCenter = rail.scrollLeft + rail.clientWidth / 2;
-    const needsJsFocus = !CSS.supports("animation-timeline: view()");
 
     let active = 0;
     let closest = Infinity;
@@ -65,7 +71,7 @@ export function BanMenhScreen() {
       );
       const range = spacing === Infinity ? rail.clientWidth / 2 : spacing;
       const distance = Math.abs(center - viewCenter);
-      if (needsJsFocus) {
+      if (!HAS_SCROLL_TIMELINES) {
         card.style.setProperty(
           "--card-focus",
           Math.min(1, Math.max(0, 1 - distance / range)).toFixed(3),
