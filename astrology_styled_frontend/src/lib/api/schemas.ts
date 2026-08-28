@@ -165,9 +165,18 @@ export const chartProfileSchema = z.object({
   updated_at: z.iso.datetime({ offset: true }),
 });
 
+export type ChartProfile = z.infer<typeof chartProfileSchema>;
+
 export const createChartProfileResponseSchema = z.object({
   chart_profile: chartProfileSchema,
 });
+
+/**
+ * `DELETE /api/v1/chart-profiles/{id}` answers `204` with no body, which the
+ * client's `safeBody` turns into `null`. Delete hooks parse their response
+ * with this rather than a JSON schema. Any future 204 endpoint reuses it.
+ */
+export const emptyResponseSchema = z.null();
 
 export const listChartProfilesResponseSchema = z.object({
   chart_profiles: z.array(chartProfileSchema),

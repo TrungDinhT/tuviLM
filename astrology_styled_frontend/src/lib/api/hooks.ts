@@ -17,6 +17,8 @@ import {
   type BuildLasoResponse,
   type PreviewLasoRequest,
   buildLasoResponseSchema,
+  emptyResponseSchema,
+  listChartProfilesResponseSchema,
   previewLasoRequestSchema,
   previewLasoResponseSchema,
 } from "./schemas";
@@ -87,5 +89,45 @@ export function useLasoPreview(birth: PreviewLasoRequest | null) {
     // While a new tuple loads, keep showing the previous preview: a spinning
     // dial must not make the reward flicker off and on.
     placeholderData: keepPreviousData,
+  });
+}
+
+/**
+ * The owner's saved chart profiles.
+ *
+ * Authoritative on the backend, so unlike the cast chart this is a real
+ * network query with loading and error states. It is not persisted: the
+ * query-cache persister whitelists only the cast-chart key family.
+ */
+export function useChartProfiles() {
+  return useQuery({
+    queryKey: queryKeys.chartProfiles.all(),
+    queryFn: () =>
+      request("/api/v1/chart-profiles", {
+        schema: listChartProfilesResponseSchema,
+        withOwner: true,
+      }),
+  });
+}
+
+/**
+ * Delete one saved chart profile, then refresh the list.
+ *
+ * The endpoint answers `204` with no body, so the response parses through
+ * `emptyResponseSchema`. Deletion is idempotent by nature and creates nothing,
+ * so it carries the owner identity but no `Idempotency-Key`.
+ */
+export function useDeleteChartProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      request(`/api/v1/chart-profiles/${id}`, {
+        method: "DELETE",
+        schema: emptyResponseSchema,
+        withOwner: true,
+      }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.chartProfiles.all() });
+    },
   });
 }
