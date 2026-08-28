@@ -1,0 +1,1740 @@
+workflow: strength_weakness
+model: openrouter:qwen/qwen3.7-max
+results:
+- profile:
+    name: Khanh
+    birth_date: '1998-04-04'
+    birth_time: 8
+    gender: male
+  output:
+    tong_quan: 'Lá số có cấu trúc "nghịch cảnh tạo nội lực": Mệnh Thái Dương hãm tại Tý được Triệt cứu
+      thành phản vi kỳ cách, kết hợp với Thiên Lương miếu chiếu từ Thiên Di và bộ cát tinh Tả-Hữu-Xương-Khúc
+      hội hợp, tạo nên chiều sâu tư duy triết học, khả năng đào sâu vấn đề và sức phục hồi đáng kể sau
+      biến cố. Tuy nhiên, toàn bộ tam phương tứ chính bị Kình-Đà hiệp, Quan Lộc có Cự Môn hãm kèm Đà La,
+      Phúc Đức có Thiên Cơ hãm nhận Hóa Kỵ, và cung Thân vô chính tinh lại gặp Tuần cùng cách Tử Mã, tạo
+      nên mô hình hành động chậm, phân tích dễ quá đà, và biểu đạt trí tuệ bị trở ngại. Điểm mạnh nổi
+      bật nằm ở chiều sâu nhận thức và sức bền nội tại; điểm yếu tập trung ở khâu chuyển hóa từ suy nghĩ
+      sang quyết định và hành động cụ thể.'
+    diem_manh:
+    - nang_luc_id: dao_sau_van_de
+      mo_ta: Bạn có xu hướng tự nhiên không dừng ở lời giải bề mặt mà tiếp tục truy xét, đặt câu hỏi cho
+        đến khi chạm được bản chất hoặc lớp nguyên nhân sâu hơn. Đây là một trong những năng lực nổi trội
+        và ổn định nhất ở bạn, thể hiện qua hầu hết các bối cảnh từ học tập, công việc đến suy tư cá nhân.
+        Nó đặc biệt mạnh khi bạn đối diện với những vấn đề phức tạp hoặc có chiều sâu triết học, nhưng
+        có thể trở nên quá đà trong những tình huống cần chốt nhanh.
+      giai_thich: Thái Dương hãm tại Tý tạo nền tảng "ham chuộng văn chương, triết học, đạo lý" theo cách
+        cục Nhật hãm Hợi Tý – một xu hướng tìm kiếm ý nghĩa sâu xa tự nhiên chứ không phải thói quen phân
+        tích bề mặt. Cự Môn tại Quan Lộc mang năng lực phân tích, chất vấn và truy tìm bản chất sự việc.
+        Thiên Cơ tại Phúc Đức nhận Hóa Kỵ tạo thêm lớp "không buông" – tâm trí tiếp tục đào sâu ngay cả
+        khi đã có câu trả lời tạm thời, biến hoạt động tư duy thành quá trình truy xét liên tục. Thiên
+        Lương miếu địa chiếu Mệnh từ Thiên Di cung cấp trí tuệ để nhận ra đâu là lớp sâu thực sự đáng
+        đào, giúp năng lực này có định hướng chứ không chỉ là phân tích lan man.
+      nang_luc: Đào sâu vấn đề
+    - nang_luc_id: phuc_hoi_sau_kho_khan
+      mo_ta: Sau những giai đoạn bị setbacks nặng, biến cố hoặc mất phương hướng, bạn có khả năng trở
+        lại trạng thái hữu dụng và thường tìm được hướng đi mới có ý nghĩa hơn trước. Năng lực này nổi
+        trội ở chỗ bạn không chỉ hồi phục thụ động mà thường biến chính nghịch cảnh thành bước ngoặt phát
+        triển. Nó thể hiện rõ nhất ở những giai đoạn chuyển tiếp lớn trong đời, khi môi trường ban đầu
+        hoặc xuất phát điểm gặp trở ngại nghiêm trọng.
+      giai_thich: 'Cách cục "Nhật hãm gặp Tuần Triệt án ngữ lại thành sáng sủa tốt đẹp" là pattern phản
+        vi kỳ cách: chính sự "cắt" mạnh của Triệt lên Thái Dương hãm tạo ra bước ngoặt, biến bóng tối
+        thành ánh sáng – nghịch cảnh không đánh gục mà ngược lại trở thành xúc tác chuyển hóa. Thiên Lương
+        miếu địa chiếu Mệnh từ Thiên Di, lại gặp Tả Phù, Văn Xương, Văn Khúc, Hữu Bật hội hợp tạo thành
+        cách "Thiên Lương thủ chiếu, cát tương phùng" – lớp đệm phúc đức giúp người này không bị đánh
+        gục hoàn toàn bởi biến cố và luôn có trí tuệ để nhìn ra hướng đi mới. Sự kết hợp giữa Triệt (cắt
+        mạnh, tạo bước ngoặt) và Thiên Lương (phúc, bền, che chở) tạo nên pattern "từ đổ vỡ mà tái sinh"
+        chứ không chỉ là sự hồi phục thông thường.'
+      nang_luc: Phục hồi sau khó khăn
+    - nang_luc_id: kien_tri
+      mo_ta: Bạn có khả năng tiếp tục nỗ lực qua thời gian dài dù kết quả chậm đến, dù hoàn cảnh liên
+        tục tạo rào cản. Đây không phải là kiểu kiên trì bùng nổ mà là sự bền bỉ âm thầm, dai dẳng – bạn
+        không bỏ cuộc dễ dàng ngay cả khi mọi thứ kéo dài hơn dự kiến rất nhiều. Năng lực này ổn định
+        và xuyên suốt, đặc biệt phát huy trong những giai đoạn phải tự lập, xây dựng sự nghiệp từ đầu
+        hoặc duy trì công việc qua nhiều trở ngại lặp đi lặp lại.
+      giai_thich: Cung Thân cư Tài Bạch gặp Tuần không bị "cắt" như Triệt mà chỉ bị "vây", làm chậm, khiến
+        mọi việc vòng vèo nhưng không đứt gãy – tạo nên pattern "chậm nhưng không dừng" ở phần tự lập
+        và hậu vận. Đà La tại Quan Lộc dù là hung tinh lại mang tính bám trụ, dai dẳng, kết hợp với Thiên
+        Lương (sao của sự bền bỉ, trường thọ) chiếu Mệnh tạo nên sức chịu đựng lâu dài. Cách cục "Tả Hữu
+        đơn thủ chiếu Mệnh, ly tông" buộc phải sớm lìa gia đình, tự lập từ sớm – hoàn cảnh này tôi luyện
+        sự kiên trì qua thực tế chứ không chỉ qua ý chí. Toàn bộ cấu trúc Mệnh Triệt-Thân Tuần tạo nên
+        một cuộc đời mà sự tiến bộ đến chậm nhưng đều đặn, vì mỗi rào cản đều được vượt qua thay vì né
+        tránh.
+      nang_luc: Kiên trì
+    - nang_luc_id: hoc_tu_kinh_nghiem
+      mo_ta: Bạn không phải mẫu người tiếp thu nhanh qua sách vở hay đào tạo chính quy, nhưng lại biến
+        trải nghiệm thực tế – kể cả sai lầm và thất bại – thành hiểu biết sâu sắc và dùng được lâu dài.
+        Kiến thức của bạn thường đến chậm hơn người khác nhưng một khi đã thấm thì rất chắc và khó ai
+        lấy đi được. Năng lực này phát huy mạnh nhất khi bạn được trực tiếp trải nghiệm, thử sai và rút
+        bài học từ chính quá trình đó, thay vì chỉ tiếp nhận lý thuyết thuần túy.
+      giai_thich: 'Văn Xương và Văn Khúc đều hãm địa trong tam phương tứ chính Mệnh, cho thấy kênh tiếp
+        thu qua con đường học thuật chính quy hoặc biểu đạt văn chương truyền thống bị trở ngại. Tuy nhiên,
+        Hóa Khoa đóng tại cung Thân trên sao Hữu Bật cho thấy trí tuệ thực sự phát triển qua quá trình
+        tự thân vận động, tương tác và giải quyết vấn đề thực tế. Thân vô chính tinh buộc phải "mượn"
+        kinh nghiệm bên ngoài để lấp đầy khoảng trống định hướng, biến mỗi trải nghiệm thành một mảnh
+        kiến thức có cấu trúc. Sự kết hợp giữa kênh chính quy bị hạn chế (Xương Khúc hãm) và kênh thực
+        tế được Hóa Khoa kích hoạt tại cung tự lập tạo nên mô hình học tập đặc thù: chậm qua sách vở nhưng
+        sâu và bền qua trải nghiệm thực.'
+      nang_luc: Học từ kinh nghiệm
+    diem_yeu:
+    - ten: Phân tích quá đà dẫn đến khó chốt quyết định
+      loai: qua_da
+      mo_ta: Khi đứng trước một lựa chọn quan trọng, bạn thường tiếp tục phân tích, cân nhắc thêm thay
+        vì chốt lại. Tâm trí bạn luôn tìm thấy thêm một góc khuất cần xem xét, thêm một khả năng cần loại
+        trừ, khiến thời gian từ lúc cân nhắc đến lúc quyết định kéo dài hơn mức cần thiết. Biểu hiện này
+        nổi trội trong những quyết định có tính bước ngoặt hoặc khi thông tin không đầy đủ, và có xu hướng
+        mạnh lên khi bạn càng có nhiều dữ liệu để phân tích – nghịch lý là càng biết nhiều càng khó chốt.
+      giai_thich: 'Cự Môn hãm tại Quan Lộc mang năng lực phân tích và chất vấn nhưng ở trạng thái hãm,
+        nó tạo khuynh hướng nhìn thấy quá nhiều mặt trái, quá nhiều điểm cần hoài nghi trước khi cam kết.
+        Đà La hãm đồng cung làm mọi thứ chậm lại, kéo dài thêm thời gian phân tích nhưng cũng khiến quá
+        trình này trở nên vô tận. Tại Phúc Đức, Thiên Cơ hãm nhận Hóa Kỵ tạo thêm lớp "ám ảnh" – tâm trí
+        không ngừng quay trở lại vấn đề ngay cả khi đã phân tích đủ, liên tục đặt câu hỏi "nhưng nếu...".
+        Ba lớp này cộng hưởng: Cự Môn đặt câu hỏi, Đà La kéo dài quá trình, Hóa Kỵ không cho buông – khiến
+        việc đi đến một quyết định dứt khoát trở thành thử thách thực sự, đặc biệt khi không có deadline
+        cứng hoặc áp lực bên ngoài buộc phải chốt.'
+    - ten: Khó chuyển từ suy nghĩ sang hành động cụ thể
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường mất nhiều thời gian để thực sự bắt tay vào việc, ngay cả khi đã hiểu rõ vấn đề
+        và biết mình cần làm gì. Có một khoảng cách lớn giữa "biết" và "làm" – giai đoạn chuẩn bị, suy
+        tính thường kéo dài hơn dự kiến, và việc vượt qua quán tính ban đầu để bước vào hành động đòi
+        hỏi nỗ lực ý chí đáng kể. Biểu hiện này rõ nhất khi bạn phải tự khởi xướng một việc mới mà không
+        có áp lực bên ngoài hoặc mốc thời gian rõ ràng; khi có deadline hoặc người khác thúc đẩy, bạn
+        vẫn hoàn thành được nhưng vẫn chậm hơn ở bước đầu.
+      giai_thich: 'Cung Thân cư Tài Bạch không có chính tinh tọa thủ, tạo cảm giác thiếu động lực cốt
+        lõi hoặc thiếu "ngôi sao dẫn đường" cho hành động – mọi thứ phải được lắp ghép từ bên ngoài thay
+        vì có sẵn một lực đẩy nội tại. Tuần đóng tại đây làm mọi sự vận hành trở nên chậm chạp, vòng vèo,
+        không đi thẳng vào vấn đề mà luôn qua đường vòng. Thiên Mã – sao của sự khởi động, di chuyển và
+        hành động – cũng tại cung này lại gặp Tuần tạo thành cách "Tử Mã": con ngựa bị vây, mất đường
+        chạy, nghĩa là năng lượng hành động bị kìm hãm ngay từ nguồn. Ba yếu tố này cùng tác động lên
+        cung Thân (phần tự lập, cách vận hành cuộc đời): thiếu chính tinh định hướng, Tuần làm chậm mọi
+        quá trình, và Mã bị chặn khiến xung lực hành động không thể bung ra – tạo nên rào cản cấu trúc
+        khiến việc chuyển từ tư duy sang hành động trở thành điểm nghẽn thường trực.'
+    - ten: Khó buông một vấn đề về mặt tâm trí
+      loai: qua_da
+      mo_ta: Khi một vấn đề chưa được giải quyết thỏa đáng hoặc một câu hỏi chưa có lời đáp trọn vẹn,
+        tâm trí bạn có xu hướng quay trở lại nó liên tục, ngay cả khi nó không còn liên quan đến hoàn
+        cảnh hiện tại. Bạn khó "gác lại" một chuyện để tập trung vào việc khác, và đôi khi dành quá nhiều
+        năng lượng tinh thần cho những vấn đề đã qua hoặc những điều không thể thay đổi. Biểu hiện này
+        mạnh lên khi bạn ở một mình, ít bị phân tán bởi công việc hoặc tương tác xã hội, và nó có thể
+        làm giảm chất lượng nghỉ ngơi cũng như khả năng tái tạo năng lượng.
+      giai_thich: 'Hóa Kỵ trên Thiên Cơ hãm tại Phúc Đức là cấu trúc chính tạo nên pattern này. Thiên
+        Cơ vốn là sao của tư duy, tính toán, suy luận; khi hãm địa lại nhận Hóa Kỵ – sao của sự ám ảnh,
+        vướng mắc, không thuận – nó biến hoạt động tư duy thành vòng lặp: tâm trí cứ quay lại cùng một
+        vấn đề mà không thể đóng lại, liên tục tìm kiếm một lời giải "đủ tốt" mà tiêu chuẩn đó luôn dịch
+        chuyển. Phúc Đức là cung của nội tâm, trạng thái tinh thần sâu kín, nên pattern này hoạt động
+        ở lớp sâu mà người ngoài khó thấy – bên ngoài bạn vẫn có vẻ bình thản nhưng bên trong tâm trí
+        không ngừng quay vòng. Hóa Quyền trên Thái Âm hãm đồng cung tạo một mức độ kiểm soát cảm xúc nhất
+        định, giúp bạn không bộc lộ sự bất an ra ngoài, nhưng nó không đủ để ngăn Thiên Cơ nhận Hóa Kỵ
+        tiếp tục quay vòng ở lớp tư duy thuần túy.'
+- profile:
+    name: Dung
+    birth_date: '1995-09-17'
+    birth_time: 14
+    gender: male
+  output:
+    tong_quan: 'Hồ sơ năng lực của bạn được định hình bởi bộ Sát Phá Tham đều miếu địa trong tam phương
+      Mệnh, tạo nên một profile thiên về hành động quyết liệt, phản ứng nhanh và khả năng xoay xở trong
+      hoàn cảnh khó khăn. Năng lượng chủ đạo là dám khởi sự, dám đối đầu và đọc tình huống sắc bén trong
+      bối cảnh cần hành động tức thì. Tuy nhiên, chính cường độ năng lượng này cũng tạo ra mặt trái: xu
+      hướng hành động trước khi cân nhắc đủ, và khó duy trì nhịp độ ổn định qua thời gian khi sự nghiệp
+      và các đầu việc dài hơi thường trải qua thăng giáng thất thường. Cung Thân cư Phúc Đức mang cách
+      cục ''Tham Vũ Thân cung hạ cách'' cùng Địa Không hãm và Kình Dương, tạo thêm áp lực lên khả năng
+      duy trì thành quả lâu dài, khiến những khởi đầu mạnh mẽ thường không chuyển hóa thành tiến trình
+      bền vững.'
+    diem_manh:
+    - nang_luc_id: khoi_dong_hanh_dong
+      mo_ta: Bạn có khả năng vượt qua quán tính để bắt tay vào việc rất nhanh, không mắc kẹt ở giai đoạn
+        chuẩn bị hay do dự. Khi nhận diện được mục tiêu, bạn lập tức hành động với tốc độ và sự quyết
+        tâm cao, thường thúc đẩy mọi việc chuyển động trong khi người khác vẫn còn đang cân nhắc. Đây
+        là khuynh hướng nổi trội và ổn định ở bạn, phát huy mạnh nhất trong các tình huống cần ai đó dám
+        đi trước, dám nhận bước đầu tiên khi kết quả chưa rõ ràng.
+      giai_thich: Thất Sát miếu địa tại Dần tạo cách 'Thất Sát triều đẩu' — một trong những cách cục mạnh
+        nhất của Thất Sát, mang đặc tính 'can đảm, dũng mãnh, làm việc gì cũng muốn cho chóng xong.' Hỏa
+        Tinh đắc địa đồng cung tại Mệnh cộng thêm tầng năng lượng nóng, thúc đẩy hành động tức thì thay
+        vì trì hoãn. Đà La đắc địa bổ sung chiều sâu mưu lược ngầm, giúp sự khởi động không chỉ là bốc
+        đồng mà có tính toán phía sau. Tổng hợp ba yếu tố này trong cung Mệnh tạo nên một động lực khởi
+        sự vừa nhanh, vừa có chiều sâu chiến thuật, vừa bền bỉ trong quyết tâm.
+      nang_luc: Khởi động hành động
+    - nang_luc_id: xu_ly_khung_hoang
+      mo_ta: Bạn tỏ ra bình tĩnh và hiệu quả bất thường khi đối mặt với tình huống nghiêm trọng, nguy
+        hiểm hoặc có áp lực cao. Trong khi nhiều người tê liệt hoặc hoảng loạn, bạn lại tìm được cách
+        xoay xở, ưu tiên đúng việc cần làm và đưa ra hành động quyết liệt. Khả năng này phát huy rõ nhất
+        trong các bối cảnh khủng hoảng thực sự — nơi thời gian hạn hẹp, thông tin không đầy đủ và hậu
+        quả nếu thất bại là nghiêm trọng.
+      giai_thich: 'Phá Quân miếu địa tại Ngọ trong cung Quan Lộc được Tân Biên mô tả là ''thành công trong
+        những việc thật khó khăn và nguy hiểm, có nhiều mưu trí và rất dũng mãnh.'' Đây là đặc tính nổi
+        bật của Phá Quân khi miếu địa tại Tý Ngọ — năng lực hành động hiệu quả nhất trong hoàn cảnh mà
+        người khác không dám dấn thân. Sự hiện diện của Địa Kiếp hãm và Triệt trong cùng cung tuy tạo
+        thăng trầm cho sự nghiệp, nhưng đồng thời cũng rèn luyện khả năng thích nghi với biến động và
+        phản ứng nhanh trước các tình huống bất ngờ. Bộ Sát Phá Tham hội tụ trong tam phương càng củng
+        cố khuynh hướng này: cả ba sao đều mang tính chất hành động mạnh, không ngại đối đầu.'
+      nang_luc: Xử lý khủng hoảng
+    - nang_luc_id: phan_doan_tinh_huong
+      mo_ta: Bạn có khả năng đọc nhanh và tương đối chính xác trạng thái thực của một tình huống, đặc
+        biệt trong các bối cảnh cạnh tranh, đối đầu hoặc cần ra quyết định gấp. Bạn nhận ra điều gì đang
+        thực sự diễn ra, ai đang nắm thế chủ động, và đâu là điểm mấu chốt cần tác động — thường trước
+        khi người khác kịp phân tích đầy đủ. Khả năng này ổn định và phát huy rộng, từ công việc đến các
+        tương tác xã hội có tính chiến lược.
+      giai_thich: Thất Sát miếu địa tại Dần được Tân Biên ghi nhận là 'thông minh, có nhiều mưu cơ' —
+        đây không phải trí tuệ học thuật mà là sự sắc bén trong đọc tình thế thực tế. Đà La đắc địa đồng
+        cung bổ sung đặc tính 'thâm trầm, có mưu cơ, thủ đoạn,' tạo nên lớp nhận định ngầm, không bộc
+        lộ ngay ra ngoài nhưng rất chính xác. Cách 'Xương Khúc giáp Mệnh' bao quanh cung Mệnh cũng góp
+        phần tăng cường khả năng nhận định và phân tích. Thiên Di có Tử Vi, Thiên Phủ đều miếu địa cùng
+        Hóa Khoa cho thấy khi tiếp xúc với bên ngoài, bạn có khả năng đánh giá con người và hoàn cảnh
+        với độ tin cậy cao, dù Tuần tại đây làm giảm phần nào tốc độ tiếp cận ban đầu.
+      nang_luc: Phán đoán tình huống
+    diem_yeu:
+    - ten: Hành động trước khi cân nhắc đủ
+      loai: qua_da
+      mo_ta: Xu hướng nổi bật của bạn là phản ứng và hành động rất nhanh khi có kích thích, đôi khi trước
+        khi kịp đánh giá đầy đủ các hệ quả hoặc phương án thay thế. Biểu hiện này không phải là thiếu
+        năng lực phán đoán — bạn vẫn đọc tình huống tốt — mà là năng lượng hành động quá mạnh khiến bước
+        cân nhắc bị rút ngắn hoặc bỏ qua. Nó xuất hiện ổn định ở hầu hết các bối cảnh, đặc biệt khi bạn
+        cảm thấy bị thách thức hoặc khi cơ hội có vẻ đang trôi qua.
+      giai_thich: Thất Sát tại Mệnh vốn mang tính 'nóng nảy, làm việc gì cũng muốn cho chóng xong,' và
+        Hỏa Tinh đắc địa đồng cung khuếch đại đặc tính này thành một thôi thúc hành động gần như tức thì.
+        Tân Biên mô tả Hỏa Tinh đắc địa thủ Mệnh là người 'can đảm, dũng mãnh, có chí khí hiên ngang'
+        nhưng cũng 'ương ngạnh, nóng nảy.' Sự kết hợp này tạo ra một động lực rất mạnh từ nhận định sang
+        hành động, với rất ít khoảng đệm để phản tư. Đà La tuy thêm chiều sâu mưu lược nhưng ở vị trí
+        đồng cung với Hỏa Tinh, nó không đủ để kéo chậm tốc độ phản ứng mà chỉ làm cho hành động thêm
+        phần quyết liệt và ít bộc lộ.
+    - ten: Khó duy trì tiến độ ổn định qua thời gian
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường khởi đầu mọi việc với năng lượng rất cao nhưng gặp khó khăn trong việc giữ nhịp
+        độ đều đặn và đưa công việc đến điểm kết thúc bền vững. Sự nghiệp và các dự án dài hơi của bạn
+        có xu hướng trải qua nhiều đợt thăng giáng — có giai đoạn tiến rất nhanh, rồi bỗng chậm lại, đứt
+        đoạn hoặc phải làm lại từ đầu. Đây là hạn chế trực tiếp và nổi bật, ảnh hưởng rõ nhất đến các
+        mục tiêu đòi hỏi sự kiên trì qua nhiều năm.
+      giai_thich: 'Cung Quan Lộc tại Ngọ có Phá Quân miếu địa nhưng đồng cung với Địa Kiếp hãm và chịu
+        ảnh hưởng của Triệt. Tân Biên ghi nhận Phá Quân đơn thủ tại Tý Ngọ ''võ nghiệp hiển đạt nhưng
+        thăng giáng thất thường'' — sự nghiệp có đỉnh cao nhưng không ổn định. Triệt tại Quan Lộc cắt
+        đứt hoặc làm gián đoạn luồng phát triển liên tục, trong khi Địa Kiếp hãm thêm yếu tố phá tán,
+        khiến những gì xây dựng được dễ bị xáo trộn. Ở chiều sâu hơn, cung Thân cư Phúc Đức mang cách
+        ''Tham Vũ Thân cung vi hạ cách'' — hướng đi后半生 bị ràng buộc, ''suốt đời vất vả.'' Địa Không hãm
+        tại đây cùng Kình Dương tạo thêm lớp bất ổn: năng lượng xây dựng (Vũ Khúc miếu) bị xói mòn bởi
+        yếu tố phá tán đột ngột và xung lực quá mạnh, khiến thành quả khó được duy trì lâu dài.'
+- profile:
+    name: Trung
+    birth_date: '1996-12-19'
+    birth_time: 6
+    gender: male
+  output:
+    tong_quan: Lá số cho thấy một người có năng lượng hành động mạnh, dễ bắt tay vào việc và thích nghi
+      với nhiều hoàn cảnh khác nhau, nhưng đồng thời gặp khó khăn trong việc duy trì sự tập trung lâu
+      dài và theo đuổi công việc đến mức tinh thục. Mệnh Liêm Trinh và Phá Quân đều hãm địa kết hợp Hóa
+      Kỵ tạo nên một profile vừa tháo vát, đa năng vừa dễ phân tán, nông nổi. Thân cư Thiên Di với Thiên
+      Tướng hãm củng cố xu hướng hoạt động bên ngoài và di chuyển. Quan Lộc và Tài Bạch sáng hơn với Vũ
+      Khúc, Tham Lang, Tử Vi, Thất Sát miếu địa, nhưng Triệt tại Tài Bạch làm giảm khả năng tích lũy bền
+      vững. Cách cục 'Thất Sát Phá Quân nghi xuất ngoại, chư ban thủ nghệ bất năng tinh' là trục chính
+      chi phối toàn bộ profile năng lực.
+    diem_manh:
+    - nang_luc_id: khoi_dong_hanh_dong
+      mo_ta: Bạn dễ bắt tay vào việc thay vì chần chừ hay chờ đợi điều kiện hoàn hảo. Khi có ý định hoặc
+        cơ hội, bạn thường hành động ngay, sẵn sàng thử nghiệm và không ngại thay đổi môi trường hay lĩnh
+        vực hoạt động. Xu hướng này nổi trội và ổn định, thể hiện ở cả công việc chuyên môn lẫn các quyết
+        định đời sống cá nhân, đặc biệt khi có yếu tố mới hoặc khi cần rời khỏi vùng an toàn.
+      giai_thich: Mệnh có Liêm Trinh và Phá Quân đều hãm địa tọa thủ, cả hai đều mang tính chất hoạt động
+        mạnh, thích đi xa và không chịu ngồi yên. Phá Quân hãm chủ về 'chuyên về kỹ nghệ, máy móc, thủ
+        công hay đi buôn', Liêm Trinh hãm cũng 'chuyên về kỹ nghệ, máy móc hay thủ công'. Thân cư Thiên
+        Di với Thiên Tướng củng cố xu hướng hoạt động bên ngoài. Quan Lộc có Vũ Khúc và Tham Lang miếu
+        địa chủ về doanh thương, tạo động lực hành động trong lĩnh vực kinh doanh. Cách cục 'Thất Sát
+        Phá Quân nghi xuất ngoại' cho thấy việc rời bỏ môi trường quen thuộc để bắt đầu ở nơi khác là
+        bản năng tự nhiên, không cần nhiều động lực bên ngoài.
+      nang_luc: Khởi động hành động
+    - nang_luc_id: thich_nghi_voi_hoan_canh
+      mo_ta: Bạn có khả năng thích nghi nhanh với nhiều hoàn cảnh và loại công việc khác nhau. Khi môi
+        trường thay đổi hoặc yêu cầu mới xuất hiện, bạn không mất quá nhiều thời gian để điều chỉnh cách
+        làm và tìm được chỗ đứng. Khả năng này phát huy rộng trong nhiều bối cảnh, từ công việc kỹ thuật,
+        thủ công đến kinh doanh buôn bán, tuy nhiên nó có xu hướng thiên về thích nghi bề mặt hơn là đi
+        sâu vào một lĩnh vực duy nhất.
+      giai_thich: Cách cục 'Thất Sát Phá Quân nghi xuất ngoại, chư ban thủ nghệ bất năng tinh' trực tiếp
+        cho thấy bạn biết nhiều nghề - đây là biểu hiện của khả năng thích nghi rộng. Liêm Trinh hãm địa
+        và Phá Quân hãm địa đều có tính 'khéo tay' và linh hoạt trong nhiều loại hình công việc. Thân
+        cư Thiên Di với Thiên Tướng hãm cho thấy cuộc đời thường phải hoạt động ở môi trường bên ngoài,
+        đòi hỏi liên tục điều chỉnh. Quan Lộc Vũ Tham miếu địa chủ về doanh thương, lĩnh vực vốn đòi hỏi
+        thích nghi liên tục với thị trường và hoàn cảnh kinh doanh.
+      nang_luc: Thích nghi với hoàn cảnh
+    - nang_luc_id: hoc_nhanh
+      mo_ta: Bạn nắm bắt kiến thức và kỹ năng mới tương đối nhanh, đặc biệt ở giai đoạn đầu tiếp xúc với
+        một lĩnh vực. Khả năng này giúp bạn hiểu được những nguyên tắc cơ bản và bắt đầu vận dụng mà không
+        cần quá nhiều thời gian hay sự hướng dẫn chi tiết. Tốc độ học nhanh này thể hiện rõ khi tiếp cận
+        những lĩnh vực thực hành, kỹ thuật hoặc mang tính ứng dụng, tuy nhiên thường đi kèm với việc khó
+        duy trì sự tập trung lâu dài để đạt mức chuyên sâu.
+      giai_thich: Thiên Việt tọa thủ tại Mệnh mang lại nền tảng thông minh và khả năng tiếp thu nhanh,
+        dù bị Tuần án ngữ nên mức độ bị chiết giảm phần nào. Cách cục 'Khôi Việt tại Mệnh Thân da chiết
+        quế' vẫn cho thấy năng lực học tập và thi cử, dù kết quả cuối cùng có thể không như mong đợi do
+        Tuần và Hóa Kỵ. Liêm Phá hãm địa có tính 'khéo tay' - một dạng học nhanh qua thực hành và bắt
+        chước. Cách cục 'biết nhiều nghề' cũng gián tiếp cho thấy khả năng nắm bắt nhanh nhiều lĩnh vực
+        khác nhau.
+      nang_luc: Học nhanh
+    diem_yeu:
+    - ten: Khó theo việc đến cùng ở mức tinh thục
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường gặp khó khăn trong việc theo đuổi một công việc đến mức tinh thục hoặc đến điểm
+        kết thúc trọn vẹn. Xu hướng này thể hiện qua việc dễ bắt đầu nhiều thứ nhưng khó duy trì sự tập
+        trung đủ lâu để đạt mức thành thạo, hoặc dễ chuyển hướng khi chưa hoàn tất. Đây là một hạn chế
+        ổn định, ảnh hưởng đến nhiều lĩnh vực từ chuyên môn đến các dự định cá nhân, và thường khiến kết
+        quả cuối cùng không tương xứng với tiềm năng ban đầu.
+      giai_thich: Cách cục 'Thất Sát Phá Quân nghi xuất ngoại, chư ban thủ nghệ bất năng tinh' trực tiếp
+        nói lên việc 'biết nhiều nghề nhưng không được tinh thục' - đây là trục chính của hạn chế này.
+        Liêm Trinh và Phá Quân đều hãm địa ở Mệnh, chủ về sự vất vả, bôn ba và khó ổn định trên một con
+        đường. Hóa Kỵ thủ Mệnh gây thêm sự nhầm lẫn và dang dở. Tài Bạch có Tử Vi và Thất Sát miếu địa
+        nhưng bị Triệt án ngữ, làm giảm khả năng tích lũy bền vững - phản ánh việc khó duy trì kết quả
+        lâu dài. Thiên Tướng hãm ở Thân 'suốt đời chẳng mấy khi được xứng ý toại lòng'.
+    - ten: Kiểm soát xung động kém
+      loai: han_che_truc_tiep
+      mo_ta: Bạn dễ để những thôi thúc tức thời dẫn đến hành động mà chưa kịp cân nhắc kỹ lưỡng. Khi đối
+        diện với một tình huống, bạn có xu hướng phản ứng nhanh và mạnh, đôi khi bỏ qua bước suy xét các
+        hệ quả có thể xảy ra. Biểu hiện này nổi trội trong các quyết định quan trọng hoặc khi chịu áp
+        lực, và có thể dẫn đến những hậu quả không mong muốn hoặc phải trả giá cho sự vội vàng.
+      giai_thich: Phá Quân hãm địa ở Mệnh chủ về 'liều lĩnh, hung tợn', thiếu sự suy xét cẩn thận. Thiên
+        Tướng hãm ở cung Thân (Thiên Di) cũng 'trước khi làm bất cứ việc gì cũng không biết suy xét cẩn
+        thận, nên hay nhầm lẫn suốt đời lao khổ'. Hóa Kỵ thủ Mệnh trực tiếp gây 'tính nông nổi, hay nhầm
+        lẫn'. Liêm Trinh hãm địa thêm tính 'khắc nghiệt', càng đẩy mạnh xu hướng phản ứng thiếu kiểm soát.
+        Tuần tại Mệnh có phần giảm bớt nhưng không đủ để triệt tiêu hoàn toàn, đặc biệt khi Hỏa Tinh từ
+        Tài Bạch chiếu về tạo thêm sự nóng vội.
+    - ten: Duy trì tập trung kém bền
+      loai: han_che_truc_tiep
+      mo_ta: Bạn khó giữ sự chú ý vào một nhiệm vụ duy nhất trong thời gian dài, đặc biệt khi có nhiều
+        yếu tố mới hoặc hấp dẫn xuất hiện. Xu hướng này khiến bạn dễ chuyển từ việc này sang việc khác,
+        dẫn đến nhiều đầu việc dang dở và khó đạt được chiều sâu cần thiết trong bất kỳ lĩnh vực nào.
+        Hạn chế này hiện diện ổn định và thường được kích hoạt khi công việc đòi hỏi sự kiên nhẫn hoặc
+        khi phải làm những việc lặp đi lặp lại.
+      giai_thich: Hóa Kỵ thủ Mệnh gây 'hay nhầm lẫn' và thiếu sự tập trung bền vững, dễ bị phân tâm bởi
+        các yếu tố xung quanh. Liêm Phá hãm địa đều có tính hoạt động mạnh nhưng thiếu ổn định, dễ bị
+        phân tán năng lượng qua nhiều hướng. Cách cục 'biết nhiều nghề nhưng không tinh thục' cho thấy
+        sự phân tán chú ý thay vì tập trung vào một. Tuần tại Mệnh gây trắc trở và gián đoạn dòng công
+        việc, làm cho việc duy trì nhịp độ liên tục trở nên khó khăn. Đào Hoa, Thiên Hỉ đồng cung cũng
+        tạo thêm sự hấp dẫn với những điều mới mẻ, kéo sự chú ý ra khỏi nhiệm vụ chính.
+- profile:
+    name: Uyen
+    birth_date: '1999-03-09'
+    birth_time: 18
+    gender: female
+  output:
+    tong_quan: 'Hồ sơ năng lực của bạn có hình thái đặc trưng bởi một lõi nội tại thiên về quản lý thận
+      trọng và tư duy chiến lược, kết hợp với một lớp thể hiện bên ngoài mang tính quyết liệt, uy quyền
+      và giàu sức thuyết phục. Sự kết hợp này tạo ra người vừa có chiều sâu phân tích vừa có khả năng
+      hành động mạnh mẽ khi bước ra thế giới bên ngoài. Tuy nhiên, chính cấu trúc này cũng sinh ra những
+      điểm nghẽn đáng kể: năng lượng hành động bị cản trở ngay từ bên trong, khả năng tổ chức dài hạn
+      bị phong tỏa, và mâu thuẫn thường trực giữa hai thái cực thận trọng và quyết liệt. Năng lực chiến
+      lược nổi bật nhưng cần được ý thức để không trượt sang thao túng, và khả năng diễn đạt tuy mạnh
+      trong giao tiếp trực tiếp nhưng dễ sai sót khi chuyển sang văn bản hoặc giao dịch chính thức.'
+    diem_manh:
+    - nang_luc_id: phan_tich_van_de
+      mo_ta: Khi đối mặt với một vấn đề phức tạp, bạn có thói quen tách nó thành các phần nhỏ hơn để nhận
+        ra mối quan hệ giữa chúng và tìm ra điểm then chốt cần xử lý. Bạn cũng tự nhiên cân đo các mặt
+        lợi hại trước khi đi đến một đánh giá, không vội vàng kết luận khi chưa xem xét đủ yếu tố. Năng
+        lực này hiện diện ổn định trong nhiều bối cảnh, từ công việc đến đời sống, và đặc biệt phát huy
+        khi vấn đề đòi hỏi tư duy chiến lược hơn là phản ứng tức thì.
+      giai_thich: Thiên Phủ đắc địa thủ Mệnh là tài tinh chủ về quản lý và suy tính, tạo nền tảng cho
+        khả năng phân tích có hệ thống. Đà La đắc địa đồng cung bổ sung chiều sâu chiến lược với tính
+        chất thâm trầm và mưu cơ, giúp bạn không chỉ nhìn bề mặt mà còn truy tìm lớp nguyên nhân bên trong.
+        Bộ Phủ Tướng hội chiếu củng cố tư duy quản trị tổng thể, trong khi Tang Môn mang lại sự cương
+        nghị giúp bạn không né tránh những vấn đề khó. Tuy nhiên, chính Chiết Túc Mã cũng từ cấu trúc
+        này khiến quá trình phân tích đôi khi bị kéo dài do sự do dự nội tại, và kết quả phân tích không
+        phải lúc nào cũng chuyển hóa được thành hành động liền mạch.
+      nang_luc: Phân tích vấn đề
+    - nang_luc_id: quyet_doan
+      mo_ta: Khi hoạt động bên ngoài hoặc trong các tình huống đòi hỏi sự quyết đoán, bạn có khả năng
+        đi đến lựa chọn dứt khoát và cam kết với hướng đi đã chọn mà không kéo dài do dự. Sự quyết đoán
+        này nổi trội nhất khi bạn ở trong môi trường tương tác với người khác hoặc đối mặt với tình huống
+        cần sự chỉ huy. Trong bối cảnh cá nhân hoặc khi tự suy tính, bạn có thể chậm hơn do xu hướng cân
+        nhắc kỹ, nhưng khi đã bước vào hành động thực tế, tốc độ và độ dứt khoát tăng lên rõ rệt.
+      giai_thich: Cung Thân cư Thiên Di có Thất Sát miếu địa đồng cung Tử Vi, tạo cách Đế huề bảo kiếm
+        — vua mang kiếm báu — nên khi thể hiện ra bên ngoài, bạn mang phong thái quyết liệt và uy quyền.
+        Thất Sát chủ dũng tinh, ưa hành động nhanh và dứt khoát; Tử Vi bổ sung uy quyền và sự nghiêm cẩn,
+        giúp quyết định không chỉ nhanh mà còn có trọng lượng. Bộ Tứ Linh và cách Hổ đội hòm sắt tại cung
+        Thân gia tăng quý khí và uy danh, khiến người khác dễ tin phục. Tuy nhiên, Tử Vi bình hòa tại
+        Hợi giảm bớt phần rực rỡ, nên uy lực tuy có nhưng không ở mức áp đảo tuyệt đối, và sự quyết đoán
+        này phát huy tốt nhất khi có bối cảnh bên ngoài kích hoạt hơn là từ nội tại.
+      nang_luc: Quyết đoán
+    - nang_luc_id: thuyet_phuc
+      mo_ta: Bạn có khả năng trình bày ý tưởng và lập luận theo cách khiến người khác dễ chấp nhận quan
+        điểm của mình, kết hợp giữa lý lẽ có cấu trúc và phong thái tự tin. Năng lực này thể hiện rõ trong
+        cả giao tiếp trực tiếp lẫn diễn đạt bằng văn bản, đặc biệt khi bạn cần bảo vệ một lập trường hoặc
+        thuyết phục người khác thay đổi cách nhìn. Đây là năng lực ổn định, được hỗ trợ bởi cả tư duy
+        chiến lược bên trong và khả năng biểu đạt bên ngoài.
+      giai_thich: Cách Hổ đội hòm sắt tại cung Thân chủ về tài hùng biện và văn học, tạo nền tảng cho
+        khả năng thuyết phục bằng lời nói. Tấu Thư đồng cung tại Thiên Di bổ sung sở trường về văn thư
+        và diễn đạt có bài bản. Từ tam hợp, Văn Xương và Văn Khúc đều đắc địa tại Tài Bạch chiếu về Mệnh,
+        mang lại sự linh hoạt trong ngôn ngữ và khả năng chuyển tải ý tưởng phức tạp thành dạng dễ tiếp
+        nhận. Thiên Phủ thủ Mệnh với tính cách khoan hòa giúp cách trình bày không gây phản cảm, trong
+        khi Đà La thâm trầm tạo chiều sâu cho lập luận. Hóa Kỵ trên Văn Khúc ở Tài Bạch có thể tạo một
+        số nhầm lẫn trong giao dịch cụ thể, nhưng không làm mất đi năng lực diễn đạt tổng thể.
+      nang_luc: Thuyết phục
+    - nang_luc_id: giu_chuc_nang_duoi_ap_luc
+      mo_ta: Khi đối mặt với áp lực hoặc tình huống căng thẳng, bạn vẫn duy trì được khả năng suy nghĩ
+        và hành động ở mức hữu dụng thay vì bị tê liệt hoặc mất phương hướng. Bên ngoài bạn thể hiện sự
+        điềm tĩnh và cương nghị, dù bên trong có thể vẫn có những lo lắng và ưu tư. Năng lực này phát
+        huy rõ nhất trong các tình huống đòi hỏi bản lĩnh trực tiếp, và ít phát huy hơn khi áp lực kéo
+        dài âm ỉ mà không có điểm kết thúc rõ ràng.
+      giai_thich: Thiên Phủ thủ Mệnh mang tính cách khoan hòa, tạo lớp đệm cảm xúc giúp bạn không dễ bị
+        cuốn theo hoảng loạn. Tang Môn đồng cung bổ sung sự can đảm và cương nghị, dù cũng mang theo ưu
+        tư phiền muộn — nghĩa là bạn cảm nhận áp lực rõ rệt nhưng không để nó chi phối hành động. Đà La
+        đắc địa với tính thâm trầm giúp giữ sự tỉnh táo để suy tính ngay cả trong hoàn cảnh khó. Khi chuyển
+        sang cung Thân, Thất Sát miếu địa là dũng tinh giúp đương đầu trực tiếp với thử thách thay vì
+        né tránh. Tuy nhiên, cấu trúc Tang Hổ gặp Sát tinh hội hợp cũng cảnh báo rằng nếu áp lực quá lớn
+        và kéo dài, sức chịu đựng có thể bị vượt ngưỡng, đặc biệt khi liên quan đến cảm xúc cá nhân.
+      nang_luc: Giữ chức năng dưới áp lực
+    diem_yeu:
+    - ten: Khó khởi động và duy trì đà hành động
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường có ý tưởng và năng lượng nhưng hay gặp trở ngại ngay khi bắt tay vào thực hiện,
+        khiến mọi việc không tiến triển nhanh như mong muốn. Sự sốt ruột dễ xuất hiện, và khi bị cản trở,
+        bạn có xu hướng đổi hướng thay vì kiên trì với hướng đi ban đầu. Hạn chế này hiện diện khá thường
+        xuyên, đặc biệt khi bạn tự khởi xướng công việc mà không có áp lực hoặc cấu trúc bên ngoài buộc
+        phải tiến lên.
+      giai_thich: Chiết Túc Mã hình thành từ sự hội hợp của Đà La và Thiên Mã ngay tại cung Mệnh, tạo
+        hình ảnh ngựa què — có lực nhưng đường không thông, muốn chạy mà chân bị vướng. Đà La vốn chủ
+        về sự trì hoãn và xoay vòng tại chỗ, trong khi Thiên Mã là động lực di chuyển; hai sao này mâu
+        thuẫn nhau ngay trong cùng một cung, tạo ra trạng thái nội tại mà ý muốn hành động luôn bị chính
+        sự thận trọng và trì trệ kéo lại. Thiên Phủ thủ Mệnh tuy có mưu cơ nhưng cũng ưa sự an toàn, khiến
+        bạn càng do dự trước mỗi bước đi mới. Cấu trúc này không phủ nhận năng lực phân tích hay sự quyết
+        đoán khi đã vào guồng, nhưng giải thích vì sao khoảng cách từ ý định đến hành động đầu tiên thường
+        dài hơn bình thường.
+    - ten: Khó xây dựng và bám đuổi kế hoạch dài hạn
+      loai: han_che_truc_tiep
+      mo_ta: Bạn gặp khó khăn trong việc thiết lập một lộ trình dài hạn rõ ràng và bám theo nó đến cùng.
+        Các kế hoạch thường bị gián đoạn, thay đổi cấu trúc hoặc mất phương hướng giữa chừng, không phải
+        vì thiếu năng lực mà vì khả năng tổ chức và duy trì hệ thống bị ảnh hưởng bởi nhiều yếu tố gây
+        nhiễu. Hạn chế này thể hiện rõ nhất trong những mục tiêu đòi hỏi sự kiên trì qua nhiều giai đoạn.
+      giai_thich: Cung Quan Lộc tại Dậu có Thiên Tướng hãm địa, vốn đã yếu về mặt tổ chức và quản lý,
+        lại chịu cả Tuần lẫn Triệt án ngữ. Thiên Tướng gặp Tuần Triệt được ví như ông tướng mất đầu, ấn
+        bị sứt mẻ, mất khả năng điều phối và duy trì trật tự. Thiên Hình miếu địa đồng cung mang lại kỷ
+        luật cá nhân và sự nghiêm khắc, nhưng không đủ bù đắp cho sự phong tỏa cấu trúc mà Tuần Triệt
+        gây ra. Thêm vào đó, Thiên Hư, Tiểu Hao và Tuế Phá tại đây tạo xu hướng hao tán và thất bại lặp
+        lại trong các nỗ lực tổ chức dài hạn. Cấu trúc này không có nghĩa bạn không thể đạt được gì, mà
+        cho thấy con đường xây dựng sự nghiệp thường phải đi qua nhiều lần tái cấu trúc hơn là một lộ
+        trình tuyến tính.
+    - ten: Xung đột giữa thận trọng và quyết liệt
+      loai: xung_dot
+      mo_ta: Có một mâu thuẫn nội tại giữa phần bên trong muốn giữ an toàn, cân nhắc kỹ lưỡng và phần
+        bên ngoài muốn hành động nhanh, mạnh, thậm chí liều lĩnh. Bạn có thể thấy mình rất thận trọng
+        khi suy tính một mình nhưng lại trở nên rất quyết liệt khi bước ra tương tác, rồi sau đó tự hoài
+        nghi về mức độ mạo hiểm của chính mình. Xung đột này tạo ra sự thiếu nhất quán trong phong cách
+        và đôi khi khiến người xung quanh khó đoán được bạn sẽ phản ứng theo hướng nào.
+      giai_thich: 'Mệnh có Thiên Phủ đắc địa — sao chủ về bảo tồn, tích lũy và thận trọng, mang tính cách
+        khoan hòa nhân hậu và ưa sự an toàn. Trong khi đó, cung Thân cư Thiên Di có Thất Sát miếu địa
+        — dũng tinh chủ về hành động nhanh, cương nghị, hiếu thắng và không ngại đối đầu. Tử Vi đồng cung
+        khuếch đại cả uy quyền lẫn sự liều lĩnh của Thất Sát. Hai thái cực tồn tại song song: Mệnh là
+        bản năng gốc, Thân là cách thể hiện ra thế giới và xu hướng hậu vận. Khi Mệnh và Thân kéo theo
+        hai hướng khác nhau, bạn dễ rơi vào trạng thái lúc thì quá cẩn thận đến mức bỏ lỡ cơ hội, lúc
+        lại quá quyết liệt đến mức không kịp cân nhắc rủi ro. Chiết Túc Mã tại Mệnh càng làm tăng sự giằng
+        co này.'
+    - ten: Mưu lược vượt ranh giới thành thao túng
+      loai: qua_da
+      mo_ta: Khả năng phân tích và xây dựng chiến lược vốn là điểm mạnh có thể bị đẩy quá xa, biến thành
+        xu hướng sắp đặt tình huống hoặc dẫn dắt người khác theo hướng có lợi cho mình mà không minh bạch.
+        Trong những hoàn cảnh mà lợi ích cá nhân bị đe dọa hoặc khi cảm thấy cần kiểm soát kết quả, bạn
+        dễ bị cám dỗ sử dụng mưu cơ thay vì trao đổi thẳng thắn. Xu hướng này không phải bản chất mặc
+        định mà xuất hiện khi áp lực hoặc bất an kích hoạt mặt tối của năng lực chiến lược.
+      giai_thich: Thiên Phủ thủ Mệnh khi gặp nhiều Sát tinh hội hợp bị Tân Biên nhận định là người hay
+        mưu mẹo, thiếu minh bạch. Đà La đắc địa đồng cung mang tính chất thâm trầm, có mưu cơ, thủ đoạn
+        — khi tích cực thì là chiều sâu chiến lược, khi tiêu cực thì là sự tính toán ngầm. Linh Tinh từ
+        Tài Bạch chiếu về Mệnh nằm trong bộ Tang Hổ Sát tinh hội hợp bổ sung yếu tố bí mật, khiến mưu
+        cơ dễ chuyển sang hướng không công khai. Thiên Phủ vốn là sao quản lý kho tàng, khi kết hợp với
+        Sát tinh tạo xu hướng bảo vệ lợi ích bằng mọi giá, kể cả bằng cách kiểm soát thông tin. Cấu trúc
+        này cho thấy khi năng lực chiến lược bị kích hoạt bởi bất an, ranh giới giữa mưu lược chính đáng
+        và thao túng trở nên mong manh.
+    - ten: Sai sót trong diễn đạt và giao dịch tài chính
+      loai: han_che_truc_tiep
+      mo_ta: Trong các tình huống liên quan đến giao tiếp bằng văn bản, hợp đồng hoặc giao dịch tiền bạc,
+        bạn dễ mắc những lỗi nhầm lẫn hoặc bỏ sót chi tiết mà bình thường ít xảy ra. Sự mơ hồ hoặc hiểu
+        lầm có thể phát sinh ngay cả khi bạn tự tin về nội dung mình truyền đạt. Hạn chế này không ảnh
+        hưởng đến khả năng hùng biện trực tiếp nhưng gây trở ngại trong các tình huống đòi hỏi độ chính
+        xác cao về câu chữ và số liệu.
+      giai_thich: 'Hóa Kỵ tọa thủ tại cung Tài Bạch trên sao Văn Khúc, tạo sự nhầm lẫn và bế tắc ngay
+        trên phương tiện diễn đạt và giao dịch tài chính. Văn Khúc vốn chủ về ngôn ngữ và văn thư, khi
+        bị Hóa Kỵ xâm phạm thì độ chính xác của câu chữ bị ảnh hưởng, dễ sinh hiểu lầm hoặc sai sót trong
+        văn bản. Tuy Hóa Kỵ đắc địa tại Sửu nên tác hại được giảm nhẹ, nhưng tính chất hay nhầm lẫn vẫn
+        hiện diện. Thiên Diêu hãm địa đồng cung bổ sung yếu tố mơ hồ và thiếu rõ ràng, trong khi Quả Tú
+        tạo xu hướng giữ kín thông tin thay vì minh bạch hóa. Cấu trúc này tạo ra một điểm mù cụ thể:
+        năng lực hùng biện hoạt động tốt trong giao tiếp trực tiếp, nhưng khi chuyển sang văn bản hoặc
+        giao dịch chính thức, độ tin cậy giảm đi đáng kể.'
+- profile:
+    name: Bang
+    birth_date: '2000-03-18'
+    birth_time: 14
+    gender: male
+  output:
+    tong_quan: 'Lá số của bạn có hình thái đặc trưng: năng lực nhận thức và ngôn ngữ tập trung ở tam phương
+      Mệnh–Quan–Tài rất dày, đặc biệt quanh trục lập luận, tổ chức và chiều sâu tri thức. Thiên Di là
+      vùng sáng nhất — khi hoạt động bên ngoài, bạn thể hiện sự linh hoạt, uy tín và khả năng thu hút
+      hỗ trợ tốt hơn hẳn so với khi vận hành trong không gian cá nhân. Tuy nhiên, cung Mệnh vô chính diệu
+      gặp Tuần và cách cục Lộc Tồn bị bao vây bởi Địa Không, Thái Tuế, Thiên Mã tạo nên một lớp ma sát
+      thường trực: năng lực có nhưng đường triển khai hay bị gián đoạn, kết quả ít khi trọn vẹn như ý
+      muốn. Cung Thân đồng cung Phúc Đức với Thái Âm Miếu đi cùng Hóa Kỵ tạo thêm một lớp phức tạp nội
+      tâm — cảm xúc và sự đa nghi có thể trở thành lực cản ngầm, đặc biệt trong các mối quan hệ thân cận.
+      Tổng thể, bạn là người có nền tảng tư duy vững và khả năng thích nghi tốt ở môi trường mới, nhưng
+      cần ý thức quản lý nhịp độ đường dài, kiểm soát phản ứng cảm xúc và học cách chia sẻ quyền kiểm
+      soát để năng lực không bị chính cấu trúc nội tại kìm hãm.'
+    diem_manh:
+    - nang_luc_id: lap_luan_bang_loi
+      mo_ta: Bạn có khả năng trình bày chuỗi lý lẽ sắc bén, đanh thép và có sức thuyết phục trong giao
+        tiếp công việc. Khi cần bảo vệ quan điểm hoặc phân tích một vấn đề trước người khác, bạn thường
+        tìm được cách diễn đạt vừa logic vừa có trọng lượng, khiến người nghe phải cân nhắc. Năng lực
+        này nổi trội và ổn định, phát huy mạnh nhất trong bối cảnh nghề nghiệp, thảo luận chuyên môn hoặc
+        khi cần trình bày trước tập thể; trong đời sống cá nhân nó có thể bớt rõ do xu hướng giữ khoảng
+        cách.
+      giai_thich: Cự Môn vượng địa tại Quan Lộc cung ở Tý là nền tảng chính — sách Tân Biên mô tả Cự Môn
+        vượng tại Tý là 'ăn nói đanh thép, có nhiều tài năng nhất là ăn nói và tổ chức, sẵn mưu trí, văn
+        võ kiêm toàn.' Bạch Hổ đồng cung tăng thêm tính nghiêm nghị và sức nặng trong lời nói, trong khi
+        Tướng Quân mang đến dáng dấp quyết đoán, chỉ huy khi biểu đạt. Thái Dương vượng địa tại Tài Bạch
+        góp phần tạo độ sáng cho tư duy, giúp lập luận không chỉ đanh thép mà còn có chiều rộng. Toàn
+        bộ tam hợp Mệnh–Quan–Tài hỗ trợ nhau khiến năng lực ngôn ngữ trở thành một trong những điểm nổi
+        bật nhất của lá số.
+      nang_luc: Lập luận bằng lời
+    - nang_luc_id: cau_truc_hoa
+      mo_ta: Bạn có năng lực tự nhiên trong việc biến những thông tin hoặc công việc rời rạc thành một
+        hệ thống có trật tự, phân chia rõ ràng các phần và xác định được mối quan hệ giữa chúng. Khi đối
+        diện với một bài toán phức tạp, bạn thường là người đầu tiên nhìn ra cách sắp xếp hợp lý và đề
+        xuất quy trình thực hiện. Năng lực này hiện diện ổn định ở cả tư duy lẫn hành động, phát huy tốt
+        trong công việc đòi hỏi quy hoạch hoặc xây dựng hệ thống, tuy có thể bị gián đoạn khi cảm xúc
+        cá nhân xen vào.
+      giai_thich: 'Lộc Tồn tại Mệnh, dù nằm trong cách cục bất lợi, vẫn giữ đặc tính cốt lõi được Tân
+        Biên ghi nhận: ''thông minh, có tài tổ chức, có nhiều sáng kiến lạ và biết ứng biến.'' Cự Môn
+        tại Quan Lộc củng cố thêm phương diện tổ chức trong sự nghiệp. Quốc Ấn tại Tài Bạch mang dấu ấn
+        của sự sắp xếp mang tính chính thức, có quy phạm. Sự kết hợp này tạo nên khuynh hướng tự nhiên:
+        khi tiếp cận bất kỳ vấn đề nào, bạn có xu hướng phân lớp và tạo cấu trúc trước khi hành động,
+        thay vì ứng phó ngẫu hứng.'
+      nang_luc: Cấu trúc hóa
+    - nang_luc_id: thich_nghi_voi_hoan_canh
+      mo_ta: Khi rời khỏi vùng an toàn hoặc bước vào môi trường mới, bạn thể hiện sự linh hoạt đáng kể
+        — điều chỉnh cách làm, cách giao tiếp và kỳ vọng theo điều kiện thực tế mà không mất phương hướng.
+        Bạn dễ được người xung quanh tín nhiệm và thường gặp sự hỗ trợ đúng lúc từ những người có vị thế
+        hoặc kinh nghiệm. Năng lực thích nghi này phát huy mạnh nhất ở bối cảnh bên ngoài — đi xa, thay
+        đổi môi trường làm việc, hoặc tiếp xúc với nhóm người mới — và tỏ ra vượt trội so với khả năng
+        vận hành trong không gian quen thuộc.
+      giai_thich: Thiên Di cung là vùng sáng nhất của lá số với Thiên Đồng Miếu địa và Thiên Lương vượng
+        địa đồng cung tại Dần, lại thêm Hóa Khoa. Thiên Đồng chủ 'canh cải' — khả năng thay đổi và thích
+        ứng là bản chất của sao này. Thiên Lương 'có mưu cơ, biết quyền biến' bổ sung chiều sâu chiến
+        lược cho sự thích nghi. Hóa Khoa tại Thiên Di được Tân Biên ghi 'thông minh, lịch lãm, uyên bác,
+        ra ngoài có danh giá, được nhiều người kính trọng.' Thiên Việt và Thiên Mã đồng cung tạo thêm
+        yếu tố quý nhân phù trợ và khả năng di chuyển linh hoạt. Toàn bộ cung Thiên Di xung chiếu Mệnh,
+        chiếu cả Phúc Đức (cung Thân), khiến năng lực thích nghi trở thành lợi thế lớn nhất khi bạn hoạt
+        động bên ngoài.
+      nang_luc: Thích nghi với hoàn cảnh
+    - nang_luc_id: nghien_cuu_chuyen_sau
+      mo_ta: Bạn có khuynh hướng tìm hiểu một lĩnh vực đến mức chuyên sâu thay vì chỉ nắm bề mặt. Khi
+        đã quan tâm đến một chủ đề, bạn duy trì việc đọc, phân tích và tích lũy kiến thức một cách có
+        hệ thống, dần dần xây dựng được nền tảng hiểu biết dày và chắc. Năng lực này phát huy trong những
+        bối cảnh cho phép làm việc độc lập và đào sâu — nghiên cứu, phân tích, tư vấn chuyên môn — hơn
+        là trong các vai trò đòi hỏi phản ứng nhanh hoặc xoay chuyển liên tục.
+      giai_thich: 'Hóa Khoa tại Thiên Di mang đặc tính ''uyên bác, được tôn là thần giám sát thi cử, chấp
+        chưởng văn bài'' — đây là sao chủ về chiều sâu tri thức và sự công nhận học thuật. Lộc Tồn tại
+        Mệnh có đặc tính ''hiếu học, thông minh'' ngay cả khi bị cách cục xấu bao vây. Cự Môn tại Quan
+        Lộc ''văn võ kiêm toàn'' cho thấy khả năng tiếp cận vấn đề từ nhiều góc độ. Hoa Cái tại Tài Bạch
+        là sao chủ về sự uyên thâm, đôi khi mang tính cô độc trong nghiên cứu. Sự phối hợp giữa các sao
+        này tạo nên một profile học thuật rõ nét: bạn không chỉ tiếp thu nhanh mà còn có xu hướng đào
+        sâu đến khi chạm được bản chất vấn đề.'
+      nang_luc: Nghiên cứu chuyên sâu
+    diem_yeu:
+    - ten: Khó duy trì đà tiến liên tục
+      loai: han_che_truc_tiep
+      mo_ta: Dù có năng lực và sáng kiến, bạn thường gặp những trở ngại lặp đi lặp lại khiến công việc
+        khó giữ được đà phát triển ổn định. Có những giai đoạn mọi thứ tưởng như đã vào guồng thì lại
+        xuất hiện yếu tố gây gián đoạn — từ hoàn cảnh bên ngoài đến những vướng mắc nội tại — khiến bạn
+        phải dừng lại xử lý thay vì tiến tiếp. Biểu hiện này hiện diện xuyên suốt và không giới hạn ở
+        một lĩnh vực cụ thể; nó rõ nhất khi bạn theo đuổi các mục tiêu dài hạn đòi hỏi sự kiên trì qua
+        nhiều giai đoạn.
+      giai_thich: Cách cục 'Lộc đáo Mã đáo kỵ Kiếp Không Tuế' được phát hiện khi Lộc Tồn tại Mệnh gặp
+        Thiên Mã ở Thiên Di xung chiếu, lại thêm Địa Không hãm địa và Thái Tuế tại Tài Bạch trong tam
+        hợp. Tân Biên ghi nhận cách này tạo pattern 'suốt đời chẳng mấy khi xứng ý toại lòng, công danh
+        trắc trở, hay phải lo lắng về sinh kế.' Tuần án ngữ tại Mệnh vô chính diệu gia tăng cảm giác bị
+        kìm hãm, khiến năng lực khó bung ra liền mạch. Địa Không hãm tại Tài Bạch mang tính 'phá tán,
+        hay gây tai họa' trực tiếp phá vỡ sự ổn định của dòng tài chính và tiến trình công việc. Đây không
+        phải là thiếu năng lực mà là cấu trúc tạo ra lực ma sát thường trực trên đường triển khai.
+    - ten: Phản ứng cảm xúc thiếu ổn định ở vùng cá nhân
+      loai: han_che_truc_tiep
+      mo_ta: 'Trong công việc và giao tiếp bên ngoài, bạn thường giữ được sự điềm tĩnh và lý trí. Nhưng
+        khi đụng đến các vấn đề cá nhân — gia đình, tình cảm, hoặc những gì chạm vào vùng bất an sâu —
+        phản ứng cảm xúc có thể vượt khỏi mức kiểm soát thông thường: suy diễn quá mức, nghi ngờ không
+        có cơ sở rõ ràng, hoặc để sự bất an chi phối quyết định. Biểu hiện này không thường xuyên nhưng
+        có cường độ đáng kể khi xuất hiện, và thường đi kèm cảm giác trống rỗng hoặc bất an kéo dài sau
+        đó.'
+      giai_thich: Hóa Kỵ tại Phúc Đức — cung cũng là cung Thân — đi cùng Thái Âm Miếu địa là cấu trúc
+        then chốt. Hóa Kỵ mang đặc tính 'độc hiểm, ích kỷ, hay ghen ghét, hay nhầm lẫn, gây thị phi' và
+        khi đóng tại Phúc Đức, sách ghi 'giảm thọ, họ hàng ly tán, hay tranh chấp lẫn nhau.' Thái Âm vốn
+        là sao chủ về cảm xúc và nội tâm, khi kết hợp với Kỵ tạo nên lớp cảm xúc phức tạp khó kiểm soát.
+        Thiên Hư đồng cung mang cảm giác hư không, bất an nội tại; Tuế Phá tạo sự phá vỡ, bất ổn trong
+        đời sống tinh thần. Mặc dù Hóa Kỵ đắc địa tại Tuất nên 'đỡ lo ngại' so với hãm địa, ảnh hưởng
+        vẫn đủ mạnh để tạo ra một vùng dễ tổn thương — đặc biệt vì cung Thân chi phối giai đoạn sau của
+        cuộc đời, khi các vấn đề nội tâm thường trở nên rõ nét hơn.
+    - ten: Giữ quyền kiểm soát quá chặt
+      loai: qua_da
+      mo_ta: 'Bạn có xu hướng muốn tự mình nắm và xử lý mọi việc thay vì chia sẻ hoặc giao phó cho người
+        khác, ngay cả khi khối lượng công việc vượt quá khả năng một người. Điều này không xuất phát từ
+        thiếu tin tưởng cụ thể vào ai đó mà là một phản xạ phòng thủ tự nhiên: giữ chặt nguồn lực, thông
+        tin và quyền quyết định trong tầm tay mình. Biểu hiện này trở nên rõ hơn khi bạn cảm thấy áp lực
+        hoặc bất an, và có thể vô tình giới hạn quy mô những gì bạn đạt được vì không tận dụng được nguồn
+        lực tập thể.'
+      giai_thich: 'Lộc Tồn tại Mệnh trong cách cục xấu được Tân Biên mô tả trực tiếp: ''người biển lận,
+        ích kỷ'' — đây là mặt tối của sao vốn chủ về tài lộc và sự giữ gìn. Khi Lộc Tồn không được các
+        sao sáng sủa hỗ trợ mà bị vây bởi Địa Không, Thái Tuế và các sao mờ ám, đặc tính ''giữ của'' bị
+        đẩy sang cực đoan: không chỉ giữ tài sản mà còn giữ quyền kiểm soát, thông tin và không gian quyết
+        định. Tuần tại Mệnh gia tăng tính co cụm, phòng thủ. Cấu trúc này tương phản rõ với năng lực thích
+        nghi và giao tiếp bên ngoài (Thiên Di sáng), tạo nên nghịch lý: bạn có thể rất cởi mở và linh
+        hoạt với người ngoài nhưng lại khép chặt quyền kiểm soát trong không gian riêng và các mối quan
+        hệ thân cận.'
+- profile:
+    name: Phuong
+    birth_date: '1999-03-29'
+    birth_time: 6
+    gender: female
+  output:
+    tong_quan: 'Hồ sơ năng lực của bạn xoay quanh trục Cự Môn vượng địa tại Mệnh kết hợp với Thiên Cơ
+      đắc địa tại cung Thân, tạo nên một người có tư duy phân tích sắc bén, khả năng ngôn luận đanh thép
+      và óc chiến lược linh hoạt. Tam phương tứ chính được Thái Dương vượng địa tại Quan Lộc chiếu sáng,
+      củng cố thêm sự rõ ràng và uy tín trong lập luận cũng như định hướng công việc. Tuy nhiên, Hỏa Tinh
+      hãm địa đồng cung với Cự Môn tạo ra lực kéo ngược đáng kể: sự nóng nảy và xung động làm giảm độ
+      chính xác của phán đoán trong những thời điểm cần kiềm chế. Cung Tài Bạch chịu ảnh hưởng đồng thời
+      của Tuần, Triệt và Địa Không — một cấu trúc hiếm gặp — khiến việc duy trì thành quả và hệ thống
+      ổn định theo thời gian trở thành thách thức kéo dài. Phúc Đức có Thiên Đồng và Thiên Lương đều miếu
+      địa kèm Hóa Khoa, cho thấy nền tảng nội tâm vững và chiều sâu học thuật làm bệ đỡ ngầm cho các năng
+      lực bề nổi.'
+    diem_manh:
+    - nang_luc_id: lap_luan_bang_loi
+      mo_ta: Bạn có khả năng xây dựng và trình bày lập luận bằng lời nói một cách đanh thép, chặt chẽ
+        và có sức thuyết phục cao. Khi tranh luận hoặc bảo vệ quan điểm, bạn thường đi thẳng vào cốt lõi
+        vấn đề, dùng lý lẽ sắc bén và ngôn từ chính xác để khiến đối phương phải cân nhắc lại vị thế của
+        họ. Năng lực này nổi trội và ổn định ở bạn, phát huy mạnh nhất trong các tình huống đối thoại
+        trực tiếp, thương lượng hoặc khi cần thuyết phục người khác thay đổi nhận định, hơn là khi trình
+        bày gián tiếp qua văn bản.
+      giai_thich: Cự Môn vượng địa tại Mệnh là sao chủ về ngôn ngữ và khả năng xét đoán, khi ở vị trí
+        Tý được ví như ngọc quý giấu trong đá, tạo nên trí sắc bén tiềm tàng. Thiên Khôi tọa thủ tại Mệnh
+        bổ sung chất lượng trí tuệ và uy tín học thuật, giúp lời nói mang trọng lượng đặc biệt. Thái Dương
+        vượng địa tại Thìn trong thế tam hợp Quan Lộc chiếu sáng thêm sự rõ ràng và chính trực trong lập
+        luận, khiến người nghe khó bác bỏ dễ dàng. Sự kết hợp giữa Cự Môn chủ ngôn ngữ, Khôi-Việt trục
+        trí tuệ và Thái Dương quang minh tạo nên nền tảng cho khả năng ngôn luận vượt trội, đặc biệt khi
+        bạn trực tiếp đối thoại thay vì trình bày qua trung gian.
+      nang_luc: Lập luận bằng lời
+    - nang_luc_id: phan_tich_van_de
+      mo_ta: Khi đối mặt với một vấn đề phức tạp, bạn có xu hướng tách nó thành các thành phần nhỏ hơn,
+        nhận ra mối quan hệ nhân-quả giữa chúng và xác định điểm then chốt cần xử lý trước. Bạn không
+        dễ bị đánh lừa bởi bề mặt của sự việc mà thường tìm đến cấu trúc ẩn bên dưới, kể cả khi người
+        xung quanh chỉ thấy hiện tượng. Khả năng này hoạt động ổn định trong hầu hết bối cảnh, từ công
+        việc chuyên môn đến các tình huống đời sống, và đặc biệt sắc bén khi bạn có đủ không gian để suy
+        xét kỹ lưỡng thay vì bị ép phản ứng tức thì.
+      giai_thich: Cự Môn vượng địa mang lại 'trí xét đoán sáng suốt' và 'mưu cơ' — khả năng nhìn thấy
+        cấu trúc và động lực ẩn sau hiện tượng bề mặt. Thiên Cơ đắc địa tại cung Thân bổ sung óc phân
+        tích chiến lược và khả năng 'quyền biến', giúp bạn không chỉ phân tích tĩnh mà còn thấy được các
+        mối quan hệ động giữa các yếu tố. Thái Dương vượng địa tại Thìn ở cung Quan Lộc đóng vai trò như
+        nguồn sáng chiếu vào vấn đề, tăng thêm độ rõ ràng và khách quan cho quá trình phân tích. Bộ ba
+        Mệnh-Thân-Quan này tạo nên năng lực phân tích có cả chiều sâu cấu trúc lẫn tầm nhìn hệ thống,
+        cho phép bạn xử lý vấn đề ở mức nguyên nhân thay vì chỉ triệu chứng.
+      nang_luc: Phân tích vấn đề
+    - nang_luc_id: tien_lieu_dien_bien
+      mo_ta: Bạn thường hình dung được cách một tình huống có thể phát triển theo thời gian dựa trên những
+        dấu hiệu hiện có, từ đó chuẩn bị tinh thần và phương án trước khi sự việc thực sự xảy ra. Bạn
+        ít khi bị bất ngờ hoàn toàn bởi diễn biến vì đã quen với việc phóng chiếu nhiều kịch bản có thể
+        xảy ra và đánh giá xác suất tương đối của chúng. Năng lực này phát huy rõ nhất khi bạn quan sát
+        các xu hướng đang hình thành hoặc khi cần lập kế hoạch cho những bước tiếp theo trong một chuỗi
+        hành động phức tạp.
+      giai_thich: Thiên Cơ đắc địa tại cung Thân — cung đại diện cho hành động và giai đoạn sau của đời
+        người — mang lại 'mưu trí' và khả năng 'biết quyền biến', tức là hình dung trước các bước đi và
+        chuẩn bị cho sự thay đổi. Cự Môn tại Mệnh bổ sung 'mưu cơ', giúp bạn không chỉ phản ứng với hiện
+        tại mà còn dự phóng về tương lai. Lộc Tồn đồng cung với Thiên Cơ tại Thiên Di tạo nền tảng ổn
+        định, giúp những dự phóng không chỉ là suy đoán mơ hồ mà gắn với nguồn lực và ràng buộc thực tế.
+        Sự phối hợp giữa Mệnh và Thân tạo nên khuynh hướng tự nhiên luôn nhìn về phía trước, xem hiện
+        tại như một điểm trên chuỗi diễn biến chứ không phải trạng thái cố định.
+      nang_luc: Tiên liệu diễn biến
+    - nang_luc_id: doc_dong_co_nguoi_khac
+      mo_ta: Bạn có khả năng cảm nhận được những động cơ, nhu cầu hoặc mục đích ẩn sau lời nói và hành
+        vi của người khác, ngay cả khi họ không nói ra trực tiếp hoặc cố tình che giấu. Bạn thường nhận
+        ra sự khác biệt giữa điều người ta nói và điều họ thực sự muốn, giúp bạn điều chỉnh cách tiếp
+        cận phù hợp với từng đối tượng. Năng lực này nổi trội trong các tương tác một-một hoặc trong nhóm
+        nhỏ, nơi bạn có đủ không gian và thời gian để quan sát các tín hiệu tinh vi mà người khác dễ bỏ
+        qua.
+      giai_thich: Cự Môn vốn là 'ám tinh' — sao có bản chất nhìn thấy những gì bị che giấu, bao gồm cả
+        ý định ẩn sau lời nói và hành vi bề mặt. Đào Hoa và Hồng Loan tại Mệnh tăng thêm độ nhạy cảm với
+        tín hiệu xã hội và trạng thái cảm xúc của người đối diện, giúp bạn đọc được cả tầng cảm xúc lẫn
+        tầng lý trí. Thiếu Âm tại cung Thiên Di xung chiếu Mệnh bổ sung khả năng quan sát tinh tế, nhận
+        ra những chi tiết nhỏ và tín hiệu ngầm. Sự kết hợp giữa ám tinh Cự Môn, bộ sao tình cảm Đào-Hồng
+        và Thiếu Âm tạo nên năng lực đọc người ở tầng sâu, đặc biệt chính xác khi bạn ở trong môi trường
+        giao tiếp trực tiếp và có đủ bình tĩnh để quan sát.
+      nang_luc: Đọc động cơ người khác
+    - nang_luc_id: ung_bien
+      mo_ta: Khi tình huống thay đổi bất ngờ hoặc kế hoạch ban đầu không còn phù hợp với thực tế, bạn
+        có khả năng điều chỉnh cách xử lý ngay lập tức mà không bị tê liệt hay mất phương hướng. Bạn không
+        bám cứng vào một phương án duy nhất mà sẵn sàng chuyển hướng khi bằng chứng cho thấy cần thay
+        đổi, đồng thời vẫn giữ được sự ổn định nội tại để không bị cuốn theo hỗn loạn bên ngoài. Năng
+        lực này phát huy mạnh nhất khi bạn hoạt động trong môi trường có nhiều biến động và đòi hỏi phản
+        ứng linh hoạt theo thời gian thực.
+      giai_thich: Thân cư Thiên Di cho thấy bạn tự nhiên hướng ra bên ngoài và tương tác với môi trường,
+        thay vì co vào nội tâm hay bám vào kế hoạch cố định. Thiên Cơ đắc địa tại đây mang lại tính linh
+        hoạt và khả năng 'quyền biến' — điều chỉnh chiến lược theo diễn biến thực tế mà không mất đi mục
+        tiêu tổng thể. Lộc Tồn đồng cung tạo sự ổn định nội tại, giúp bạn thay đổi phương pháp mà không
+        mất nền tảng. Sự phối hợp giữa Cự Môn tại Mệnh (phân tích nhanh tình hình mới) và Thiên Cơ tại
+        Thân (điều chỉnh chiến lược linh hoạt) tạo nên năng lực ứng biến vừa sắc bén vừa vững vàng, cho
+        phép bạn duy trì hiệu quả ngay cả khi bối cảnh thay đổi thường xuyên.
+      nang_luc: Ứng biến
+    diem_yeu:
+    - ten: Kiểm soát xung động
+      loai: qua_da
+      mo_ta: Bạn có xu hướng phản ứng rất nhanh trước các kích thích, đặc biệt bằng lời nói, trước khi
+        kịp cân nhắc đầy đủ hậu quả của những gì mình sắp nói hoặc làm. Khi cảm thấy có điều không đúng,
+        bị khiêu khích hoặc cần bảo vệ quan điểm, lời nói có thể bật ra với tốc độ và cường độ cảm xúc
+        mạnh, khiến bạn khó thu hồi hoặc điều chỉnh sau đó. Biểu hiện này nổi trội và xuất hiện khá thường
+        xuyên, đặc biệt trong các tình huống bạn cảm thấy bất công, bị thách thức hoặc khi phát hiện ra
+        điều bạn cho là sai trái.
+      giai_thich: 'Hỏa Tinh hãm địa tại Mệnh là sát tinh mang tính nóng nảy, ương ngạnh và liều lĩnh,
+        khi đi cùng Cự Môn vốn đã ''ăn nói đanh thép'' thì tạo ra hiệu ứng khuếch đại: lời nói trở nên
+        sắc bén hơn, nhanh hơn và thiếu bộ lọc. Cự Môn tại Tý tuy vượng nhưng thiếu Hóa Lộc đồng cung
+        hoặc Tuần/Triệt án ngữ — hai yếu tố có thể giúp ''phá đá lộ ngọc'' theo hướng kiểm soát và tinh
+        chế — nên năng lượng thô của Cự Môn kết hợp Hỏa Tinh dễ bung ra trực tiếp thay vì được chuyển
+        hóa thành lập luận có cân nhắc. Đây là mặt quá đà của chính năng lực ngôn luận: cùng một cấu trúc
+        tạo ra khả năng tranh biện sắc bén cũng tạo ra những phát ngôn bốc đồng mà hậu quả của chúng thường
+        kéo dài hơn dự kiến.'
+    - ten: Duy trì tiến độ
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường gặp khó khăn trong việc giữ cho công việc và các hệ thống tiếp tục tiến triển
+        đều đặn qua thời gian. Dù có thể khởi đầu mạnh mẽ với nhiều ý tưởng và năng lượng, bạn dễ đối
+        mặt với các trở ngại khiến tiến độ bị gián đoạn, hoặc bản thân bạn mất dần sự tập trung vào mục
+        tiêu ban đầu khi xuất hiện những hướng đi mới hấp dẫn hơn. Hạn chế này hiện diện khá ổn định và
+        ảnh hưởng đến nhiều lĩnh vực, từ quản lý tài chính cá nhân đến việc theo đuổi các dự án dài hạn
+        đòi hỏi sự kiên trì đều đặn.
+      giai_thich: 'Cung Tài Bạch vô chính diệu tại Thân chịu sự án ngữ đồng thời của cả Tuần lẫn Triệt
+        — một cấu trúc hiếm gặp tạo ra sự phong tỏa nặng nề đối với khả năng duy trì và tích lũy nguồn
+        lực ổn định. Địa Không đắc địa tại đây bổ sung yếu tố bất ổn và phi tuyến tính: thành quả có thể
+        đến đột ngột rồi cũng ra đi nhanh chóng, khiến việc xây dựng nền tảng bền vững trở nên khó khăn.
+        Thiên Không tại cung Quan Lộc trong tam hợp củng cố thêm khuynh hướng này ở mặt sự nghiệp — những
+        gì được xây dựng có nguy cơ bị phá vỡ hoặc mất phương hướng đột ngột. Trong khi đó, Thiên Cơ tại
+        Thân cung tuy giỏi quyền biến nhưng bản chất thiên về mưu tính và thích nghi hơn là duy trì kỷ
+        luật dài hạn, khiến bạn dễ chuyển hướng thay vì kiên trì bám đuổi một mục tiêu đến cùng khi gặp
+        trở ngại kéo dài.'
+    - ten: Nhận diện mâu thuẫn quá mức
+      loai: qua_da
+      mo_ta: Tâm trí bạn tự động phát hiện các điểm bất nhất, mâu thuẫn hoặc lỗ hổng trong lập luận và
+        hành vi xung quanh mình, kể cả ở mức độ tinh vi mà đa số mọi người không nhận ra hoặc cho qua.
+        Điều này không chỉ dừng ở nhận thức — bạn thường cảm thấy thôi thúc phải gọi tên những mâu thuẫn
+        đó, ngay cả khi bối cảnh xã hội không phù hợp hoặc khi việc bỏ qua sẽ có lợi hơn cho mối quan
+        hệ và tiến độ công việc chung. Khuynh hướng này tạo ra ma sát trong hợp tác, vì người xung quanh
+        có thể cảm thấy bị soi xét quá mức hoặc bị tấn công thay vì được hỗ trợ.
+      giai_thich: 'Cự Môn vốn ''chủ ngôn ngữ, thị phi'' — sao này không chỉ tạo ra khả năng ngôn luận
+        mà còn kéo theo xu hướng phát hiện và lên tiếng về những điểm bất hợp lý trong môi trường. Khi
+        Cự Môn vượng kết hợp với Hỏa Tinh hãm, bộ lọc ''nên nói gì và khi nào'' bị suy yếu: mọi mâu thuẫn
+        được phát hiện đều có nguy cơ bị đưa ra ngay lập tức với cường độ mạnh, bất kể mức độ nghiêm trọng
+        thực tế. Đà La tại cung Nô Bộc cho thấy mối quan hệ với người xung quanh vốn đã có yếu tố trì
+        trệ và khó xây dựng lòng tin nhanh chóng; khuynh hướng chỉ ra mâu thuẫn quá thường xuyên càng
+        làm trầm trọng thêm dynamic này, khiến người khác dè dặt thay vì cởi mở. Đây là mặt trái của năng
+        lực phân tích sắc bén: cùng một cơ chế giúp bạn thấy rõ cấu trúc vấn đề cũng khiến bạn không thể
+        ''làm ngơ'' trước những bất nhất nhỏ, dẫn đến thị phi và ma sát không đáng có trong các mối quan
+        hệ hợp tác.'
+- profile:
+    name: Thuy_anh
+    birth_date: '1999-03-12'
+    birth_time: 8
+    gender: female
+  output:
+    tong_quan: Hồ sơ năng lực của bạn có hình dạng đặc trưng bởi một nội tâm ấm áp, thiện chí nhưng biểu
+      hiện ra ngoài thường bị giảm cường độ (Thái Dương hãm tại Mệnh), bù lại được trang bị năng lực ngôn
+      ngữ sắc bén và tư duy chiến lược phát triển rõ nét qua thời gian (Cự Môn vượng địa tại cung Thân
+      cư Tài Bạch). Trục Tả-Hữu chiếu Mệnh kết hợp với Lộc Tồn tại Thân tạo thành nền tảng hợp tác, mưu
+      trí và khả năng ứng biến linh hoạt. Điểm giới hạn nổi bật nhất nằm ở nhịp độ hành động không đều—bùng
+      nổ ban đầu rồi hụt hơi dần—cùng với xu hướng để cảm xúc chi phối phán đoán, đặc biệt khi hoạt động
+      trong môi trường xa lạ.
+    diem_manh:
+    - nang_luc_id: tranh_bien
+      mo_ta: Bạn có khả năng đối đáp trực tiếp với lập luận đối phương, chỉ ra lỗ hổng trong lý lẽ của
+        họ và bảo vệ quan điểm của mình bằng chuỗi lập luận sắc bén, đanh thép. Năng lực này thể hiện
+        rõ nhất khi bạn cần bảo vệ một lập trường hoặc phản bác một nhận định mà bạn cho là sai—lúc đó
+        lời nói trở nên gãy gọn, có sức nặng và khó bị bẻ gãy. Tuy nhiên, nó phát huy mạnh trong bối cảnh
+        tranh luận có cấu trúc hơn là trong giao tiếp thường nhật, nơi bạn có xu hướng nhường nhịn.
+      giai_thich: Cự Môn nhập vượng địa tại Ngọ, đóng ở cung Thân cư Tài Bạch, là vị trí mà Tân Biên mô
+        tả 'ăn nói đanh thép, có mưu cơ, có trí xét đoán sáng suốt.' Cự Môn vốn chủ ngôn ngữ và thị phi;
+        khi đắc lực tại Ngọ, mặt sắc bén của ngôn từ được kích hoạt tối đa. Sự hiện diện của Văn Xương
+        dù hãm địa vẫn bổ sung chiều sâu văn chương cho lập luận, còn Lộc Tồn đồng cung gia tăng tính
+        hệ thống và nghiêm cẩn. Mặt trái là Cự Môn tại đây thiếu Hóa Lộc hoặc Tuần/Triệt để 'phá đá lộ
+        ngọc,' nên năng lực tranh biện tuy có thật nhưng không phải lúc nào cũng được môi trường bên ngoài
+        đón nhận trọn vẹn.
+      nang_luc: Tranh biện
+    - nang_luc_id: hop_tac
+      mo_ta: Bạn làm việc cùng người khác một cách tự nhiên theo hướng cùng đóng góp, không giành quyền
+        kiểm soát và sẵn sàng hỗ trợ những ai đang gặp khó. Phong cách hợp tác của bạn mang tính khoan
+        hòa, thẳng thắn và thực tâm giúp đỡ hơn là tính toán lợi ích. Đây là khuynh hướng ổn định, xuất
+        hiện ở hầu hết các bối cảnh từ công việc đến quan hệ cá nhân, và thường tạo được thiện cảm lâu
+        dài với người xung quanh.
+      giai_thich: Hữu Bật tọa thủ tại Mệnh cùng Tả Phù từ Thiên Di chiếu về tạo thành cách 'Tả Hữu chung
+        thân phúc hậu' và 'Mộ phùng Tả Hữu tôn cư bát tọa chi quý'—cả hai đều nhấn mạnh tính nhân hậu,
+        khoan hòa, hay cứu giúp người khốn cùng. Cung Mệnh an tại Tứ Mộ (Tuất) có Tả-Hữu là hợp cách,
+        làm cho ảnh hưởng của cặp trợ tinh này sáng sủa hơn so với các vị trí khác. Lộc Tồn tại Thân cũng
+        mang tính 'nhân hậu, từ thiện,' củng cố thêm khuynh hướng hợp tác thiện chí xuyên suốt từ Mệnh
+        đến Thân.
+      nang_luc: Hợp tác
+    - nang_luc_id: ung_bien
+      mo_ta: Khi tình huống thay đổi bất ngờ hoặc kế hoạch không thể bám sát thực tế, bạn điều chỉnh cách
+        xử lý khá nhanh, tìm ra sáng kiến hoặc lối đi thay thế mà không bị tê liệt. Khả năng này đi kèm
+        với tư duy chiến lược—bạn thường có sẵn vài phương án trong đầu và không ngại chuyển hướng khi
+        cần. Năng lực ứng biến phát huy tốt trong các tình huống đòi hỏi phản ứng tức thời hơn là trong
+        những quy trình dài hạn cần sự kiên nhẫn.
+      giai_thich: 'Lộc Tồn tại cung Thân được Tân Biên ghi nhận là ''có tài tổ chức, có nhiều sáng kiến
+        lạ và biết ứng biến.'' Kết hợp với Hữu Bật tại Mệnh và Tả Phù chiếu—cả hai cùng thuộc nhóm ''phò
+        tá, giúp đỡ'' nhưng đồng thời mang tính mưu trí—tạo nên một nền tảng linh hoạt: bạn vừa có sáng
+        kiến (Lộc Tồn), vừa có khả năng đánh giá nhanh các lựa chọn (Tả-Hữu mưu trí). Cự Môn vượng địa
+        tại Thân bổ sung khả năng xét đoán tình huống sắc bén, giúp việc điều chỉnh không chỉ nhanh mà
+        còn có cơ sở.'
+      nang_luc: Ứng biến
+    - nang_luc_id: phan_tich_van_de
+      mo_ta: Bạn có thói quen tách vấn đề thành các thành phần để hiểu cấu trúc và quan hệ bên trong trước
+        khi hành động, thay vì phản ứng theo bề mặt. Khuynh hướng này giúp bạn nhận ra điểm mấu chốt cần
+        xử lý và sắp xếp thứ tự ưu tiên hợp lý. Năng lực phân tích thể hiện rõ khi đối mặt với vấn đề
+        phức tạp có nhiều biến số, nhưng có thể chậm phát huy trong những tình huống đòi hỏi hành động
+        ngay lập tức mà không có thời gian suy xét.
+      giai_thich: Cự Môn vượng địa tại Ngọ mang đặc tính 'có trí xét đoán sáng suốt'—khả năng nhìn xuyên
+        qua bề mặt thông tin để nắm bản chất. Tả-Hữu chiếu Mệnh bổ sung 'có nhiều mưu trí,' tức là tư
+        duy chiến lược đa chiều. Lộc Tồn tại Thân thêm 'có tài tổ chức'—khả năng sắp xếp các mảnh thông
+        tin thành cấu trúc mạch lạc. Quan Lộc vô chính diệu tại Dần không bị chi phối bởi một chính tinh
+        cố định nào, nên tư duy phân tích của bạn không bị khóa vào một khung duy nhất mà linh hoạt theo
+        bản chất vấn đề.
+      nang_luc: Phân tích vấn đề
+    diem_yeu:
+    - ten: Khó duy trì nhịp độ bền bỉ
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường bắt đầu công việc với sự siêng năng và nhiệt tình rõ rệt, nhưng khi thời gian
+        kéo dài hoặc khi sự mới mẻ ban đầu phai nhạt, nhịp độ làm việc giảm dần và có xu hướng bỏ dở những
+        gì đã khởi động. Đây không phải là vấn đề thiếu năng lực mà là khó giữ mức năng lượng đều đặn—bạn
+        dễ bùng lên rồi hụt hơi, đặc biệt với những mục tiêu dài hạn đòi hỏi sự lặp lại hoặc chờ đợi kết
+        quả chậm.
+      giai_thich: 'Thái Dương hãm địa tại Mệnh được Tân Biên mô tả là ''không cương nghị, không bền chí.''
+        Phú giải ''Nhật tại Mùi, Thân, Mệnh vị, vi nhân tiên cần hậu lận'' (siêng năng buổi đầu, rồi lười
+        biếng trễ nải và bỏ dở) tuy nói về vị trí Mùi-Thân nhưng phản ánh đúng bản chất của Nhật hãm:
+        năng lượng ban đầu có nhưng không duy trì được. Tả-Hữu tuy cho sự siêng năng (nữ mệnh ''siêng
+        năng, hiền hậu''), nhưng khi Nhật hãm là gốc Mệnh, xung lực nền tảng vẫn thiếu độ bền. Thái Âm
+        hãm tại Thiên Di (Thìn) xung chiếu cũng ở trạng thái ''kém sáng suốt, phát tán suy bại,'' không
+        cung cấp đủ lực đẩy bổ sung cho Mệnh.'
+    - ten: Cảm xúc chi phối phán đoán
+      loai: qua_da
+      mo_ta: Bạn là người đa sầu đa cảm, dễ bị tác động bởi tâm trạng và cảm xúc khi đưa ra nhận định
+        hoặc quyết định. Sự nhạy cảm này giúp bạn thấu hiểu người khác và có chiều sâu nội tâm, nhưng
+        khi cảm xúc dâng cao—đặc biệt trong môi trường xa lạ hoặc khi đối mặt với xung đột—nó có thể làm
+        mờ khả năng xét đoán sáng suốt vốn có, dẫn đến những phản ứng hoặc đánh giá thiếu chính xác mà
+        sau này bạn tự nhận ra.
+      giai_thich: Thái Dương hãm địa nữ mệnh được Tân Biên ghi rõ là 'đa sầu, đa cảm.' Bản thân Nhật hãm
+        đã 'kém thông minh, hay nhầm lẫn' so với khi miếu vượng—không phải thiếu trí tuệ mà là ánh sáng
+        lý trí bị che mờ bởi lớp sương cảm xúc. Thái Âm hãm tại Thiên Di (Thìn) cũng ở trạng thái 'kém
+        sáng suốt, hay nhầm lẫn,' và khi ra ngoài giao thiệp thì 'hay gặp tai ương vì những sự phiền lòng,
+        nhiều người ghét.' Cả Nhật lẫn Nguyệt đều hãm địa trong lá số này, tạo nên một lớp nền cảm xúc
+        dày có thể lấn át tính xét đoán. Cự Môn vượng tại Thân tuy có 'trí xét đoán sáng suốt' nhưng chỉ
+        phát huy khi bạn kích hoạt được trục Thân—tức là qua giai đoạn đầu đời hoặc khi đủ bình tĩnh để
+        vận dụng năng lực ngôn ngữ và phân tích.
+    - ten: Năng lực ẩn tàng khó phát lộ
+      loai: xung_dot
+      mo_ta: Bạn sở hữu nhiều năng lực thực chất—tranh biện, phân tích, ứng biến—nhưng chúng thường không
+        được thể hiện trọn vẹn ra bên ngoài hoặc không được môi trường xung quanh ghi nhận đúng mức. Có
+        một khoảng cách giữa những gì bạn biết mình có thể làm và những gì thực sự được triển khai trong
+        đời sống. Điều này không hẳn do thiếu cơ hội mà do sự kết hợp giữa xu hướng không duy trì đủ lâu
+        để năng lực chín muồi và hoàn cảnh thiếu chất xúc tác cần thiết.
+      giai_thich: 'Cự Môn vượng địa tại Ngọ được ví như ''ngọc giấu trong đá''—tân Biên nhấn mạnh rằng
+        ở vị trí Tý-Ngọ, Cự Môn cần Hóa Lộc đồng cung hoặc Tuần/Triệt án ngữ để ngọc lộ ra ngoài. Trong
+        lá số này, Cự Môn đồng cung với Lộc Tồn nhưng không có Hóa Lộc hay Tuần/Triệt, nên Tân Biên ghi
+        nhận ''chẳng khác gì ngọc chìm sâu trong đá—đa học, đa năng nhưng không gặp thời.'' Xung đột nằm
+        ở chỗ: năng lực phân tích và ngôn ngữ có thật (Cự Môn vượng + Tả-Hữu mưu trí + Lộc Tồn), nhưng
+        cấu trúc thiếu yếu tố kích hoạt cần thiết, đồng thời Nhật hãm tại Mệnh không cung cấp đủ xung
+        lực bền bỉ để tự phá lớp đá bao bọc. Đây là xung đột giữa tiềm năng bên trong và điều kiện phát
+        lộ bên ngoài.'
+- profile:
+    name: Trang
+    birth_date: '1998-12-11'
+    birth_time: 14
+    gender: female
+  output:
+    tong_quan: 'Hồ sơ năng lực của bạn được định hình bởi trục Mệnh–Thân nối Vũ Khúc miếu địa (tổ chức,
+      quyết đoán, thực tế) với Phá Quân miếu địa ở cung Thân (phá cũ lập mới, hành động quyết liệt), trên
+      nền nhiều sát tinh hội hợp tạo ra cường độ cao và nhịp biến động mạnh. Điểm mạnh nổi bật nằm ở khả
+      năng cấu trúc hóa nguồn lực, phán đoán tình huống bằng sự sắc sảo thực tiễn, và đặc biệt là năng
+      lực bứt phá khi hoàn cảnh bất ổn – chính nơi người khác chao đảo lại là lúc bạn phát huy tốt nhất.
+      Tuy nhiên, cùng những cấu trúc ấy cũng tạo ra mặt trái: nhịp độ thành–bại thất thường, xu hướng
+      hành động quá nhanh khi bị kích thích, giao tiếp thẳng đến mức thiếu linh hoạt, và phản ứng cảm
+      xúc dễ lấn át khi áp lực kéo dài. Tứ Hóa phân tán (Lộc ở Thiên Di, Quyền ở Nô Bộc, Khoa ở Tử Tức,
+      Kỵ ở Điền Trạch) cho thấy năng lực của bạn tỏa ra nhiều hướng nhưng trọng tâm nằm ở tương tác bên
+      ngoài và hành động thực tế hơn là duy trì ổn định nội bộ.'
+    diem_manh:
+    - nang_luc_id: cau_truc_hoa
+      mo_ta: 'Bạn có khả năng tự nhiên trong việc biến các nguồn lực, công việc hoặc thông tin rời rạc
+        thành một cấu trúc rõ ràng, có trật tự và vận hành được. Đây không phải là kỹ năng học được qua
+        đào tạo mà là cách bạn tiếp cận vấn đề: khi đối diện một mớ hỗn độn, bạn nhanh chóng nhìn ra các
+        phần, quan hệ và thứ tự cần thiết để sắp xếp chúng. Năng lực này thể hiện ổn định trong hầu hết
+        bối cảnh – từ quản lý tài chính cá nhân, tổ chức công việc đến xây dựng hệ thống – và đặc biệt
+        phát huy khi quy mô hoặc độ phức tạp tăng lên.'
+      giai_thich: 'Vũ Khúc miếu địa thủ Mệnh được Tân Biên mô tả trực tiếp là người ''có tài tổ chức,
+        óc kinh doanh''. Năng lực này được củng cố bởi cách cục Phủ Tướng đồng lai hội Mệnh cung: Thiên
+        Phủ miếu ở Quan Lộc mang tư duy quản lý hệ thống và nguồn lực lớn, Thiên Tướng miếu ở Tài Bạch
+        mang khả năng điều phối thực thi. Tử Vi miếu đồng cung với Thiên Phủ tại Quan Lộc bổ sung tầm
+        nhìn bao quát và khả năng phân tầng ưu tiên. Dù Tuần án ngữ Quan Lộc làm chậm biểu hiện trong
+        sự nghiệp chính thức, cấu trúc nền tảng của Mệnh vẫn giữ nguyên năng lực cấu trúc hóa, thể hiện
+        qua cách bạn tổ chức đời sống và công việc hàng ngày hơn là qua vị trí công việc cụ thể.'
+      nang_luc: Cấu trúc hóa
+    - nang_luc_id: quyet_doan
+      mo_ta: Khi đối diện một lựa chọn, bạn có xu hướng chốt phương án nhanh và cam kết với nó thay vì
+        kéo dài do dự. Sự quyết đoán này đi kèm khả năng bắt tay vào hành động ngay sau khi quyết định
+        – bạn không mắc kẹt ở giai đoạn chuẩn bị hay phân tích lặp lại. Đây là đặc điểm nổi bật và gần
+        như bản năng, xuất hiện cả trong quyết định nhỏ hàng ngày lẫn những bước ngoặt lớn. Tuy nhiên,
+        nó phát huy tốt nhất khi bạn đã có đủ thông tin cơ bản; trong trường hợp hoàn toàn mơ hồ, tốc
+        độ quyết định có thể chuyển thành vội vàng.
+      giai_thich: Vũ Khúc miếu địa mang tính 'quả quyết, cương nghị, hiếu thắng' theo Tân Biên, tạo nền
+        tảng cho sự quyết đoán. Phá Quân miếu ở cung Thân (Thân cư Phúc Đức) bổ sung khả năng hành động
+        dứt khoát, thậm chí chấp nhận phá bỏ cái cũ để chuyển hướng. Tang Môn thủ Mệnh và Bạch Hổ xung
+        chiếu tạo thêm sự can đảm, dám chịu trách nhiệm cho lựa chọn của mình. Cụm sát tinh Đà La–Địa
+        Không tại Mệnh và Kình Dương–Hỏa Tinh tại Thân không làm giảm quyết đoán mà ngược lại tăng thêm
+        lực đẩy, khiến một khi đã quyết, bạn hành động với cường độ rất cao. Cách cục Tử Vi Vũ Khúc Sát
+        diệu cho thấy người 'thích được tiếng anh hùng' – yếu tố này củng cố xu hướng dám quyết và dám
+        đứng tên cho quyết định.
+      nang_luc: Quyết đoán
+    - nang_luc_id: hoat_dong_trong_moi_truong_bien_dong
+      mo_ta: 'Bạn thể hiện tốt nhất trong những hoàn cảnh mà người khác thấy bất an hoặc quá tải: khi
+        tình hình thay đổi liên tục, kế hoạch đổ vỡ, hoặc xuất hiện yếu tố bất thường cần phản ứng ngay.
+        Trong môi trường ổn định và lặp lại, bạn có thể giảm hứng thú và mất dần năng lượng; nhưng khi
+        biến động xảy ra, sự sắc sảo và khả năng hành động của bạn được kích hoạt mạnh mẽ. Đây là năng
+        lực bứt phá chứ không phải duy trì – bạn tỏa sáng ở những thời điểm bước ngoặt hơn là trong giai
+        đoạn vận hành đều đặn.'
+      giai_thich: Cách cục Mệnh Không Thân Kiếp là trung tâm của năng lực này. Tân Biên mô tả người có
+        cấu trúc này 'rất khôn ngoan sắc sảo' và 'có khả năng bứt phá trong hoàn cảnh bất thường'. Địa
+        Không hãm tại Mệnh tạo tư duy khác biệt, không theo lối mòn; Địa Kiếp hãm tại Thân (cung Phúc
+        Đức) thúc đẩy hành động quyết liệt và sẵn sàng đổi hướng lớn. Phá Quân miếu ở Thân vốn là sao
+        chủ về cải cách, phá旧 lập mới, càng phát huy trong bối cảnh cần thay đổi căn bản. Hỏa Tinh đắc
+        địa tại Thân cung bổ sung tốc độ phản ứng. Hóa Lộc tại Thiên Di (Tham Lang miếu) cho thấy khi
+        ra ngoài và đối diện hoàn cảnh mới, bạn thu hút được cơ hội và nguồn lực – môi trường biến động
+        bên ngoài kích hoạt luồng cơ hội thay vì chỉ tạo rủi ro. Tuy nhiên, chính cách cục này cũng nói
+        rõ 'thành bại thất thường, lên xuống mạnh', nghĩa là năng lực bứt phá đi kèm với tính không ổn
+        định.
+      nang_luc: Hoạt động trong môi trường biến động
+    - nang_luc_id: phan_doan_tinh_huong
+      mo_ta: Bạn có khả năng đọc nhanh và tương đối chính xác trạng thái thực của một tình huống – điều
+        gì đang thực sự diễn ra, đâu là yếu tố then chốt, đâu là nhiễu. Sự phán đoán này mang tính thực
+        tiễn cao, thiên về đọc vị con người và hoàn cảnh cụ thể hơn là suy luận trừu tượng. Bạn thường
+        nhận ra vấn đề trước khi nó được phát biểu rõ ràng, đặc biệt trong các tình huống có yếu tố lợi
+        ích, động cơ hoặc rủi ro tiềm ẩn. Năng lực này hoạt động tốt ngay cả khi thông tin chưa đầy đủ,
+        nhờ khả năng kết hợp quan sát nhanh với kinh nghiệm thực tế.
+      giai_thich: Sự sắc sảo của Mệnh Không Thân Kiếp ('rất khôn ngoan sắc sảo') là nền tảng cho phán
+        đoán tình huống – đây là loại trí khôn đường phố, đọc vị hoàn cảnh nhanh, không phụ thuộc vào
+        bằng cấp hay lý thuyết. Xương Khúc giáp Mệnh bổ sung trí thông minh tổng quát và khả năng tiếp
+        nhận thông tin đa dạng. Vũ Khúc miếu mang 'óc kinh doanh' – một dạng phán đoán thực tế về lợi
+        ích, chi phí và động cơ. Thiên Khốc và Thiên Hư tại Mệnh, dù tạo ưu phiền, cũng mang lại độ nhạy
+        cảm với tín hiệu cảm xúc và không khí xung quanh, giúp bạn phát hiện những điều không được nói
+        ra. Hóa Kỵ tại Điền Trạch (Thiên Cơ) tuy là điểm khó ở mặt khác, nhưng cho thấy bạn quen với việc
+        đọc ra sự bất ổn hoặc trục trặc trong các hệ thống quen thuộc – kỹ năng này chuyển hóa thành khả
+        năng phát hiện vấn đề trong các tình huống hàng ngày.
+      nang_luc: Phán đoán tình huống
+    diem_yeu:
+    - ten: Khó duy trì nhịp độ ổn định
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường làm việc theo kiểu bùng nổ rồi hụt hơi hơn là duy trì nhịp độ đều đặn qua thời
+        gian. Giai đoạn cao hứng, bạn có thể xử lý khối lượng công việc rất lớn với tốc độ ấn tượng; nhưng
+        sau đó dễ rơi vào giai đoạn mất đà, giảm hứng thú hoặc đổi hướng hoàn toàn. Pattern này lặp lại
+        khá nhất quán trong nhiều lĩnh vực – từ công việc, dự án cá nhân đến các mối quan tâm – và trở
+        nên rõ rệt hơn khi công việc đòi hỏi sự kiên trì dài hạn mà không có biến cố kích thích.
+      giai_thich: Cách cục Mệnh Không Thân Kiếp mô tả trực tiếp 'thành bại thất thường, lên xuống mạnh,
+        khó bình ổn' và 'mất rồi lại có, có rồi lại mất, đổi hướng lớn'. Đây là cấu trúc nền tảng tạo
+        ra nhịp sống cực đoan. Phá Quân miếu ở Thân cư Phúc Đức vốn chủ về thay đổi lớn, không duy trì
+        trạng thái cũ; khi kết hợp với Địa Kiếp hãm, nó tạo xu hướng phá bỏ và làm lại thay vì tiếp tục
+        xây dựng trên nền đang có. Hỏa Tinh đắc tại Thân cung tạo năng lượng bùng nổ nhưng ngắn hạn, không
+        bền. Đại Hao tại Quan Lộc cũng góp phần vào xu hướng hao tán năng lượng và nguồn lực theo chu
+        kỳ. Phủ Tướng hội Mệnh cho bạn đủ tài nguyên để bắt đầu lại, nhưng chính sự dồi dào đó có thể
+        vô tình khuyến khích chu kỳ 'phá–xây' thay vì duy trì.
+    - ten: Hành động trước khi cân nhắc đủ
+      loai: qua_da
+      mo_ta: 'Sự quyết đoán vốn là điểm mạnh của bạn có mặt trái: khi bị kích thích, áp lực hoặc cảm thấy
+        bị thách thức, bạn dễ chuyển từ quyết đoán sang hành động tức thì mà không dành đủ thời gian đánh
+        giá hậu quả. Biểu hiện này không xuất hiện trong mọi tình huống – bạn vẫn cân nhắc được khi bình
+        tĩnh – nhưng khi cảm xúc dâng cao hoặc bị dồn vào thế phải phản ứng, khoảng cách giữa nhận tín
+        hiệu và hành động bị rút ngắn quá mức. Hậu quả thường là những quyết định cần phải điều chỉnh
+        hoặc khắc phục sau đó.'
+      giai_thich: 'Năng lượng quyết đoán của Vũ Khúc miếu khi đi qua lăng kính của cụm sát tinh trở nên
+        quá đà. Kình Dương hãm tại Thân cung mang tính hung hăng, thôi thúc hành động mạnh mẽ; Hỏa Tinh
+        đắc tạo phản ứng nhanh và nóng; Địa Kiếp hãm đẩy hành động sang hướng cực đoan, quyết liệt đến
+        mức bất chấp. Phá Quân miếu ở Thân vốn đã chủ về hành động drastich, khi kết hợp với Hỏa–Kiếp–Kình
+        tạo thành một chain reaction: tín hiệu kích thích → phản ứng cảm xúc (Hỏa Tinh) → thôi thúc hành
+        động (Kình Dương) → hành động cực đoan (Địa Kiếp + Phá Quân). Tuần tại Quan Lộc và Triệt tại Tài
+        Bạch đáng lẽ tạo sự kìm hãm, nhưng chúng nằm ở cung khác chứ không trực tiếp án ngữ Mệnh hay Thân,
+        nên lực kiểm soát xung động tại chính trung tâm hành động (Thân cư Phúc Đức) bị yếu.'
+    - ten: Giao tiếp thẳng và cứng, khó điều chỉnh theo người nghe
+      loai: qua_da
+      mo_ta: Bạn có xu hướng nói thẳng điều mình nghĩ và giữ vững lập trường, đôi khi đến mức thiếu linh
+        hoạt trong cách diễn đạt. Khi người đối diện cần sự mềm mỏng, gián tiếp hoặc cần được dẫn dắt
+        từ từ, bạn vẫn giữ nguyên cách nói trực diện và có phần cứng rắn. Điều này không phải do thiếu
+        hiểu biết mà do bản năng ưu tiên sự thẳng thắn và trung thực với quan điểm của mình hơn là điều
+        chỉnh theo phản ứng người nghe. Biểu hiện này rõ nhất khi bạn tin rằng mình đúng hoặc khi thảo
+        luận về các vấn đề bạn coi trọng.
+      giai_thich: Vũ Khúc miếu được Tân Biên mô tả là 'thẳng thắn' – đây là đặc tính cố hữu, không phải
+        thói quen có thể dễ dàng thay đổi. Tang Môn thủ Mệnh kết hợp với Bạch Hổ ở Thiên Di tạo cách cục
+        'can đảm, cương nghị, hơi ương ngạnh' – sự ương ngạnh này thể hiện rõ trong giao tiếp khi bạn
+        không muốn uốn lời theo ý người khác. Đà La hãm tại Mệnh bổ sung tính cố chấp, khó thay đổi hướng
+        đã chọn. Thiên Hình tại Thân cung (cung Phúc Đức) mang tính nguyên tắc cứng nhắc, khiến bạn có
+        xu hướng áp dụng cùng một chuẩn mực cho mọi tình huống thay vì linh hoạt. Cụm Tang Hổ gặp sát
+        tinh hội hợp tuy mô tả theo hướng tiêu cực hơn trong sách, nhưng ở mức độ năng lực giao tiếp,
+        nó cho thấy pattern cứng rắn và thiếu điều chỉnh là có cấu trúc vững chắc trong lá số.
+    - ten: Phản ứng cảm xúc dễ lấn át khi áp lực kéo dài
+      loai: xung_dot
+      mo_ta: 'Bên trong bạn tồn tại một mâu thuẫn: một mặt bạn quyết đoán và hướng đến hành động lý trí,
+        mặt khác bạn mang sẵn độ nhạy cảm sâu và dễ bị cảm xúc chi phối khi áp lực tích tụ. Trong các
+        tình huống ngắn hạn, bạn có thể giữ được sự bình tĩnh và hành động hiệu quả. Nhưng khi áp lực
+        kéo dài – đặc biệt liên quan đến những vấn đề bạn gắn bó cảm xúc – cảm xúc có xu hướng dâng lên
+        và nhuộm màu vào cách bạn phán đoán và phản ứng. Kết quả là những quyết định trong giai đoạn này
+        thường mang dấu ấn của trạng thái cảm xúc hơn là đánh giá khách quan.'
+      giai_thich: 'Thiên Khốc và Thiên Hư thủ Mệnh tạo cách cục ''đa sầu đa cảm, suốt đời ưu tư phiền
+        muộn'' – đây là lớp nền cảm xúc sâu và dai dẳng. Tang Môn tại Mệnh và Bạch Hổ ở Thiên Di cũng
+        góp vào ''ưu tư phiền muộn'' theo cách cục Tang Hổ thổ thủ Mệnh. Cùng lúc đó, Hỏa Tinh đắc tại
+        Thân cung mang năng lượng cảm xúc nóng, dễ bùng phát. Mâu thuẫn nằm ở chỗ: Vũ Khúc và Phá Quân
+        thúc đẩy hành động nhanh, quyết liệt, dựa trên lý trí và ý chí; nhưng Khốc–Hư–Tang–Hổ liên tục
+        tạo ra dòng cảm xúc ngầm có thể trào lên khi sức ép đủ lớn. Hóa Kỵ tại Điền Trạch (Thiên Cơ) cho
+        thấy có một vùng đời sống – gia đình, nơi ở, sự an toàn cơ bản – nơi cảm xúc tiêu cực dễ bị kích
+        hoạt và khó giải tỏa, từ đó ảnh hưởng lan tỏa sang các quyết định ở lĩnh vực khác.'
+- profile:
+    name: Hoang
+    birth_date: '2000-01-07'
+    birth_time: 6
+    gender: male
+  output:
+    tong_quan: Hồ sơ năng lực của bạn được định hình bởi sự tương phản giữa lớp bề mặt và chiều sâu bên
+      trong. Mệnh có Cự Môn hãm địa tạo khuynh hướng xử lý thông tin qua ngôn ngữ nhưng dễ méo mó - đa
+      nghi, vội vàng trong phát ngôn và thiếu chính xác khi đọc tình huống. Thân cư Thiên Di với Thiên
+      Đồng hãm khiến bạn linh hoạt trong môi trường mới nhưng khó duy trì cam kết dài hạn, thường xuyên
+      thay đổi hướng đi trước khi mọi việc kịp chín muồi. Điểm sáng nằm ở Phúc Đức với Thiên Lương miếu
+      địa kết hợp Hóa Khoa và Thiên Khôi, tạo nền tảng trí tuệ sâu và khả năng rút ra bài học thực chất
+      từ trải nghiệm. Đây là năng lực cốt lõi giúp bạn bù đắp phần nào những hạn chế ở Mệnh và Thân. Tài
+      Bạch có Thái Dương miếu địa cùng Lộc Tồn cho thấy bản năng nhận diện giá trị thực tế vẫn hiện diện,
+      dù nó không đủ để thay đổi bức tranh tổng thể khi các cung Mệnh, Thân còn nhiều thử thách.
+    diem_manh:
+    - nang_luc_id: nghien_cuu_chuyen_sau
+      mo_ta: Bạn có khả năng đi sâu vào một lĩnh vực, tích lũy kiến thức dày và chắc theo cách có hệ thống.
+        Khi đã thực sự quan tâm đến một chủ đề, bạn duy trì sự tìm hiểu bền bỉ, không dừng ở lớp bề mặt
+        mà tiếp tục đào cho đến khi nắm được cấu trúc cốt lõi. Năng lực này nổi trội hơn hẳn so với các
+        mặt khác trong profile, ổn định qua thời gian và phát huy tốt nhất khi bạn làm việc độc lập hoặc
+        trong môi trường cho phép tập trung dài hạn, ít bị phân tán bởi áp lực phải phản ứng nhanh.
+      giai_thich: Phúc Đức an tại Tý có Thiên Lương miếu địa - sao chủ về trí tuệ, bảo vệ và nguyên tắc
+        - kết hợp với Hóa Khoa (tượng trưng cho học thuật, sự minh bạch và giải trừ hung họa) và Thiên
+        Khôi (khởi đầu thuận lợi, dẫn dắt). Bộ sao này tạo nền tảng nội tại vững chắc cho việc nghiên
+        cứu có chiều sâu. Hóa Khoa tại Phúc Đức còn có vai trò hóa giải phần nào tính hung của Cự Môn
+        hãm ở Mệnh, cho thấy khi bạn quay về với chiều sâu tri thức thay vì phản ứng bề mặt, năng lực
+        trí tuệ thực sự được kích hoạt. Thiên Lương miếu mang tính hệ thống và bảo tồn, Hóa Khoa mang
+        tính minh xác - sự phối hợp này giải thích vì sao bạn có thể duy trì sự tìm hiểu chuyên sâu mà
+        không bị lạc hướng.
+      nang_luc: Nghiên cứu chuyên sâu
+    - nang_luc_id: hoc_tu_kinh_nghiem
+      mo_ta: Bạn có khả năng biến những trải nghiệm thực tế - kể cả sai lầm và thất bại - thành hiểu biết
+        dùng được cho những lần sau. Dù cuộc đời có nhiều lần thay đổi hướng đi, mỗi lần như vậy bạn đều
+        rút ra được điều gì đó có giá trị, dần dần xây dựng vốn hiểu biết phong phú từ chính sự đa dạng
+        trong trải nghiệm. Năng lực này phát huy rõ nhất khi bạn có không gian để nhìn lại và tổng kết,
+        thay vì bị cuốn ngay vào vòng xoáy tiếp theo.
+      giai_thich: 'Thiên Đồng tại Thân cư Thiên Di tạo ra cuộc đời nhiều biến động, thay đổi chỗ ở, công
+        việc và hoàn cảnh - đây chính là nguồn nguyên liệu trải nghiệm phong phú. Đồng thời, Phúc Đức
+        có Thiên Lương miếu kết hợp Hóa Khoa đóng vai trò như bộ lọc trí tuệ: nó tiếp nhận những trải
+        nghiệm hỗn độn từ Thiên Đồng và chuyển hóa chúng thành bài học có cấu trúc. Thiên Y và Thiên Đức
+        tại Phúc Đức hỗ trợ thêm khả năng nhận ra ý nghĩa ẩn sau các sự kiện. Sự kết hợp giữa một Thân
+        liên tục tạo ra trải nghiệm mới và một Phúc Đức có khả năng chiết xuất bài học từ những trải nghiệm
+        đó tạo nên năng lực học từ kinh nghiệm đặc trưng ở bạn.'
+      nang_luc: Học từ kinh nghiệm
+    diem_yeu:
+    - ten: Xung động trong lời nói
+      loai: qua_da
+      mo_ta: Bạn thường nói trước khi kịp cân nhắc, dễ phóng đại hoặc phát ngôn thiếu chính xác, dẫn đến
+        thị phi và hiểu lầm không đáng có. Biểu hiện này không phải lúc nào cũng xuất hiện nhưng trở nên
+        rõ rệt khi bạn ở trong môi trường có nhiều kích thích, áp lực phải phản hồi nhanh hoặc khi cảm
+        thấy bị nghi ngờ. Trong những tình huống cần sự thận trọng về ngôn từ, đây là điểm dễ gây tổn
+        thất nhất.
+      giai_thich: Cự Môn vốn là sao chủ ngôn ngữ và thị phi, khi hãm địa tại Tuất lại càng mờ ám - sách
+        ghi rõ không cẩn ngôn, hay nói khoác lác. Hỏa Tinh đắc địa tại Tài Bạch trong tam hợp Mệnh thêm
+        năng lượng nóng, gấp rút vào cách diễn đạt. Bệnh Phù và Địa Võng đồng cung tại Mệnh càng làm tăng
+        khuynh hướng lời nói mang tính phòng thủ quá mức hoặc thiếu căn cứ. Sự kết hợp này khiến xung
+        động ngôn ngữ không chỉ là thói quen mà còn là phản xạ tự vệ khi bạn cảm thấy bất an, khiến việc
+        kiểm soát trở nên khó khăn hơn trong các tình huống căng thẳng.
+    - ten: Khó duy trì tiến độ
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường bắt đầu nhiều việc nhưng khó theo đến cùng - công việc dễ dang dở khi hứng thú
+        ban đầu giảm đi hoặc khi xuất hiện một hướng mới hấp dẫn hơn. Hạn chế này hiện diện khá ổn định
+        trong nhiều lĩnh vực của đời sống, từ công việc đến các dự định cá nhân, và trở nên nghiêm trọng
+        hơn khi không có áp lực bên ngoài hoặc cam kết rõ ràng với người khác.
+      giai_thich: Thiên Đồng hãm địa tại Thân cư Thiên Di mang tính canh cải, thất thường - sách Tân Biên
+        ghi rõ làm việc gì rồi cũng chóng chán, thay đổi thất thường. Vì Thân là cung chi phối hành động
+        và cách bạn triển khai công việc trong thực tế, tính chất này của Thiên Đồng hãm ảnh hưởng trực
+        tiếp đến khả năng duy trì nỗ lực. Quan Lộc vô chính diệu tại Dần không có sao chủ đạo để neo giữ
+        phương hướng dài hạn, khiến sự thay đổi từ Thiên Đồng càng thiếu điểm tựa. Địa Kiếp tại Quan Lộc
+        tuy cho sự táo bạo nhưng lại thiếu tính bền vững, góp phần vào mô hình bùng nổ rồi hụt hơi thay
+        vì tiến đều.
+    - ten: Thiếu quyết đoán
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường do dự kéo dài khi cần đưa ra lựa chọn, đặc biệt khi có nhiều phương án hoặc khi
+        chưa chắc chắn về kết quả. Sự thiếu định kiến rõ ràng khiến bạn dễ bị lung lay bởi ý kiến người
+        khác hoặc bởi thông tin mới, dẫn đến việc trì hoãn quyết định hoặc thay đổi lựa chọn vào phút
+        chót. Hạn chế này hiện diện rộng nhưng giảm bớt khi bạn có đủ thời gian để nghiên cứu sâu - lĩnh
+        vực mà Phúc Đức phát huy tác dụng.
+      giai_thich: Thiên Đồng hãm địa được sách mô tả là không quả quyết, không có định kiến - đây là đặc
+        tính cốt lõi của sao này khi ở trạng thái hãm. Vì Thiên Đồng án ngữ cung Thân nơi chi phối hành
+        động thực tế, sự thiếu quyết đoán không chỉ nằm ở suy nghĩ mà còn biểu hiện thành sự trì trệ trong
+        hành động. Cự Môn hãm tại Mệnh góp phần bằng cách tạo ra sự đa nghi và kém sáng suốt, khiến bạn
+        không tin vào đánh giá của chính mình. Tuy nhiên, khi vấn đề thuộc lĩnh vực bạn đã nghiên cứu
+        chuyên sâu, nơi Phúc Đức Thiên Lương kết hợp Hóa Khoa phát huy, mức độ do dự có thể giảm đáng
+        kể vì bạn đã có nền tảng tri thức để dựa vào.
+    - ten: Đọc sai tình huống
+      loai: han_che_truc_tiep
+      mo_ta: Bạn dễ misread những gì đang thực sự diễn ra, đặc biệt trong các tình huống xã hội hoặc khi
+        cần đánh giá động cơ người khác. Khuynh hướng đa nghi kết hợp với sự thiếu sáng suốt khiến bạn
+        có thể nhìn thấy mối đe dọa hoặc mâu thuẫn ở nơi không có, hoặc bỏ qua những tín hiệu quan trọng
+        vì bị cuốn vào chi tiết gây nhiễu. Hạn chế này nổi bật khi bạn phải phán đoán nhanh và không có
+        thời gian để phân tích kỹ.
+      giai_thich: Cự Môn hãm địa tại Mệnh được sách Tân Biên mô tả là kém thông minh, gian quyệt, tham
+        lam, khắc nghiệt, đa nghi, hay nhầm lẫn. Đây là mô tả trực tiếp về khả năng phán đoán tình huống
+        bị suy giảm. Cự Môn vốn chủ về phân tích và ngôn ngữ, nhưng khi hãm tại Tuất - vị trí rất mờ ám
+        xấu xa theo sách - khả năng này bị méo mó thành sự nghi ngờ thiếu căn cứ và nhầm lẫn trong đánh
+        giá. Địa Kiếp và Hỏa Tinh trong tam hợp Mệnh thêm yếu tố impulsiveness vào quá trình nhận định,
+        khiến bạn dễ vội vàng kết luận trước khi có đủ thông tin. Phúc Đức Thiên Lương kết hợp Hóa Khoa
+        chỉ phát huy tác dụng hóa giải khi bạn chủ động dừng lại và suy xét kỹ - điều mà Thiên Đồng hãm
+        tại Thân thường không cho phép.
+- profile:
+    name: Long
+    birth_date: '1992-02-04'
+    birth_time: 8
+    gender: male
+  output:
+    tong_quan: Hồ sơ năng lực của bạn mang hình dạng đặc trưng của một trí tuệ chiến lược sâu sắc bị giới
+      hạn bởi lớp ngăn cách giữa nhận thức và hành động. Trục Cơ–Lương miếu địa tại Mệnh tạo nên nền tảng
+      phân tích và tư duy đa tầng vững chắc, nhưng Tuần án ngữ cùng Đà La hãm địa khiến năng lực trí tuệ
+      chủ yếu hoạt động ở không gian nội tâm thay vì chuyển hóa thành bước đi dứt khoát bên ngoài. Phần
+      vận hành (Thân cư Tài Bạch với chính tinh hãm địa) mang tính dao động và cảm xúc nhiều hơn, dễ thay
+      đổi hướng đi và khó duy trì nhịp độ ổn định. Hóa Lộc tại Mệnh kết hợp với Thiên Lương tạo khuynh
+      hướng hào phóng, nhưng ở đất Mộ và chịu áp lực Sát tinh cùng Hao khiến nguồn lực khó tích lũy bền
+      vững. Cảm xúc nội tâm vừa là kênh nhận diện vấn đề nhạy bén, vừa là gánh nặng thường trực làm chậm
+      quá trình ra quyết định.
+    diem_manh:
+    - nang_luc_id: phan_tich_van_de
+      mo_ta: Bạn có khả năng tách một vấn đề phức tạp thành các thành phần, nhận ra cấu trúc và quan hệ
+        nhân quả giữa chúng, từ đó xác định điểm then chốt cần xử lý. Đây là năng lực nổi trội và ổn định
+        nhất trong hồ sơ, vận hành tự nhiên trong hầu hết các bối cảnh từ hoạch định chiến lược đến xử
+        lý tình huống hàng ngày. Nó phát huy mạnh nhất khi bạn đối mặt với những vấn đề đòi hỏi phải nhìn
+        thấu cơ chế vận hành bên trong thay vì chỉ phản ứng với bề mặt hiện tượng.
+      giai_thich: Thiên Cơ miếu địa đồng cung Thiên Lương miếu địa tại Tuất tạo thành cách cục 'Thiên
+        Ấm triều cương' — một trong những cấu trúc trí tuệ mạnh của Tử Vi, nhấn mạnh 'mưu trí' và khả
+        năng 'bàn xét chính lược chiến lược.' Thiên Cơ mang lại óc phân tích cơ chế, sự sắc sảo trong
+        việc tách bạch các yếu tố và quan hệ; Thiên Lương bổ sung khung nguyên tắc giúp đánh giá điều
+        gì hợp lý, điều gì không. Tuần án ngữ Mệnh tuy hạn chế biểu hiện ra ngoài nhưng không làm giảm
+        chiều sâu phân tích nội tại — nó buộc năng lực này hoạt động ở tầng sâu hơn, nơi sự phân tích
+        trở nên kỹ lưỡng và có hệ thống hơn. Đà La hãm địa tuy tạo trì hoãn hành động nhưng đồng thời
+        kéo dài thời gian suy xét, giúp phân tích thêm phần thorough.
+      nang_luc: Phân tích vấn đề
+    - nang_luc_id: nhin_da_chieu
+      mo_ta: Trước khi đi đến kết luận, bạn thường xem xét cùng một vấn đề từ nhiều góc nhìn và nhiều
+        tầng mức — từ chiến lược tổng thể đến chi tiết chiến thuật, từ lợi ích các bên liên quan đến các
+        hệ quy chiếu giá trị khác nhau. Năng lực này hoạt động nổi bật khi bạn cần đánh giá những tình
+        huống có nhiều bên liên quan hoặc khi vấn đề không thể giải quyết bằng một khung phân tích duy
+        nhất. Trong các bối cảnh đơn giản hoặc cần quyết định nhanh, nó có thể nhường chỗ cho phân tích
+        trực tiếp.
+      giai_thich: Cách cục 'thiện đàm binh, cư Tuất, diệc vi mỹ luận' mô tả xu hướng bàn xét ở cả hai
+        tầng chính lược và chiến lược — đây chính là biểu hiện tự nhiên của việc nhìn đa chiều. Thiên
+        Cơ cung cấp khả năng phân tích ở tầng chi tiết và cơ chế (làm thế nào), trong khi Thiên Lương
+        đặt mọi thứ trong khung nguyên tắc và đạo lý rộng hơn (tại sao, có nên không). Sự kết hợp này
+        khiến bạn tự nhiên xem xét vấn đề từ ít nhất hai hệ quy chiếu song song. Hữu Bật tại Mệnh và Tả
+        Phù chiếu từ Thiên Di góp phần mở rộng góc nhìn qua việc tiếp nhận và cân nhắc ý kiến từ nhiều
+        nguồn. Hóa Lộc tại Mệnh nhắm vào Thiên Lương cũng bổ sung lăng kính lợi ích và chia sẻ, giúp bạn
+        không chỉ phân tích kỹ thuật mà còn đánh giá tác động đến các bên.
+      nang_luc: Nhìn đa chiều
+    - nang_luc_id: he_thong_hoa_tri_thuc
+      mo_ta: Bạn có xu hướng sắp xếp những gì mình học và trải nghiệm thành các hệ thống khái niệm có
+        trật tự, phân nhóm rõ ràng để dễ truy xuất và tái sử dụng. Năng lực này phát huy tốt trong các
+        bối cảnh đòi hỏi tổng hợp thông tin từ nhiều nguồn hoặc xây dựng khung tham chiếu cho bản thân
+        và người khác. Tuy nhiên, nó hoạt động chủ yếu ở mặt nhận thức bên trong — hệ thống tri thức được
+        xây dựng chắc chắn trong tư duy nhưng không phải lúc nào cũng được thể hiện thành tài liệu hay
+        quy trình cụ thể bên ngoài.
+      giai_thich: Thiên Cơ miếu địa mang 'óc kinh doanh' — khả năng tổ chức và sắp xếp các yếu tố thành
+        hệ thống vận hành có logic. Phối hợp với Thiên Lương (ngôi sao của nguyên tắc và trật tự), cấu
+        trúc Mệnh tạo khuynh hướng tự nhiên trong việc phân loại, nhóm và xây dựng khung khái niệm. Cách
+        cục Cơ Nguyệt Đồng Lương hội hợp — với Thái Âm và Thiên Đồng từ cung Tài Bạch — củng cố mô hình
+        làm việc có phương pháp và hệ thống. Văn Xương từ cung Thân tuy hãm địa nhưng vẫn góp phần hỗ
+        trợ việc ghi chép và sắp xếp thông tin. Tuần tại Mệnh giới hạn việc hiện thực hóa hệ thống ra
+        bên ngoài, nhưng năng lực tổ chức tri thức vẫn hoạt động mạnh ở tầng tư duy nội tại.
+      nang_luc: Hệ thống hóa tri thức
+    diem_yeu:
+    - ten: Khoảng cách từ suy nghĩ đến hành động
+      loai: han_che_truc_tiep
+      mo_ta: Mặc dù có khả năng phân tích và hoạch định chiến lược sâu sắc, bạn thường gặp khó khăn khi
+        chuyển những phân tích đó thành bước hành động cụ thể trong thực tế. Ý tưởng và kế hoạch có thể
+        rất rõ ràng trong đầu nhưng quá trình hiện thực hóa thường bị trì hoãn, kéo dài hoặc mất đà trước
+        khi thành hình. Hạn chế này hiện diện khá ổn định và trở nên rõ nhất khi bạn cần đưa ra bước đi
+        đầu tiên hoặc cam kết một hướng hành động dứt khoát giữa nhiều lựa chọn.
+      giai_thich: Tuần án ngữ cung Mệnh là yếu tố then chốt tạo ra khoảng cách này — Tuần có tính chất
+        ngăn chặn và giam giữ, khiến năng lượng của Thiên Cơ và Thiên Lương không thể biểu hiện trọn vẹn
+        ra bên ngoài, dù cả hai đều ở miếu địa. Đà La hãm địa đồng cung bổ sung lực kéo trì hoãn, tạo
+        xu hướng quay vòng trong suy nghĩ thay vì tiến về phía trước. Thiên Cơ vốn chủ về mưu tính và
+        cân nhắc — khi bị Tuần chặn, nó càng có xu hướng phân tích thêm thay vì hành động. Cấu trúc 'Cơ
+        Lương đồng chiếu Mệnh Thân Không, vi tăng đạo' phản ánh xu hướng năng lực trí tuệ bị đẩy vào không
+        gian nội tâm thay vì biểu hiện thành hành động thế tục. Quan Lộc tại Dần không có chính tinh lại
+        chịu Triệt án ngữ càng làm cho phần sự nghiệp thiếu điểm tựa vững chắc để chuyển hóa tư duy thành
+        kết quả.
+    - ten: Xung đột giữa phân tích sắc bén và gánh nặng cảm xúc
+      loai: xung_dot
+      mo_ta: Bạn có khả năng nhìn thấu vấn đề và hiểu rõ cơ chế của mọi thứ, nhưng chính sự rõ ràng đó
+        đi kèm với một gánh nặng cảm xúc đáng kể — lo lắng, ưu tư, đa sầu đa cảm. Càng phân tích sâu,
+        bạn càng cảm nhận được trọng lượng của những gì mình thấy, và cảm xúc này ngược lại có thể làm
+        mờ đi sự sắc bén vốn có hoặc kéo dài thời gian ra quyết định. Xung đột này hiện diện khá liên
+        tục, đặc biệt trong những giai đoạn phải đối mặt với quyết định quan trọng hoặc khi chứng kiến
+        những điều trái với nguyên tắc của mình.
+      giai_thich: 'Thiên Khốc và Thiên Hư tại Mệnh tạo nên tính ''đa sầu đa cảm, suốt đời ưu tư phiền
+        muộn'' — đây là lớp cảm xúc nền luôn hiện diện. Tang Môn tại Mệnh bổ sung chiều sâu ưu tư và sự
+        cương nghị nhưng cũng nặng nề. Trong khi đó, Thiên Cơ và Thiên Lương cho khả năng phân tích sắc
+        bén, nhìn rõ các vấn đề và rủi ro. Kết quả là một vòng lặp: phân tích càng rõ thì cảm nhận càng
+        nặng, và cảm xúc nặng lại làm chậm phân tích. Cách cục ''Khốc Hư ngộ Cơ'' chỉ ra mối liên hệ trực
+        tiếp giữa hai sao cảm xúc và Thiên Cơ, khiến sự lo lắng gắn chặt vào chính quá trình tư duy. Hóa
+        Lộc tại Mệnh tuy mang nguồn lực nhưng ở đất Mộ và chịu áp lực Đà La, khiến ngay cả những điều
+        tích cực cũng mang theo cảm giác bị kìm nén, không bung tỏa trọn vẹn.'
+    - ten: Khó tích lũy nguồn lực bền vững
+      loai: han_che_truc_tiep
+      mo_ta: Dù có khả năng tạo ra và thu hút nguồn lực, bạn thường khó giữ chúng bền lâu — tiền tài,
+        năng lượng hoặc thời gian có xu hướng hao tán nhanh hơn tốc độ tích lũy. Một phần đến từ bản tính
+        hào phóng và sẵn sàng chia sẻ với người khác; phần khác đến từ việc thiếu cơ chế tự nhiên để giữ
+        và bảo vệ những gì mình đã tạo ra. Hạn chế này biểu hiện rõ nhất trong quản lý tài chính và nguồn
+        lực cá nhân, nơi sự tích lũy dài hạn đòi hỏi kỷ luật và cấu trúc mà năng lực hiện tại không tự
+        nhiên hỗ trợ.
+      giai_thich: Hóa Lộc tại Mệnh nhắm vào Thiên Lương tạo cách 'Lộc phùng Lương miếu, bảo tư tài ích
+        dữ tha nhân' — người có Lộc nhưng dùng để giúp người khác, không giữ cho riêng mình. Hóa Lộc tại
+        Tuất (đất Mộ) bị coi là 'Lộc như bị chôn vùi lấp kín, không thể thành đại phú' — năng lượng Lộc
+        bị giam, không bung ra thành tích lũy lớn. Đà La hãm địa tại Mệnh cùng Hỏa Tinh và Linh Tinh từ
+        cung Thân/Tài Bạch tạo nhóm Sát tinh hội hợp với Hóa Lộc, kích hoạt cách 'Hóa Lộc gặp Song Hao
+        hay Sát tinh' dẫn đến 'tiêu pha hoang phí, tiền tài hao tán.' Tiểu Hao tại Quan Lộc chiếu về củng
+        cố dòng chảy hao tán. Tổng hợp lại, nguồn lực đến nhưng không ở lại — vừa vì cấu trúc giam giữ
+        (Tuần, Mộ), vừa vì khuynh hướng chia sẻ (Lương + Lộc), vừa vì lực hao tán (Sát + Hao).
+    - ten: Dễ chuyển hướng khi chưa đi đủ sâu
+      loai: qua_da
+      mo_ta: Bạn có xu hướng thay đổi hướng đi, mục tiêu hoặc cách tiếp cận khá nhanh, thường trước khi
+        hướng hiện tại kịp mang lại kết quả tích lũy. Điều này không phải do thiếu nhận thức mà do sự
+        kết hợp giữa tính thất thường, mong muốn trải nghiệm cái mới, và cảm giác rằng hướng cũ không
+        còn phù hợp. Biểu hiện này rõ nhất trong sự nghiệp và các dự án dài hạn, nơi sự kiên trì qua giai
+        đoạn trung gian khó khăn là điều kiện tiên quyết. Khi nhận ra mẫu này, bạn có thể chủ ý tạo cơ
+        chế cam kết để bù đắp.
+      giai_thich: Cung Thân cư Tài Bạch tại Ngọ có Thiên Đồng hãm địa và Thái Âm hãm địa tọa thủ. Thiên
+        Đồng hãm địa mang tính 'thất thường, hay thay đổi chí hướng, nghề nghiệp' — đây là động lực chính
+        tạo ra sự chuyển hướng liên tục ở giai đoạn sau của cuộc đời. Thái Âm hãm địa bổ sung dao động
+        cảm xúc, khiến quyết định về hướng đi bị ảnh hưởng bởi tâm trạng thay vì đánh giá lý trí. Thiên
+        Mã tại Quan Lộc tạo lực đẩy di chuyển và thay đổi, nhưng Triệt tại cung Dần chặn đứng sự phát
+        triển ổn định của sự nghiệp, khiến mỗi lần chuyển hướng đều gặp trở ngại mới thay vì tích lũy
+        từ hướng cũ. Mệnh có Thiên Cơ 'biết quyền biến' nhưng quyền biến ở đây thiên về nhận thức (biết
+        khi nào nên thay đổi) hơn là kỷ luật để bám đuổi một hướng đủ lâu.
+- profile:
+    name: Khanh
+    birth_date: '1998-06-22'
+    birth_time: 8
+    gender: female
+  output:
+    tong_quan: 'Hồ sơ năng lực của bạn cho thấy một cấu trúc có sự phân hóa rõ rệt giữa năng lực cá nhân
+      thuần túy và năng lực vận hành trong môi trường có cấu trúc sẵn. Mệnh có Thái Âm và Thiên Cơ đều
+      hãm địa, lại thêm Hóa Kỵ bám vào Thiên Cơ, tạo ra lớp sương mù trên khả năng tư duy và phán đoán
+      trực tiếp. Tuy nhiên, cách cục Cơ Nguyệt Đồng Lương hội hợp cùng Thiên Lương miếu địa tại Quan Lộc
+      và mạng lưới cát tinh (Tả Hữu, Hóa Khoa, Hóa Quyền) bao quanh đã tạo ra một hệ thống bù trừ đáng
+      kể: bạn hoạt động hiệu quả nhất khi có khung làm việc rõ ràng, có đồng đội hỗ trợ và có vai trò
+      chuyên môn cụ thể. Điểm yếu nổi bật không nằm ở thiếu năng lực mà ở sự thiếu ổn định nội tại — giữa
+      mong muốn nắm quyền kiểm soát (Hóa Quyền) và thực tế hay nhầm lẫn (Hóa Kỵ), giữa xu hướng thay đổi
+      liên tục (Thiên Đồng hãm tại Thân) và yêu cầu phải duy trì đường hướng dài hạn.'
+    diem_manh:
+    - nang_luc_id: giai_quyet_cong_viec
+      mo_ta: Trong môi trường chuyên nghiệp hoặc công việc có khung rõ ràng, bạn thể hiện khả năng đưa
+        công việc qua các trở ngại thực tế một cách đáng tin cậy. Bạn có xu hướng tiếp cận vấn đề bằng
+        kinh nghiệm tích lũy và sự cẩn trọng hơn là bằng trực giác nhanh, và khi có đủ thời gian cùng
+        không gian làm việc ổn định, bạn xử lý công việc khá chắc chắn. Năng lực này nổi trội nhất trong
+        các vai trò mang tính chuyên môn, hành chính hoặc tham mưu, nơi quy trình và tiêu chuẩn đã được
+        xác định.
+      giai_thich: 'Thiên Lương miếu địa tại cung Quan Lộc ở Ngọ là yếu tố then chốt: sách ghi ''công danh
+        hoạnh đạt, văn võ kiêm toàn, văn chức hiển hách hơn võ chức.'' Hóa Khoa bám vào Hữu Bật tại cùng
+        cung Quan Lộc bổ sung lớp trí tuệ uyên bác và khả năng giải trừ trở ngại. Thiên Lương bản chất
+        ''có mưu cơ, biết quyền biến'' — không phải kiểu phân tích nhanh mà là sự thấu hiểu có chiều sâu,
+        biết thích ứng trong phạm vi chuyên môn. Khi kết hợp với cách cục Cơ Nguyệt Đồng Lương (hội hợp
+        cả bốn sao ở tam phương), năng lực giải quyết công việc của bạn được định hình theo hướng vận
+        hành trong hệ thống có sẵn hơn là khai phá từ đầu.'
+      nang_luc: Giải quyết công việc
+    - nang_luc_id: cau_truc_hoa
+      mo_ta: Bạn có khuynh hướng tự nhiên trong việc biến thông tin hoặc công việc rời rạc thành cấu trúc
+        có trình tự và quan hệ rõ ràng. Khi đối diện với một vấn đề phức tạp, phản ứng đầu tiên của bạn
+        thường là tìm cách phân loại, sắp xếp và tạo ra khung tham chiếu trước khi đi vào chi tiết. Năng
+        lực này hoạt động ổn định trong nhiều bối cảnh khác nhau, đặc biệt khi bạn làm việc trong tổ chức
+        hoặc nhóm có phân vai, nhưng có thể yếu đi khi bạn phải tự tạo cấu trúc hoàn toàn mới mà không
+        có tiền lệ.
+      giai_thich: Cách cục Cơ Nguyệt Đồng Lương là pattern chủ đạo tạo nên khuynh hướng này — sách Tân
+        Biên ghi rõ 'thường là công chức,' nghĩa là tư duy vận hành theo hệ thống hành chính, có quy trình
+        và phân cấp. Thiên Cơ (dù hãm) vẫn giữ bản chất 'chủ huynh đệ, phúc thọ' và khi hội với Thiên
+        Lương, Đồng, Nguyệt, nó tạo thành một mạng lưới tư duy có tính phân loại và sắp xếp. Đẩu Quân
+        tại Mệnh ('nghiêm nghị, khắc nghiệt, giữ gìn của cải bền vững') bổ sung lớp kỷ luật cá nhân giúp
+        duy trì cấu trúc đã tạo. Tuy nhiên, vì cả Thiên Cơ và Thái Âm đều hãm, khả năng cấu trúc hóa này
+        không đến từ sự sắc bén tức thì mà từ quá trình tích lũy và lặp lại trong môi trường quen thuộc.
+      nang_luc: Cấu trúc hóa
+    - nang_luc_id: hop_tac
+      mo_ta: Bạn có khả năng làm việc cùng người khác theo hướng phối hợp và cùng đóng góp, đặc biệt khi
+        vai trò của mỗi bên được xác định rõ. Bạn không phải kiểu dẫn dắt bằng uy tín cá nhân áp đảo,
+        mà thu hút sự hỗ trợ bằng cách tạo không gian cho người khác tham gia vào hệ thống bạn đang vận
+        hành. Năng lực hợp tác này ổn định khi có cấu trúc tổ chức làm khung, nhưng giảm đi khi làm việc
+        một-một hoặc trong nhóm quá nhỏ không có quy tắc chung.
+      giai_thich: 'Tả Phù tại Thiên Di (xung chiếu Mệnh) và Hữu Bật tại Quan Lộc (tam hợp) tạo thành bộ
+        Tả Hữu đơn thủ chiếu Mệnh — sách ghi ''ly tông thứ xuất'' nhưng đồng thời ''gặp nhiều sao sáng
+        sủa tốt đẹp thì được hưởng giàu sang và sống lâu.'' Sự hiện diện của Tả Hữu ở hai vị trí chiếu
+        Mệnh cho thấy bạn có mạng lưới hỗ trợ tự nhiên: người khác sẵn sàng đóng góp khi bạn tạo ra khung
+        làm việc. Thái Âm dù hãm vẫn mang bản chất ''khoan hòa, nhân hậu, từ thiện,'' và Thiên Lương miếu
+        tại Quan cũng ''nhân hậu, khoan hòa'' — hai yếu tố này tạo nên thái độ mềm dẻo trong tương tác,
+        giúp duy trì quan hệ hợp tác lâu dài hơn là tạo ấn tượng mạnh ban đầu.'
+      nang_luc: Hợp tác
+    diem_yeu:
+    - ten: Phán đoán tình huống thiếu chính xác
+      loai: han_che_truc_tiep
+      mo_ta: Bạn dễ đọc sai trạng thái thực tế của một tình huống, đặc biệt khi thông tin đến nhanh hoặc
+        khi cần đánh giá ý định của người khác. Biểu hiện thường gặp là đưa ra nhận định dựa trên ấn tượng
+        ban đầu rồi sau đó phát hiện mình đã bỏ sót yếu tố quan trọng, hoặc hiểu nhầm động cơ của người
+        xung quanh dẫn đến thị phi không đáng có. Hạn chế này xuất hiện khá ổn định across các bối cảnh,
+        nhưng giảm đi khi bạn có đủ thời gian để kiểm tra lại và tham khảo ý kiến người tin cậy.
+      giai_thich: 'Thiên Cơ hãm địa tại Mệnh được sách mô tả là ''kém sáng suốt,'' và khi Hóa Kỵ bám vào
+        chính Thiên Cơ, lớp mờ càng dày thêm: ''hay nhầm lẫn, tính nông nổi, hay mắc thị phi khẩu thiệt.''
+        Thái Âm hãm địa đồng cung cũng ''kém sáng suốt'' và ''tính ương ngạnh'' — nghĩa là không chỉ thiếu
+        clarity mà còn có xu hướng bám vào nhận định đã hình thành dù nó sai. Hóa Kỵ thuộc Thủy trên nền
+        Thiên Cơ thuộc Mộc (Thủy sinh Mộc) khiến ảnh hưởng của Kỵ thấm sâu vào quá trình tư duy thay vì
+        chỉ tạo rắc rối bên ngoài. Cát tinh bao quanh (Tả Hữu, Khoa, Quyền) giúp bù đắp phần nào ở lớp
+        vận hành bên ngoài, nhưng không thay đổi được gốc tư duy tại Mệnh.'
+    - ten: Khó duy trì đường hướng dài hạn
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường xuyên thay đổi ý định, công việc hoặc hướng đi trước khi kịp thấy kết quả, tạo
+        ra cảm giác dang dở và thiếu tích lũy. Biểu hiện cụ thể là bắt đầu nhiều thứ nhưng chóng chán,
+        hay chuyển đổi kế hoạch khi gặp khó khăn đầu tiên thay vì tìm cách vượt qua, và có xu hướng tiêu
+        tốn nguồn lực cho việc khởi động lại hơn là cho việc đi đến cùng. Mặt này hiện diện rõ nhất trong
+        các quyết định cá nhân và tài chính, nhưng có thể được kiểm chế khi bạn làm việc trong tổ chức
+        có deadline và accountability rõ ràng.
+      giai_thich: Cung Thân cư Tài Bạch có Thiên Đồng hãm địa tọa thủ — sách ghi rõ 'không quả quyết,
+        không bền chí, hay thay đổi ý kiến, công việc' và 'làm việc gì rồi cũng chóng chán.' Thân là cung
+        thể hiện hành động và xu hướng後半生, nên đặc tính 'canh cải, thất thường' của Thiên Đồng hãm ảnh
+        hưởng trực tiếp đến cách bạn triển khai hành động thực tế. Thêm vào đó, cách cục Hao thủ Mệnh
+        (Tiểu Hao tại Mệnh, Đại Hao tại Thiên Di) mô tả 'khôn ngoan nhưng không quả quyết, tiêu tiền không
+        biết tiếc, suốt đời túng thiếu' — sự kết hợp giữa thiếu quyết đoán và xu hướng phân tán nguồn
+        lực. Thiên Đồng thuộc Dương Thủy tại Tuất (Dương Thổ) tạo xung khắc nội tại, khiến năng lượng
+        hành động bị tiêu hao vào việc thay đổi thay vì tích lũy.
+    - ten: Xung đột giữa mong muốn kiểm soát và thực tế thiếu clarity
+      loai: xung_dot
+      mo_ta: Bạn có xu hướng muốn nắm quyền quyết định và áp đặt ý chí lên tình huống, nhưng đồng thời
+        lại thiếu đủ clarity để làm điều đó một cách chính xác. Kết quả là bạn dễ rơi vào trạng thái kiên
+        quyết bảo vệ một hướng đi mà bản thân cũng không chắc chắn, hoặc phản ứng mạnh khi bị thách thức
+        dù chưa có đủ cơ sở. Xung đột này tạo ra căng thẳng nội tại và có thể gây friction với người xung
+        quanh, đặc biệt khi bạn ở vị trí cần ra quyết định độc lập mà không có hệ thống hỗ trợ.
+      giai_thich: 'Hóa Quyền bám vào Thái Âm tại Mệnh tạo ra drive ''mạnh bạo, mau mắn, thích nắm quyền
+        hành,'' nhưng Thái Âm đang ở trạng thái hãm địa — ''kém sáng suốt, tính ương ngạnh.'' Sách ghi
+        Hóa Quyền ''gặp nhiều sao xấu xa thì làm cho xấu xa thêm,'' nghĩa là nó khuếch đại cả mặt tích
+        cực lẫn tiêu cực của sao chủ. Ở đây, Quyền khuếch đại sự ương ngạnh của Thái Âm hãm và kết hợp
+        với Hóa Kỵ trên Thiên Cơ (nông nổi, nhầm lẫn) tạo thành một dynamic: muốn kiểm soát nhưng thiếu
+        tầm nhìn đủ rộng. Đẩu Quân tại Mệnh (''nghiêm nghị, khắc nghiệt'') thêm vào lớp cứng rắn trong
+        thái độ, khiến việc thừa nhận sai lầm hoặc điều chỉnh hướng đi trở nên khó khăn hơn. Đây là xung
+        đột cấu trúc giữa ba yếu tố tại Mệnh, không phải hạn chế có thể giải quyết bằng nỗ lực đơn lẻ
+        mà cần môi trường có cơ chế phản hồi và người đối trọng.'
+- profile:
+    name: Hung
+    birth_date: '1999-09-02'
+    birth_time: 4
+    gender: male
+  output:
+    tong_quan: Lá số có Mệnh Phá Quân miếu tại Ngọ đơn thủ, hội Lộc Tồn và Hóa Kỵ, tạo nên một profile
+      năng lực thiên về hành động nhanh và ứng biến linh hoạt, nhưng đồng thời chứa nhiều xung đột nội
+      tại giữa khả năng sáng kiến và xu hướng nông nổi, thiếu suy xét. Thân cư Quan Lộc với Tham Lang
+      vượng địa và Hóa Quyền cho thấy tham vọng và uy quyền trong sự nghiệp, nhưng cách cục hạ cách của
+      Thân tại Tứ Mộ đặt ra giới hạn cho sự bền vững dài hạn. Toàn bộ tam phương tứ chính mang bộ Sát
+      Phá Tham miếu vượng, xác nhận khuynh hướng hoạt động trong môi trường biến động và dám thay đổi,
+      nhưng cũng đi kèm những điểm mù đáng kể về phán đoán và kiểm soát cảm xúc trong giao tiếp.
+    diem_manh:
+    - nang_luc_id: ung_bien
+      mo_ta: 'Bạn có khả năng phản ứng nhanh khi tình huống thay đổi, không bám cứng vào kế hoạch cũ mà
+        sẵn sàng điều chỉnh hướng đi hoặc cách làm ngay khi thấy diễn biến thực tế không còn phù hợp.
+        Ở bạn, năng lực này biểu hiện nổi trội và khá ổn định: bạn thường có sẵn nhiều sáng kiến lạ và
+        cách tiếp cận khác biệt, đặc biệt phát huy tốt khi hoàn cảnh đòi hỏi sự linh hoạt hoặc khi cần
+        phá vỡ lối mòn. Tuy nhiên, nó thiên về ứng biến tức thời hơn là hoạch định chiến lược bài bản,
+        và mạnh nhất trong những tình huống cần phản ứng nhanh hơn là trong những bài toán đòi hỏi phân
+        tích sâu trước khi thay đổi.'
+      giai_thich: Lộc Tồn thủ Mệnh tại Ngọ, hội hợp cùng Phá Quân miếu địa và nhiều phụ tinh sáng, tạo
+        cách cục 'Lộc Tồn hậu trọng đa y thực' mà Tân Biên ghi rõ người này 'có nhiều sáng kiến lạ và
+        biết ứng biến'. Phá Quân miếu đơn thủ vốn là sao chủ về phá旧 đổi mới, khi đi cùng Lộc Tồn (thông
+        minh, học rộng) thì khả năng ứng biến được gia tăng cả về tốc độ lẫn độ sáng tạo. Văn Khúc hãm
+        địa đồng cung và Hóa Kỵ đi kèm tuy làm suy yếu nền tảng phân tích, nhưng lại không cản được —
+        mà thậm chí còn đẩy nhanh hơn — khuynh hướng nhảy sang phương án mới khi cái cũ không còn hiệu
+        quả, vì người này ít bị ràng buộc bởi sự thận trọng quá mức.
+      nang_luc: Ứng biến
+    - nang_luc_id: khoi_dong_hanh_dong
+      mo_ta: 'Bạn ít khi để sự do dự kéo dài; khi thấy việc cần làm hoặc cơ hội mới, bạn có xu hướng bắt
+        tay vào ngay thay vì chờ đợi điều kiện hoàn hảo. Biểu hiện này khá nhất quán ở bạn: bạn sẵn sàng
+        nhận những việc mà người khác còn e ngại, đặc biệt khi công việc đòi hỏi sự can đảm, quyết đoán
+        hoặc phải đập đi làm lại từ đầu. Năng lực này phát huy mạnh nhất trong giai đoạn khởi đầu dự án,
+        khi cần phá vỡ trạng thái trì trệ, hoặc khi phải ra quyết định dứt khoát giữa nhiều lựa chọn mà
+        thông tin chưa thể đầy đủ.'
+      giai_thich: Phá Quân miếu địa tại Ngọ là vị trí mạnh nhất của Phá Quân, mang đặc tính 'can đảm,
+        dũng mãnh, cương quả, ưa hoạt động' theo Tân Biên. Khi Phá Quân đơn thủ ở Ngọ, nó tạo nên khuynh
+        hướng hành động trực tiếp, không vòng vo. Thất Sát miếu địa tại cung Tài Bạch (Dần) củng cố thêm
+        sự quyết liệt trong hành động, đặc biệt trong lĩnh vực sinh kế — Tân Biên ghi Thất Sát đơn thủ
+        tại Dần 'trước ít sau nhiều, lúc đứng tuổi kiếm tiền một cách nhanh chóng, dễ dàng'. Hóa Quyền
+        tại cung Thân (Quan Lộc, Tuất) trên Tham Lang vượng địa tiếp thêm uy quyền và sự quyết đoán trong
+        cách triển khai công việc. Bộ ba Sát Phá Tham miếu vượng trong tam hợp Mệnh–Quan–Tài xác nhận
+        đây là người được cấu trúc để hành động mạnh mẽ, không ngại thay đổi và có khả năng vượt qua quán
+        tính ban đầu mà nhiều người khác gặp phải.
+      nang_luc: Khởi động hành động
+    diem_yeu:
+    - ten: Nông nổi, thiếu suy xét trước khi hành động
+      loai: han_che_truc_tiep
+      mo_ta: 'Bạn có xu hướng hành động trước khi suy xét đầy đủ, dễ bị cuốn vào thôi thúc tức thời mà
+        không dừng lại để đánh giá rủi ro hoặc hệ quả. Biểu hiện này hiện diện khá rõ và ổn định ở bạn:
+        bạn thường bắt tay vào việc với tốc độ cao nhưng đôi khi bỏ sót những chi tiết quan trọng hoặc
+        không lường trước được sai lầm, dẫn đến nhầm lẫn và phải làm lại. Nó đặc biệt xuất hiện khi bạn
+        hứng thú với ý tưởng mới hoặc khi cảm thấy bị thúc ép phải quyết định nhanh, và giảm đi khi bạn
+        có đủ thời gian và không gian để bình tĩnh xem xét.'
+      giai_thich: 'Văn Khúc hãm địa đồng cung với Phá Quân tại Mệnh, lại bị Hóa Kỵ đi kèm, tạo nên cách
+        cục ''Xương Khúc hãm địa gặp nhiều sao mờ ám'' mà Tân Biên mô tả là ''tính nông nổi, trước khi
+        làm bất cứ việc gì cũng không suy xét cẩn thận, nên hay nhầm lẫn, thất bại''. Hóa Kỵ thủ Mệnh
+        còn được ghi nhận riêng là gây ''tính nông nổi, hay nhầm lẫn, hay mắc thị phi khẩu thiệt''. Sự
+        kết hợp giữa Phá Quân — vốn đã là sao hành động nhanh và cương quả — với Văn Khúc hãm và Hóa Kỵ
+        tạo ra một khuynh hướng impulsivity rõ rệt: năng lượng hành động rất lớn nhưng bộ lọc suy xét
+        bị suy yếu. Cách cục ''Dương Đà giáp Kỵ vi bại cục'' (Kình Dương và Đà La giáp Hóa Kỵ tại Mệnh)
+        còn khuếch đại hậu quả của sự thiếu suy xét, biến những nhầm lẫn nhỏ thành những vấn đề lớn hơn.'
+    - ten: Dễ bị ảnh hưởng bởi lời nịnh, khó đọc động cơ người khác
+      loai: han_che_truc_tiep
+      mo_ta: 'Bạn dễ bị ảnh hưởng bởi những lời khen ngợi hoặc sự tán đồng bề ngoài, đôi khi không nhận
+        ra động cơ thực sự đằng sau hành vi của người khác. Hạn chế này biểu hiện ở mức đáng lưu ý: dù
+        bạn là người thông minh và có học thức, trong các tình huống giao tiếp mà đối phương tỏ ra ủng
+        hộ hoặc tâng bốc, bạn có xu hướng tin vào lời họ hơn là đánh giá khách quan hành động thực tế
+        của họ. Điều này dễ dẫn đến việc đặt niềm tin sai chỗ hoặc bị dẫn dắt bởi những người khéo nói,
+        đặc biệt trong những lĩnh vực mà bạn không có chuyên môn sâu để tự kiểm chứng.'
+      giai_thich: Cách cục 'Phá Quân nhất diệu, tính nan minh' áp dụng trực tiếp cho trường hợp Phá Quân
+        đơn thủ tại Mệnh không gặp chính diệu khác đồng cung — Tân Biên ghi rõ đây là người 'không sáng
+        suốt, hay nghe nịnh hót'. Mặc dù Lộc Tồn đồng cung mang lại trí thông minh và học thức, nó không
+        đủ để bù đắp khiếm khuyết đặc thù này của Phá Quân đơn thủ, vì 'tính nan minh' ở đây liên quan
+        cụ thể đến khả năng phán đoán về người khác và về những thông tin được trình bày một cách khéo
+        léo. Hóa Kỵ tại Mệnh, với đặc tính 'ích kỷ', có thể tạo ảo giác rằng bản thân đang cảnh giác,
+        nhưng thực tế nó chỉ khiến người này thêm đề phòng ở mặt lợi ích cá nhân mà vẫn dễ bị lung lạc
+        bởi sự nịnh hót trực tiếp — một blind spot nằm đúng ở nơi mà trí thông minh chung không chạm tới
+        được.
+    - ten: Phản ứng cảm xúc mạnh trong lời nói, dễ vướng thị phi
+      loai: qua_da
+      mo_ta: 'Bạn có xu hướng phản ứng cảm xúc mạnh trong lời nói, dễ gắt gỏng hoặc nói năng thiếu kiềm
+        chế khi gặp điều trái ý, và điều này thường kéo theo thị phi hoặc hiểu lầm trong giao tiếp. Biểu
+        hiện này khá nổi bật ở bạn: dù bình thường bạn có thể rất vui tính và hài hước, khi bị kích động
+        hoặc không vừa lòng, cách diễn đạt dễ trở nên thô lỗ hoặc gây mất lòng. Nó đặc biệt xuất hiện
+        trong các tình huống mà bạn cảm thấy bị thách thức hoặc khi công việc không diễn ra theo ý muốn,
+        và hậu quả thường kéo dài hơn bản thân lời nói — dưới dạng tranh cãi, hiểu lầm hoặc mất lòng tin
+        từ người xung quanh.'
+      giai_thich: Cách cục 'Phá tọa Ly, ngôn ngữ thô bạo' mô tả trực tiếp khuynh hướng lời nói khi Phá
+        Quân tọa thủ tại Ngọ (Ly cung). Mặc dù cách cục 'Phá tọa Ly phùng Lộc, Dương nan giải xướng cuồng'
+        cho thấy Lộc Tồn và Thiếu Âm đồng cung làm chuyển hóa một phần thành tính vui vẻ, hay nói đùa,
+        nhưng gốc rễ của sự thô bạo trong ngôn ngữ vẫn tồn tại và dễ trỗi dậy khi cảm xúc mạnh. Hóa Kỵ
+        thủ Mệnh, với đặc tính gây 'thị phi khẩu thiệt', cộng hưởng với khuynh hướng này, khiến những
+        lúc phản ứng cảm xúc không chỉ gây khó chịu tức thời mà còn kéo theo hệ quả thị phi kéo dài. Sự
+        kết hợp giữa Phá Quân (năng lượng bộc phát mạnh), Hóa Kỵ (khuếch đại mặt tiêu cực của giao tiếp)
+        và vị trí Ngọ (hỏa, nóng nảy) tạo nên một pattern mà cảm xúc dễ tràn vào lời nói trước khi lý
+        trí kịp điều chỉnh.
+- profile:
+    name: Len
+    birth_date: '2002-02-13'
+    birth_time: 12
+    gender: female
+  output:
+    tong_quan: 'Hồ sơ năng lực của bạn có hình thái tập trung rõ rệt: trục sức mạnh nằm ở lĩnh vực trí
+      tuệ và ngôn ngữ, với khả năng tranh luận đanh thép và phân tích cấu trúc vấn đề tạo thành hai trụ
+      cột chính. Ngược lại, trục hành động và thực thi bị phân tán bởi nhiều ràng buộc cấu trúc — từ sự
+      do dự khi chốt quyết định, nhịp độ trồi sụt theo thời gian, đến khoảng cách hệ thống giữa tư duy
+      và hiện thực hóa. Sự chênh lệch này tạo ra một mâu thuẫn nội tại xuyên suốt: bạn nhìn thấy vấn đề
+      rất rõ và lập luận rất thuyết phục, nhưng năng lực biến những điều đó thành kết quả cụ thể lại bị
+      kìm hãm bởi chính cấu trúc lá số. Nền tảng cảm xúc đi kèm là xu hướng ưu tư và bất mãn mãn tính,
+      làm trầm trọng thêm khoảng cách giữa kỳ vọng và thực tế.'
+    diem_manh:
+    - nang_luc_id: tranh_bien
+      mo_ta: Bạn có khả năng đối đáp trực tiếp với lập luận của người khác, chỉ ra điểm yếu trong lý lẽ
+        của họ và bảo vệ quan điểm của mình một cách đanh thép, có hệ thống. Đây là năng lực nổi bật nhất
+        và ổn định trong hồ sơ, phát huy rộng rãi trong hầu hết các tình huống cần trao đổi, tranh luận
+        hoặc bảo vệ lập trường — từ thảo luận chuyên môn đến các tình huống pháp lý hoặc đàm phán. Khả
+        năng này đặc biệt mạnh khi bạn có thời gian chuẩn bị lý lẽ và khi đối phương đưa ra lập luận có
+        cấu trúc để bạn phân tích; trong các tình huống cần phản ứng tức thì mà không có thời gian suy
+        nghĩ, mức độ đanh thép có thể giảm đi.
+      giai_thich: 'Cự Môn đắc địa thủ Mệnh là yếu tố cốt lõi: Cự Môn chủ ngôn ngữ, khi đắc địa tại Thân
+        mang lại lời nói sắc bén, mưu cơ và trí xét đoán sáng suốt. Phối hợp với bộ Hổ–Tuế–Phù hội hợp
+        qua Bạch Hổ xung chiếu từ Thiên Di và Quan Phủ tam hợp từ Quan Lộc, cấu trúc này tạo thành cách
+        cục ''Cự Môn miếu vượng đắc địa gặp Hổ Tuế Phù'' — người biết nhiều luật pháp, hay lý luận, thiên
+        về tư pháp và ngoại giao. Văn Xương đắc địa ở Tài Bạch tam hợp chiếu Mệnh bổ sung lớp tư duy hệ
+        thống và văn chương, giúp lập luận không chỉ đanh thép mà còn chặt chẽ. Thái Dương tuy hãm địa
+        nhưng được Tuần án ngữ tại Mệnh nên lấy lại phần nào ánh sáng, góp thêm sự tự tin và khả năng
+        tỏa sáng khi trình bày trước người khác.'
+      nang_luc: Tranh biện
+    - nang_luc_id: phan_tich_van_de
+      mo_ta: Bạn có xu hướng tự nhiên tách một vấn đề phức tạp thành các thành phần để hiểu cấu trúc,
+        quan hệ giữa chúng và xác định điểm cần xử lý. Năng lực này hoạt động ổn định trong nhiều bối
+        cảnh, từ phân tích chuyên môn, đánh giá tình huống đến việc đọc hiểu các hệ thống quy tắc. Bạn
+        thường nhìn thấy cấu trúc ẩn sau bề mặt thông tin và có thể chỉ ra mối liên hệ mà người khác bỏ
+        sót. Khả năng này phát huy tốt nhất khi vấn đề có tính hệ thống hoặc liên quan đến quy tắc, luật
+        lệ; với các vấn đề thuần túy cảm xúc hoặc mơ hồ, mức độ phân tích có thể không đồng đều.
+      giai_thich: Cự Môn đắc địa tại Mệnh mang lại 'mưu cơ' và 'trí xét đoán sáng suốt' — nền tảng trực
+        tiếp của khả năng phân tích cấu trúc. Cự Nhật đồng cung tại Thân tạo thành cách cục 'quan phong
+        tam đại', cho thấy truyền thống trí tuệ và phân tích được tích lũy qua nhiều thế hệ, tạo ra chiều
+        sâu tự nhiên trong cách tiếp cận vấn đề. Thái Dương tuy hãm địa nhưng nhờ Tuần án ngữ nên vẫn
+        đóng góp trí thông minh và khả năng nhìn nhận tổng thể. Văn Xương đắc địa ở Tài Bạch chiếu Mệnh
+        bổ sung tư duy có phương pháp và khả năng hệ thống hóa thông tin. Sự phối hợp giữa Cự Môn (phân
+        tích ngôn ngữ và cấu trúc) với các yếu tố trí tuệ trong tam phương tạo nên năng lực phân tích
+        vững, đặc biệt khi vấn đề liên quan đến hệ thống quy tắc hoặc lập luận phức tạp.
+      nang_luc: Phân tích vấn đề
+    diem_yeu:
+    - ten: Do dự khi cần chốt quyết định
+      loai: han_che_truc_tiep
+      mo_ta: 'Khi đứng trước nhiều lựa chọn, bạn thường kéo dài thời gian cân nhắc và khó đi đến một quyết
+        định dứt khoát, ngay cả khi đã có đủ thông tin cần thiết. Hạn chế này hiện diện khá ổn định: bạn
+        có thể phân tích rất tốt các phương án nhưng đến bước cam kết thì lại chần chừ, muốn xem xét thêm
+        hoặc lo ngại bỏ lỡ phương án tốt hơn. Biểu hiện này rõ nhất trong các quyết định có tính dài hạn
+        hoặc liên quan đến tài chính, nơi áp lực chọn lựa cao và hậu quả khó đảo ngược; trong các quyết
+        định nhỏ hàng ngày, mức độ ảnh hưởng nhẹ hơn.'
+      giai_thich: 'Cách cục ''Hao thủ Mệnh'' là yếu tố trực tiếp nhất: Tiểu Hao tọa thủ tại Mệnh cùng
+        Đại Hao xung chiếu từ Thiên Di tạo thành mô tả cổ điển ''khôn ngoan nhưng không quả quyết''. Song
+        Hao mang tính phân tán, làm năng lượng bị chia nhỏ ra nhiều hướng thay vì tập trung vào một lựa
+        chọn. Cự Môn tuy đắc địa nhưng bản chất là ám tinh, mang tính đa nghi và thận trọng quá mức —
+        khi kết hợp với Hao, sự thận trọng này biến thành do dự kéo dài. Thái Dương hãm địa cũng góp phần
+        làm giảm sự cương nghị, khiến lực đẩy cần thiết để chốt quyết định bị yếu đi. Tử Mã (Thiên Mã
+        bị Tuần chặn tại Mệnh) làm giảm khả năng xoay chuyển nhanh, khiến việc chuyển từ giai đoạn cân
+        nhắc sang cam kết càng thêm chậm chạp.'
+    - ten: Khó duy trì nhịp độ đều đặn
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường bắt đầu công việc với năng lượng cao và sự chuyên cần, nhưng sau giai đoạn đầu
+        thì nhịp độ giảm rõ rệt — có xu hướng trễ nải, mất hứng hoặc bỏ dở khi công việc kéo dài. Hạn
+        chế này khá ổn định và xuất hiện trong nhiều bối cảnh, từ công việc chuyên môn đến các dự án cá
+        nhân. Nó đặc biệt rõ khi công việc đòi hỏi sự lặp đi lặp lại hoặc khi kết quả không đến nhanh.
+        Những giai đoạn có áp lực bên ngoài hoặc có người đồng hành có thể giúp bạn duy trì tốt hơn, nhưng
+        khi làm việc độc lập thì nhịp độ dễ trồi sụt.
+      giai_thich: 'Thái Dương hãm địa thủ Mệnh là nguồn gốc chính: sách ghi rõ Nhật hãm ''không bền chí,
+        không cương nghị'', và cách cục ''Nhật tại Mùi Thân Mệnh vị, vi nhân tiên cần hậu lấn'' mô tả
+        chính xác mô hình ''chuyên cần buổi đầu, lười biếng về sau''. Thái Dương tượng trưng cho mặt trời
+        — khi hãm địa, ánh sáng và năng lượng không duy trì được ở mức cao. Tuần án ngữ giúp cải thiện
+        phần nào (biến hãm thành sáng hơn), nhưng bản chất kìm hãm và làm chậm của Tuần cũng làm giảm
+        cường độ năng lượng liên tục. Tang Môn và Bạch Hổ hội hợp mang lại sự can đảm ban đầu nhưng cũng
+        kéo theo ''ưu tư phiền muộn suốt đời'', tạo ra gánh nặng cảm xúc làm hao mòn sức bền theo thời
+        gian. Hỏa Tinh và Linh Tinh giáp Mệnh tạo thành bại cục, khiến người này ''suốt đời chẳng mấy
+        khi được xứng ý toại lòng'', làm giảm động lực duy trì nỗ lực khi kết quả không đáp ứng kỳ vọng.'
+    - ten: Khoảng cách giữa tư duy và thực thi
+      loai: xung_dot
+      mo_ta: 'Bạn thường có những phân tích sắc bén và ý tưởng rõ ràng về điều cần làm, nhưng khi cần
+        chuyển chúng thành bước hành động cụ thể trong thực tế thì gặp trở ngại đáng kể. Ý tưởng càng
+        lớn hoặc càng phức tạp thì khoảng cách này càng rõ — bạn có thể tranh luận rất thuyết phục về
+        một kế hoạch nhưng lại khó bắt tay vào thực hiện nó. Xung đột này hiện diện xuyên suốt và tạo
+        ra cảm giác bất mãn mãn tính: bạn biết mình có thể nghĩ tốt hơn nhiều người khác, nhưng kết quả
+        thực tế lại không phản ánh đúng năng lực tư duy đó. Biểu hiện này giảm bớt khi có người hỗ trợ
+        cụ thể hóa các bước hoặc khi công việc có quy trình sẵn để bám vào.'
+      giai_thich: 'Xung đột này là hệ quả của sự chênh lệch cấu trúc giữa nửa trí tuệ và nửa hành động
+        trong lá số. Phía tư duy được nâng đỡ bởi Cự Môn đắc địa (thông minh, mưu cơ, xét đoán sáng suốt),
+        Văn Xương đắc địa (tư duy hệ thống) và Cự Nhật đồng cung (truyền thống trí tuệ). Phía hành động
+        bị kìm hãm bởi nhiều yếu tố đồng thời: Thiên Mã bị Tuần chặn tạo thành cách cục Tử Mã — ''ngựa
+        mất đường chạy'', làm giảm khả năng động, phát và xoay chuyển; Song Hao phân tán năng lượng hành
+        động; Hỏa Tinh và Linh Tinh giáp Mệnh tạo thành bại cục. Sự kết hợp giữa năng lực tư duy cao và
+        năng lực thực thi bị ràng buộc tạo ra mâu thuẫn nội tại: tầm nhìn vượt xa khả năng hiện thực hóa.
+        Cô Thần thủ Mệnh và Tang Hổ hội hợp còn tạo thêm xu hướng co mình và ưu tư, khiến người này ít
+        tìm kiếm sự hỗ trợ bên ngoài để bù đắp khoảng trống thực thi.'
+- profile:
+    name: Oanh
+    birth_date: '1998-12-11'
+    birth_time: 2
+    gender: female
+  output:
+    tong_quan: 'Lá số này có cấu trúc Mệnh–Thân phân ly rõ rệt: Mệnh mang Thất Sát hãm địa cùng Địa Không
+      và nhiều sát tinh, tạo nên năng lượng hành động mãnh liệt, thiên về phản ứng nhanh và bứt phá trong
+      tình huống khó; trong khi Thân cư Phúc Đức có Tử Vi đắc địa nhưng bị Triệt chặn và Kiếp Hỏa bao
+      vây, khiến lớp khát vọng sâu hơn về trật tự và sự kiểm soát khó biểu hiện trọn vẹn. Thiên Di có
+      Liêm Phủ đều miếu địa tạo điểm tựa tốt khi hoạt động bên ngoài, tương phản với nội cung nhiều xáo
+      trộn. Tổng thể, profile nghiêng về người vận hành hiệu quả trong các đợt bùng phát ngắn và môi trường
+      mới, nhưng gặp khó khi cần duy trì nhịp ổn định hoặc đi sâu vào một lĩnh vực đến mức tinh thục.'
+    diem_manh:
+    - nang_luc_id: xu_ly_khung_hoang
+      mo_ta: Bạn có xu hướng phản ứng tốt nhất khi tình huống trở nên nghiêm trọng, hỗn loạn hoặc đòi
+        hỏi hành động gấp. Thay vì tê liệt trước áp lực, bạn thường tìm được lối thoát hoặc nước đi bất
+        ngờ mà người khác không nghĩ ra. Năng lực này nổi trội rõ rệt ở bạn, phát huy mạnh trong các hoàn
+        cảnh bất thường có tính bước ngoặt, nhưng ít xuất hiện trong sinh hoạt đều đặn hàng ngày.
+      giai_thich: Cách cục Mệnh Không–Thân Kiếp nói rõ 'có khả năng bứt phá trong hoàn cảnh bất thường.'
+        Thất Sát hãm tại Mệnh mang tính chất 'dũng mãnh, nóng nảy, làm việc gì cũng muốn cho chóng xong,'
+        kết hợp với Tang Hổ thủ Mệnh tạo thêm sự can đảm và cương nghị. Toàn bộ tam phương tứ chính rải
+        nhiều sát tinh (Kình, Đà, Linh, Hỏa, Không, Kiếp) khiến đời sống thường xuyên có biến động, buộc
+        bạn phải liên tục rèn luyện phản ứng trong điều kiện khẩn cấp. Thiên Di có Liêm Phủ đều miếu địa
+        cho thấy khi rời khỏi vùng an toàn, bạn tiếp cận được nguồn lực và sự minh mẫn tốt hơn hẳn.
+      nang_luc: Xử lý khủng hoảng
+    - nang_luc_id: hoc_nhanh
+      mo_ta: Bạn tiếp thu kiến thức và nắm bắt quy tắc mới nhanh hơn đa số người xung quanh, đặc biệt
+        ở giai đoạn đầu khi mọi thứ còn mới lạ. Sự sắc sảo giúp bạn hiểu được bản chất vấn đề mà không
+        cần lặp lại nhiều lần. Tuy nhiên, tốc độ này thể hiện rõ nhất ở khả năng nắm bắt nhanh chứ không
+        đi kèm với sự thông thạo sâu ở bất kỳ lĩnh vực nào.
+      giai_thich: Mệnh Không–Thân Kiếp được mô tả là 'rất khôn ngoan sắc sảo.' Cách cục Xương Khúc giáp
+        Mệnh bổ sung yếu tố 'rất thông minh và được nhiều người kính trọng.' Tử Vi đắc địa tại cung Thân
+        (dù bị Triệt) vẫn giữ lại lớp nền trí tuệ và khát vọng hiểu biết. Sự kết hợp giữa trí tuệ sắc
+        bén bẩm sinh và môi trường nhiều biến động tạo điều kiện cho việc học nhanh từ tình huống thực
+        tế, tuy Triệt tại Thân và tính chất 'biết nhiều nghề nhưng không tinh thục' của Sát–Phá giới hạn
+        chiều sâu của quá trình này.
+      nang_luc: Học nhanh
+    - nang_luc_id: khoi_dong_hanh_dong
+      mo_ta: Bạn hiếm khi mắc kẹt ở giai đoạn chuẩn bị hay do dự quá lâu. Khi thấy việc cần làm, bạn bắt
+        tay vào ngay thay vì chờ mọi thứ hoàn hảo. Khuynh hướng này ổn định xuyên suốt các bối cảnh, từ
+        công việc đến đời sống cá nhân, và trở thành một trong những đặc điểm dễ nhận thấy nhất ở bạn.
+      giai_thich: 'Thất Sát hãm tại Mệnh được Tân Biên mô tả cụ thể: ''làm việc gì cũng muốn cho chóng
+        xong.'' Tính chất này kết hợp với Địa Không hãm — sao chủ sự hành động đột ngột, cực đoan — và
+        Tang Hổ mang lại sự can đảm, cương nghị. Cung Quan Lộc có Phá Quân hãm cũng mang năng lượng ''liều
+        lĩnh, dũng mãnh,'' hỗ trợ thêm cho xu hướng hành động trước rồi tính sau. Tổng hợp lại, quán tính
+        để bắt đầu ở bạn rất thấp; rào cản tâm lý để khởi sự gần như không đáng kể.'
+      nang_luc: Khởi động hành động
+    - nang_luc_id: thich_nghi_voi_hoan_canh
+      mo_ta: Bạn hoạt động hiệu quả hơn rõ rệt khi ở môi trường mới, bên ngoài hoặc khác biệt so với hoàn
+        cảnh quen thuộc. Khi phải di chuyển, thay đổi nơi chốn hoặc tiếp xúc với bối cảnh xa lạ, bạn thích
+        nghi nhanh và thường thể hiện tốt hơn so với khi ở trong môi trường cố định. Đây là một năng lực
+        có điều kiện — phát huy mạnh khi bạn rời khỏi vùng quen thuộc và yếu đi khi bạn bị giữ yên một
+        chỗ quá lâu.
+      giai_thich: Cung Thiên Di tại Thìn có Liêm Trinh và Thiên Phủ đều miếu địa, tạo tương phản sắc nét
+        với Mệnh Thất Sát hãm tại Tuất. Điều này có nghĩa điều kiện bên ngoài thuận lợi hơn nhiều so với
+        nội tại. Cách cục 'Thất Sát Phá Quân nghi xuất ngoại' cũng khẳng định hướng phát triển nằm ở bên
+        ngoài, ở sự di chuyển và thay đổi môi trường. Sự kết hợp này cho thấy bạn không chỉ thích nghi
+        được mà thực sự vận hành ở trạng thái tốt hơn khi ở trong môi trường mới, nơi Liêm Phủ miếu địa
+        hỗ trợ.
+      nang_luc: Thích nghi với hoàn cảnh
+    diem_yeu:
+    - ten: Khó duy trì nhịp độ ổn định
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường làm việc theo kiểu bùng nổ rồi hụt hơi, chứ không giữ được mức độ đều đặn qua
+        thời gian. Có những giai đoạn bạn lao vào công việc với cường độ rất cao, nhưng sau đó nhanh chóng
+        mất đà hoặc chuyển hướng sang việc khác. Hạn chế này hiện diện xuyên suốt và ảnh hưởng đến hầu
+        hết các lĩnh vực bạn theo đuổi, khiến kết quả thường thiếu tính bền vững.
+      giai_thich: 'Mệnh Không–Thân Kiếp được sách ghi rõ ''thành bại thất thường, vui ít buồn nhiều,''
+        và ''sự nghiệp như đám mây nổi vật vờ.'' Địa Không hãm tại Mệnh kết hợp Địa Kiếp hãm tại Thân
+        tạo vòng lặp cực đoan: lên nhanh và xuống cũng nhanh. Phá Quân hãm tại Quan Lộc mang tính ''hao
+        tán, bại hoại,'' không hỗ trợ cho sự ổn định nghề nghiệp. Tham Lang hãm tại Tài Bạch cùng Hóa
+        Lộc cho thấy tiền tài có đến nhưng cũng dễ tan, ''hoang phí, chơi bời nên hao tán.'' Toàn bộ cấu
+        trúc này khiến nhịp sống và công việc của bạn mang tính chu kỳ ngắn hơn là đường cong tăng trưởng
+        đều.'
+    - ten: Hành động trước khi cân nhắc đủ
+      loai: qua_da
+      mo_ta: Xu hướng bắt tay vào việc ngay lập tức ở bạn thường đi quá xa thành sự nóng vội. Bạn dễ quyết
+        định hoặc phản ứng trước khi kịp đánh giá đầy đủ các yếu tố liên quan, đặc biệt trong những tình
+        huống kích thích mạnh hoặc khi cảm thấy bị thúc ép về thời gian. Biểu hiện này trở nên rõ hơn
+        khi áp lực cao và giảm bớt khi bạn ở trong môi trường yên tĩnh, ít kích thích.
+      giai_thich: Thất Sát hãm tại Tuất mang tính 'hung bạo, liều lĩnh, hay gây tai họa,' và khi kết hợp
+        với Kình Dương hãm tại Tài Bạch chiếu về, Đà La hãm tại Thiên Di xung chiếu, cùng Hỏa Linh tại
+        Thân, tạo thành cách 'Thất Sát hãm địa gặp nhiều sát tinh' — làm tăng đáng kể mức độ impulsivity.
+        Địa Không hãm thêm vào sự 'gian tà, xảo quyệt, phá tán,' nghĩa là hành động có thể thiếu cân nhắc
+        cả về mặt chiến lược lẫn đạo đức khi bị kích động. Năng lượng khởi động hành động rất mạnh, nhưng
+        hệ thống phanh hãm bên trong lại yếu do thiếu cát tinh nâng đỡ trực tiếp tại Mệnh.
+    - ten: Thiếu chiều sâu chuyên môn
+      loai: han_che_truc_tiep
+      mo_ta: Bạn dễ dàng nắm bắt nhiều lĩnh vực khác nhau nhưng hiếm khi đi đủ sâu để thực sự tinh thục
+        bất kỳ lĩnh vực nào. Khi đã qua giai đoạn mới lạ ban đầu, bạn có xu hướng mất hứng thú và chuyển
+        sang thứ khác thay vì tiếp tục đào sâu. Hạn chế này khiến bạn tích lũy được bề rộng kiến thức
+        đáng kể nhưng thiếu nền tảng chuyên sâu đủ để xử lý các vấn đề phức tạp đặc thù.
+      giai_thich: 'Cách cục ''Thất Sát Phá Quân nghi xuất ngoại, chư ban thủ nghệ bất năng tinh'' nói
+        thẳng: ''biết nhiều nghề nhưng không được tinh thục.'' Đây là hệ quả cấu trúc của việc Mệnh có
+        Thất Sát hãm (muốn chóng xong) kết hợp với Địa Không hãm (thay đổi cực đoan) và Thân bị Triệt
+        chặn (không duy trì được sự tập trung lâu dài vào một hướng). Tử Vi tại Thân đáng lẽ tạo khả năng
+        hệ thống hóa và đi sâu, nhưng Triệt làm giảm uy lực, trong khi Kiếp Hỏa cùng cung kéo sự chú ý
+        sang các mối lo ngắn hạn. Kết quả là bạn liên tục mở rộng bề ngang nhưng ít khi đào đủ sâu ở bất
+        cứ đâu.'
+- profile:
+    name: Hanh
+    birth_date: '1998-06-01'
+    birth_time: 14
+    gender: female
+  output:
+    tong_quan: Hồ sơ năng lực của bạn được định hình bởi trục Mệnh–Thân mang tính bổ sung nhưng cũng tạo
+      ra lực kéo ngược chiều. Mệnh có Thiên Đồng đắc địa tại Hợi với Văn Khúc và nhiều cát tinh hội hợp,
+      tạo nền tảng linh hoạt, thông minh và giàu khả năng thích ứng. Cung Thân cư Phúc Đức mang Nhật Nguyệt
+      đồng cung cùng Hóa Quyền, cho thấy thế giới nội tâm phong phú và nhu cầu kiểm soát ngày càng rõ
+      theo thời gian, nhưng bị Triệt làm gián đoạn. Quan Lộc có Cự Môn và Thiên Cơ đều miếu địa, tạo năng
+      lực phân tích và lập luận nổi trội trong phương diện nghề nghiệp, song song với Hóa Kỵ tạo ra lớp
+      phức tạp đáng kể. Toàn bộ profile cho thấy một người có năng lực trí tuệ và giao tiếp thuộc nhóm
+      nổi bật, nhưng bản chất thiên về thay đổi của Thiên Đồng kết hợp với các yếu tố cản trở trên cung
+      Thân tạo ra thách thức cố hữu trong việc duy trì cam kết và hiện thực hóa trọn vẹn tiềm năng.
+    diem_manh:
+    - nang_luc_id: thich_nghi_voi_hoan_canh
+      mo_ta: Bạn dễ dàng hòa nhập vào môi trường mới, không cần nhiều thời gian để làm quen với hoàn cảnh
+        thay đổi. Khi phải di chuyển, chuyển việc hoặc đối mặt với điều kiện khác biệt, bạn có xu hướng
+        tìm cách thích ứng thay vì phản kháng hay thu mình. Khả năng này phát huy rộng và ổn định trong
+        hầu hết bối cảnh, từ sinh hoạt hàng ngày đến công việc, nhưng mạnh nhất khi bạn có tự do di chuyển
+        và không bị ép vào khuôn khổ cố định quá lâu.
+      giai_thich: Thiên Đồng đắc địa tại Hợi mang bản chất canh cải — ưa thay đổi, thích phiêu lưu, nay
+        đây mai đó. Đây là phúc tinh nên sự thay đổi không mang tính hỗn loạn mà được dẫn dắt bởi bản
+        năng tìm kiếm môi trường thuận lợi. Văn Khúc đắc địa đồng cung bổ sung sự linh hoạt trong tư duy
+        và tiếp nhận, giúp bạn nhanh chóng đọc được quy tắc ngầm của môi trường mới. Các cát tinh Khôi,
+        Việt, Xương, Khúc hội hợp tạo thành cách Tỵ Hợi tọa Quế Hoa và Lộc triều viên, cho thấy sự thích
+        nghi này không chỉ là phản ứng thụ động mà còn mở ra cơ hội và sự hỗ trợ từ bên ngoài. Thiên Lương
+        xung chiếu từ Thiên Di tuy hãm địa vẫn tạo lớp đệm bảo vệ, giúp bạn ít bị tổn thương nghiêm trọng
+        khi bước vào hoàn cảnh xa lạ.
+      nang_luc: Thích nghi với hoàn cảnh
+    - nang_luc_id: hoc_nhanh
+      mo_ta: Bạn tiếp thu kiến thức mới nhanh hơn đa số người xung quanh, đặc biệt khi lĩnh vực đó liên
+        quan đến ngôn ngữ, văn chương hoặc các môn đòi hỏi tư duy phân tích. Bạn có xu hướng học rộng
+        hơn là chuyên sâu một lĩnh vực duy nhất, và thường nắm được bản chất vấn đề sau thời gian ngắn
+        tiếp xúc. Tốc độ học này ổn định qua các giai đoạn cuộc đời, phát huy tốt nhất khi bạn được tiếp
+        cận nhiều nguồn tài liệu hoặc môi trường đa dạng.
+      giai_thich: Văn Khúc đắc địa tọa thủ Mệnh là sao chủ văn chương, mỹ thuật và khoa giáp, tạo nền
+        tảng thông minh và hiếu học. Khi kết hợp với Văn Xương đắc địa chiếu từ Quan Lộc, tạo thành cách
+        Xương Khúc đắc địa hội hợp nhiều sao sáng sủa tốt đẹp — một trong những cách cục mạnh nhất về
+        trí tuệ và học vấn trong Tử Vi Tân Biên, được mô tả là người thông minh, học rộng, có nhiều tài
+        năng. Thiên Khôi tại Thân và Thiên Việt chiếu Tài Bạch hoàn thiện bộ Khôi Việt, xác nhận năng
+        lực học thuật và khả năng đỗ đạt. Thiên Cơ miếu địa ở Quan Lộc bổ sung tư duy chiến lược và sự
+        sáng suốt, giúp việc tiếp thu không chỉ dừng ở ghi nhớ mà còn hiểu được cấu trúc và ứng dụng.
+      nang_luc: Học nhanh
+    - nang_luc_id: lap_luan_bang_loi
+      mo_ta: Khi cần trình bày quan điểm, bảo vệ lập luận hoặc thuyết phục người khác, bạn có khả năng
+        sắp xếp lý lẽ mạch lạc và diễn đạt với sức nặng. Lời nói của bạn thường có tính đanh thép và thuyết
+        phục, đặc biệt trong các tình huống tranh luận hoặc cần phân tích vấn đề trước đám đông. Năng
+        lực này nổi trội trong bối cảnh chuyên môn và học thuật, nơi bạn có đủ không gian để triển khai
+        lập luận đầy đủ.
+      giai_thich: Cự Môn miếu địa tại Mão là vị trí mạnh nhất của sao chủ ngôn ngữ, tạo ra khả năng ăn
+        nói đanh thép và chủ uy quyền theo Tân Biên. Đồng cung với Thiên Cơ miếu địa — sao chủ mưu cơ
+        và sự sáng suốt — lời nói không chỉ có sức nặng mà còn có chiều sâu chiến lược, biết cách dẫn
+        dắt người nghe qua chuỗi lý lẽ logic. Văn Xương đắc địa đồng cung bổ sung chất văn chương và cấu
+        trúc cho lập luận. Cách cục Cự Cơ đồng cung được mô tả là văn võ toàn tài, có nhiều mưu trí, xác
+        nhận đây là năng lực nổi bật trong phương diện nghề nghiệp. Hóa Kỵ cũng tại cung này trên Thiên
+        Cơ tạo ra lớp phức tạp sẽ được phân tích ở phần điểm yếu.
+      nang_luc: Lập luận bằng lời
+    - nang_luc_id: phan_tich_van_de
+      mo_ta: Khi đối mặt với vấn đề phức tạp, bạn tự nhiên tách nó thành các thành phần nhỏ hơn, nhận
+        ra mối quan hệ giữa chúng và xác định điểm then chốt cần xử lý. Bạn có xu hướng không chấp nhận
+        lời giải bề mặt mà muốn hiểu cơ chế vận hành bên dưới. Năng lực này phát huy rõ nhất trong công
+        việc đòi hỏi lập kế hoạch, tham mưu hoặc xử lý tình huống có nhiều yếu tố đan xen, nhưng có thể
+        chậm lại khi vấn đề liên quan đến cảm xúc hoặc giá trị cá nhân.
+      giai_thich: 'Thiên Cơ miếu địa tại Quan Lộc là sao chủ mưu cơ — khả năng tư duy chiến lược, phân
+        tích và hoạch định. Khi kết hợp với Cự Môn miếu địa mang tư duy phản biện và khả năng xem xét
+        nhiều mặt, tạo thành năng lực phân tích có chiều sâu: không chỉ tách vấn đề mà còn đánh giá được
+        các khía cạnh và lập luận về chúng. Văn Khúc tại Mệnh hỗ trợ bằng trực giác và khả năng nhận diện
+        pattern từ thông tin rời rạc. Thiên Lương từ Thiên Di xung chiếu, dù hãm địa, vẫn đóng vai trò
+        Ấm tinh tạo khuynh hướng tìm hiểu bản chất và bảo vệ kết luận bằng lý lẽ có căn cứ, phù hợp với
+        cách Ấm Phúc tại Mệnh án ngữ bất pha tai ương.'
+      nang_luc: Phân tích vấn đề
+    diem_yeu:
+    - ten: Thiếu bền chí và quyết đoán
+      loai: han_che_truc_tiep
+      mo_ta: Bạn thường do dự khi phải chốt một hướng đi, và ngay cả khi đã quyết định, bạn dễ thay đổi
+        ý định sau một thời gian ngắn. Sự do dự này không đến từ thiếu hiểu biết — bạn thường đã phân
+        tích kỹ — mà từ bản năng muốn giữ mọi khả năng mở. Trong công việc dài hạn, bạn có xu hướng chóng
+        chán, chuyển sang hướng mới hoặc bỏ dở khi chưa đến điểm kết thúc. Biểu hiện này hiện diện ổn
+        định qua các giai đoạn và mạnh lên khi bạn bị ép vào khuôn khổ cố định quá lâu.
+      giai_thich: Thiên Đồng đắc địa tại Hợi, dù được nhiều cát tinh nâng đỡ, vẫn giữ bản chất không quả
+        quyết, không bền chí, hay thay đổi ý kiến và công việc theo mô tả của Tân Biên. Phú giải Thiên
+        Đồng nhập Mệnh hoán cải vô thường khẳng định đây là đặc tính cốt lõi chứ không phải khiếm khuyết
+        ngoại vi. Cung Thân cư Phúc Đức có Triệt án ngữ trong khi nhiều sao sáng sủa như Nhật Nguyệt đồng
+        cung, Thiên Khôi và Hóa Quyền tụ tập — theo quy tắc nhiều sao sáng sủa tốt đẹp gặp Triệt thì suốt
+        đời chẳng được xứng ý toại lòng — tạo ra lớp cản trở cấu trúc khiến những ý định tốt đẹp khó được
+        hiện thực hóa trọn vẹn. Sự kết hợp giữa bản chất hay thay đổi của Thiên Đồng và lớp cản của Triệt
+        trên cung Thân khiến việc duy trì cam kết dài hạn trở thành thách thức cố hữu.
+    - ten: Phân tích quá đà dẫn đến bế tắc
+      loai: qua_da
+      mo_ta: 'Năng lực phân tích mạnh đôi khi trở thành cái bẫy: bạn có xu hướng suy xét quá nhiều khả
+        năng, lật đi lật lại vấn đề đến mức mất phương hướng hoặc không thể chốt được kết luận. Trong
+        công việc, điều này biểu hiện qua việc dành quá nhiều thời gian cho giai đoạn chuẩn bị, hoặc thay
+        đổi phương án liên tục vì luôn thấy điểm chưa ổn ở phương án hiện tại. Biểu hiện này rõ nhất khi
+        bạn đối mặt với quyết định nghề nghiệp quan trọng hoặc khi làm việc trong môi trường có nhiều
+        thông tin mâu thuẫn.'
+      giai_thich: 'Thiên Cơ miếu địa tại Quan Lộc vốn tạo năng lực tư duy chiến lược sắc bén, nhưng Hóa
+        Kỵ đồng cung trên Thiên Cơ tạo ra hiện tượng hay nhầm lẫn. Theo Tân Biên, Hóa Kỵ mang tính độc
+        hiểm, hay ghen ghét, hay nhầm lẫn, gây thị phi. Khi Hóa Kỵ tác động lên Thiên Cơ — sao chủ mưu
+        cơ và sự sáng suốt — nó không triệt tiêu năng lực phân tích mà làm méo quá trình vận hành: bạn
+        vẫn phân tích sâu nhưng dễ rơi vào vòng lặp tự nghi ngờ, nhìn thấy quá nhiều rủi ro hoặc khả năng
+        thay thế đến mức không thể cam kết với bất kỳ phương án nào. Cung Quan Lộc là tam hợp Mệnh nên
+        ảnh hưởng này tác động trực tiếp lên cách bạn hành động và xây dựng sự nghiệp. Hóa Kỵ tại Mão
+        không ở vị trí đắc địa nên tác động tiêu cực không bị chiết giảm.'
+    - ten: Xung đột giữa linh hoạt và kiểm soát
+      loai: xung_dot
+      mo_ta: 'Bên trong bạn tồn tại hai khuynh hướng kéo ngược chiều: một bên là bản năng muốn giữ mọi
+        thứ linh hoạt, không cam kết, đi theo dòng chảy; bên kia là nhu cầu kiểm soát cảm xúc và định
+        hình kết quả theo ý mình. Sự giằng co này tạo ra những giai đoạn bạn bất ngờ trở nên quyết liệt
+        và áp đặt, xen kẽ với những giai đoạn buông xuôi hoặc thay đổi hướng đi đột ngột. Người xung quanh
+        có thể thấy bạn khó đoán — lúc thì rất dễ thích nghi, lúc lại rất cứng rắn về một điều gì đó.'
+      giai_thich: 'Mệnh có Thiên Đồng đắc địa — sao chủ sự thay đổi, khoan hòa, trung hậu nhưng thất thường.
+        Cung Thân cư Phúc Đức có Hóa Quyền trên Thái Âm, tạo ra nhu cầu kiểm soát và uy quyền trong thế
+        giới nội tâm. Hóa Quyền là sao chủ quyền lực và sự áp đặt, khi đóng trên Thái Âm tại cung Thân,
+        nó tạo ra một lớp tính cách phát triển theo thời gian: càng về sau bạn càng muốn nắm quyền kiểm
+        soát cảm xúc và định hình môi trường xung quanh. Tuy nhiên, Triệt đồng cung tại Phúc Đức tạo ra
+        sự gián đoạn — quyền lực nội tâm này không được biểu hiện mượt mà mà bị ngắt quãng, tạo ra những
+        bùng nổ kiểm soát xen kẽ với những giai đoạn mất phương hướng. Mệnh và Thân kéo hai hướng khác
+        nhau: Mệnh muốn chảy, Thân muốn nắm, và Triệt làm cả hai phía đều khó đạt được trạng thái ổn định
+        bền vững.'
+completed_at: '2026-08-28T09:50:29+02:00'
+summary:
+  succeeded: 15
+  failed: 0
