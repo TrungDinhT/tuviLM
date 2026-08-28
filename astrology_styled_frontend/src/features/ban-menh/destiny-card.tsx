@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties, useId } from "react";
+import { useId } from "react";
 
 import {
   CONSTELLATION_SCATTER,
@@ -11,7 +11,6 @@ import { destinyFor } from "@/content/destiny";
 import { STAR_SHAPES } from "@/content/star-shapes";
 import type { BuildLasoResponse } from "@/lib/api/schemas";
 import { starKeyFromName } from "@/lib/theme";
-import { cn } from "@/lib/utils";
 
 import { displayStarName, menhChinhTinh, menhStarKey } from "./selectors";
 
@@ -23,20 +22,7 @@ import { displayStarName, menhChinhTinh, menhStarKey } from "./selectors";
  * stage. Vô chính diệu gets its authored reading and the scattered sky —
  * a reading in its own right, never an empty stage.
  */
-export function DestinyCard({
-  chart,
-  active = true,
-  initialFocus = 1,
-}: {
-  chart: BuildLasoResponse;
-  /** Whether this card opens focused — it paints above its neighbours. */
-  active?: boolean;
-  /**
-   * The `--card-focus` the card renders with before the first scroll frame.
-   * Afterwards the rail writes it imperatively on every scroll.
-   */
-  initialFocus?: number;
-}) {
+export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
   const gradientId = useId().replace(/:/g, "");
 
   const names = menhChinhTinh(chart);
@@ -53,10 +39,7 @@ export function DestinyCard({
     : [[60, 26, 200, 168]];
 
   return (
-    <article
-      className={cn("destiny reveal", active && "is-active")}
-      style={{ "--card-focus": initialFocus } as CSSProperties}
-    >
+    <article className="destiny reveal">
       <div className="card-back" aria-hidden="true">
         <span className="card-back-sigil">✦</span>
       </div>

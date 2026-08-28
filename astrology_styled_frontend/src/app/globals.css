@@ -743,6 +743,21 @@
     box-shadow: 0 0 10px var(--accent-glow);
   }
 
+  /* Carousel mechanics — the library-free rail (components/primitives/
+     carousel.tsx): native scroll-snap does the gesture, items are
+     fixed-size flex children. Skins like .deck supply sizing and the
+     scroll-linked focus visuals. */
+  .carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .carousel-item {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+  }
+
   /* The deck rail: a horizontal scroll-snap below lg; from lg up, a grid —
      the main card fills the left column, the two lá bài phụ stack right.
 
@@ -760,12 +775,9 @@
   .deck {
     --focus-scale: 1.2195;
     --card-w: max(240px, calc(var(--deck-h) * 0.82 / 1.7));
-    display: flex;
     gap: 14px;
-    overflow-x: auto;
     padding-block: 6px 8px;
     padding-inline: calc(50% - var(--card-w) / 2);
-    scroll-snap-type: x mandatory;
     align-items: flex-end;
     height: calc(var(--card-w) * 1.7 * var(--focus-scale) + 14px);
   }
@@ -774,14 +786,20 @@
      full rail height as its focus approaches 1. The transform consumes
      --card-focus, which is driven by the scroll-driven animation where
      supported and by JS elsewhere. */
-  .deck > .destiny,
-  .deck > .tarot {
-    flex: 0 0 auto;
+  .deck > .carousel-item {
+    display: flex;
     width: var(--card-w);
-    scroll-snap-align: center;
     aspect-ratio: 1 / 1.7;
     transform: scale(calc(1 + (var(--focus-scale) - 1) * var(--card-focus, 0)));
     transform-origin: 50% 100%;
+  }
+
+  /* The card article stretches to fill its carousel item. */
+  .deck > .carousel-item > .destiny,
+  .deck > .carousel-item > .tarot {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
   }
 
   /* The growing card overlaps its resting neighbours; it must paint above. */
@@ -1187,8 +1205,7 @@
     height: 594px;
   }
 
-  .deck > .destiny,
-  .deck > .tarot {
+  .deck > .carousel-item {
     --focus-scale: 1.269;
     aspect-ratio: 1 / 1.7;
     height: auto;
@@ -1232,7 +1249,7 @@
     height: auto;
   }
 
-  .deck > .destiny {
+  .deck > .carousel-item:first-child {
     grid-column: 1;
     grid-row: 1 / span 2;
     width: 100%;
@@ -1242,7 +1259,7 @@
     transform: none;
   }
 
-  .deck > .tarot {
+  .deck > .carousel-item:not(:first-child) {
     grid-column: 2;
     width: auto;
     height: auto;
@@ -1270,20 +1287,19 @@
 
    Where `animation-timeline: view()` is supported (Chromium 115+, Safari
    18+), each card's scale, face fade and back fade run on the compositor,
-   driven by the card's traversal through the rail's scrollport: 50% of the
+   driven by the item's traversal through the rail's scrollport: 50% of the
    timeline is the centred snap point, 0%/100% are fully off-centre. No
-   JavaScript per frame, no scroll-event lag — which is what made the JS
-   fallback below judder. Only `transform` and `opacity` are animated, and
-   the keyframes are linear on purpose: the user's scroll is already the
-   easing curve.
+   JavaScript per frame, no scroll-event lag. Only `transform` and `opacity`
+   are animated, and the keyframes are linear on purpose: the user's scroll
+   is already the easing curve.
 
-   The face/back subscribe to their card's *named* view timeline: their own
-   `view()` would resolve against the card's overflow:hidden box instead of
-   the rail. Descendants see an ancestor's timeline name without
-   `timeline-scope`.
+   Each carousel item publishes a named inline view timeline from its inline
+   style (CarouselItem); the face/back subscribe via --card-tl because their
+   own `view()` would resolve against the card's overflow:hidden box instead
+   of the rail.
 
    Browsers without support (Firefox) keep the JS-written `--card-focus`
-   fallback — see ban-menh-screen.tsx.
+   fallback — see components/primitives/carousel.tsx.
    ========================================================================= */
 @media (width < 64rem) {
   @supports (animation-timeline: view()) {
@@ -1327,38 +1343,9 @@
       }
     }
 
-    .deck > article:nth-child(1) {
-      --card-tl: --card-1;
-      view-timeline-name: --card-1;
-      view-timeline-axis: inline;
-    }
-
-    .deck > article:nth-child(2) {
-      --card-tl: --card-2;
-      view-timeline-name: --card-2;
-      view-timeline-axis: inline;
-    }
-
-    .deck > article:nth-child(3) {
-      --card-tl: --card-3;
-      view-timeline-name: --card-3;
-      view-timeline-axis: inline;
-    }
-
-    .deck > .destiny,
-    .deck > .tarot {
+    .deck > .carousel-item {
       animation: deck-focus linear both;
       animation-timeline: view(inline);
-    }
-
-    /* The entrance reveal is time-based (translate, so it never fights the
-       focus transform); the focus track is scroll-based. Two animations,
-       two timelines, one element. */
-    .deck > .destiny.reveal {
-      animation:
-        cardin 1s cubic-bezier(0.2, 0.8, 0.2, 1) both,
-        deck-focus linear both;
-      animation-timeline: auto, view(inline);
     }
 
     .deck .card-face {

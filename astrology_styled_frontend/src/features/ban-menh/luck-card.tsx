@@ -6,7 +6,6 @@ import { locRoleBlurb } from "@/content/loc-roles";
 import { luckColourFor } from "@/content/luck-colour";
 import { thangCatFor } from "@/content/thang-cat";
 import type { BuildLasoResponse } from "@/lib/api/schemas";
-import { cn } from "@/lib/utils";
 
 import { cungRoleHolding } from "./selectors";
 
@@ -21,17 +20,7 @@ import { cungRoleHolding } from "./selectors";
  * The lucky colour is written to the scoped `--luck-hue` on this card alone;
  * CSS folds it into `--t-hue`. The global accent is never touched.
  */
-export function LuckCard({
-  chart,
-  active = true,
-  initialFocus = 0,
-}: {
-  chart: BuildLasoResponse;
-  /** Whether this card opens focused — it paints above its neighbours. */
-  active?: boolean;
-  /** The `--card-focus` before the first scroll frame; see DestinyCard. */
-  initialFocus?: number;
-}) {
+export function LuckCard({ chart }: { chart: BuildLasoResponse }) {
   const hoaLocRole = cungRoleHolding(chart, "Hóa Lộc");
   const locTonRole = cungRoleHolding(chart, "Lộc Tồn");
   const luck = luckColourFor(chart.ban_menh_ngu_hanh);
@@ -45,8 +34,8 @@ export function LuckCard({
 
   return (
     <article
-      className={cn("tarot glass luck-card", active && "is-active")}
-      style={{ "--luck-hue": luck.hue, "--card-focus": initialFocus } as CSSProperties}
+      className="tarot glass luck-card"
+      style={{ "--luck-hue": luck.hue } as CSSProperties}
     >
       <div className="card-back" aria-hidden="true">
         <span className="card-back-sigil">✦</span>

@@ -1,9 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 
 import { Pill } from "@/components/primitives/pill";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselDots,
+  CarouselItem,
+} from "@/components/primitives/carousel";
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
 import { useLasoChart } from "@/lib/api/hooks";
 import { useToastStore } from "@/store/toast-store";
@@ -14,16 +19,6 @@ import { LuckCard } from "./luck-card";
 import { displayStarName, menhChinhTinh } from "./selectors";
 
 const COMING_SOON = "Tính năng sẽ sớm được cập nhật ✦";
-
-/**
- * Browsers with scroll-driven animations get the focus visuals from CSS
- * (`animation-timeline: view()` in globals.css); the rest get imperative
- * `--card-focus` writes on scroll — main-thread per-frame style writes are
- * what made the rail judder, so they are the fallback, not the default.
- * Evaluated once: support never flips at runtime.
- */
-const HAS_SCROLL_TIMELINES =
-  typeof CSS !== "undefined" && CSS.supports("animation-timeline: view()");
 
 /** The greeting follows the clock, so it is gated on hydration. */
 function greeting(): string {
@@ -44,46 +39,10 @@ function greeting(): string {
  */
 export function BanMenhScreen() {
   const { data: chart } = useLasoChart();
-  const [activeDot, setActiveDot] = useState(0);
   const showToast = useToastStore((state) => state.show);
   const hydrated = useIsHydrated();
 
   if (chart === undefined) return null;
-
-  /**
-   * Tracks which card is centred, for the dots and the focused card's
-   * z-index. Writes `--card-focus` only on the fallback path.
-   */
-  const updateFocus = (rail: HTMLDivElement) => {
-    const cards = [...rail.children] as HTMLElement[];
-    const centers = cards.map((card) => card.offsetLeft + card.offsetWidth / 2);
-    const viewCenter = rail.scrollLeft + rail.clientWidth / 2;
-
-    let active = 0;
-    let closest = Infinity;
-    cards.forEach((card, index) => {
-      const center = centers[index]!;
-      const previous = centers[index - 1];
-      const next = centers[index + 1];
-      const spacing = Math.min(
-        previous === undefined ? Infinity : center - previous,
-        next === undefined ? Infinity : next - center,
-      );
-      const range = spacing === Infinity ? rail.clientWidth / 2 : spacing;
-      const distance = Math.abs(center - viewCenter);
-      if (!HAS_SCROLL_TIMELINES) {
-        card.style.setProperty(
-          "--card-focus",
-          Math.min(1, Math.max(0, 1 - distance / range)).toFixed(3),
-        );
-      }
-      if (distance < closest) {
-        closest = distance;
-        active = index;
-      }
-    });
-    setActiveDot(active);
-  };
 
   const stars = menhChinhTinh(chart).map(displayStarName);
   const badge = stars.length > 0 ? stars.join(" · ") : "Vô Chính Diệu";
@@ -106,16 +65,20 @@ export function BanMenhScreen() {
         </p>
       </div>
 
-      <div className="deck" onScroll={(event) => updateFocus(event.currentTarget)}>
-        <DestinyCard chart={chart} active={activeDot === 0} initialFocus={1} />
-        <LuckCard chart={chart} active={activeDot === 1} initialFocus={0} />
-        <AdviceCard chart={chart} active={activeDot === 2} initialFocus={0} />
-      </div>
-      <div className="deck-dots" aria-hidden="true">
-        {[0, 1, 2].map((index) => (
-          <i key={index} className={index === activeDot ? "on" : undefined} />
-        ))}
-      </div>
+      <Carousel>
+        <CarouselContent className="deck">
+          <CarouselItem index={0} initialFocus={1}>
+            <DestinyCard chart={chart} />
+          </CarouselItem>
+          <CarouselItem index={1}>
+            <LuckCard chart={chart} />
+          </CarouselItem>
+          <CarouselItem index={2}>
+            <AdviceCard chart={chart} />
+          </CarouselItem>
+        </CarouselContent>
+        <CarouselDots count={3} className="deck-dots" />
+      </Carousel>
 
       <div className="px-[22px] pt-[10px] md:px-[30px] lg:px-10">
         <div className="share-row">

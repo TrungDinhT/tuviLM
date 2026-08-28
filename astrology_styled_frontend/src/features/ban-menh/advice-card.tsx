@@ -4,7 +4,6 @@ import type { CSSProperties } from "react";
 
 import { adviceFor } from "@/content/advice";
 import type { BuildLasoResponse } from "@/lib/api/schemas";
-import { cn } from "@/lib/utils";
 
 /**
  * Lá bài phụ 2 — Lời Khuyên.
@@ -16,25 +15,12 @@ import { cn } from "@/lib/utils";
  * Its hue is the accent's own second shade: close to the deck's chrome, and
  * deliberately not the lucky colour — that one belongs to Vận May alone.
  */
-export function AdviceCard({
-  chart,
-  active = true,
-  initialFocus = 0,
-}: {
-  chart: BuildLasoResponse;
-  /** Whether this card opens focused — it paints above its neighbours. */
-  active?: boolean;
-  /** The `--card-focus` before the first scroll frame; see DestinyCard. */
-  initialFocus?: number;
-}) {
+export function AdviceCard({ chart }: { chart: BuildLasoResponse }) {
   const entry = adviceFor(chart.menh_cuc_relation, chart.am_duong_relation);
   const polarityLabel = chart.am_duong_relation === "thuan_ly" ? "Thuận lý" : "Nghịch lý";
 
   return (
-    <article
-      className={cn("tarot glass", active && "is-active")}
-      style={{ "--t-hue": "var(--accent-2)", "--card-focus": initialFocus } as CSSProperties}
-    >
+    <article className="tarot glass" style={{ "--t-hue": "var(--accent-2)" } as CSSProperties}>
       <div className="card-back" aria-hidden="true">
         <span className="card-back-sigil">✦</span>
       </div>
