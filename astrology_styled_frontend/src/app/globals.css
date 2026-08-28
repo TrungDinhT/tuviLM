@@ -1179,6 +1179,142 @@
     font-size: 12.5px;
     color: var(--color-muted);
   }
+
+  /* Hồ sơ — saved-chart rail + settings list. */
+  .saved {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 4px 0;
+    scrollbar-width: none;
+  }
+
+  .saved::-webkit-scrollbar {
+    height: 0;
+  }
+
+  .savecard {
+    flex: 0 0 130px;
+    padding: 16px;
+    border-radius: 20px;
+    position: relative;
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--accent) 18%, transparent),
+      rgba(46, 26, 74, 0.5)
+    );
+    border: 1px solid var(--accent-glow);
+  }
+
+  .savecard .dt {
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+
+  .savecard b {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    display: block;
+    margin-top: 8px;
+    line-height: 1.15;
+    padding-right: 22px;
+  }
+
+  .savecard-delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-glass-line);
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+
+  .savecard-delete svg {
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+    padding: 6px;
+  }
+
+  .li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 14px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    background: none;
+    border: 0;
+    color: var(--color-ink);
+    font: inherit;
+    text-align: left;
+    width: 100%;
+  }
+
+  .li:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .li svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--accent);
+    fill: none;
+    stroke-width: 1.5;
+    flex: 0 0 auto;
+  }
+
+  .li .t {
+    flex: 1;
+  }
+
+  .li .t b {
+    font-weight: 500;
+    font-size: 15px;
+  }
+
+  .li .t small {
+    display: block;
+    color: var(--color-muted);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .li .chev {
+    color: var(--color-muted);
+  }
+
+  .skip {
+    background: none;
+    border: 0;
+    color: var(--color-muted);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .center {
+    text-align: center;
+  }
 }
 
 /* The entrance animates `translate`, never `transform`: the deck's focus
@@ -1357,5 +1493,20 @@
       animation: deck-back linear both;
       animation-timeline: var(--card-tl);
     }
+  }
+}
+
+/* Hồ sơ — the saved-chart rail becomes a three-column grid at the desktop
+   tier (the screen's own two-column layout is Tailwind in the component). */
+@media (width >= 64rem) {
+  .saved {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    overflow: visible;
+  }
+
+  .savecard {
+    flex: none;
   }
 }
