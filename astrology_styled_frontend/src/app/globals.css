@@ -55,11 +55,11 @@
      These stay CSS custom properties on purpose: lib/theme.ts resolves an
      outcome to `var(--element-*)` references, never to a raw colour, which is
      what keeps every literal in this file. */
-  --element-kim: #ead9a0;
+  --element-kim: #e0dbcf;
   --element-moc: #63c79a;
   --element-thuy: #79b7ff;
-  --element-hoa: #ff7e6b;
-  --element-tho: #c99c70;
+  --element-hoa: #ff5d57;
+  --element-tho: #b3855a;
 
   --element-kim-light: color-mix(in srgb, var(--element-kim) 45%, var(--color-ink));
   --element-moc-light: color-mix(in srgb, var(--element-moc) 45%, var(--color-ink));
@@ -74,14 +74,14 @@
   --element-tho-glow: color-mix(in srgb, var(--element-tho) 50%, transparent);
 
   /* Vô chính diệu, and the fallback for an unrecognised star. */
-  --accent-neutral: #b9aed1;
-  --accent-neutral-light: #f3effa;
-  --accent-neutral-glow: rgba(185, 174, 209, 0.45);
+  --accent-neutral: #bca6f5;
+  --accent-neutral-light: #e8e1fb;
+  --accent-neutral-glow: rgba(188, 166, 245, 0.45);
 
-  /* Pre-chart default accent (Kim). */
-  --accent-default: var(--element-kim);
-  --accent-2-default: #f5f7fa;
-  --accent-glow-default: rgba(234, 217, 160, 0.55);
+  /* Pre-chart default accent (vô chính diệu). */
+  --accent-default: var(--accent-neutral);
+  --accent-2-default: var(--accent-neutral-light);
+  --accent-glow-default: var(--accent-neutral-glow);
 
   --accent: var(--accent-default);
   --accent-2: var(--accent-2-default);
