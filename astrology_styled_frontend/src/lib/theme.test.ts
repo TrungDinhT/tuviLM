@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_ACCENT, resolveAccent, starKeyFromName } from "./theme";
+import { DEFAULT_ACCENT, nguHanhOf, resolveAccent, starKeyFromName } from "./theme";
 
 describe("resolveAccent", () => {
   it("returns the pre-chart default when no chart has been cast", () => {
@@ -77,5 +77,17 @@ describe("starKeyFromName", () => {
   it("strips the trạng thái suffix the build payload carries", () => {
     expect(starKeyFromName("Tử Vi (Miếu)")).toBe("tuvi");
     expect(starKeyFromName("Thất Sát (V)")).toBe("thatsat");
+  });
+});
+
+describe("nguHanhOf", () => {
+  it("maps a chính tinh key to its ngũ hành", () => {
+    expect(nguHanhOf("thatsat")).toBe("kim");
+    expect(nguHanhOf("thamlang")).toBe("moc");
+    expect(nguHanhOf("tuvi")).toBe("tho");
+  });
+
+  it("returns null for an unrecognised key", () => {
+    expect(nguHanhOf("saola")).toBeNull();
   });
 });

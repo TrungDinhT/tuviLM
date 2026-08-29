@@ -1,5 +1,7 @@
 "use client";
 
+import type { CSSProperties } from "react";
+
 import Link from "next/link";
 
 import { Pill } from "@/components/primitives/pill";
@@ -11,6 +13,7 @@ import {
 } from "@/components/primitives/carousel";
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
 import { useLasoChart } from "@/lib/api/hooks";
+import { nguHanhOf, starKeyFromName } from "@/lib/theme";
 import { useToastStore } from "@/store/toast-store";
 
 import { AdviceCard } from "./advice-card";
@@ -45,8 +48,16 @@ export function BanMenhScreen() {
 
   if (chart === undefined) return null;
 
-  const stars = menhChinhTinh(chart).map(displayStarName);
-  const badge = stars.length > 0 ? stars.join(" · ") : "Vô Chính Diệu";
+  const names = menhChinhTinh(chart).map(displayStarName);
+  const keys = menhChinhTinh(chart).map(starKeyFromName);
+  // Song tinh whose two chính tinh carry two different ngũ hành: each star is
+  // shown in its own element colour and the badge itself becomes a gradient.
+  const twoTone = (() => {
+    if (keys.length !== 2) return null;
+    const [a, b] = keys.map(nguHanhOf);
+    if (a == null || b == null || a === b) return null;
+    return [a, b] as const;
+  })();
 
   return (
     <div className="pb-[calc(56px+var(--tabbar-h))] lg:pb-14">
@@ -56,10 +67,27 @@ export function BanMenhScreen() {
             {hydrated ? greeting() : "Chào bạn"}
           </div>
           <div className="flex flex-none flex-col items-end gap-[9px]">
-            <span className="inline-flex items-center gap-2 rounded-full border border-accent-glow bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] px-[14px] py-[6px] text-[13px] font-semibold text-accent">
-              <span className="h-[9px] w-[9px] rounded-full bg-accent shadow-[0_0_10px_var(--accent-glow)]" />
-              {badge}
-            </span>
+            {twoTone ? (
+              <span
+                className="inline-flex items-center gap-2 rounded-full border bg-[linear-gradient(135deg,color-mix(in_srgb,var(--badge-a)_14%,transparent),color-mix(in_srgb,var(--badge-b)_14%,transparent))] px-[14px] py-[6px] text-[13px] font-semibold [border-color:color-mix(in_srgb,var(--badge-a),var(--badge-b))]"
+                style={
+                  {
+                    "--badge-a": `var(--element-${twoTone[0]})`,
+                    "--badge-b": `var(--element-${twoTone[1]})`,
+                  } as CSSProperties
+                }
+              >
+                <span className="h-[9px] w-[9px] rounded-full bg-[linear-gradient(135deg,var(--badge-a),var(--badge-b))] shadow-[0_0_10px_color-mix(in_srgb,var(--badge-a)_50%,transparent)]" />
+                <span className="[color:var(--badge-a)]">{names[0]}</span>
+                <span className="text-muted">·</span>
+                <span className="[color:var(--badge-b)]">{names[1]}</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2 rounded-full border border-accent-glow bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] px-[14px] py-[6px] text-[13px] font-semibold text-accent">
+                <span className="h-[9px] w-[9px] rounded-full bg-accent shadow-[0_0_10px_var(--accent-glow)]" />
+                {names.length > 0 ? names.join(" · ") : "Vô Chính Diệu"}
+              </span>
+            )}
           </div>
         </div>
         <h2 className="mt-[10px] font-display text-[26px] leading-[1.06] font-semibold tracking-[-0.01em]">

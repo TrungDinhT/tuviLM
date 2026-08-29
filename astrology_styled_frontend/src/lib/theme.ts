@@ -22,6 +22,7 @@
  * | `--focus`            | the highlighted source cung              |
  * | `--star-color`       | one star in a cung list                  |
  * | `--star-info-color`  | the star currently open in its popup     |
+ * | `--badge-a`/`-b`     | the two hành colours of a song-tinh badge |
  *
  * Any new per-subtree colour follows the same shape. Reassigning `--accent`
  * locally is never the answer: every descendant glow, border and gradient
@@ -87,6 +88,11 @@ export function starKeyFromName(name: string): string {
     .replace(/\p{M}/gu, "")
     .toLowerCase()
     .replace(/\s+/g, "");
+}
+
+/** The ngũ hành of a chính tinh key, or null when the key is unrecognised. */
+export function nguHanhOf(starKey: string): NguHanh | null {
+  return CHINH_TINH_ELEMENT[starKey] ?? null;
 }
 
 interface Accent {
