@@ -1,0 +1,42 @@
+/* The Lá Bài Bản Mệnh (main card) paint. Layout is inline; here is the
+   layered background, the tinted border/glow, the chip, the mantra divider,
+   and the entrance animation. */
+
+.destiny {
+  background:
+    linear-gradient(180deg, rgba(13, 7, 28, 0.88) 0%, rgba(13, 7, 28, 0.54) 20%, transparent 36%),
+    linear-gradient(0deg, rgba(13, 7, 28, 0.92) 0%, rgba(13, 7, 28, 0.66) 13%, transparent 31%),
+    url("/assets/bg-la-bai-chinh.png") center/cover no-repeat,
+    linear-gradient(168deg, #3b2569 0%, #2b1b4e 44%, #1d1136 100%);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow:
+    0 34px 92px rgba(12, 6, 28, 0.7),
+    0 0 60px color-mix(in srgb, var(--accent) 26%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.dchip {
+  border: 1px solid color-mix(in srgb, var(--accent) 52%, transparent);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dmantra {
+  border-top: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.reveal {
+  animation: cardin 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* The entrance animates `translate`, never `transform`: the deck's focus
+   scaling owns `transform` on the same element. */
+@keyframes cardin {
+  from {
+    opacity: 0;
+    translate: 0 30px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}

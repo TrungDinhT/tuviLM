@@ -14,8 +14,10 @@ import { useLasoChart } from "@/lib/api/hooks";
 import { useToastStore } from "@/store/toast-store";
 
 import { AdviceCard } from "./advice-card";
+import deckStyles from "./deck.module.css";
 import { DestinyCard } from "./destiny-card";
 import { LuckCard } from "./luck-card";
+import screenStyles from "./ban-menh-screen.module.css";
 import { displayStarName, menhChinhTinh } from "./selectors";
 
 const COMING_SOON = "Tính năng sẽ sớm được cập nhật ✦";
@@ -49,39 +51,45 @@ export function BanMenhScreen() {
 
   return (
     <div className="pb-[calc(56px+var(--tabbar-h))] lg:pb-14">
-      <div className="bm-header px-[22px] pt-[calc(10px+var(--safe-t))] md:px-[30px] lg:px-10 lg:pt-[calc(18px+var(--safe-t))]">
-        <div className="headline">
-          <div className="eyebrow">{hydrated ? greeting() : "Chào bạn"}</div>
-          <div className="head-aside">
-            <span className="elbadge">
-              <span className="dot" />
+      <div className="px-[22px] pt-[calc(10px+var(--safe-t))] md:px-[30px] lg:px-10 lg:pt-[calc(18px+var(--safe-t))]">
+        <div className="flex items-center justify-between gap-[14px]">
+          <div className="text-[10px] font-bold tracking-[0.26em] text-accent uppercase">
+            {hydrated ? greeting() : "Chào bạn"}
+          </div>
+          <div className="flex flex-none flex-col items-end gap-[9px]">
+            <span
+              className={`${screenStyles.elBadge} inline-flex items-center gap-2 rounded-full border border-accent-glow px-[14px] py-[6px] text-[13px] font-semibold text-accent`}
+            >
+              <span className="h-[9px] w-[9px] rounded-full bg-accent shadow-[0_0_10px_var(--accent-glow)]" />
               {badge}
             </span>
           </div>
         </div>
-        <h2>Bạn Sao Trẻ</h2>
-        <p className="headsub">
+        <h2 className="mt-[10px] font-display text-[26px] leading-[1.06] font-semibold tracking-[-0.01em]">
+          Bạn Sao Trẻ
+        </h2>
+        <p className="mt-[7px] max-w-[54ch] text-[13.5px] leading-[1.5] text-muted">
           Lá Bài Bản Mệnh ở đầu — vuốt sang để lật hai lá bài phụ.
         </p>
       </div>
 
       <Carousel>
-        <CarouselContent className="deck">
-          <CarouselItem index={0} initialFocus={1}>
+        <CarouselContent className={deckStyles.deck}>
+          <CarouselItem index={0} initialFocus={1} className={deckStyles.deckItem}>
             <DestinyCard chart={chart} />
           </CarouselItem>
-          <CarouselItem index={1}>
+          <CarouselItem index={1} className={deckStyles.deckItem}>
             <LuckCard chart={chart} />
           </CarouselItem>
-          <CarouselItem index={2}>
+          <CarouselItem index={2} className={deckStyles.deckItem}>
             <AdviceCard chart={chart} />
           </CarouselItem>
         </CarouselContent>
-        <CarouselDots count={3} className="deck-dots" />
+        <CarouselDots count={3} className={deckStyles.deckDots} />
       </Carousel>
 
       <div className="px-[22px] pt-[10px] md:px-[30px] lg:px-10">
-        <div className="share-row">
+        <div className="mx-auto mt-[18px] flex w-[min(340px,86%)] gap-[10px] md:w-[min(560px,92%)]">
           <Pill
             variant="ghost"
             className="flex-1 px-[10px] py-[13px] text-[14px]"
@@ -97,30 +105,36 @@ export function BanMenhScreen() {
           </Pill>
         </div>
 
-        <div className="shead">
-          <h2>Khám phá thêm</h2>
+        <div className="mx-[2px] mt-[26px] mb-[12px] flex items-baseline justify-between">
+          <h2 className="text-[22px] font-semibold">Khám phá thêm</h2>
         </div>
-        <div className="shorts">
-          <Link className="short glass" href="/van-han">
-            <svg viewBox="0 0 24 24" fill="none">
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            className="glass flex cursor-pointer flex-col gap-[10px] border-0 p-[18px] text-left text-ink no-underline"
+            href="/van-han"
+          >
+            <svg viewBox="0 0 24 24" fill="none" className="h-[30px] w-[30px] fill-none [stroke:var(--accent)] [stroke-width:1.4]">
               <circle cx="12" cy="12" r="9" />
               <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
               <circle cx="12" cy="12" r="2.5" />
             </svg>
             <div>
-              <b>Vận hạn</b>
+              <b className="text-base font-semibold">Vận hạn</b>
             </div>
-            <span>Tình cảm, công danh, tiền tài</span>
+            <span className="text-[12.5px] text-muted">Tình cảm, công danh, tiền tài</span>
           </Link>
-          <Link className="short glass" href="/hoi-ai">
-            <svg viewBox="0 0 24 24" fill="none">
+          <Link
+            className="glass flex cursor-pointer flex-col gap-[10px] border-0 p-[18px] text-left text-ink no-underline"
+            href="/hoi-ai"
+          >
+            <svg viewBox="0 0 24 24" fill="none" className="h-[30px] w-[30px] fill-none [stroke:var(--accent)] [stroke-width:1.4]">
               <path d="M4 6h16v10H9l-4 4V6z" />
               <path d="M9 11h6M9 8h4" />
             </svg>
             <div>
-              <b>Hỏi AI</b>
+              <b className="text-base font-semibold">Hỏi AI</b>
             </div>
-            <span>Trò chuyện cùng Nghê Sao</span>
+            <span className="text-[12.5px] text-muted">Trò chuyện cùng Nghê Sao</span>
           </Link>
         </div>
       </div>

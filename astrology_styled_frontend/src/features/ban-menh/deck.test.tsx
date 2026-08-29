@@ -113,19 +113,19 @@ describe("deck cards", () => {
         </QueryClientProvider>,
       );
 
-      const destiny = document.querySelector(".destiny");
-      expect(destiny?.querySelector(".dchip")?.textContent?.trim().length).toBeGreaterThan(1);
-      expect(destiny?.querySelector(".dmantra")?.textContent?.trim()).not.toBe("");
+      const destiny = document.querySelector('[data-testid="destiny-card"]');
+      expect(destiny?.querySelector('[data-testid="destiny-chip"]')?.textContent?.trim().length).toBeGreaterThan(1);
+      expect(destiny?.querySelector('[data-testid="destiny-mantra"]')?.textContent?.trim()).not.toBe("");
 
-      const luck = document.querySelector(".luck-card");
+      const luck = document.querySelector('[data-testid="luck-card"]');
       const luckText = luck?.textContent ?? "";
       expect(luckText).toContain("Hóa Lộc tại");
       expect(luckText).toContain("Lộc Tồn tại");
       expect(luckText).toMatch(/Tháng cát: [\d ·]+ \(âm lịch\)/);
-      expect(luck?.querySelector(".luck-orb")).not.toBeNull();
+      expect(luck?.querySelector('[data-testid="luck-orb"]')).not.toBeNull();
 
-      const advice = document.querySelector(".tarot:not(.luck-card)");
-      expect(advice?.querySelector(".key")?.textContent?.trim()).not.toBe("");
+      const advice = document.querySelector('[data-testid="advice-card"]');
+      expect(advice?.querySelector('[data-testid="advice-key"]')?.textContent?.trim()).not.toBe("");
       expect(advice?.querySelector("p")?.textContent?.trim()).not.toBe("");
 
       unmount();
@@ -138,7 +138,7 @@ describe("deck cards", () => {
         <BanMenhScreenHarness chart={chartWith(["Tử Vi", "Thiên Phủ"])} />
       </QueryClientProvider>,
     );
-    const first = document.querySelector(".dchip")?.textContent;
+    const first = document.querySelector('[data-testid="destiny-chip"]')?.textContent;
     unmount();
 
     render(
@@ -146,7 +146,7 @@ describe("deck cards", () => {
         <BanMenhScreenHarness chart={chartWith(["Thiên Phủ", "Tử Vi"])} />
       </QueryClientProvider>,
     );
-    expect(document.querySelector(".dchip")?.textContent).toBe(first);
+    expect(document.querySelector('[data-testid="destiny-chip"]')?.textContent).toBe(first);
   });
 
   it("sets --luck-hue on the Vận May card and never writes the global accent", () => {
@@ -157,7 +157,7 @@ describe("deck cards", () => {
       </QueryClientProvider>,
     );
 
-    const luckCard = document.querySelector(".luck-card") as HTMLElement;
+    const luckCard = document.querySelector('[data-testid="luck-card"]') as HTMLElement;
     // The fixture's nạp âm is Tích Lịch Hỏa → Hỏa.
     expect(luckCard.style.getPropertyValue("--luck-hue")).toBe("var(--element-hoa)");
     expect(document.documentElement.style.getPropertyValue("--accent")).toBe("");
