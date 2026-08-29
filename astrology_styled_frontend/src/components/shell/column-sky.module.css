@@ -1,0 +1,32 @@
+/* The twilight canvas behind the content column, fixed so it never scrolls
+   away. Layout is inline on the component; here is the paint and the tier
+   overrides. */
+
+.columnSky {
+  background:
+    radial-gradient(90% 60% at 50% 106%, rgba(255, 158, 125, 0.16), transparent 60%),
+    radial-gradient(
+      120% 80% at 50% -5%,
+      var(--color-bg-2),
+      var(--color-bg-1) 46%,
+      var(--color-bg-0) 100%
+    );
+}
+
+/* From the `sm` tier the column reads as a panel floating on the backdrop. */
+@media (min-width: 40rem) {
+  .columnSky {
+    box-shadow:
+      0 0 0 1px rgba(243, 239, 250, 0.07),
+      0 30px 90px rgba(8, 4, 20, 0.55);
+  }
+}
+
+/* The rail owns the left edge, so the column sky spans the whole viewport
+   and drops the panel treatment it wears at narrower widths. */
+@media (min-width: 64rem) {
+  .columnSky {
+    max-width: none;
+    box-shadow: none;
+  }
+}

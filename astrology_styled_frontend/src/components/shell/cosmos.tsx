@@ -1,5 +1,7 @@
 import { StarField } from "./star-field";
 
+import styles from "./cosmos.module.css";
+
 /**
  * The full-viewport ambient backdrop: twilight gradient, two breathing
  * nebulae, and a wide star field.
@@ -10,10 +12,10 @@ import { StarField } from "./star-field";
  */
 export function Cosmos() {
   return (
-    <div className="cosmos" aria-hidden="true">
-      <div className="neb neb-a" />
-      <div className="neb neb-b" />
-      <StarField count={70} minSize={1} maxSize={3} bright className="absolute inset-0" />
+    <div className={styles.cosmos} aria-hidden="true">
+      <div className={`${styles.neb} ${styles.nebA}`} />
+      <div className={`${styles.neb} ${styles.nebB}`} />
+      <StarField count={70} minSize={1} maxSize={3} bright dim className="absolute inset-0" />
     </div>
   );
 }

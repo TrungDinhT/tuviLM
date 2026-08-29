@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
+import styles from "./shooting-stars.module.css";
+
 interface Shot {
   readonly id: number;
   readonly sx: number;
@@ -71,7 +73,7 @@ export function ShootingStars() {
       {shots.map((shot) => (
         <i
           key={shot.id}
-          className="shooting-star"
+          className={styles.shootingStar}
           style={
             {
               "--sx": `${shot.sx.toFixed(1)}%`,

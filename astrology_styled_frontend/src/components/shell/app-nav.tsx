@@ -36,7 +36,7 @@ export function AppNav() {
     <nav
       aria-label="Điều hướng chính"
       className={[
-        "nav-surface fixed z-35",
+        "bg-[linear-gradient(0deg,rgba(18,10,36,0.82),rgba(18,10,36,0.58)_70%,rgba(18,10,36,0))] fixed z-35 border-glass-line backdrop-blur-[14px] lg:border-r lg:bg-[linear-gradient(180deg,rgba(20,12,40,0.74),rgba(14,8,30,0.88))]",
         hiddenBelowDesktop ? "hidden lg:flex" : "flex",
         // Phone / tablet: a bottom band, capped at the column width.
         "bottom-0 left-1/2 w-full max-w-[var(--col)] -translate-x-1/2 gap-0.5",

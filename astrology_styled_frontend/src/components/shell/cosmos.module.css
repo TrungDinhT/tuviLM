@@ -1,0 +1,55 @@
+/* The full-viewport ambient backdrop: twilight gradient and two breathing
+   nebulae. Star elements are seeded client-side by star-field.tsx. */
+
+.cosmos {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(80% 55% at 50% 108%, rgba(255, 158, 125, 0.22), transparent 60%),
+    radial-gradient(120% 90% at 50% 0%, #3b2063 0%, #2e1a4a 45%, #160d2c 100%);
+}
+
+.neb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  animation: breathe 12s ease-in-out infinite;
+}
+
+.nebA {
+  width: 60vmax;
+  height: 60vmax;
+  left: -10vmax;
+  top: -15vmax;
+  background: radial-gradient(circle, rgba(123, 79, 166, 0.6), transparent 60%);
+}
+
+.nebB {
+  width: 50vmax;
+  height: 50vmax;
+  right: -12vmax;
+  bottom: -10vmax;
+  background: radial-gradient(circle, rgba(79, 157, 224, 0.35), transparent 60%);
+  animation-delay: -4s;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+/* On phones the column is the whole page; the surrounding ambience only
+   costs paint time. */
+@media (max-width: 39.999rem) {
+  .neb {
+    display: none;
+  }
+}

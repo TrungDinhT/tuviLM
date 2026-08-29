@@ -23,7 +23,9 @@ export function TopBar() {
   if (screen === null) return null;
 
   return (
-    <header className="topbar-surface sticky top-0 z-30 hidden h-[var(--topbar-h)] lg:block">
+    <header
+      className="bg-[linear-gradient(180deg,rgba(28,17,54,0.78)_62%,rgba(28,17,54,0.58)_88%,rgba(28,17,54,0))] sticky top-0 z-30 hidden h-[var(--topbar-h)] border-b border-glass-line backdrop-blur-[22px] backdrop-saturate-[130%] lg:block"
+    >
       <div className="mx-auto flex h-full w-full max-w-[var(--shell)] items-center gap-[18px] px-10">
         <div>
           <div className="text-[10px] font-bold tracking-[0.24em] text-muted uppercase">

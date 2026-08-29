@@ -1,6 +1,8 @@
 import { ShootingStars } from "./shooting-stars";
 import { StarField } from "./star-field";
 
+import styles from "./column-sky.module.css";
+
 /**
  * The twilight canvas sitting directly behind the content column.
  *
@@ -11,7 +13,10 @@ import { StarField } from "./star-field";
  */
 export function ColumnSky() {
   return (
-    <div className="column-sky" aria-hidden="true">
+    <div
+      className={`fixed top-0 bottom-0 left-1/2 z-0 w-full max-w-[var(--col)] -translate-x-1/2 overflow-hidden pointer-events-none ${styles.columnSky}`}
+      aria-hidden="true"
+    >
       <StarField count={46} minSize={1} maxSize={2.6} className="absolute inset-0" />
       <ShootingStars />
     </div>

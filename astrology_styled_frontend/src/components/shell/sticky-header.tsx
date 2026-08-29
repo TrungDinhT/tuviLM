@@ -35,7 +35,7 @@ export function StickyHeader({
   return (
     <div
       className={[
-        "stickhead-surface sticky top-[var(--topbar-h)] z-14 mb-3 lg:hidden",
+        "bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-bg-2)_70%,transparent)_58%,color-mix(in_srgb,var(--color-bg-2)_38%,transparent)_82%,transparent)] sticky top-[var(--topbar-h)] z-14 mb-3 backdrop-blur-[22px] backdrop-saturate-[135%] lg:hidden",
         "-mt-[calc(10px+var(--safe-t))] -mx-[22px] px-[22px]",
         "pt-[calc(12px+var(--safe-t))] pb-3",
         "md:-mx-[30px] md:px-[30px]",

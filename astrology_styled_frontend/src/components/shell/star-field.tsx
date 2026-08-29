@@ -3,6 +3,9 @@
 import { useMemo } from "react";
 
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
+import { cn } from "@/lib/utils";
+
+import styles from "./star-field.module.css";
 
 interface Star {
   readonly size: number;
@@ -51,12 +54,15 @@ export function StarField({
   minSize,
   maxSize,
   bright = false,
+  dim = false,
   className,
 }: {
   count: number;
   minSize: number;
   maxSize: number;
   bright?: boolean;
+  /** Dim the stars on phones — used by the outer Cosmos field only. */
+  dim?: boolean;
   className?: string;
 }) {
   const hydrated = useIsHydrated();
@@ -66,11 +72,11 @@ export function StarField({
   );
 
   return (
-    <div className={className} aria-hidden="true">
+    <div className={cn(className, dim && styles.dim)} aria-hidden="true">
       {stars.map((star, i) => (
         <span
           key={i}
-          className={bright ? "sky-star sky-star-bright" : "sky-star"}
+          className={cn("absolute rounded-full bg-ink", styles.skyStar, bright && styles.skyStarBright)}
           style={
             {
               width: `${star.size.toFixed(1)}px`,
