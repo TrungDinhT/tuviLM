@@ -161,7 +161,10 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(function T
         >
           {/* Face, rings and ticks */}
           <div aria-hidden="true" className={`${styles.clockFace} absolute inset-0 rounded-full`} />
-          <div aria-hidden="true" className={`${styles.clockTicks} pointer-events-none absolute inset-[4px] rounded-full`} />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-[4px] rounded-full bg-[repeating-conic-gradient(from_-1deg,rgba(243,239,250,0.34)_0_1.5deg,transparent_1.5deg_30deg)] [mask:radial-gradient(circle,transparent_0_88%,#000_88%_94%,transparent_94%)]"
+          />
 
           {/* Hand */}
           <div
@@ -191,7 +194,11 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(function T
                   "pointer-events-none absolute z-4 flex h-[34px] w-[34px] -translate-x-1/2 -translate-y-1/2",
                   "items-center justify-center rounded-full font-display text-[13px] font-semibold text-muted",
                   "transition-[color,background,box-shadow,transform] duration-200",
-                  active && cn(styles.clockPosOn, "scale-[1.08]"),
+                  active &&
+                    cn(
+                      "bg-[linear-gradient(135deg,var(--accent-2),var(--accent))] text-bg-0 shadow-[0_0_16px_var(--accent-glow)]",
+                      "scale-[1.08]",
+                    ),
                 )}
               >
                 {position === 0 ? 12 : position}
@@ -202,7 +209,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(function T
           {/* Pin + readout */}
           <span
             aria-hidden="true"
-            className={`${styles.clockPin} pointer-events-none absolute top-1/2 left-1/2 z-5 h-[12px] w-[12px] -translate-x-1/2 -translate-y-1/2 rounded-full`}
+            className="pointer-events-none absolute top-1/2 left-1/2 z-5 h-[12px] w-[12px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-bg-2 bg-accent shadow-[0_0_13px_var(--accent-glow)]"
           />
           <span
             aria-hidden="true"

@@ -1,16 +1,13 @@
 /* Drifting, twinkling stars. Each star gets its own drift distance, period
    and phase from the seeding effect, so the sky actually moves rather than
    blinking in place. `translate` rather than `transform` keeps it clear of any
-   other transform. */
+   other transform. The star's shape and the bright glow are inline utilities
+   on star-field.tsx. */
 
 .skyStar {
   animation:
     twinkle var(--twinkle, 4s) ease-in-out infinite,
     drift var(--drift, 44s) ease-in-out infinite alternate;
-}
-
-.skyStarBright {
-  box-shadow: 0 0 6px rgba(243, 239, 250, 0.6);
 }
 
 @keyframes twinkle {

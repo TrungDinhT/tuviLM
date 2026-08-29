@@ -67,7 +67,7 @@ export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
         </div>
         <div
           data-testid="destiny-chip"
-          className={`${cardStyles.dchip} mt-[14px] inline-flex items-center gap-2 self-start rounded-full px-[14px] py-[7px] text-[12.5px] font-semibold text-ink`}
+          className="mt-[14px] inline-flex items-center gap-2 self-start rounded-full border bg-[rgba(255,255,255,0.05)] px-[14px] py-[7px] text-[12.5px] font-semibold text-ink [border-color:color-mix(in_srgb,var(--accent)_52%,transparent)]"
         >
           <i className="not-italic text-accent">✦</i> {entry.archetype}
         </div>
@@ -95,7 +95,7 @@ export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
         </div>
         <div
           data-testid="destiny-mantra"
-          className={`${cardStyles.dmantra} pt-[14px] font-display text-[15px] leading-[1.42] italic md:text-[17px]`}
+          className="border-t pt-[14px] font-display text-[15px] leading-[1.42] italic [border-top-color:color-mix(in_srgb,var(--accent)_22%,transparent)] md:text-[17px]"
         >
           {entry.mantra}
         </div>

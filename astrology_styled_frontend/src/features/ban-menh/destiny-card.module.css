@@ -1,6 +1,6 @@
-/* The Lá Bài Bản Mệnh (main card) paint. Layout is inline; here is the
-   layered background, the tinted border/glow, the chip, the mantra divider,
-   and the entrance animation. */
+/* The Lá Bài Bản Mệnh (main card) layered background and entrance. The chip
+   and mantra divider are inline utilities on destiny-card.tsx; the background
+   stays here because it stacks a `url()` image layer with colour gradients. */
 
 .destiny {
   background:
@@ -13,15 +13,6 @@
     0 34px 92px rgba(12, 6, 28, 0.7),
     0 0 60px color-mix(in srgb, var(--accent) 26%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-
-.dchip {
-  border: 1px solid color-mix(in srgb, var(--accent) 52%, transparent);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.dmantra {
-  border-top: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 .reveal {

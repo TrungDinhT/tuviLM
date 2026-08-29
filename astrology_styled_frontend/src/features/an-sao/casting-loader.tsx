@@ -78,9 +78,9 @@ export function CastingLoader() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-[26px] p-10">
       <div className="relative h-[190px] w-[190px]">
-        <div className={`${styles.orbitRing} ${styles.spin22} absolute inset-0 rounded-full`} />
-        <div className={`${styles.orbitRing} ${styles.spin14} absolute inset-[22px] rounded-full border-dashed`} />
-        <div className={`${styles.orbitPlanet} ${styles.spin6} absolute top-[-4px] left-1/2 ml-[-6px] h-[12px] w-[12px] rounded-full`} />
+        <div className={`${styles.spin22} absolute inset-0 rounded-full border border-accent-glow opacity-40`} />
+        <div className={`${styles.spin14} absolute inset-[22px] rounded-full border border-accent-glow border-dashed opacity-40`} />
+        <div className={`${styles.spin6} absolute top-[-4px] left-1/2 ml-[-6px] h-[12px] w-[12px] origin-[50%_99px] rounded-full bg-accent shadow-[0_0_16px_var(--accent-glow)]`} />
         <div className="absolute inset-0 grid place-items-center">
           {showCrane ? (
             <video

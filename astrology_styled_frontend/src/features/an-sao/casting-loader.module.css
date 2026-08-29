@@ -1,15 +1,5 @@
-/* The casting loader's orbit rings and loading dots. */
-
-.orbitRing {
-  border: 1px solid var(--accent-glow);
-  opacity: 0.4;
-}
-
-.orbitPlanet {
-  background: var(--accent);
-  box-shadow: 0 0 16px var(--accent-glow);
-  transform-origin: 50% 99px;
-}
+/* The casting loader's orbit spin and loading dots. The orbit rings and the
+   planet's paint are inline utilities on casting-loader.tsx. */
 
 .spin22 {
   animation: spin 22s linear infinite reverse;

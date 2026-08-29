@@ -76,7 +76,11 @@ export function StarField({
       {stars.map((star, i) => (
         <span
           key={i}
-          className={cn("absolute rounded-full bg-ink", styles.skyStar, bright && styles.skyStarBright)}
+          className={cn(
+            "absolute rounded-full bg-ink",
+            styles.skyStar,
+            bright && "shadow-[0_0_6px_rgba(243,239,250,0.6)]",
+          )}
           style={
             {
               width: `${star.size.toFixed(1)}px`,

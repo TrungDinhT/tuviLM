@@ -33,7 +33,7 @@ export function AdviceCard({ chart }: { chart: BuildLasoResponse }) {
       </div>
       <div className={deckStyles.cardFace}>
         <div className="relative z-1 flex items-center gap-[10px]">
-          <span className={`${tarotStyles.g} grid h-8 w-8 place-items-center rounded-[10px]`}>
+          <span className="grid h-8 w-8 place-items-center rounded-[10px] border bg-[color-mix(in_srgb,var(--t-hue)_18%,transparent)] [border-color:color-mix(in_srgb,var(--t-hue)_45%,transparent)]">
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 fill-none [stroke:var(--t-hue)] [stroke-width:1.6]">
               <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5z" />
             </svg>
@@ -52,9 +52,7 @@ export function AdviceCard({ chart }: { chart: BuildLasoResponse }) {
         <p className="relative z-1 mt-[10px] text-xs leading-[1.55] font-light text-muted lg:max-w-[64ch]">
           {entry.advice}
         </p>
-        <span
-          className={`${tarotStyles.tag} relative z-1 mt-auto self-start rounded-full px-3 py-[6px] text-[11px] font-medium [color:var(--t-hue)] lg:mt-[14px]`}
-        >
+        <span className="relative z-1 mt-auto self-start rounded-full border bg-[color-mix(in_srgb,var(--t-hue)_10%,transparent)] px-3 py-[6px] text-[11px] font-medium [border-color:color-mix(in_srgb,var(--t-hue)_40%,transparent)] [color:var(--t-hue)] lg:mt-[14px]">
           ✦ {chart.menh_cuc_relation_label} · {polarityLabel}
         </span>
       </div>

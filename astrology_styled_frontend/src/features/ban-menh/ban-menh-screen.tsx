@@ -17,7 +17,6 @@ import { AdviceCard } from "./advice-card";
 import deckStyles from "./deck.module.css";
 import { DestinyCard } from "./destiny-card";
 import { LuckCard } from "./luck-card";
-import screenStyles from "./ban-menh-screen.module.css";
 import { displayStarName, menhChinhTinh } from "./selectors";
 
 const COMING_SOON = "Tính năng sẽ sớm được cập nhật ✦";
@@ -57,9 +56,7 @@ export function BanMenhScreen() {
             {hydrated ? greeting() : "Chào bạn"}
           </div>
           <div className="flex flex-none flex-col items-end gap-[9px]">
-            <span
-              className={`${screenStyles.elBadge} inline-flex items-center gap-2 rounded-full border border-accent-glow px-[14px] py-[6px] text-[13px] font-semibold text-accent`}
-            >
+            <span className="inline-flex items-center gap-2 rounded-full border border-accent-glow bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] px-[14px] py-[6px] text-[13px] font-semibold text-accent">
               <span className="h-[9px] w-[9px] rounded-full bg-accent shadow-[0_0_10px_var(--accent-glow)]" />
               {badge}
             </span>

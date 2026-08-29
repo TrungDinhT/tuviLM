@@ -8,7 +8,6 @@ import { thangCatFor } from "@/content/thang-cat";
 import type { BuildLasoResponse } from "@/lib/api/schemas";
 
 import deckStyles from "./deck.module.css";
-import luckStyles from "./luck-card.module.css";
 import { cungRoleHolding } from "./selectors";
 import tarotStyles from "./tarot.module.css";
 
@@ -46,7 +45,7 @@ export function LuckCard({ chart }: { chart: BuildLasoResponse }) {
       </div>
       <div className={deckStyles.cardFace}>
         <div className="relative z-1 flex items-center gap-[10px]">
-          <span className={`${tarotStyles.g} grid h-8 w-8 place-items-center rounded-[10px]`}>
+          <span className="grid h-8 w-8 place-items-center rounded-[10px] border bg-[color-mix(in_srgb,var(--t-hue)_18%,transparent)] [border-color:color-mix(in_srgb,var(--t-hue)_45%,transparent)]">
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 fill-none [stroke:var(--t-hue)] [stroke-width:1.6]">
               <path d="M12 3l2.4 5.3L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.6-.7z" />
             </svg>
@@ -72,12 +71,10 @@ export function LuckCard({ chart }: { chart: BuildLasoResponse }) {
             {locRoleBlurb(loc.role ?? "")}
           </p>
         ))}
-        <div
-          className={`${luckStyles.luckRow} relative z-1 mt-3 flex items-center gap-[11px] rounded-full py-2 pl-[9px] pr-[14px] text-[13px] text-muted`}
-        >
+        <div className="relative z-1 mt-3 flex items-center gap-[11px] rounded-full border border-glass-line bg-[rgba(255,255,255,0.055)] py-2 pl-[9px] pr-[14px] text-[13px] text-muted">
           <span
             data-testid="luck-orb"
-            className={`${luckStyles.luckOrb} h-[26px] w-[26px] shrink-0 rounded-full`}
+            className="h-[26px] w-[26px] shrink-0 rounded-full bg-[radial-gradient(circle_at_34%_28%,#ffffff,color-mix(in_srgb,var(--luck-hue)_55%,#ffffff)_26%,var(--luck-hue)_70%,color-mix(in_srgb,var(--luck-hue)_60%,#000000)_100%)] shadow-[0_0_14px_color-mix(in_srgb,var(--luck-hue)_55%,transparent),inset_0_-2px_5px_rgba(0,0,0,0.35)]"
             aria-hidden="true"
           />
           Màu may mắn<b className="ml-auto text-[14px] font-semibold text-ink">{luck.name}</b>
@@ -85,9 +82,7 @@ export function LuckCard({ chart }: { chart: BuildLasoResponse }) {
         <p className="relative z-1 mt-[10px] text-xs leading-[1.55] font-light text-muted lg:max-w-[64ch]">
           Theo nạp âm bản mệnh <b className="font-semibold text-ink">{chart.ban_menh_name}</b>.
         </p>
-        <span
-          className={`${tarotStyles.tag} relative z-1 mt-auto self-start rounded-full px-3 py-[6px] text-[11px] font-medium [color:var(--t-hue)] lg:mt-[14px]`}
-        >
+        <span className="relative z-1 mt-auto self-start rounded-full border bg-[color-mix(in_srgb,var(--t-hue)_10%,transparent)] px-3 py-[6px] text-[11px] font-medium [border-color:color-mix(in_srgb,var(--t-hue)_40%,transparent)] [color:var(--t-hue)] lg:mt-[14px]">
           ✦ Tháng cát: {months.join(" · ")} (âm lịch)
         </span>
       </div>

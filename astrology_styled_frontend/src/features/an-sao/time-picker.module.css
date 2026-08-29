@@ -1,5 +1,7 @@
-/* The birth-time clock face — the gradients, rings, ticks, hand, and pin, plus
-   the missing-input pulse. Layout is inline on time-picker.tsx. */
+/* The birth-time clock face — the gradients, rings, hand, and pin, plus the
+   missing-input pulse. The ticks, selected-hour badge, and pin paint are
+   inline utilities on time-picker.tsx; here is what cannot be inline (the
+   face and hand pseudo-elements, and the pulse animation). */
 
 .clockFace {
   background:
@@ -33,15 +35,6 @@
   border: 1px solid rgba(243, 239, 250, 0.08);
 }
 
-.clockTicks {
-  background: repeating-conic-gradient(
-    from -1deg,
-    rgba(243, 239, 250, 0.34) 0 1.5deg,
-    transparent 1.5deg 30deg
-  );
-  mask: radial-gradient(circle, transparent 0 88%, #000 88% 94%, transparent 94%);
-}
-
 .clockHand {
   background: linear-gradient(to top, var(--accent), var(--accent-2));
   box-shadow: 0 0 9px var(--accent-glow);
@@ -58,18 +51,6 @@
   transform: translateX(-50%);
   background: var(--accent-2);
   box-shadow: 0 0 10px var(--accent-glow);
-}
-
-.clockPin {
-  background: var(--accent);
-  border: 3px solid var(--color-bg-2);
-  box-shadow: 0 0 13px var(--accent-glow);
-}
-
-.clockPosOn {
-  color: var(--color-bg-0);
-  background: linear-gradient(135deg, var(--accent-2), var(--accent));
-  box-shadow: 0 0 16px var(--accent-glow);
 }
 
 /* The missing-input pulse; replayed by remounting the ring element. */

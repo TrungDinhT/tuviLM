@@ -9,8 +9,6 @@ import type { ChartProfile } from "@/lib/api/schemas";
 import { describe, isApiError } from "@/lib/http/errors";
 import { useToastStore } from "@/store/toast-store";
 
-import styles from "./saved-chart-card.module.css";
-
 /** The profile's own stored birth data, formatted for display — not a reading. */
 function dateLabel(profile: ChartProfile): string {
   const { year, month, day } = profile.birth_info;
@@ -40,10 +38,10 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
   };
 
   return (
-    <div className={`${styles.savecard} relative flex-[0_0_130px] rounded-[20px] border border-accent-glow p-4 lg:flex-none`}>
+    <div className="relative flex-[0_0_130px] rounded-[20px] border border-accent-glow bg-[linear-gradient(160deg,color-mix(in_srgb,var(--accent)_18%,transparent),rgba(46,26,74,0.5))] p-4 lg:flex-none">
       <button
         type="button"
-        className={`${styles.savecardDelete} absolute top-[10px] right-[10px] grid h-6 w-6 cursor-pointer place-items-center rounded-full border border-glass-line text-muted`}
+        className="absolute top-[10px] right-[10px] grid h-6 w-6 cursor-pointer place-items-center rounded-full border border-glass-line bg-white/6 text-muted"
         aria-label={`Xoá lá số ${profile.display_name}`}
         onClick={() => setOpen(true)}
       >

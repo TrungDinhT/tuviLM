@@ -1,5 +1,0 @@
-/* The screen headline hành badge. Layout is inline; here is the tint. */
-
-.elBadge {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-}
