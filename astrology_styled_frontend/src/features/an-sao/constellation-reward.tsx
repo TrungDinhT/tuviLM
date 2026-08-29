@@ -7,6 +7,7 @@ import {
   ConstellationGradientDefs,
   ConstellationShape,
 } from "@/components/shared/constellation-art";
+import styles from "@/components/shared/constellation-art.module.css";
 import { STAR_SHAPES } from "@/content/star-shapes";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +52,7 @@ export function ConstellationReward({ stars, names }: ConstellationRewardProps) 
       : [[92, 16, 136, 66]];
 
   return (
-    <div className={cn("relative mt-[6px] mb-[2px] h-[154px]", lit && "constel-lit")} aria-hidden="true">
+    <div className={cn("relative mt-[6px] mb-[2px] h-[154px]", lit && styles.constelLit)} aria-hidden="true">
       <svg
         viewBox="0 0 320 100"
         preserveAspectRatio="xMidYMid meet"
@@ -71,7 +72,7 @@ export function ConstellationReward({ stars, names }: ConstellationRewardProps) 
           CONSTELLATION_SCATTER.map(([cx, cy], index) => (
             <circle
               key={index}
-              className={cn("constel-node", lit && stars.length === 0 && "constel-node-neutral")}
+              className={cn(styles.constelNode, lit && stars.length === 0 && styles.constelNodeNeutral)}
               cx={cx}
               cy={cy}
               r="2.4"

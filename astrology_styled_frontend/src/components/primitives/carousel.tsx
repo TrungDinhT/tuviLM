@@ -20,8 +20,8 @@ import { cn } from "@/lib/utils";
  * tracks the active item (dots, z-index) and writes the `--card-focus`
  * fallback variable for browsers without `animation-timeline: view()`.
  *
- * The primitive ships structure and mechanics (`.carousel`, `.carousel-item`
- * in globals.css); skins like `.deck` supply sizing and effects.
+ * The primitive ships structure and mechanics (inline scroll-snap utilities);
+ * skins like `.deck` supply sizing and effects.
  */
 
 /**
@@ -90,7 +90,10 @@ export function CarouselContent({
   };
 
   return (
-    <div className={cn("carousel", className)} onScroll={(event) => trackActive(event.currentTarget)}>
+    <div
+      className={cn("flex snap-x snap-mandatory overflow-x-auto", className)}
+      onScroll={(event) => trackActive(event.currentTarget)}
+    >
       {children}
     </div>
   );
@@ -119,7 +122,7 @@ export function CarouselItem({
     <div
       role="group"
       aria-roledescription="slide"
-      className={cn("carousel-item", index === active && "is-active", className)}
+      className={cn("shrink-0 snap-center", index === active && "is-active", className)}
       style={
         {
           "--card-focus": initialFocus,

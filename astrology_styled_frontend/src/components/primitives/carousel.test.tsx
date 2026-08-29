@@ -26,7 +26,7 @@ describe("Carousel", () => {
   it("opens with the first item active and one dot per item", () => {
     const { container } = renderCarousel();
 
-    const items = container.querySelectorAll(".carousel-item");
+    const items = container.querySelectorAll('[aria-roledescription="slide"]');
     expect(items).toHaveLength(3);
     expect(items[0]?.className).toContain("is-active");
     expect(items[1]?.className).not.toContain("is-active");
@@ -40,7 +40,7 @@ describe("Carousel", () => {
   it("gives every item its focus plumbing: initial var and a named view timeline", () => {
     const { container } = renderCarousel();
 
-    const items = container.querySelectorAll<HTMLElement>(".carousel-item");
+    const items = container.querySelectorAll<HTMLElement>('[aria-roledescription="slide"]');
     expect(items[0]?.style.getPropertyValue("--card-focus")).toBe("1");
     expect(items[1]?.style.getPropertyValue("--card-focus")).toBe("0");
 

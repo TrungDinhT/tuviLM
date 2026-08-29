@@ -2,11 +2,13 @@
 
 import type { StarShape } from "@/content/star-shapes";
 
+import styles from "./constellation-art.module.css";
+
 /**
  * The constellation line-art renderer shared by every screen that draws a
  * StarShape — the An sao reward and the Bản mệnh main card. Styling comes
- * from the `constel-*` rules in globals.css; the parent adds `constel-lit`
- * to trigger the draw-in.
+ * from the `constel-*` classes in constellation-art.module.css; the parent
+ * adds `styles.constelLit` to trigger the draw-in.
  *
  * Both consumers render inside their own `<svg>` with their own viewBox —
  * this module supplies the pieces, not the frame.
@@ -31,8 +33,8 @@ export function ConstellationGradientDefs({ id }: { id: string }) {
   return (
     <defs>
       <linearGradient id={id} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="320" y2="0">
-        <stop offset="0" className="constel-stop-a" />
-        <stop offset="1" className="constel-stop-b" />
+        <stop offset="0" className={styles.constelStopA} />
+        <stop offset="1" className={styles.constelStopB} />
       </linearGradient>
     </defs>
   );
@@ -61,7 +63,7 @@ export function ConstellationShape({
         return (
           <line
             key={`${a}-${b}`}
-            className="constel-line"
+            className={styles.constelLine}
             style={{ stroke: `url(#${gradientId})` }}
             x1={x1.toFixed(1)}
             y1={y1.toFixed(1)}
@@ -75,7 +77,7 @@ export function ConstellationShape({
         return (
           <circle
             key={index}
-            className="constel-node"
+            className={styles.constelNode}
             style={{ fill: `url(#${gradientId})` }}
             cx={cx.toFixed(1)}
             cy={cy.toFixed(1)}
