@@ -5,6 +5,7 @@ import { forwardRef, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 import { type Meridiem, canhGioOf } from "./birth-time";
+import styles from "./time-picker.module.css";
 
 /** Positions on the face; each step is 30°. */
 const POSITIONS = 12;
@@ -35,8 +36,8 @@ interface TimePickerProps {
  * There is no minute face — see `birth-time.ts` for why the hour alone decides
  * the reading. The AM/PM toggle sits above, in the parent.
  *
- * Complex surfaces live in globals.css (`clock-face` and friends) — here there
- * is only layout and state.
+ * Complex surfaces live in time-picker.module.css (`clockFace` and friends) —
+ * here there is only layout and state.
  */
 export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(function TimePicker(
   { value, meridiem, onChange, pulseKey },
@@ -101,7 +102,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(function T
           <span
             key={pulseKey}
             aria-hidden="true"
-            className="need-ring pointer-events-none absolute inset-0 z-10 mx-auto aspect-square w-[min(218px,66vw)] rounded-full"
+            className={`${styles.needRing} pointer-events-none absolute inset-0 z-10 mx-auto aspect-square w-[min(218px,66vw)] rounded-full`}
           />
         ) : null}
 
@@ -159,15 +160,15 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(function T
           )}
         >
           {/* Face, rings and ticks */}
-          <div aria-hidden="true" className="clock-face absolute inset-0 rounded-full" />
-          <div aria-hidden="true" className="clock-ticks pointer-events-none absolute inset-[4px] rounded-full" />
+          <div aria-hidden="true" className={`${styles.clockFace} absolute inset-0 rounded-full`} />
+          <div aria-hidden="true" className={`${styles.clockTicks} pointer-events-none absolute inset-[4px] rounded-full`} />
 
           {/* Hand */}
           <div
             aria-hidden="true"
             style={{ transform: `rotate(${handAngle}deg)` }}
             className={cn(
-              "clock-hand pointer-events-none absolute bottom-1/2 left-[calc(50%-1px)] z-2 h-[31%] w-[2px] origin-bottom rounded-sm",
+              `${styles.clockHand} pointer-events-none absolute bottom-1/2 left-[calc(50%-1px)] z-2 h-[31%] w-[2px] origin-bottom rounded-sm`,
               dragging
                 ? "transition-none"
                 : "transition-[transform,opacity] duration-[240ms] ease-[cubic-bezier(.2,.8,.2,1)]",
@@ -190,7 +191,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(function T
                   "pointer-events-none absolute z-4 flex h-[34px] w-[34px] -translate-x-1/2 -translate-y-1/2",
                   "items-center justify-center rounded-full font-display text-[13px] font-semibold text-muted",
                   "transition-[color,background,box-shadow,transform] duration-200",
-                  active && "clock-pos-on scale-[1.08]",
+                  active && cn(styles.clockPosOn, "scale-[1.08]"),
                 )}
               >
                 {position === 0 ? 12 : position}
@@ -201,7 +202,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(function T
           {/* Pin + readout */}
           <span
             aria-hidden="true"
-            className="clock-pin pointer-events-none absolute top-1/2 left-1/2 z-5 h-[12px] w-[12px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            className={`${styles.clockPin} pointer-events-none absolute top-1/2 left-1/2 z-5 h-[12px] w-[12px] -translate-x-1/2 -translate-y-1/2 rounded-full`}
           />
           <span
             aria-hidden="true"

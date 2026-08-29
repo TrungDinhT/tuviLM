@@ -6,6 +6,7 @@ import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
 import { CRANE_LOADING_SRC } from "./loading-video";
+import styles from "./casting-loader.module.css";
 
 const LOAD_SUBS = [
   "Nghê Sao đang đọc vị trí các vì tinh tú…",
@@ -77,9 +78,9 @@ export function CastingLoader() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-[26px] p-10">
       <div className="relative h-[190px] w-[190px]">
-        <div className="orbit-ring absolute inset-0 animate-[spin_22s_linear_infinite_reverse] rounded-full" />
-        <div className="orbit-ring absolute inset-[22px] animate-[spin_14s_linear_infinite] rounded-full border-dashed" />
-        <div className="orbit-planet absolute top-[-4px] left-1/2 ml-[-6px] h-[12px] w-[12px] animate-[spin_6s_linear_infinite] rounded-full" />
+        <div className={`${styles.orbitRing} ${styles.spin22} absolute inset-0 rounded-full`} />
+        <div className={`${styles.orbitRing} ${styles.spin14} absolute inset-[22px] rounded-full border-dashed`} />
+        <div className={`${styles.orbitPlanet} ${styles.spin6} absolute top-[-4px] left-1/2 ml-[-6px] h-[12px] w-[12px] rounded-full`} />
         <div className="absolute inset-0 grid place-items-center">
           {showCrane ? (
             <video
@@ -100,7 +101,7 @@ export function CastingLoader() {
       <div className="text-center">
         <div className="font-display text-[26px] font-medium">
           đang luận giải
-          <span className="load-dots">
+          <span className={styles.loadDots}>
             <span>.</span>
             <span>.</span>
             <span>.</span>

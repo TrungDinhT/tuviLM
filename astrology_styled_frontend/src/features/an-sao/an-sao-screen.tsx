@@ -27,6 +27,7 @@ import { outcomeFromChart } from "./outcome";
 import { SegmentedControl } from "./segmented-control";
 import { TimePicker } from "./time-picker";
 import { WheelPicker } from "./wheel-picker";
+import wheelStyles from "./wheel-picker.module.css";
 
 /** The loading interlude's floor, from the design. */
 const MIN_LOADING_MS = 2600;
@@ -175,7 +176,7 @@ export function AnSaoScreen() {
         <div className="relative grid grid-cols-[1fr_1fr_1.15fr] gap-[10px]">
           <div
             aria-hidden="true"
-            className="dial-band pointer-events-none absolute right-[6px] bottom-[55px] left-[6px] z-2 h-[46px] rounded-[14px]"
+            className={`${wheelStyles.dialBand} pointer-events-none absolute right-[6px] bottom-[55px] left-[6px] z-2 h-[46px] rounded-[14px]`}
           />
           <WheelPicker
             label="Ngày"

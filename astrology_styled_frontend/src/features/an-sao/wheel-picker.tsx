@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
+import styles from "./wheel-picker.module.css";
+
 /** One option's height; the spacers center the first/last option. Keep in
  * sync with the classes below. */
 const ROW_PX = 46;
@@ -67,7 +69,7 @@ export function WheelPicker({ label, min, max, value, onChange, pad = false }: W
         role="listbox"
         aria-label={label}
         aria-activedescendant={`picker-${label}-${value}`}
-        className="picker-mask h-[156px] snap-y snap-mandatory overflow-y-scroll"
+        className={`${styles.pickerMask} h-[156px] snap-y snap-mandatory overflow-y-scroll`}
       >
         <div style={{ height: SPACER_PX }} aria-hidden="true" />
         {options.map((option) => (
@@ -85,7 +87,7 @@ export function WheelPicker({ label, min, max, value, onChange, pad = false }: W
             className={cn(
               "flex snap-center items-center justify-center font-display text-[24px] font-medium",
               "cursor-pointer text-muted transition-[color,transform] duration-200",
-              option === value && "picker-sel scale-[1.06]",
+              option === value && cn(styles.pickerSel, "scale-[1.06]"),
             )}
             style={{ height: ROW_PX }}
           >
