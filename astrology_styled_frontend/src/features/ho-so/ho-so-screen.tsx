@@ -19,14 +19,14 @@ export function HoSoScreen() {
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-x-[30px]">
       <div>
-        <div className="shead">
-          <h2>Lá số đã lưu</h2>
+        <div className="mx-[2px] mt-[26px] mb-[12px] flex items-baseline justify-between">
+          <h2 className="text-[22px] font-semibold">Lá số đã lưu</h2>
         </div>
         {renderSaved()}
       </div>
       <div>
-        <div className="shead">
-          <h2>Cài đặt</h2>
+        <div className="mx-[2px] mt-[26px] mb-[12px] flex items-baseline justify-between">
+          <h2 className="text-[22px] font-semibold">Cài đặt</h2>
         </div>
         <SettingsList />
       </div>
@@ -60,7 +60,7 @@ export function HoSoScreen() {
       return <p className="text-[13.5px] text-muted">Chưa có lá số nào được lưu.</p>;
     }
     return (
-      <div className="saved">
+      <div className="flex gap-3 overflow-x-auto py-1 lg:grid lg:grid-cols-3 lg:gap-[14px] lg:overflow-visible">
         {data.chart_profiles.map((profile) => (
           <SavedChartCard key={profile.id} profile={profile} />
         ))}

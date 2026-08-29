@@ -9,6 +9,8 @@ import type { ChartProfile } from "@/lib/api/schemas";
 import { describe, isApiError } from "@/lib/http/errors";
 import { useToastStore } from "@/store/toast-store";
 
+import styles from "./saved-chart-card.module.css";
+
 /** The profile's own stored birth data, formatted for display — not a reading. */
 function dateLabel(profile: ChartProfile): string {
   const { year, month, day } = profile.birth_info;
@@ -38,19 +40,21 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
   };
 
   return (
-    <div className="savecard">
+    <div className={`${styles.savecard} relative flex-[0_0_130px] rounded-[20px] border border-accent-glow p-4 lg:flex-none`}>
       <button
         type="button"
-        className="savecard-delete"
+        className={`${styles.savecardDelete} absolute top-[10px] right-[10px] grid h-6 w-6 cursor-pointer place-items-center rounded-full border border-glass-line text-muted`}
         aria-label={`Xoá lá số ${profile.display_name}`}
         onClick={() => setOpen(true)}
       >
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-[13px] w-[13px] fill-none stroke-current [stroke-width:1.5]">
           <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M10 11v6M14 11v6" />
         </svg>
       </button>
-      <span className="dt">{dateLabel(profile)}</span>
-      <b>{profile.display_name}</b>
+      <span className="text-[11px] text-muted">{dateLabel(profile)}</span>
+      <b className="mt-2 block pr-[22px] font-display text-[17px] leading-[1.15] font-semibold">
+        {profile.display_name}
+      </b>
 
       <Dialog
         open={open}
