@@ -3,16 +3,19 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
 /**
- * Colour values belong in `src/app/globals.css` and nowhere else. A rule that
- * only lives in AGENTS.md gets violated within a few screens, so it is
- * enforced here instead.
+ * Colour values belong in CSS: `src/app/globals.css` tokens, a component's
+ * co-located `*.module.css`, or a Tailwind arbitrary value in a `className`
+ * (a className string *is* CSS, so `bg-[...rgba(...)...]` is fine).
  *
- * The escape hatch is a `// eslint-disable-next-line no-restricted-syntax`
- * with a comment saying why — there is exactly one legitimate case today
- * (the `theme-color` meta tag, which cannot read a CSS variable).
+ * The one place they must never appear is an inline `style={{...}}` object —
+ * inline styles bypass the token/utility system entirely. A rule that only
+ * lives in AGENTS.md gets violated within a few screens, so it is enforced
+ * here instead.
  */
 const COLOUR_LITERAL = String.raw`#[0-9a-fA-F]{3,8}\b`;
 const COLOUR_FUNCTION = String.raw`\b(?:rgba?|hsla?|oklch|lab|lch|color-mix)\(`;
+
+const INLINE_STYLE = "JSXAttribute[name.name='style']";
 
 const noColourLiterals = {
   files: ["src/**/*.{ts,tsx}"],
@@ -20,24 +23,24 @@ const noColourLiterals = {
     "no-restricted-syntax": [
       "error",
       {
-        selector: `Literal[value=/${COLOUR_LITERAL}/]`,
+        selector: `${INLINE_STYLE} Literal[value=/${COLOUR_LITERAL}/]`,
         message:
-          "Colour literals belong in src/app/globals.css. Use a token-backed Tailwind utility or a CSS custom property.",
+          "Colour literals don't belong in an inline style prop. Use a token-backed utility, an arbitrary value in className, or a co-located *.module.css.",
       },
       {
-        selector: `Literal[value=/${COLOUR_FUNCTION}/]`,
+        selector: `${INLINE_STYLE} Literal[value=/${COLOUR_FUNCTION}/]`,
         message:
-          "Colour functions belong in src/app/globals.css. Use a token-backed Tailwind utility or a CSS custom property.",
+          "Colour functions don't belong in an inline style prop. Use a token-backed utility, an arbitrary value in className, or a co-located *.module.css.",
       },
       {
-        selector: `TemplateElement[value.raw=/${COLOUR_LITERAL}/]`,
+        selector: `${INLINE_STYLE} TemplateElement[value.raw=/${COLOUR_LITERAL}/]`,
         message:
-          "Colour literals belong in src/app/globals.css. Use a token-backed Tailwind utility or a CSS custom property.",
+          "Colour literals don't belong in an inline style prop. Use a token-backed utility, an arbitrary value in className, or a co-located *.module.css.",
       },
       {
-        selector: `TemplateElement[value.raw=/${COLOUR_FUNCTION}/]`,
+        selector: `${INLINE_STYLE} TemplateElement[value.raw=/${COLOUR_FUNCTION}/]`,
         message:
-          "Colour functions belong in src/app/globals.css. Use a token-backed Tailwind utility or a CSS custom property.",
+          "Colour functions don't belong in an inline style prop. Use a token-backed utility, an arbitrary value in className, or a co-located *.module.css.",
       },
     ],
   },

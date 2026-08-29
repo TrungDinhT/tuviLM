@@ -22,10 +22,9 @@ export const viewport: Viewport = {
   // Required for env(safe-area-inset-*) to report anything but 0.
   viewportFit: "cover",
   colorScheme: "dark",
-  // Tints the browser and Android navigation bars to match the shell.
-  // The only colour literal outside globals.css: a meta tag cannot read a CSS
-  // custom property. Keep it in step with --color-bg-0.
-  // eslint-disable-next-line no-restricted-syntax
+  // Tints the browser and Android navigation bars to match the shell. A meta
+  // tag cannot read a CSS custom property, so this is a literal — keep it in
+  // step with --color-bg-0.
   themeColor: "#1A1033",
 };
 
