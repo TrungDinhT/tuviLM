@@ -63,7 +63,12 @@ export function resolveBaseUrl(configured: string, pageHostname: string | null):
   return parsed.toString().replace(/\/$/, "");
 }
 
-function url(path: string): string {
+/**
+ * The absolute URL for a backend path. Exported so the SSE reader can reuse
+ * the same base-URL/host-resolution logic without reaching past the client's
+ * single URL rule.
+ */
+export function apiUrl(path: string): string {
   const pageHostname =
     process.env.NODE_ENV === "development" && typeof window !== "undefined"
       ? window.location.hostname
@@ -73,11 +78,18 @@ function url(path: string): string {
 
 /** A fresh key for one logical operation. Reuse it across retries. */
 export function newIdempotencyKey(): string {
-  return crypto.randomUUID();
+  // `crypto.randomUUID` is secure-context-only: it is absent over plain HTTP
+  // on a LAN (e.g. `http://192.168.1.23:3000`), where the chat still has to
+  // work. The idempotency key needs uniqueness, not cryptographic strength,
+  // so fall back to a timestamp + two random segments.
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
 }
 
-async function mintOwnerId(): Promise<string> {
-  const response = await fetch(url("/api/v1/anonymous"), { method: "POST" });
+export async function mintOwnerId(): Promise<string> {
+  const response = await fetch(apiUrl("/api/v1/anonymous"), { method: "POST" });
   if (!response.ok) {
     throw new ApiErrorException({
       kind: "http",
@@ -92,7 +104,7 @@ async function mintOwnerId(): Promise<string> {
   return parsed.data.owner_id;
 }
 
-async function safeBody(response: Response): Promise<unknown> {
+export async function safeBody(response: Response): Promise<unknown> {
   const text = await response.text();
   if (text === "") return null;
   try {
@@ -112,7 +124,7 @@ export async function request<T>(path: string, options: RequestOptions<T>): Prom
 
   let response: Response;
   try {
-    response = await fetch(url(path), {
+    response = await fetch(apiUrl(path), {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),

@@ -34,6 +34,8 @@ export const chatMessageSchema = z.object({
   updated_at: z.iso.datetime({ offset: true }),
 });
 
+export type ChatMessage = z.infer<typeof chatMessageSchema>;
+
 export const chatSessionSchema = z.object({
   id: z.string(),
   chart_profile_id: z.string(),
@@ -43,6 +45,8 @@ export const chatSessionSchema = z.object({
   updated_at: z.iso.datetime({ offset: true }),
 });
 
+export type ChatSession = z.infer<typeof chatSessionSchema>;
+
 export const chatSessionSummarySchema = z.object({
   id: z.string(),
   chart_profile_id: z.string(),
@@ -51,6 +55,82 @@ export const chatSessionSummarySchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
 });
+
+export type ChatSessionSummary = z.infer<typeof chatSessionSummarySchema>;
+
+// --- chat stream events (SSE) ----------------------------------------------
+
+/**
+ * Terminal statuses the `done` event can carry. Wider than
+ * `chatMessageStatusSchema` because a duplicate in-progress stream also ends
+ * with `done` carrying `duplicate_in_progress` — see `api/chat/routes.py`.
+ */
+export const sseDoneStatusSchema = z.enum([
+  "confirmed",
+  "failed",
+  "cancelled",
+  "duplicate_in_progress",
+]);
+
+export const sseIdsEventSchema = z.object({
+  type: z.literal("ids"),
+  user_message_id: z.string(),
+  assistant_message_id: z.string(),
+});
+
+export const sseTextEventSchema = z.object({
+  type: z.literal("text"),
+  delta: z.string(),
+});
+
+export const sseToolCallEventSchema = z.object({
+  type: z.literal("tool_call"),
+  id: z.string(),
+  name: z.string(),
+  arguments: z.unknown(),
+});
+
+export const sseToolResultEventSchema = z.object({
+  type: z.literal("tool_result"),
+  id: z.string().nullable().optional(),
+  name: z.string().nullable().optional(),
+  content: z.unknown(),
+});
+
+export const sseResultEventSchema = z.object({
+  type: z.literal("result"),
+  output: z.unknown(),
+});
+
+export const sseErrorEventSchema = z.object({
+  type: z.literal("error"),
+  message: z.string(),
+});
+
+export const sseDoneEventSchema = z.object({
+  type: z.literal("done"),
+  status: sseDoneStatusSchema,
+});
+
+export const sseDuplicateInProgressEventSchema = z.object({
+  type: z.literal("duplicate_in_progress"),
+  user_message_id: z.string(),
+  assistant_message_id: z.string(),
+  status: chatMessageStatusSchema,
+});
+
+export const sseChatEventSchema = z.discriminatedUnion("type", [
+  sseIdsEventSchema,
+  sseTextEventSchema,
+  sseToolCallEventSchema,
+  sseToolResultEventSchema,
+  sseResultEventSchema,
+  sseErrorEventSchema,
+  sseDoneEventSchema,
+  sseDuplicateInProgressEventSchema,
+]);
+
+export type SseChatEvent = z.infer<typeof sseChatEventSchema>;
 
 // --- api/schemas.py --------------------------------------------------------
 
@@ -167,6 +247,13 @@ export const chartProfileSchema = z.object({
 
 export type ChartProfile = z.infer<typeof chartProfileSchema>;
 
+export const createChartProfileRequestSchema = z.object({
+  display_name: z.string(),
+  birth_info: birthInfoSchema,
+});
+
+export type CreateChartProfileRequest = z.infer<typeof createChartProfileRequestSchema>;
+
 export const createChartProfileResponseSchema = z.object({
   chart_profile: chartProfileSchema,
 });
@@ -180,6 +267,10 @@ export const emptyResponseSchema = z.null();
 
 export const listChartProfilesResponseSchema = z.object({
   chart_profiles: z.array(chartProfileSchema),
+});
+
+export const createSessionRequestSchema = z.object({
+  title: z.string().nullable().optional(),
 });
 
 export const createSessionResponseSchema = z.object({

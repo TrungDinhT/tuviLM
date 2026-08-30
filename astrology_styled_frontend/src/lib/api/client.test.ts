@@ -203,3 +203,21 @@ describe("resolveBaseUrl", () => {
     );
   });
 });
+
+describe("newIdempotencyKey", () => {
+  it("returns a non-empty key", () => {
+    expect(newIdempotencyKey().length).toBeGreaterThan(0);
+  });
+
+  it("falls back when crypto.randomUUID is unavailable (plain HTTP over LAN)", () => {
+    const original = globalThis.crypto;
+    vi.stubGlobal("crypto", { getRandomValues: () => undefined, randomUUID: undefined });
+    try {
+      const key = newIdempotencyKey();
+      expect(key.startsWith("id-")).toBe(true);
+      expect(key.length).toBeGreaterThan(3);
+    } finally {
+      vi.stubGlobal("crypto", original);
+    }
+  });
+});

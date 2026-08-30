@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import fixture from "./__fixtures__/build-laso.json";
-import { buildLasoResponseSchema } from "./schemas";
+import { buildLasoResponseSchema, sseChatEventSchema } from "./schemas";
 
 const FOUNDATION_FIELDS = [
   "menh_cuc_relation",
@@ -39,5 +39,32 @@ describe("buildLasoResponseSchema", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe("sseChatEventSchema", () => {
+  it.each([
+    { type: "ids", user_message_id: "u1", assistant_message_id: "a1" },
+    { type: "text", delta: "xin chào" },
+    { type: "done", status: "confirmed" },
+    { type: "done", status: "duplicate_in_progress" },
+    {
+      type: "duplicate_in_progress",
+      user_message_id: "u1",
+      assistant_message_id: "a1",
+      status: "pending",
+    },
+    { type: "tool_call", id: "t1", name: "xem", arguments: { a: 1 } },
+    { type: "error", message: "boom" },
+  ])("accepts %o", (event) => {
+    expect(sseChatEventSchema.parse(event).type).toBe(event.type);
+  });
+
+  it("rejects an unknown event type", () => {
+    expect(sseChatEventSchema.safeParse({ type: "bogus" }).success).toBe(false);
+  });
+
+  it("rejects a text event missing its delta", () => {
+    expect(sseChatEventSchema.safeParse({ type: "text" }).success).toBe(false);
   });
 });

@@ -10,15 +10,22 @@ import {
 
 import { useChartStore } from "@/store/chart-store";
 
-import { request } from "./client";
+import { newIdempotencyKey, request } from "./client";
 import { queryKeys } from "./queryKeys";
 import {
   type BirthInfo,
   type BuildLasoResponse,
+  type CreateChartProfileRequest,
   type PreviewLasoRequest,
   buildLasoResponseSchema,
+  createChartProfileRequestSchema,
+  createChartProfileResponseSchema,
+  createSessionRequestSchema,
+  createSessionResponseSchema,
   emptyResponseSchema,
+  getSessionResponseSchema,
   listChartProfilesResponseSchema,
+  listSessionsResponseSchema,
   previewLasoRequestSchema,
   previewLasoResponseSchema,
 } from "./schemas";
@@ -110,6 +117,38 @@ export function useChartProfiles() {
   });
 }
 
+/** A stable idempotency key for a chart profile, from its birth tuple. */
+export function profileIdempotencyKey(birth: BirthInfo): string {
+  return `profile:${birth.year}-${birth.month}-${birth.day}-${birth.hour}-${birth.gender}`;
+}
+
+/** A readable label for an auto-saved profile: the cast birth date. */
+export function profileDisplayName(birth: BirthInfo): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(birth.day)}/${pad(birth.month)}/${birth.year}`;
+}
+
+/**
+ * Create a chart profile from a birth tuple.
+ *
+ * The idempotency key is derived from the birth tuple, so re-casting the same
+ * data reuses the same profile instead of accumulating duplicates. This is the
+ * auto-save path the cast flow fires; the Hồ sơ screen's user-facing save is
+ * still a separate change.
+ */
+export function useCreateChartProfile() {
+  return useMutation({
+    mutationFn: (input: CreateChartProfileRequest) =>
+      request("/api/v1/chart-profiles", {
+        method: "POST",
+        body: createChartProfileRequestSchema.parse(input),
+        schema: createChartProfileResponseSchema,
+        withOwner: true,
+        idempotencyKey: profileIdempotencyKey(input.birth_info),
+      }),
+  });
+}
+
 /**
  * Delete one saved chart profile, then refresh the list.
  *
@@ -128,6 +167,62 @@ export function useDeleteChartProfile() {
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.chartProfiles.all() });
+    },
+  });
+}
+
+/**
+ * The sessions under one chart profile, newest first. Disabled while the
+ * profile is null — the chat screen resolves its session only after a cast
+ * has produced a profile.
+ */
+export function useListSessions(profileId: string | null) {
+  return useQuery({
+    queryKey: queryKeys.sessions.byProfile(profileId ?? "idle"),
+    queryFn: () =>
+      request(`/api/v1/chart-profiles/${profileId as string}/sessions`, {
+        schema: listSessionsResponseSchema,
+        withOwner: true,
+      }),
+    enabled: profileId !== null,
+  });
+}
+
+/** One session's full message transcript. Disabled while no session is active. */
+export function useGetSession(sessionId: string | null) {
+  return useQuery({
+    queryKey: queryKeys.sessions.detail(sessionId ?? "idle"),
+    queryFn: () =>
+      request(`/api/v1/sessions/${sessionId as string}`, {
+        schema: getSessionResponseSchema,
+        withOwner: true,
+      }),
+    enabled: sessionId !== null,
+  });
+}
+
+/**
+ * Create a new session under a chart profile and refresh the session list.
+ *
+ * Each invocation mints a fresh `Idempotency-Key`; mutations never auto-retry,
+ * so a manual retry is a fresh create action with its own key.
+ */
+export function useCreateSession(profileId: string | null) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => {
+      if (profileId === null) throw new Error("chart profile id required");
+      return request(`/api/v1/chart-profiles/${profileId}/sessions`, {
+        method: "POST",
+        body: createSessionRequestSchema.parse({ title: null }),
+        schema: createSessionResponseSchema,
+        withOwner: true,
+        idempotencyKey: newIdempotencyKey(),
+      });
+    },
+    onSuccess: () => {
+      if (profileId === null) return;
+      void queryClient.invalidateQueries({ queryKey: queryKeys.sessions.byProfile(profileId) });
     },
   });
 }

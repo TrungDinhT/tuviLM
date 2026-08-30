@@ -32,6 +32,8 @@ export const queryKeys = {
 
   sessions: {
     all: () => ["sessions"] as const,
+    /** Sessions under one chart profile. */
+    byProfile: (profileId: string) => ["sessions", "profile", profileId] as const,
     detail: (sessionId: string) => ["sessions", sessionId] as const,
   },
 } as const;
