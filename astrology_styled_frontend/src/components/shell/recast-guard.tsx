@@ -49,7 +49,7 @@ export function useRecastGuard() {
       onOpenChange={setOpen}
       variant="center"
       title="An sao lại từ đầu?"
-      description="Toàn bộ lá số hiện tại sẽ bị xoá — lá bài bản mệnh, vận hạn, thiên bàn, lá số 12 cung và cuộc trò chuyện với Nghê Sao đều trở lại từ đầu."
+      description="Lá số đang hiển thị sẽ được đặt lại để bạn nhập thông tin sinh khác. Lịch sử trò chuyện đã lưu theo từng bộ thông tin sinh vẫn được giữ."
     >
       <div className="mt-[22px] grid grid-cols-2 gap-2.5">
         <DialogClose asChild>

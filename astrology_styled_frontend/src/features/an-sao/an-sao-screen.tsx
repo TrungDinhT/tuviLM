@@ -5,7 +5,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Pill } from "@/components/primitives/pill";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { useBuildLaso, useLasoPreview } from "@/lib/api/hooks";
+import {
+  profileDisplayName,
+  useBuildLaso,
+  useCreateChartProfile,
+  useLasoPreview,
+} from "@/lib/api/hooks";
 import { describe, isApiError } from "@/lib/http/errors";
 import { starKeyFromName } from "@/lib/theme";
 import { useChartStore } from "@/store/chart-store";
@@ -94,6 +99,7 @@ export function AnSaoScreen() {
 
   // --- Casting -------------------------------------------------------------
   const buildLaso = useBuildLaso();
+  const createProfile = useCreateChartProfile();
 
   const requestCast = () => {
     if (time === null) {
@@ -122,21 +128,28 @@ export function AnSaoScreen() {
       return;
     }
 
+    const birth = { calendar: "solar" as const, ...mapped.value, gender };
+
     setConfirmOpen(false);
     setPhase("loading");
+    const minimumLoading = new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS));
     try {
-      const [chart] = await Promise.all([
-        buildLaso.mutateAsync({ calendar: "solar", ...mapped.value, gender }),
-        new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS)),
+      const chart = await buildLaso.mutateAsync(birth);
+      const [, profileId] = await Promise.all([
+        minimumLoading,
+        // Auto-save starts only after a valid build. It must never fail the
+        // cast, so it resolves to the profile id or null.
+        createProfile
+          .mutateAsync({ display_name: profileDisplayName(birth), birth_info: birth })
+          .then((res) => res.chart_profile.id)
+          .catch(() => null),
       ]);
-      castChart(outcomeFromChart(chart), chart.id);
+      castChart(outcomeFromChart(chart), chart.id, birth, profileId);
       router.push("/ban-menh");
     } catch (error) {
       setPhase("form");
       showToast(
-        isApiError(error)
-          ? describe(error.error)
-          : "Có lỗi xảy ra khi an sao. Bạn thử lại nhé.",
+        isApiError(error) ? describe(error.error) : "Có lỗi xảy ra khi an sao. Bạn thử lại nhé.",
       );
     }
   };
