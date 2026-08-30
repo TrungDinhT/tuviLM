@@ -19,3 +19,6 @@ if (!window.matchMedia) {
     dispatchEvent: vi.fn(),
   }));
 }
+
+// jsdom has no scroll implementation; the chat's stick-to-bottom calls it.
+window.scrollTo = vi.fn();
