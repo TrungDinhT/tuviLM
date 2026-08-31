@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
-
 import { CONSTELLATION_SCATTER } from "@/components/shared/constellation-art";
 import styles from "@/components/shared/constellation-art.module.css";
 import { GOD_CONSTELLATIONS, type GodConstellation } from "@/content/god-constellations";
-import { GOD_PORTRAITS } from "@/content/god-portraits";
+import { GOD_GHOSTS } from "@/content/god-ghosts";
+import { GOD_SILHOUETTES, type GodSilhouette } from "@/content/god-silhouettes";
 import { cn } from "@/lib/utils";
 
 import rewardStyles from "./constellation-reward.module.css";
@@ -20,7 +19,17 @@ interface ConstellationRewardProps {
   names: readonly string[];
 }
 
-function GodConstellationArt({ shape, label }: { shape: GodConstellation; label: string }) {
+function GodConstellationArt({
+  shape,
+  silhouette,
+  renderSilhouette,
+  label,
+}: {
+  shape: GodConstellation;
+  silhouette: GodSilhouette;
+  renderSilhouette: boolean;
+  label: string;
+}) {
   return (
     <svg
       role="img"
@@ -29,7 +38,21 @@ function GodConstellationArt({ shape, label }: { shape: GodConstellation; label:
       preserveAspectRatio="xMidYMid meet"
       className={`${rewardStyles.vectorConstellation} absolute inset-0 h-full w-full overflow-visible`}
     >
-      {shape.lines.map(([fromIndex, toIndex]) => {
+      {renderSilhouette ? (
+        <>
+          <ellipse className={rewardStyles.godAura} cx="50" cy="53" rx="35" ry="43" />
+          {silhouette.fillPaths.map((path, index) => (
+            <path key={`fill-${index}`} className={rewardStyles.godFill} d={path} />
+          ))}
+          {silhouette.detailPaths.map((path, index) => (
+            <path key={`detail-${index}`} className={rewardStyles.godDetail} d={path} />
+          ))}
+          {silhouette.symbolPaths.map((path, index) => (
+            <path key={`symbol-${index}`} className={rewardStyles.godSymbol} d={path} />
+          ))}
+        </>
+      ) : null}
+      {shape.lines.map(([fromIndex, toIndex], lineIndex) => {
         const from = shape.points[fromIndex];
         const to = shape.points[toIndex];
         if (from === undefined || to === undefined) return null;
@@ -41,13 +64,19 @@ function GodConstellationArt({ shape, label }: { shape: GodConstellation; label:
             y1={from[1]}
             x2={to[0]}
             y2={to[1]}
+            pathLength="1"
+            style={{ animationDelay: `${180 + lineIndex * 50}ms` }}
           />
         );
       })}
       {shape.points.map(([cx, cy, pointPower], index) => {
         const power = pointPower ?? 1;
         return (
-          <g key={index}>
+          <g
+            key={index}
+            className={rewardStyles.starNode}
+            style={{ animationDelay: `${110 + index * 45}ms` }}
+          >
             <circle className={rewardStyles.starHalo} cx={cx} cy={cy} r={2.7 * power} />
             <circle className={rewardStyles.starCore} cx={cx} cy={cy} r={0.72 * power} />
           </g>
@@ -61,19 +90,19 @@ function GodConstellationArt({ shape, label }: { shape: GodConstellation; label:
  * The guardian portrait that wakes as the birth data completes.
  *
  * Fed by the preview endpoint — never by birth-date arithmetic. Each chính
- * tinh maps to its god artwork through the content layer; song tinh show both
- * guardians side by side. Vô chính diệu and unknown stars retain the neutral
- * scattered-sky fallback.
+ * tinh maps to an inline SVG deity through the content layer; song tinh show
+ * both guardians side by side. Vô chính diệu and unknown stars retain the
+ * neutral scattered-sky fallback.
  */
 export function ConstellationReward({ stars, names }: ConstellationRewardProps) {
   const lit = stars !== null;
   const guardians =
     stars?.flatMap((key) => {
-      const portrait = GOD_PORTRAITS[key];
+      const silhouette = GOD_SILHOUETTES[key];
       const constellation = GOD_CONSTELLATIONS[key];
-      return portrait === undefined || constellation === undefined
+      return silhouette === undefined || constellation === undefined
         ? []
-        : [{ key, portrait, constellation }];
+        : [{ key, silhouette, constellation, ghostSrc: GOD_GHOSTS[key] }];
     }) ?? [];
   const hasGuardians = lit && stars.length > 0 && guardians.length === stars.length;
   const isSongTinh = guardians.length > 1;
@@ -103,7 +132,7 @@ export function ConstellationReward({ stars, names }: ConstellationRewardProps) 
             isSongTinh ? "h-[clamp(150px,44vw,172px)] gap-[2px]" : "h-[clamp(210px,78vw,252px)]",
           )}
         >
-          {guardians.map(({ key, portrait, constellation }, index) => (
+          {guardians.map(({ key, silhouette, constellation, ghostSrc }, index) => (
             <div
               key={key}
               className={cn(
@@ -113,20 +142,18 @@ export function ConstellationReward({ stars, names }: ConstellationRewardProps) 
               )}
               style={{ animationDelay: `${index * 90}ms` }}
             >
-              <Image
-                src={portrait.src}
-                alt=""
-                fill
-                loading="eager"
-                unoptimized
-                sizes={
-                  isSongTinh ? "(max-width: 767px) 44vw, 170px" : "(max-width: 767px) 78vw, 250px"
-                }
-                className={rewardStyles.figureBackdrop}
-              />
+              {ghostSrc === undefined ? null : (
+                <div
+                  aria-hidden="true"
+                  className={rewardStyles.ghostBackdrop}
+                  style={{ backgroundImage: `url(${ghostSrc})` }}
+                />
+              )}
               <GodConstellationArt
                 shape={constellation}
-                label={`Chòm sao ${names[index] ?? "chính tinh"} trong hình tượng ${portrait.deity}`}
+                silhouette={silhouette}
+                renderSilhouette={ghostSrc === undefined}
+                label={`Chòm sao ${names[index] ?? "chính tinh"} trong hình tượng ${silhouette.deity}`}
               />
             </div>
           ))}
