@@ -1,0 +1,68 @@
+.constellationFigure {
+  -webkit-mask-image: radial-gradient(
+    circle,
+    #000 0%,
+    #000 52%,
+    rgba(0, 0, 0, 0.92) 65%,
+    rgba(0, 0, 0, 0.42) 78%,
+    transparent 94%
+  );
+  mask-image: radial-gradient(
+    circle,
+    #000 0%,
+    #000 52%,
+    rgba(0, 0, 0, 0.92) 65%,
+    rgba(0, 0, 0, 0.42) 78%,
+    transparent 94%
+  );
+  animation: constellation-reveal 620ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.figureBackdrop {
+  z-index: 0;
+  object-fit: cover;
+  opacity: 0.18;
+  transform: scale(1.035);
+}
+
+.vectorConstellation {
+  z-index: 1;
+  pointer-events: none;
+}
+
+.starLine {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent-2) 68%, white);
+  stroke-width: 0.42;
+  stroke-linecap: round;
+  opacity: 0.44;
+}
+
+.starHalo {
+  fill: var(--accent);
+  opacity: 0.2;
+}
+
+.starCore {
+  fill: white;
+  stroke: var(--accent-2);
+  stroke-width: 0.16;
+  opacity: 0.96;
+}
+
+@keyframes constellation-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(7px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellationFigure {
+    animation: none;
+  }
+}
