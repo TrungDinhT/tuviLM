@@ -2,8 +2,9 @@
 
 import { CONSTELLATION_SCATTER } from "@/components/shared/constellation-art";
 import styles from "@/components/shared/constellation-art.module.css";
-import { GOD_CONSTELLATIONS, type GodConstellation } from "@/content/god-constellations";
+import type { GodConstellation } from "@/content/god-constellations";
 import { GOD_GHOSTS } from "@/content/god-ghosts";
+import { GOD_LANDMARK_CONSTELLATIONS } from "@/content/god-landmark-constellations";
 import { GOD_SILHOUETTES, type GodSilhouette } from "@/content/god-silhouettes";
 import { cn } from "@/lib/utils";
 
@@ -90,16 +91,16 @@ function GodConstellationArt({
  * The guardian portrait that wakes as the birth data completes.
  *
  * Fed by the preview endpoint — never by birth-date arithmetic. Each chính
- * tinh maps to an inline SVG deity through the content layer; song tinh show
- * both guardians side by side. Vô chính diệu and unknown stars retain the
- * neutral scattered-sky fallback.
+ * tinh maps to a tiny ghost backdrop with an anatomy-following SVG constellation;
+ * song tinh show both guardians side by side. Vô chính diệu and unknown stars
+ * retain the neutral scattered-sky fallback.
  */
 export function ConstellationReward({ stars, names }: ConstellationRewardProps) {
   const lit = stars !== null;
   const guardians =
     stars?.flatMap((key) => {
       const silhouette = GOD_SILHOUETTES[key];
-      const constellation = GOD_CONSTELLATIONS[key];
+      const constellation = GOD_LANDMARK_CONSTELLATIONS[key];
       return silhouette === undefined || constellation === undefined
         ? []
         : [{ key, silhouette, constellation, ghostSrc: GOD_GHOSTS[key] }];
