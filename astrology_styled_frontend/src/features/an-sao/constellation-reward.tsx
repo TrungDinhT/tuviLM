@@ -20,16 +20,18 @@ interface ConstellationRewardProps {
   names: readonly string[];
 }
 
-function GodConstellationArt({
+export function GodConstellationArt({
   shape,
   silhouette,
   renderSilhouette,
   label,
+  pointScale = 1,
 }: {
   shape: GodConstellation;
   silhouette: GodSilhouette;
   renderSilhouette: boolean;
   label: string;
+  pointScale?: number;
 }) {
   return (
     <svg
@@ -78,8 +80,18 @@ function GodConstellationArt({
             className={rewardStyles.starNode}
             style={{ animationDelay: `${110 + index * 45}ms` }}
           >
-            <circle className={rewardStyles.starHalo} cx={cx} cy={cy} r={2.7 * power} />
-            <circle className={rewardStyles.starCore} cx={cx} cy={cy} r={0.72 * power} />
+            <circle
+              className={rewardStyles.starHalo}
+              cx={cx}
+              cy={cy}
+              r={2.7 * power * pointScale}
+            />
+            <circle
+              className={rewardStyles.starCore}
+              cx={cx}
+              cy={cy}
+              r={0.72 * power * pointScale}
+            />
           </g>
         );
       })}
