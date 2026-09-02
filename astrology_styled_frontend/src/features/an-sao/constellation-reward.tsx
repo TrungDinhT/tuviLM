@@ -1,5 +1,7 @@
 "use client";
 
+import { useId, type CSSProperties } from "react";
+
 import { CONSTELLATION_SCATTER } from "@/components/shared/constellation-art";
 import styles from "@/components/shared/constellation-art.module.css";
 import type { GodConstellation } from "@/content/god-constellations";
@@ -20,6 +22,26 @@ interface ConstellationRewardProps {
   names: readonly string[];
 }
 
+/** Central tuning for the brightness-only star twinkle. Larger cycleMs is slower. */
+const STAR_TWINKLE_CONFIG = {
+  cycleMs: 12000,
+  firstPhaseMs: 400,
+  staggerStepMs: 1300,
+  staggerWindowMs: 12000,
+  haloRestOpacity: 0.08,
+  haloPeakOpacity: 0.82,
+  coreRestOpacity: 0.74,
+  corePeakOpacity: 1,
+} as const;
+
+const STAR_TWINKLE_STYLE = {
+  "--star-twinkle-cycle": `${STAR_TWINKLE_CONFIG.cycleMs}ms`,
+  "--star-halo-rest-opacity": `${STAR_TWINKLE_CONFIG.haloRestOpacity}`,
+  "--star-halo-peak-opacity": `${STAR_TWINKLE_CONFIG.haloPeakOpacity}`,
+  "--star-core-rest-opacity": `${STAR_TWINKLE_CONFIG.coreRestOpacity}`,
+  "--star-core-peak-opacity": `${STAR_TWINKLE_CONFIG.corePeakOpacity}`,
+} as CSSProperties;
+
 export function GodConstellationArt({
   shape,
   silhouette,
@@ -33,6 +55,8 @@ export function GodConstellationArt({
   label: string;
   pointScale?: number;
 }) {
+  const haloGradientId = useId();
+
   return (
     <svg
       role="img"
@@ -40,7 +64,15 @@ export function GodConstellationArt({
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid meet"
       className={`${rewardStyles.vectorConstellation} absolute inset-0 h-full w-full overflow-visible`}
+      style={STAR_TWINKLE_STYLE}
     >
+      <defs>
+        <radialGradient id={haloGradientId}>
+          <stop offset="0%" stopColor="white" stopOpacity="0.92" />
+          <stop offset="38%" stopColor="var(--accent-2)" stopOpacity="0.72" />
+          <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+        </radialGradient>
+      </defs>
       {renderSilhouette ? (
         <>
           <ellipse className={rewardStyles.godAura} cx="50" cy="53" rx="35" ry="43" />
@@ -74,6 +106,10 @@ export function GodConstellationArt({
       })}
       {shape.points.map(([cx, cy, pointPower], index) => {
         const power = pointPower ?? 1;
+        const twinklePhase =
+          STAR_TWINKLE_CONFIG.firstPhaseMs +
+          ((index * STAR_TWINKLE_CONFIG.staggerStepMs) % STAR_TWINKLE_CONFIG.staggerWindowMs);
+        const twinkleDelay = `-${twinklePhase}ms`;
         return (
           <g
             key={index}
@@ -84,13 +120,15 @@ export function GodConstellationArt({
               className={rewardStyles.starHalo}
               cx={cx}
               cy={cy}
-              r={2.7 * power * pointScale}
+              r={1.45 * power * pointScale}
+              style={{ animationDelay: twinkleDelay, fill: `url(#${haloGradientId})` }}
             />
             <circle
               className={rewardStyles.starCore}
               cx={cx}
               cy={cy}
-              r={0.72 * power * pointScale}
+              r={0.52 * power * pointScale}
+              style={{ animationDelay: twinkleDelay }}
             />
           </g>
         );
