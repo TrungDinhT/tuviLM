@@ -77,19 +77,23 @@
   opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
-  animation: constellation-node-ignite 300ms cubic-bezier(0.2, 0.9, 0.3, 1.35) forwards;
+  animation: constellation-node-ignite 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .starHalo {
   fill: var(--accent);
-  opacity: 0.2;
+  opacity: var(--star-halo-rest-opacity);
+  animation: constellation-halo-twinkle var(--star-twinkle-cycle) cubic-bezier(0.45, 0, 0.55, 1)
+    infinite;
 }
 
 .starCore {
   fill: white;
   stroke: var(--accent-2);
   stroke-width: 0.16;
-  opacity: 0.96;
+  opacity: var(--star-core-rest-opacity);
+  animation: constellation-core-twinkle var(--star-twinkle-cycle) cubic-bezier(0.45, 0, 0.55, 1)
+    infinite;
 }
 
 @keyframes constellation-reveal {
@@ -112,15 +116,31 @@
 @keyframes constellation-node-ignite {
   from {
     opacity: 0;
-    transform: scale(0.25);
-  }
-  70% {
-    opacity: 1;
-    transform: scale(1.25);
+    transform: scale(0.7);
   }
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes constellation-halo-twinkle {
+  0%,
+  100% {
+    opacity: var(--star-halo-rest-opacity);
+  }
+  50% {
+    opacity: var(--star-halo-peak-opacity);
+  }
+}
+
+@keyframes constellation-core-twinkle {
+  0%,
+  100% {
+    opacity: var(--star-core-rest-opacity);
+  }
+  50% {
+    opacity: var(--star-core-peak-opacity);
   }
 }
 
@@ -137,6 +157,11 @@
   .starNode {
     opacity: 1;
     transform: none;
+    animation: none;
+  }
+
+  .starHalo,
+  .starCore {
     animation: none;
   }
 }

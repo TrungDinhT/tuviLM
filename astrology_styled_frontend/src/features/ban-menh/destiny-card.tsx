@@ -91,7 +91,7 @@ export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
                   silhouette={silhouette}
                   renderSilhouette={false}
                   label={`Chòm sao ${names[index] ?? "chính tinh"} trong hình tượng ${silhouette.deity}`}
-                  pointScale={songTinh ? 1.35 : 1.2}
+                  pointScale={songTinh ? 0.9 : 0.82}
                 />
               </div>
             ))
