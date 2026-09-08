@@ -1,5 +1,13 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+
+import { screenFor } from "@/config/site";
+
 import { AppNav } from "./app-nav";
 import { TopBar } from "./top-bar";
+
+const STANDALONE_ROUTES = new Set(["/login", "/register"]);
 
 /**
  * The chrome every screen sits inside.
@@ -10,6 +18,13 @@ import { TopBar } from "./top-bar";
  * tier, where the rail takes the left edge and the column widens to `--shell`.
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const standalone = STANDALONE_ROUTES.has(pathname) || screenFor(pathname) === null;
+
+  if (standalone) {
+    return <div className="relative z-1 min-h-dvh">{children}</div>;
+  }
+
   return (
     <div className="relative z-1 min-h-dvh lg:pl-[var(--rail)]">
       <TopBar />
