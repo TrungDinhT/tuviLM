@@ -181,3 +181,5 @@ data/tan_bien.md
 graft/
 .opencode/
 openspec/
+.agents/
+.codex
