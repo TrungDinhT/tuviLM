@@ -74,4 +74,19 @@ describe("AccentTheme", () => {
 
     expect(accent()).toBe("var(--element-hoa)");
   });
+
+  it.each(["/login", "/register", "/missing-page"])(
+    "keeps the default palette on standalone route %s",
+    (pathname) => {
+      mockPathname = pathname;
+      useChartStore.setState({
+        outcome: { stars: ["thienco"] },
+        previewOutcome: { stars: ["thaiduong"] },
+      });
+
+      render(<AccentTheme>x</AccentTheme>);
+
+      expect(accent()).toBe("");
+    },
+  );
 });
