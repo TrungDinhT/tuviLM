@@ -4,11 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AN_SAO_ROUTE, isActive, NAV_ITEMS, type NavItem } from "@/config/site";
-import { useChartStore } from "@/store/chart-store";
 
 import { NavIconGlyph } from "./nav-icons";
-
-const LOCKED_HINT = "Hãy an sao trước để mở phần này";
 
 /**
  * The application's only navigation.
@@ -24,13 +21,12 @@ const LOCKED_HINT = "Hãy an sao trước để mở phần này";
  */
 export function AppNav() {
   const pathname = usePathname();
-  const hasChart = useChartStore((state) => state.hasChart);
 
   // The casting screen is a full-bleed flow: the bottom tab bar never shows
-  // there, chart or no chart — it appears once the cast lands on Bản mệnh.
-  // Before a chart exists it is hidden on every other screen too, while the
-  // desktop rail stays visible with its locked items dimmed.
-  const hiddenBelowDesktop = pathname === AN_SAO_ROUTE || !hasChart;
+  // there — it appears once the cast lands on Bản mệnh. AppShell only mounts
+  // this navigation after a chart exists, so the desktop rail follows the
+  // same rule without leaving an empty rail-sized gutter behind.
+  const hiddenBelowDesktop = pathname === AN_SAO_ROUTE;
 
   return (
     <nav
@@ -61,23 +57,14 @@ export function AppNav() {
       </div>
 
       {NAV_ITEMS.map((item) => (
-        <NavButton key={item.href} item={item} pathname={pathname} hasChart={hasChart} />
+        <NavButton key={item.href} item={item} pathname={pathname} />
       ))}
     </nav>
   );
 }
 
-function NavButton({
-  item,
-  pathname,
-  hasChart,
-}: {
-  item: NavItem;
-  pathname: string;
-  hasChart: boolean;
-}) {
+function NavButton({ item, pathname }: { item: NavItem; pathname: string }) {
   const active = isActive(item, pathname);
-  const locked = item.requiresChart && !hasChart;
 
   const shared = [
     "flex min-w-0 flex-1 flex-col items-center gap-1 px-px py-1.5",
@@ -92,25 +79,10 @@ function NavButton({
   const iconClass = [
     "size-[23px] max-[349px]:size-[21px] md:size-[25px] lg:size-5",
     "transition-[transform,filter] duration-300",
-    active && !locked
+    active
       ? "drop-shadow-[0_0_8px_var(--accent-glow)] -translate-y-px lg:translate-y-0 lg:drop-shadow-none"
       : "",
   ].join(" ");
-
-  if (locked) {
-    return (
-      <button
-        type="button"
-        disabled
-        aria-disabled="true"
-        title={LOCKED_HINT}
-        className={`${shared} cursor-not-allowed text-muted opacity-34`}
-      >
-        <NavIconGlyph name={item.icon} className={iconClass} />
-        {item.label}
-      </button>
-    );
-  }
 
   return (
     <Link

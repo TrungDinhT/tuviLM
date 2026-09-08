@@ -3,6 +3,8 @@
 import { usePathname } from "next/navigation";
 
 import { screenFor } from "@/config/site";
+import { cn } from "@/lib/utils";
+import { useChartStore } from "@/store/chart-store";
 
 import { AppNav } from "./app-nav";
 import { TopBar } from "./top-bar";
@@ -19,6 +21,7 @@ const STANDALONE_ROUTES = new Set(["/login", "/register"]);
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const hasChart = useChartStore((state) => state.hasChart);
   const standalone = STANDALONE_ROUTES.has(pathname) || screenFor(pathname) === null;
 
   if (standalone) {
@@ -26,10 +29,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="relative z-1 min-h-dvh lg:pl-[var(--rail)]">
+    <div className={cn("relative z-1 min-h-dvh", hasChart && "lg:pl-[var(--rail)]")}>
       <TopBar />
       <div className="mx-auto w-full max-w-[var(--col)] lg:max-w-[var(--shell)]">{children}</div>
-      <AppNav />
+      {hasChart ? <AppNav /> : null}
     </div>
   );
 }
