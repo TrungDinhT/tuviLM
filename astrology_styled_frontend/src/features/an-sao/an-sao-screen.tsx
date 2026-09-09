@@ -15,9 +15,9 @@ import {
 } from "@/lib/api/hooks";
 import { describe, isApiError } from "@/lib/http/errors";
 import { starKeyFromName } from "@/lib/theme";
+import { showToast } from "@/lib/toast";
 import { useChartStore } from "@/store/chart-store";
 import { usePreferencesStore } from "@/store/preferences-store";
-import { useToastStore } from "@/store/toast-store";
 
 import { BirthConfirmDialog } from "./birth-confirm-dialog";
 import {
@@ -75,7 +75,6 @@ export function AnSaoScreen() {
   const clockRef = useRef<HTMLDivElement>(null);
   const genderRef = useRef<HTMLDivElement>(null);
 
-  const showToast = useToastStore((state) => state.show);
   const setPreviewOutcome = useChartStore((state) => state.setPreviewOutcome);
   const castChart = useChartStore((state) => state.castChart);
   const muteBirthConfirm = usePreferencesStore((state) => state.muteBirthConfirm);

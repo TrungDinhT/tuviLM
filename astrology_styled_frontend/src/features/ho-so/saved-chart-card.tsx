@@ -7,7 +7,7 @@ import { Pill } from "@/components/primitives/pill";
 import { useDeleteChartProfile } from "@/lib/api/hooks";
 import type { ChartProfile } from "@/lib/api/schemas";
 import { describe, isApiError } from "@/lib/http/errors";
-import { useToastStore } from "@/store/toast-store";
+import { showToast } from "@/lib/toast";
 
 /** The profile's own stored birth data, formatted for display — not a reading. */
 function dateLabel(profile: ChartProfile): string {
@@ -26,7 +26,6 @@ function dateLabel(profile: ChartProfile): string {
 export function SavedChartCard({ profile }: { profile: ChartProfile }) {
   const [open, setOpen] = useState(false);
   const deleteProfile = useDeleteChartProfile();
-  const showToast = useToastStore((state) => state.show);
 
   const confirmDelete = () => {
     setOpen(false);

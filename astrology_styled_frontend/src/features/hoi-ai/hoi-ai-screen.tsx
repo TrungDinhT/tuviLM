@@ -11,8 +11,8 @@ import { queryKeys } from "@/lib/api/queryKeys";
 import type { ChatMessage, SseChatEvent } from "@/lib/api/schemas";
 import { streamChat } from "@/lib/api/stream";
 import { describe, isApiError } from "@/lib/http/errors";
+import { showToast } from "@/lib/toast";
 import { useChartStore } from "@/store/chart-store";
-import { useToastStore } from "@/store/toast-store";
 
 import { ChatBubble, type BubbleStatus } from "./chat-bubble";
 import { Composer } from "./composer";
@@ -67,7 +67,6 @@ function doneTerminal(status: string): Terminal {
 export function HoiAiScreen() {
   const hasChart = useChartStore((state) => state.hasChart);
   const chartProfileId = useChartStore((state) => state.chartProfileId);
-  const showToast = useToastStore((state) => state.show);
   const queryClient = useQueryClient();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);

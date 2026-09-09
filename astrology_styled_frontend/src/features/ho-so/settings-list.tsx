@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 
 import { useRecastGuard } from "@/components/shell/recast-guard";
-import { useToastStore } from "@/store/toast-store";
+import { showToast } from "@/lib/toast";
 
 const COMING_SOON = "Tính năng sẽ sớm được cập nhật ✦";
 
@@ -25,7 +25,6 @@ interface SettingRow {
  * the same confirm as every other recast.
  */
 export function SettingsList() {
-  const showToast = useToastStore((state) => state.show);
   const { requestRecast, confirmDialog } = useRecastGuard();
 
   const rows: SettingRow[] = [

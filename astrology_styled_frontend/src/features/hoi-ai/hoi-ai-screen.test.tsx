@@ -5,9 +5,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatMessage, ChatSession, ChatSessionSummary } from "@/lib/api/schemas";
 import { OWNER_ID_KEY, resetOwnerIdCache } from "@/lib/api/owner";
 import { useChartStore } from "@/store/chart-store";
-import { useToastStore } from "@/store/toast-store";
 
 import { HoiAiScreen } from "./hoi-ai-screen";
+
+const toastMocks = vi.hoisted(() => ({ showToast: vi.fn() }));
+
+vi.mock("@/lib/toast", () => toastMocks);
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -78,9 +81,9 @@ function renderScreen(client: QueryClient) {
 }
 
 beforeEach(() => {
+  vi.clearAllMocks();
   localStorage.clear();
   resetOwnerIdCache();
-  useToastStore.setState({ message: null });
   useChartStore.setState({
     hasChart: false,
     outcome: null,
@@ -325,7 +328,7 @@ describe("HoiAiScreen", () => {
 
     expect(await screen.findByText("Phần trả lời")).toBeTruthy();
     await waitFor(() =>
-      expect(useToastStore.getState().message).toBe(
+      expect(toastMocks.showToast).toHaveBeenCalledWith(
         "Thiên Hạc chưa thể trả lời trọn vẹn. Bạn thử lại nhé.",
       ),
     );

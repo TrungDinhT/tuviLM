@@ -14,7 +14,7 @@ import {
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
 import { useLasoChart } from "@/lib/api/hooks";
 import { nguHanhOf, starKeyFromName } from "@/lib/theme";
-import { useToastStore } from "@/store/toast-store";
+import { showToast } from "@/lib/toast";
 
 import { AdviceCard } from "./advice-card";
 import deckStyles from "./deck.module.css";
@@ -43,7 +43,6 @@ function greeting(): string {
  */
 export function BanMenhScreen() {
   const { data: chart } = useLasoChart();
-  const showToast = useToastStore((state) => state.show);
   const hydrated = useIsHydrated();
 
   if (chart === undefined) return null;
