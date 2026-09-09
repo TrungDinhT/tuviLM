@@ -3,19 +3,21 @@
    and the scroll-driven focus animation. */
 
 .deck {
+  /* Portrait height / width. Keep enough room for the longest card face. */
+  --card-ratio: 1.8;
   --focus-scale: 1.2195;
-  --card-w: max(240px, calc(var(--deck-h) * 0.82 / 1.7));
+  --card-w: max(240px, calc(var(--deck-h) * 0.82 / var(--card-ratio)));
   gap: 14px;
   padding-block: 6px 8px;
   padding-inline: calc(50% - var(--card-w) / 2);
   align-items: flex-end;
-  height: calc(var(--card-w) * 1.7 * var(--focus-scale) + 14px);
+  height: calc(var(--card-w) * var(--card-ratio) * var(--focus-scale) + 14px);
 }
 
 .deckItem {
   display: flex;
   width: var(--card-w);
-  aspect-ratio: 1 / 1.7;
+  aspect-ratio: 1 / var(--card-ratio);
   transform: scale(calc(1 + (var(--focus-scale) - 1) * var(--card-focus, 0)));
   transform-origin: 50% 100%;
 }
@@ -72,7 +74,7 @@
     flex-direction: column;
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
+    overflow-y: hidden;
     opacity: calc((var(--card-focus, 1) - 0.55) / 0.35);
   }
 
@@ -124,14 +126,14 @@
 
 @media (min-width: 48rem) {
   .deck {
+    --focus-scale: 1.269;
     gap: 20px;
     padding-inline: calc(50% - 134px);
-    height: 594px;
+    height: calc(268px * var(--card-ratio) * var(--focus-scale) + 14px);
   }
 
   .deckItem {
-    --focus-scale: 1.269;
-    aspect-ratio: 1 / 1.7;
+    aspect-ratio: 1 / var(--card-ratio);
     height: auto;
     max-height: 100%;
     flex: 0 0 268px;
@@ -156,7 +158,7 @@
     width: 100%;
     height: auto;
     max-width: none;
-    aspect-ratio: 1 / 1.7;
+    aspect-ratio: 1 / var(--card-ratio);
     transform: none;
   }
 

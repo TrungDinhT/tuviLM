@@ -20,9 +20,8 @@ interface SettingRow {
  * The "Cài đặt" list.
  *
  * Three rows are not built yet and raise the coming-soon toast, matching the
- * Bản mệnh share row. "Nhập lại ngày sinh" and "Bắt đầu lại từ đầu" both run
- * the recast guard — one path, not two — so a cast chart is discarded behind
- * the same confirm as every other recast.
+ * Bản mệnh share row. "Nhập lại ngày sinh" runs the shared recast guard, so a
+ * cast chart is discarded behind the same confirm as every other recast.
  */
 export function SettingsList() {
   const { requestRecast, confirmDialog } = useRecastGuard();
@@ -94,15 +93,6 @@ export function SettingsList() {
             </span>
           </button>
         ))}
-      </div>
-      <div className="mt-5 text-center">
-        <button
-          type="button"
-          className="cursor-pointer border-0 text-[14px] text-muted underline underline-offset-[3px]"
-          onClick={requestRecast}
-        >
-          Bắt đầu lại từ đầu
-        </button>
       </div>
       {confirmDialog}
     </>

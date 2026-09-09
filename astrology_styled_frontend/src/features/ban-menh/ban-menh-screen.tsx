@@ -2,8 +2,6 @@
 
 import type { CSSProperties } from "react";
 
-import Link from "next/link";
-
 import { Pill } from "@/components/primitives/pill";
 import {
   Carousel,
@@ -97,20 +95,22 @@ export function BanMenhScreen() {
         </p>
       </div>
 
-      <Carousel>
-        <CarouselContent className={deckStyles.deck}>
-          <CarouselItem index={0} initialFocus={1} className={deckStyles.deckItem}>
-            <DestinyCard chart={chart} />
-          </CarouselItem>
-          <CarouselItem index={1} className={deckStyles.deckItem}>
-            <LuckCard chart={chart} />
-          </CarouselItem>
-          <CarouselItem index={2} className={deckStyles.deckItem}>
-            <AdviceCard chart={chart} />
-          </CarouselItem>
-        </CarouselContent>
-        <CarouselDots count={3} className={deckStyles.deckDots} />
-      </Carousel>
+      <div className="mt-8">
+        <Carousel>
+          <CarouselContent className={deckStyles.deck}>
+            <CarouselItem index={0} initialFocus={1} className={deckStyles.deckItem}>
+              <DestinyCard chart={chart} />
+            </CarouselItem>
+            <CarouselItem index={1} className={deckStyles.deckItem}>
+              <LuckCard chart={chart} />
+            </CarouselItem>
+            <CarouselItem index={2} className={deckStyles.deckItem}>
+              <AdviceCard chart={chart} />
+            </CarouselItem>
+          </CarouselContent>
+          <CarouselDots count={3} className={deckStyles.deckDots} />
+        </Carousel>
+      </div>
 
       <div className="px-[22px] pt-[10px] md:px-[30px] lg:px-10">
         <div className="mx-auto mt-[18px] flex w-[min(340px,86%)] gap-[10px] md:w-[min(560px,92%)]">
@@ -127,39 +127,6 @@ export function BanMenhScreen() {
           >
             Chia sẻ
           </Pill>
-        </div>
-
-        <div className="mx-[2px] mt-[26px] mb-[12px] flex items-baseline justify-between">
-          <h2 className="text-[22px] font-semibold">Khám phá thêm</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <Link
-            className="glass flex cursor-pointer flex-col gap-[10px] border-0 p-[18px] text-left text-ink no-underline"
-            href="/van-han"
-          >
-            <svg viewBox="0 0 24 24" fill="none" className="h-[30px] w-[30px] fill-none [stroke:var(--accent)] [stroke-width:1.4]">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
-              <circle cx="12" cy="12" r="2.5" />
-            </svg>
-            <div>
-              <b className="text-base font-semibold">Vận hạn</b>
-            </div>
-            <span className="text-[12.5px] text-muted">Tình cảm, công danh, tiền tài</span>
-          </Link>
-          <Link
-            className="glass flex cursor-pointer flex-col gap-[10px] border-0 p-[18px] text-left text-ink no-underline"
-            href="/hoi-ai"
-          >
-            <svg viewBox="0 0 24 24" fill="none" className="h-[30px] w-[30px] fill-none [stroke:var(--accent)] [stroke-width:1.4]">
-              <path d="M4 6h16v10H9l-4 4V6z" />
-              <path d="M9 11h6M9 8h4" />
-            </svg>
-            <div>
-              <b className="text-base font-semibold">Hỏi AI</b>
-            </div>
-            <span className="text-[12.5px] text-muted">Trò chuyện cùng Thiên Hạc</span>
-          </Link>
         </div>
       </div>
     </div>
