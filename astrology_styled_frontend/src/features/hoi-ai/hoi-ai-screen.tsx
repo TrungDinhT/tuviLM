@@ -41,7 +41,7 @@ interface ActiveStream {
 }
 
 const GREETING =
-  "Chào bạn, tôi là Nghê Sao — tinh linh dẫn đường. Bạn muốn hỏi điều gì về lá số của mình?";
+  "Chào bạn, tôi là Thiên Hạc — tinh linh dẫn đường. Bạn muốn hỏi điều gì về lá số của mình?";
 
 function doneTerminal(status: string): Terminal {
   switch (status) {
@@ -57,7 +57,7 @@ function doneTerminal(status: string): Terminal {
 }
 
 /**
- * The Hỏi AI screen — a chat with Nghê Sao.
+ * The Hỏi AI screen — a chat with Thiên Hạc.
  *
  * Opens on the most recent session by default, with a browsable history and a
  * "Tạo mới" action. Replies stream token-by-token from the real SSE endpoint.
@@ -146,7 +146,7 @@ export function HoiAiScreen() {
     return (
       <div className="flex flex-col items-start gap-4 py-10">
         <p className="max-w-[46ch] text-[13.5px] leading-relaxed text-muted">
-          Lá số của bạn chưa được lưu để trò chuyện. Hãy an sao lại để Nghê Sao có thể dẫn đường cho
+          Lá số của bạn chưa được lưu để trò chuyện. Hãy an sao lại để Thiên Hạc có thể dẫn đường cho
           bạn.
         </p>
         <Link
@@ -209,7 +209,7 @@ export function HoiAiScreen() {
         break;
       case "error":
         updateTurnDraft(turn, (current) => ({ ...current, terminal: "failed", activity: null }));
-        showToast("Nghê Sao chưa thể trả lời trọn vẹn. Bạn thử lại nhé.");
+        showToast("Thiên Hạc chưa thể trả lời trọn vẹn. Bạn thử lại nhé.");
         break;
       case "done":
         updateTurnDraft(turn, (current) => ({

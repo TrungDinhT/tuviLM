@@ -42,7 +42,7 @@ export function SettingsList() {
     },
     {
       title: "Nhắc nhở vận hạn",
-      subtitle: "Mỗi sáng một lời từ Nghê Sao",
+      subtitle: "Mỗi sáng một lời từ Thiên Hạc",
       action: () => showToast(COMING_SOON),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className={ICON_CLASS}>

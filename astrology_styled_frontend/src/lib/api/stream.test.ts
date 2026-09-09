@@ -82,22 +82,22 @@ describe("parseSseStream", () => {
   });
 
   it("reassembles a frame split across chunk boundaries", async () => {
-    const body = sseBody(['data: {"type":"text","de', 'lta":"nghê', ' sao"}\n', "\n"]);
+    const body = sseBody(['data: {"type":"text","de', 'lta":"thiên', ' hạc"}\n', "\n"]);
 
-    expect(await collect(body)).toEqual([{ type: "text", delta: "nghê sao" }]);
+    expect(await collect(body)).toEqual([{ type: "text", delta: "thiên hạc" }]);
   });
 
   it("decodes a UTF-8 character split across two chunks", async () => {
     // "ê" is U+00EA, encoded as the two bytes 0xC3 0xAA. Split them apart.
     const encoder = new TextEncoder();
     const body = sseBody([
-      encoder.encode('data: {"type":"text","delta":"ngh'),
+      encoder.encode('data: {"type":"text","delta":"thi'),
       new Uint8Array([0xc3]),
       new Uint8Array([0xaa]),
-      encoder.encode(' sao"}\n\n'),
+      encoder.encode('n hạc"}\n\n'),
     ]);
 
-    expect(await collect(body)).toEqual([{ type: "text", delta: "nghê sao" }]);
+    expect(await collect(body)).toEqual([{ type: "text", delta: "thiên hạc" }]);
   });
 
   it("ignores a frame with no data line", async () => {

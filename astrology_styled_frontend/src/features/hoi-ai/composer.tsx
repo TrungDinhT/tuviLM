@@ -56,7 +56,7 @@ export function Composer({
             }
           }}
           disabled={disabled}
-          placeholder="Hỏi Nghê Sao điều gì đó…"
+          placeholder="Hỏi Thiên Hạc điều gì đó…"
           className="min-w-0 flex-1 border-0 bg-transparent text-[15px] text-ink outline-none placeholder:text-muted"
         />
         <button

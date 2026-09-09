@@ -1,5 +1,5 @@
 /**
- * The Nghê Sao crane that plays over the orbit rings while the chart builds.
+ * The Thiên Hạc crane that plays over the orbit rings while the chart builds.
  *
  * Its own module so the An sao route can preload it — a "use client" module's
  * exports reach a server component as client references, not as the value.

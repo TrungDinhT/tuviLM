@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type StandaloneHeaderProps = {
@@ -13,12 +14,16 @@ export function StandaloneHeader({ actionHref, actionLabel, prompt }: Standalone
         <Link
           href="/"
           className="group inline-flex min-h-11 items-center gap-2.5 font-display text-xl font-semibold text-ink no-underline"
-          aria-label="Tử Vi — về trang chính"
+          aria-label="Thiên Hạc — về trang chính"
         >
-          <span className="grid size-[30px] place-items-center rounded-full border border-glass-line transition-colors group-hover:border-ink">
-            <BrandGlyph />
-          </span>
-          <span>Tử Vi</span>
+          <Image
+            src="/assets/icons/favicon-48x48.png"
+            alt=""
+            width={48}
+            height={48}
+            className="size-9 drop-shadow-[0_0_10px_rgba(255,222,143,0.26)]"
+          />
+          <span>Thiên Hạc</span>
         </Link>
 
         <Link
@@ -30,21 +35,5 @@ export function StandaloneHeader({ actionHref, actionLabel, prompt }: Standalone
         </Link>
       </div>
     </header>
-  );
-}
-
-function BrandGlyph() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="size-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="8" />
-      <path d="M12 4c2.5 2.7 3.8 5.3 3.8 8S14.5 17.3 12 20M8 8.5h8M8 15.5h8" />
-    </svg>
   );
 }

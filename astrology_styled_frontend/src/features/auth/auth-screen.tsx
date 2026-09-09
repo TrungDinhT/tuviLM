@@ -150,7 +150,7 @@ function AuthCard({
         </h2>
         <p className="mt-2 text-sm text-muted">
           {isLogin
-            ? "Dùng Google hoặc email đã liên kết với hồ sơ Tử Vi."
+            ? "Dùng Google hoặc email đã liên kết với hồ sơ Thiên Hạc."
             : "Chỉ cần vài thông tin cơ bản để bắt đầu."}
         </p>
       </div>

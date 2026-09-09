@@ -159,7 +159,7 @@ export function BanMenhScreen() {
             <div>
               <b className="text-base font-semibold">Hỏi AI</b>
             </div>
-            <span className="text-[12.5px] text-muted">Trò chuyện cùng Nghê Sao</span>
+            <span className="text-[12.5px] text-muted">Trò chuyện cùng Thiên Hạc</span>
           </Link>
         </div>
       </div>

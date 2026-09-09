@@ -109,7 +109,7 @@ describe("HoiAiScreen", () => {
         return Promise.resolve(
           jsonResponse({
             session: sessionDetail("s1", [
-              message({ id: "a1", role: "assistant", content: "Chào bạn, tôi là Nghê Sao." }),
+              message({ id: "a1", role: "assistant", content: "Chào bạn, tôi là Thiên Hạc." }),
             ]),
           }),
         );
@@ -121,7 +121,7 @@ describe("HoiAiScreen", () => {
 
     renderScreen(new QueryClient());
 
-    expect(await screen.findByText("Chào bạn, tôi là Nghê Sao.")).toBeTruthy();
+    expect(await screen.findByText("Chào bạn, tôi là Thiên Hạc.")).toBeTruthy();
     // The most recent session is s1; s2 is never opened.
     expect(fetchMock.mock.calls.some(([url]) => url.endsWith("/api/v1/sessions/s2"))).toBe(false);
   });
@@ -144,7 +144,7 @@ describe("HoiAiScreen", () => {
 
     renderScreen(new QueryClient());
 
-    expect(await screen.findByText(/tôi là Nghê Sao/)).toBeTruthy();
+    expect(await screen.findByText(/tôi là Thiên Hạc/)).toBeTruthy();
   });
 
   it("switches sessions from the history list", async () => {
@@ -227,7 +227,7 @@ describe("HoiAiScreen", () => {
     setChart("p1");
 
     renderScreen(new QueryClient());
-    await screen.findByText(/tôi là Nghê Sao/);
+    await screen.findByText(/tôi là Thiên Hạc/);
 
     const button = screen.getByRole("button", { name: "Tạo mới" });
     expect((button as HTMLButtonElement).disabled).toBe(true);
@@ -274,7 +274,7 @@ describe("HoiAiScreen", () => {
 
     renderScreen(new QueryClient());
     await screen.findByText("tin từ s1");
-    fireEvent.change(screen.getByPlaceholderText("Hỏi Nghê Sao điều gì đó…"), {
+    fireEvent.change(screen.getByPlaceholderText("Hỏi Thiên Hạc điều gì đó…"), {
       target: { value: "Câu hỏi đang chạy" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
@@ -318,7 +318,7 @@ describe("HoiAiScreen", () => {
 
     renderScreen(new QueryClient());
     await screen.findByText("tin đã gửi");
-    fireEvent.change(screen.getByPlaceholderText("Hỏi Nghê Sao điều gì đó…"), {
+    fireEvent.change(screen.getByPlaceholderText("Hỏi Thiên Hạc điều gì đó…"), {
       target: { value: "Hỏi thử" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
@@ -326,7 +326,7 @@ describe("HoiAiScreen", () => {
     expect(await screen.findByText("Phần trả lời")).toBeTruthy();
     await waitFor(() =>
       expect(useToastStore.getState().message).toBe(
-        "Nghê Sao chưa thể trả lời trọn vẹn. Bạn thử lại nhé.",
+        "Thiên Hạc chưa thể trả lời trọn vẹn. Bạn thử lại nhé.",
       ),
     );
     expect(screen.getByText("Tin nhắn chưa gửi trọn vẹn.")).toBeTruthy();
@@ -367,7 +367,7 @@ describe("HoiAiScreen", () => {
 
     renderScreen(new QueryClient());
     await screen.findByText("tin đã gửi");
-    fireEvent.change(screen.getByPlaceholderText("Hỏi Nghê Sao điều gì đó…"), {
+    fireEvent.change(screen.getByPlaceholderText("Hỏi Thiên Hạc điều gì đó…"), {
       target: { value: "Hỏi lại cùng key" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
