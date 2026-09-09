@@ -624,6 +624,6 @@ function authErrorMessage(message: string | undefined, isLogin: boolean): string
   }
 
   return isLogin
-    ? "Email hoặc mật khẩu chưa đúng. Bạn kiểm tra lại nhé."
-    : "Không thể tạo tài khoản. Bạn kiểm tra thông tin và thử lại nhé.";
+    ? "Email hoặc mật khẩu chưa đúng."
+    : "Không thể tạo tài khoản. Vui lòng kiểm tra lại thông tin.";
 }
