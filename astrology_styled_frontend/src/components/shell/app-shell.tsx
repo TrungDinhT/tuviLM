@@ -41,9 +41,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
  * Standard screen padding: the gutters every tab shares, plus enough bottom
  * room to scroll clear of the tab bar.
  */
-export function ScreenPad({ children }: { children: React.ReactNode }) {
+export function ScreenPad({
+  children,
+  reserveTabBar = true,
+}: {
+  children: React.ReactNode;
+  reserveTabBar?: boolean;
+}) {
   return (
-    <div className="px-[22px] pt-[calc(10px+var(--safe-t))] pb-[calc(56px+var(--tabbar-h))] md:px-[30px] lg:px-10 lg:pt-[calc(18px+var(--safe-t))] lg:pb-14">
+    <div
+      className={cn(
+        "px-[22px] pt-[calc(10px+var(--safe-t))] md:px-[30px] lg:px-10 lg:pt-[calc(18px+var(--safe-t))] lg:pb-14",
+        reserveTabBar ? "pb-[calc(56px+var(--tabbar-h))]" : "pb-[10px]",
+      )}
+    >
       {children}
     </div>
   );

@@ -269,10 +269,8 @@ export function AnSaoScreen() {
         </div>
       </div>
 
-      {/* Right above the cast button on phone: the reward has to be in view at
-          the moment the dials are being turned, and by then the head of the
-          page has scrolled away. From md up it sits under the story column. */}
-      <div className="mt-2 md:col-start-1 md:row-start-2 md:mt-6 md:self-start">
+      {/* Hidden on phone; from md up it sits under the story column. */}
+      <div className="hidden md:col-start-1 md:row-start-2 md:mt-6 md:block md:self-start">
         <ConstellationReward
           stars={preview.data?.chinh_tinh.map(starKeyFromName) ?? null}
           names={preview.data?.chinh_tinh ?? []}
