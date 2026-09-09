@@ -1,0 +1,42 @@
+/* The casting loader's orbit spin and loading dots. The orbit rings and the
+   planet's paint are inline utilities on casting-loader.tsx. */
+
+.spin22 {
+  animation: spin 22s linear infinite reverse;
+}
+
+.spin14 {
+  animation: spin 14s linear infinite;
+}
+
+.spin6 {
+  animation: spin 6s linear infinite;
+}
+
+.loadDots span {
+  animation: dots 1.4s infinite;
+}
+
+.loadDots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loadDots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dots {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}

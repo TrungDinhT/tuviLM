@@ -1,0 +1,239 @@
+/* The Bản mệnh deck rail and its card face/back mechanic. Layout that can be
+   a Tailwind utility is inline; here is the paint, the custom-property math,
+   and the scroll-driven focus animation. */
+
+.deck {
+  --focus-scale: 1.2195;
+  --card-w: max(240px, calc(var(--deck-h) * 0.82 / 1.7));
+  gap: 14px;
+  padding-block: 6px 8px;
+  padding-inline: calc(50% - var(--card-w) / 2);
+  align-items: flex-end;
+  height: calc(var(--card-w) * 1.7 * var(--focus-scale) + 14px);
+}
+
+.deckItem {
+  display: flex;
+  width: var(--card-w);
+  aspect-ratio: 1 / 1.7;
+  transform: scale(calc(1 + (var(--focus-scale) - 1) * var(--card-focus, 0)));
+  transform-origin: 50% 100%;
+}
+
+.deckItem:global(.is-active) {
+  position: relative;
+  z-index: 2;
+}
+
+.cardBack {
+  display: none;
+}
+
+.cardBackSigil {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  color: var(--t-hue, var(--accent));
+  border: 1px solid color-mix(in srgb, var(--t-hue, var(--accent)) 45%, transparent);
+  box-shadow:
+    0 0 26px color-mix(in srgb, var(--t-hue, var(--accent)) 30%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--t-hue, var(--accent)) 16%, transparent);
+}
+
+.deckDots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.deckDots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-glass-line);
+}
+
+.deckDots i:global(.on) {
+  background: var(--accent);
+  width: 18px;
+  border-radius: 3px;
+  transition: 0.3s;
+}
+
+@media (max-width: 63.999rem) {
+  .deck .cardFace {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    opacity: calc((var(--card-focus, 1) - 0.55) / 0.35);
+  }
+
+  .deck .cardBack {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    opacity: calc((0.9 - var(--card-focus, 1)) / 0.35);
+    background:
+      radial-gradient(
+        2px 2px at 22% 24%,
+        color-mix(in srgb, var(--t-hue, var(--accent)) 75%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        1.6px 1.6px at 74% 18%,
+        color-mix(in srgb, var(--t-hue, var(--accent)) 55%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        2px 2px at 82% 58%,
+        color-mix(in srgb, var(--t-hue, var(--accent)) 60%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        1.6px 1.6px at 18% 66%,
+        color-mix(in srgb, var(--t-hue, var(--accent)) 50%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        2.4px 2.4px at 46% 84%,
+        color-mix(in srgb, var(--t-hue, var(--accent)) 65%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        1.6px 1.6px at 62% 38%,
+        color-mix(in srgb, var(--t-hue, var(--accent)) 45%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        55% 40% at 50% 46%,
+        color-mix(in srgb, var(--t-hue, var(--accent)) 12%, transparent),
+        transparent
+      );
+  }
+}
+
+@media (min-width: 48rem) {
+  .deck {
+    gap: 20px;
+    padding-inline: calc(50% - 134px);
+    height: 594px;
+  }
+
+  .deckItem {
+    --focus-scale: 1.269;
+    aspect-ratio: 1 / 1.7;
+    height: auto;
+    max-height: 100%;
+    flex: 0 0 268px;
+  }
+}
+
+@media (min-width: 64rem) {
+  .deck {
+    display: grid;
+    grid-template-columns: 364px minmax(0, 1fr);
+    gap: 20px;
+    overflow: visible;
+    padding: 8px 40px 10px;
+    align-items: start;
+    scroll-snap-type: none;
+    height: auto;
+  }
+
+  .deckItem:first-child {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 100%;
+    height: auto;
+    max-width: none;
+    aspect-ratio: 1 / 1.7;
+    transform: none;
+  }
+
+  .deckItem:not(:first-child) {
+    grid-column: 2;
+    width: auto;
+    height: auto;
+    max-width: none;
+    aspect-ratio: auto;
+    min-height: 0;
+    transform: none;
+  }
+
+  .deckDots {
+    display: none;
+  }
+}
+
+/* Scroll-driven deck focus — the smooth path. Where `animation-timeline:
+   view()` is supported, each card's scale, face fade and back fade run on the
+   compositor. Browsers without support keep the JS-written `--card-focus`
+   fallback (components/primitives/carousel.tsx). */
+@media (max-width: 63.999rem) {
+  @supports (animation-timeline: view()) {
+    @keyframes deckFocus {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(var(--focus-scale));
+      }
+    }
+
+    @keyframes deckFace {
+      0%,
+      35% {
+        opacity: 0;
+      }
+      45%,
+      55% {
+        opacity: 1;
+      }
+      65%,
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes deckBack {
+      0%,
+      35% {
+        opacity: 1;
+      }
+      45%,
+      55% {
+        opacity: 0;
+      }
+      65%,
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .deckItem {
+      animation: deckFocus linear both;
+      animation-timeline: view(inline);
+    }
+
+    .deck .cardFace {
+      animation: deckFace linear both;
+      animation-timeline: var(--card-tl);
+    }
+
+    .deck .cardBack {
+      animation: deckBack linear both;
+      animation-timeline: var(--card-tl);
+    }
+  }
+}
