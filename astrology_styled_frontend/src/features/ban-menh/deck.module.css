@@ -7,11 +7,14 @@
   --card-ratio: 1.8;
   --focus-scale: 1.2195;
   --card-w: max(240px, calc(var(--deck-h) * 0.82 / var(--card-ratio)));
+  --aura-headroom: calc(var(--card-w) * var(--card-ratio) * 0.1);
   gap: 14px;
   padding-block: 6px 8px;
   padding-inline: calc(50% - var(--card-w) / 2);
   align-items: flex-end;
-  height: calc(var(--card-w) * var(--card-ratio) * var(--focus-scale) + 14px);
+  height: calc(
+    var(--card-w) * var(--card-ratio) * var(--focus-scale) + var(--aura-headroom) + 14px
+  );
 }
 
 .deckItem {
@@ -127,9 +130,10 @@
 @media (min-width: 48rem) {
   .deck {
     --focus-scale: 1.269;
+    --aura-headroom: calc(268px * var(--card-ratio) * 0.1);
     gap: 20px;
     padding-inline: calc(50% - 134px);
-    height: calc(268px * var(--card-ratio) * var(--focus-scale) + 14px);
+    height: calc(268px * var(--card-ratio) * var(--focus-scale) + var(--aura-headroom) + 14px);
   }
 
   .deckItem {

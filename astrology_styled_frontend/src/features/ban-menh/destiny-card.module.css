@@ -1,8 +1,42 @@
-/* The Lá Bài Bản Mệnh (main card) layered background and entrance. The chip
-   and mantra divider are inline utilities on destiny-card.tsx; the background
-   stays here because it stacks a `url()` image layer with colour gradients. */
+/* The Lá Bài Bản Mệnh (main card) aura, layered background and entrance. */
+
+.auraFrame {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.nebulaAura::before {
+  content: "";
+  position: absolute;
+  inset: -8.2% -19.5%;
+  z-index: 0;
+  pointer-events: none;
+  mask-mode: luminance;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  background: var(--aura-paint);
+  mask-image: var(--aura-mask);
+  opacity: var(--aura-opacity);
+  will-change: transform, opacity;
+  animation: auraFloat 9s ease-in-out infinite alternate;
+}
+
+.nebulaAura {
+  --aura-mask: url("/assets/aura/nebula-silk-aligned-v3-imagen-mask.png");
+  --aura-paint: var(--accent-neutral);
+  --aura-opacity: 0.9;
+}
 
 .destiny {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
   background:
     linear-gradient(180deg, rgba(13, 7, 28, 0.88) 0%, rgba(13, 7, 28, 0.54) 20%, transparent 36%),
     linear-gradient(0deg, rgba(13, 7, 28, 0.92) 0%, rgba(13, 7, 28, 0.66) 13%, transparent 31%),
@@ -13,6 +47,21 @@
     0 34px 92px rgba(12, 6, 28, 0.7),
     0 0 60px color-mix(in srgb, var(--accent) 26%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+@keyframes auraFloat {
+  from {
+    transform: translate3d(-2px, 3px, 0) scale(0.99, 1);
+  }
+  to {
+    transform: translate3d(3px, -3px, 0) scale(1.012, 1.008);
+  }
+}
+
+@media (max-width: 47.999rem) {
+  .nebulaAura {
+    --aura-opacity: 0.8;
+  }
 }
 
 .reveal {

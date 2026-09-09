@@ -98,6 +98,16 @@ describe("BanMenhScreen", () => {
 });
 
 describe("deck cards", () => {
+  it("uses the nebula aura for Vô Chính Diệu", () => {
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <DestinyCard chart={chartWith([])} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByTestId("destiny-aura").getAttribute("data-aura")).toBe("nebula");
+  });
+
   it("no card renders an empty archetype, mantra, blurb, colour, month list, or advice", () => {
     const variants = [
       chart, // the real fixture: song tinh Mệnh
