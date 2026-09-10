@@ -12,8 +12,35 @@ import { beVietnamPro, fraunces } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tử Vi · An sao & luận giải",
-  description: "An sao, đọc lá số và trò chuyện cùng Nghê Sao.",
+  title: "Thiên Hạc · An sao & luận giải Tử Vi",
+  description: "An sao, đọc lá số và trò chuyện cùng Thiên Hạc.",
+  icons: {
+    icon: [
+      { url: "/assets/icons/favicon.ico", sizes: "any" },
+      {
+        url: "/assets/icons/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/assets/icons/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/assets/icons/favicon-48x48.png",
+        sizes: "48x48",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "/assets/icons/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
 };
 
 export const viewport: Viewport = {

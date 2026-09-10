@@ -59,7 +59,7 @@ function Thinking({ activity }: { activity?: string | null }) {
   return (
     <span className="flex items-center gap-2 text-muted">
       <span className={styles.dot} />
-      <span>{activity ? `${activity}…` : "Nghê Sao đang suy nghĩ…"}</span>
+      <span>{activity ? `${activity}…` : "Thiên Hạc đang suy nghĩ…"}</span>
     </span>
   );
 }

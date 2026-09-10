@@ -11,11 +11,12 @@ import { queryKeys } from "@/lib/api/queryKeys";
 import type { ChatMessage, SseChatEvent } from "@/lib/api/schemas";
 import { streamChat } from "@/lib/api/stream";
 import { describe, isApiError } from "@/lib/http/errors";
+import { showToast } from "@/lib/toast";
 import { useChartStore } from "@/store/chart-store";
-import { useToastStore } from "@/store/toast-store";
 
 import { ChatBubble, type BubbleStatus } from "./chat-bubble";
 import { Composer } from "./composer";
+import styles from "./hoi-ai-screen.module.css";
 import { SessionHistory } from "./session-history";
 import { toolStatusLabel } from "./tool-status";
 import { useStickToBottom } from "./use-stick-to-bottom";
@@ -41,7 +42,7 @@ interface ActiveStream {
 }
 
 const GREETING =
-  "Chào bạn, tôi là Nghê Sao — tinh linh dẫn đường. Bạn muốn hỏi điều gì về lá số của mình?";
+  "Chào bạn, tôi là Thiên Hạc — tinh linh dẫn đường. Bạn muốn hỏi điều gì về lá số của mình?";
 
 function doneTerminal(status: string): Terminal {
   switch (status) {
@@ -57,7 +58,7 @@ function doneTerminal(status: string): Terminal {
 }
 
 /**
- * The Hỏi AI screen — a chat with Nghê Sao.
+ * The Hỏi AI screen — a chat with Thiên Hạc.
  *
  * Opens on the most recent session by default, with a browsable history and a
  * "Tạo mới" action. Replies stream token-by-token from the real SSE endpoint.
@@ -67,7 +68,6 @@ function doneTerminal(status: string): Terminal {
 export function HoiAiScreen() {
   const hasChart = useChartStore((state) => state.hasChart);
   const chartProfileId = useChartStore((state) => state.chartProfileId);
-  const showToast = useToastStore((state) => state.show);
   const queryClient = useQueryClient();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -144,10 +144,10 @@ export function HoiAiScreen() {
 
   if (chartProfileId === null) {
     return (
-      <div className="flex flex-col items-start gap-4 py-10">
+      <div className={`${styles.enterTranscript} flex flex-col items-start gap-4 py-10`}>
         <p className="max-w-[46ch] text-[13.5px] leading-relaxed text-muted">
-          Lá số của bạn chưa được lưu để trò chuyện. Hãy an sao lại để Nghê Sao có thể dẫn đường cho
-          bạn.
+          Lá số của bạn chưa được lưu để trò chuyện. Hãy an sao lại để Thiên Hạc có thể dẫn đường
+          cho bạn.
         </p>
         <Link
           href="/"
@@ -209,7 +209,7 @@ export function HoiAiScreen() {
         break;
       case "error":
         updateTurnDraft(turn, (current) => ({ ...current, terminal: "failed", activity: null }));
-        showToast("Nghê Sao chưa thể trả lời trọn vẹn. Bạn thử lại nhé.");
+        showToast("Thiên Hạc chưa thể trả lời trọn vẹn. Bạn thử lại nhé.");
         break;
       case "done":
         updateTurnDraft(turn, (current) => ({
@@ -302,7 +302,7 @@ export function HoiAiScreen() {
 
   return (
     <div className="flex flex-col gap-4 pb-10">
-      <div className="flex items-center justify-between gap-2">
+      <div className={`${styles.enterToolbar} flex items-center justify-between gap-2`}>
         <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-accent">
           Khám phá vận mệnh
         </span>
@@ -325,7 +325,7 @@ export function HoiAiScreen() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className={`${styles.enterTranscript} flex flex-col gap-3`}>
         {list.isError || createSession.isError ? (
           <div className="flex items-center gap-3">
             <p className="text-[13.5px] text-muted">

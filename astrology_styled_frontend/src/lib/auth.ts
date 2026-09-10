@@ -19,7 +19,7 @@ const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 const googleConfigured = Boolean(googleClientId && googleClientSecret);
 
 export const auth = betterAuth({
-  appName: "TuviLM",
+  appName: "Thiên Hạc",
   baseURL: process.env.BETTER_AUTH_URL,
   secret: process.env.BETTER_AUTH_SECRET,
   database: mongodbAdapter(mongoClient.db(mongoDatabase), {

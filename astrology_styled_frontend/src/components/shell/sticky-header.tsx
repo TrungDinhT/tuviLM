@@ -3,7 +3,7 @@
  *
  * From `lg` up the desktop top bar already titles the screen, so this band
  * hides itself; rendering both stacks the same title twice ("Lá số của bạn /
- * Hỏi AI · Nghê Sao" above "Hỏi AI / Nghê Sao"). A screen that needs desktop
+ * Hỏi AI · Thiên Hạc" above "Hỏi AI / Thiên Hạc"). A screen that needs desktop
  * hero content beyond the top bar builds it as part of that screen, not here.
  *
  * Before this existed each screen set its own inline styles and they drifted —

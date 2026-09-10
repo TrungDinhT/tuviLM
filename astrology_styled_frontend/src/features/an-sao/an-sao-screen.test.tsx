@@ -19,9 +19,7 @@ describe("AnSaoScreen hierarchy", () => {
     render(<AnSaoScreen />);
 
     const action = screen.getByRole("button", { name: /Luận giải lá số của tôi/ });
-    const reward = screen
-      .getByText("CHỌN GIỜ SINH ĐỂ ĐÁNH THỨC CHÒM SAO")
-      .closest<HTMLElement>("[data-state]");
+    const reward = screen.getByText("CHÒM SAO MỆNH ĐANG NGỦ").parentElement;
 
     expect(reward).not.toBeNull();
     expect(action.compareDocumentPosition(reward as HTMLElement)).toBe(

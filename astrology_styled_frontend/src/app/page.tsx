@@ -16,7 +16,7 @@ export default function Page() {
           `rel=prefetch`, not `preload`: Chromium ignores `as="video"` on a
           preload link and downloads nothing — verified in the browser. */}
       <link rel="prefetch" href={CRANE_LOADING_SRC} as="video" type="video/webm" />
-      <ScreenPad>
+      <ScreenPad reserveTabBar={false}>
         <AnSaoScreen />
       </ScreenPad>
     </>

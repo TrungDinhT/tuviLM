@@ -64,7 +64,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Hỏi AI",
     icon: "hoiAi",
     group: GROUP_CHART,
-    title: "Hỏi AI · Nghê Sao",
+    title: "Hỏi AI · Thiên Hạc",
     requiresChart: true,
   },
   {
