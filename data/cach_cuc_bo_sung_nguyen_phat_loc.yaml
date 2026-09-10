@@ -1,0 +1,1167 @@
+groups:
+  chinh_tinh:
+    stars:
+      - tu_vi
+      - thien_co
+      - thai_duong
+      - vu_khuc
+      - thien_dong
+      - liem_trinh
+      - thien_phu
+      - thai_am
+      - tham_lang
+      - cu_mon
+      - thien_tuong
+      - thien_luong
+      - that_sat
+      - pha_quan
+  tai_tinh:
+    stars:
+      - vu_khuc
+      - thien_phu
+      - thai_am
+      - loc_ton
+      - hoa_loc
+  giu_cua:
+    stars:
+      - co_than
+      - qua_tu
+      - dau_quan
+      - hoa_tinh
+      - linh_tinh
+      - loc_ton
+cach_cuc:
+  - id: npl_tai_tu_sat
+    name: Tử Sát tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Theo sách, cách tạo tiền tương đối nhanh; không đồng nghĩa giữ được bất động sản.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - tu_vi
+            - that_sat
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_tu_pha
+    name: Tử Phá tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Việc kiếm tiền chật vật ban đầu, về sau có thể sung túc hơn.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - tu_vi
+            - pha_quan
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_tu_tham
+    name: Tử Tham tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Tiền bạc ở mức bình thường; tài sản thừa hưởng có khuynh hướng suy giảm về sau.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - tu_vi
+            - tham_lang
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_liem_phu
+    name: Liêm Phủ tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Sách xếp vào cấu hình thuận lợi cho tạo tiền và giữ của.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - liem_trinh
+            - thien_phu
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_liem_sat
+    name: Liêm Sát tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Tiền bạc biến động, có giai đoạn cạn rồi lại có nguồn vào.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - liem_trinh
+            - that_sat
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_liem_pha
+    name: Liêm Phá tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Có thể tạo tiền trong hoàn cảnh biến động, nhưng đi kèm bất trắc liên quan tiền bạc.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - liem_trinh
+            - pha_quan
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_dong_cu
+    name: Đồng Cự tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Dòng tiền vào ra thất thường, cần tách sức kiếm tiền khỏi tính đều đặn của thu nhập.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - thien_dong
+            - cu_mon
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_vu_sat
+    name: Vũ Sát tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Thiên về tự lập, vất vả ở giai đoạn đầu tạo dựng tài chính.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - vu_khuc
+            - that_sat
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_vu_pha
+    name: Vũ Phá tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Có tiền vào nhưng cũng tiêu tán, khó chuyển thu nhập thành phần tích luỹ giữ lại.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - vu_khuc
+            - pha_quan
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_liem_tham
+    name: Liêm Tham tại Tài Bạch
+    page: 261
+    priority: 0
+    meaning: Sách xếp vào nhóm khó khăn tiền bạc, hao phí và nợ nần; các lời đoán hình ngục trong nguyên
+      tác không được coi là kết luận về hành vi thực tế.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - liem_trinh
+            - tham_lang
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_liem_dan_than
+    name: Liêm Trinh Dần Thân tại Tài
+    page: 261
+    priority: 0
+    meaning: Kiếm tiền chậm và có cạnh tranh, nhưng sách nhấn mạnh tính vững chắc của quá trình gây dựng.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - liem_trinh
+          stars_matching_logic: all
+        - type: palace_at
+          palace: tai_bach
+          chi:
+            - dan
+            - than
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_cu_hoi_ty_ngo
+    name: Cự Môn Hợi Tý Ngọ tại Tài
+    page: 262
+    priority: 0
+    meaning: Tự lập; có thể phát tài nhanh trong môi trường biến động, cạnh tranh.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - cu_mon
+          stars_matching_logic: all
+        - type: palace_at
+          palace: tai_bach
+          chi:
+            - hoi
+            - ty
+            - ngo
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 262.
+  - id: npl_tai_cu_ty_thin_tuat
+    name: Cự Môn Tỵ Thìn Tuất tại Tài
+    page: 262
+    priority: 0
+    meaning: Tiền bạc thất thường; sách liên hệ với thị phi hoặc tranh chấp về tiền.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - cu_mon
+          stars_matching_logic: all
+        - type: palace_at
+          palace: tai_bach
+          chi:
+            - ti
+            - thin
+            - tuat
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 262.
+  - id: npl_tai_sat_ty_ngo
+    name: Thất Sát Tý Ngọ tại Tài
+    page: 262
+    priority: 0
+    meaning: Tiền bạc không đều; có sắc thái hoạnh tài, nguồn tiền đến bất ngờ.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - that_sat
+          stars_matching_logic: all
+        - type: palace_at
+          palace: tai_bach
+          chi:
+            - ty
+            - ngo
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 262.
+  - id: npl_tai_pha_thin_tuat
+    name: Phá Quân Thìn Tuất tại Tài
+    page: 262
+    priority: 0
+    meaning: Tiền bạc dao động, hết rồi có lại.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - pha_quan
+          stars_matching_logic: all
+        - type: palace_at
+          palace: tai_bach
+          chi:
+            - thin
+            - tuat
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 262.
+  - id: npl_tai_pha_dan_than
+    name: Phá Quân Dần Thân tại Tài
+    page: 261
+    priority: 0
+    meaning: Thuộc nhóm cấu hình bất lợi cho tiền bạc được liệt kê trong sách.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - pha_quan
+          stars_matching_logic: all
+        - type: palace_at
+          palace: tai_bach
+          chi:
+            - dan
+            - than
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_sat_thin_tuat
+    name: Thất Sát Thìn Tuất tại Tài
+    page: 261
+    priority: 0
+    meaning: Thuộc nhóm cấu hình bất lợi cho tiền bạc được liệt kê trong sách.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - that_sat
+          stars_matching_logic: all
+        - type: palace_at
+          palace: tai_bach
+          chi:
+            - thin
+            - tuat
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_tai_tham_dan_than_ty_ngo
+    name: Tham Lang Dần Thân Tý Ngọ tại Tài
+    page: 261
+    priority: 0
+    meaning: Thuộc nhóm khó khăn về tiền bạc trong mục này; không áp dụng cho mọi vị trí Tham Lang.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - tham_lang
+          stars_matching_logic: all
+        - type: palace_at
+          palace: tai_bach
+          chi:
+            - dan
+            - than
+            - ty
+            - ngo
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261.
+  - id: npl_dien_tu_vi_that_sat
+    name: Tử Sát tại Điền Trạch
+    page: 259
+    priority: 0
+    meaning: Có thể có tổ nghiệp nhưng khó giữ hoặc khó hưởng; về sau phải tự gây dựng điền sản, thường
+      chậm và vất vả.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - tu_vi
+            - that_sat
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 259.
+  - id: npl_dien_tu_vi_pha_quan
+    name: Tử Phá tại Điền Trạch
+    page: 259
+    priority: 0
+    meaning: Có thể có tổ nghiệp nhưng khó giữ hoặc khó hưởng; về sau phải tự gây dựng điền sản, thường
+      chậm và vất vả.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - tu_vi
+            - pha_quan
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 259.
+  - id: npl_dien_vu_khuc_pha_quan
+    name: Vũ Phá tại Điền Trạch
+    page: 259
+    priority: 0
+    meaning: Có thể có tổ nghiệp nhưng khó giữ hoặc khó hưởng; về sau phải tự gây dựng điền sản, thường
+      chậm và vất vả.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - vu_khuc
+            - pha_quan
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 259.
+  - id: npl_dien_liem_trinh_tham_lang
+    name: Liêm Tham tại Điền Trạch
+    page: 259
+    priority: 0
+    meaning: Có thể có tổ nghiệp nhưng khó giữ hoặc khó hưởng; về sau phải tự gây dựng điền sản, thường
+      chậm và vất vả.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - liem_trinh
+            - tham_lang
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 259.
+  - id: npl_dien_liem_phu
+    name: Liêm Phủ tại Điền Trạch
+    page: 259
+    priority: 0
+    meaning: Có di sản nhưng có khả năng sa sút về sau.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - liem_trinh
+            - thien_phu
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 259.
+  - id: npl_dien_liem_sat
+    name: Liêm Sát tại Điền Trạch
+    page: 259
+    priority: 0
+    meaning: Điền sản tạo lập chậm.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - liem_trinh
+            - that_sat
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 259.
+  - id: npl_dien_liem_pha
+    name: Liêm Phá tại Điền Trạch
+    page: 259
+    priority: 0
+    meaning: Dễ có thất bại ban đầu khi gây dựng điền sản.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - liem_trinh
+            - pha_quan
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 259.
+  - id: npl_dien_dong_cu
+    name: Đồng Cự tại Điền Trạch
+    page: 258
+    priority: 0
+    meaning: Sách xếp vào nhóm khó có điền sản; cần đối chiếu cát tinh và các yếu tố giải cứu trước khi
+      luận.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - thien_dong
+            - cu_mon
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 258, 259.
+  - id: npl_dien_vu_sat
+    name: Vũ Sát tại Điền Trạch
+    page: 258
+    priority: 0
+    meaning: Sách xếp vào nhóm khó có điền sản; khác với luận tự lập về tiền bạc khi bộ này ở Tài.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - vu_khuc
+            - that_sat
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 258, 259.
+  - id: npl_dien_duong_luong_dau
+    name: Dương Lương Dậu tại Điền
+    page: 259
+    priority: 0
+    meaning: Thiên về đến tuổi muộn mới có nhà đất.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - thai_duong
+            - thien_luong
+          stars_matching_logic: all
+        - type: palace_at
+          palace: dien_trach
+          chi:
+            - dau
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 259.
+  - id: npl_tai_ta_huu
+    name: Tả Hữu tại Tài Bạch
+    page: 251
+    priority: 0
+    meaning: Tài chính qua hợp tác, góp vốn, cộng sự hoặc cùng kinh doanh; hiệu quả phụ thuộc tài tinh
+      và cát sát đi cùng.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - ta_phu
+            - huu_bat
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 251. Tả Hữu là trợ tài, không tự bảo đảm giàu có.
+      Sát tinh hoặc ám tinh có thể làm biến chất sự hợp tác; không tự gán gian lận cho đương số.
+  - id: npl_tai_quang_quy
+    name: Quang Quý tại Tài Bạch
+    page: 252
+    priority: 0
+    meaning: Liên hệ di sản và vốn góp từ người thân tín, có thể mang tính gia tộc.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - an_quang
+            - thien_quy
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 252. Nếu Không Kiếp hội chiếu, sách nêu khả năng
+      di sản bị hao, không hưởng được, hoặc gắn với nợ; phải kiểm tra riêng.
+  - id: npl_dien_long_phuong_mo
+    name: Long Phượng gặp Mộ tại Điền
+    page: 250
+    priority: 0
+    meaning: Sách liên hệ Long Phượng gặp Mộ với tài sản thừa hưởng.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - long_tri
+            - phuong_cac
+            - mo
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 250. Đồng cung là trường hợp hẹp được mã hoá; nguyên
+      văn chỉ nói gặp Mộ, chưa đủ để mở rộng mọi quan hệ hội hợp.
+  - id: npl_tai_thai_toa_mo
+    name: Thai Toạ gặp Mộ tại Tài
+    page: 250
+    priority: 0
+    meaning: Tăng ý nghĩa thuận lợi về tài sản của Thai Toạ; cách nhận tiền tương đối ít tranh đấu.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - tam_thai
+            - bat_toa
+            - mo
+          stars_matching_logic: all
+        - type: palace_at
+          palace: tai_bach
+          chi:
+            - thin
+            - tuat
+            - suu
+            - mui
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 250. Mã hoá trường hợp đồng cung hẹp; không tự mở
+      rộng chữ gặp thành mọi kiểu hội chiếu.
+  - id: npl_dien_thai_toa_mo
+    name: Thai Toạ gặp Mộ tại Điền
+    page: 250
+    priority: 0
+    meaning: Thuận lợi về tạo sản hoặc được bao bọc; không đồng nghĩa có óc đầu cơ.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - tam_thai
+            - bat_toa
+            - mo
+          stars_matching_logic: all
+        - type: palace_at
+          palace: dien_trach
+          chi:
+            - thin
+            - tuat
+            - suu
+            - mui
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 250. Mã hoá trường hợp đồng cung hẹp; cần xem các
+      tài tinh khác.
+  - id: npl_tai_bach_long_ky
+    name: Thanh Long Hóa Kỵ tại Tài
+    page: 253
+    priority: 0
+    meaning: 'Cách rồng gặp mây: sách coi là thuận lợi cho cơ hội tạo tài sản. Đồng cung mạnh hơn chỉ
+      hội chiếu.'
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - thanh_long
+            - hoa_ky
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 253. Đây là trường hợp cụ thể; không dùng để kết
+      luận mọi Hóa Kỵ đều tốt.
+  - id: npl_tai_bach_ho_phi
+    name: Bạch Hổ Phi Liêm tại Tài
+    page: 253
+    priority: 0
+    meaning: Cách hổ mọc cánh, được sách dùng như dấu hiệu cơ hội thuận lợi cho tạo của.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - bach_ho
+            - phi_liem
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 253.
+  - id: npl_dien_trach_long_ky
+    name: Thanh Long Hóa Kỵ tại Điền
+    page: 253
+    priority: 0
+    meaning: 'Cách rồng gặp mây: sách coi là thuận lợi cho cơ hội tạo tài sản. Đồng cung mạnh hơn chỉ
+      hội chiếu.'
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - thanh_long
+            - hoa_ky
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 253. Đây là trường hợp cụ thể; không dùng để kết
+      luận mọi Hóa Kỵ đều tốt.
+  - id: npl_dien_trach_ho_phi
+    name: Bạch Hổ Phi Liêm tại Điền
+    page: 253
+    priority: 0
+    meaning: Cách hổ mọc cánh, được sách dùng như dấu hiệu cơ hội thuận lợi cho tạo của.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - bach_ho
+            - phi_liem
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 253.
+  - id: npl_ha_ho_hung_bien
+    name: Lưu Hà – Bạch Hổ
+    page: 158
+    priority: 0
+    meaning: Kết hợp khả năng diễn đạt trôi chảy với lời nói mạnh, có sức khích lệ.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - luu_ha
+            - bach_ho
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 158. Các sao trong bộ phối hợp bằng đồng cung, chính
+      chiếu hoặc hợp chiếu. Cần ánh xạ đúng chính chiếu/hợp chiếu với engine, không mặc định mọi sao ở
+      bất cứ đâu trong lá số là hội đủ. Quy ước mã hóa các thế phối hợp bằng scope hoi_hop có trong file
+      mẫu.
+  - id: npl_ha_tue_hung_bien
+    name: Lưu Hà – Thái Tuế
+    page: 158
+    priority: 0
+    meaning: Nguồn lời dồi dào, có khả năng trình bày dài và liên tục.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - luu_ha
+            - thai_tue
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 158. Các sao trong bộ phối hợp bằng đồng cung, chính
+      chiếu hoặc hợp chiếu. Cần ánh xạ đúng chính chiếu/hợp chiếu với engine, không mặc định mọi sao ở
+      bất cứ đâu trong lá số là hội đủ. Quy ước mã hóa các thế phối hợp bằng scope hoi_hop có trong file
+      mẫu.
+  - id: npl_ha_tau_hung_bien
+    name: Lưu Hà – Tấu Thư
+    page: 158
+    priority: 0
+    meaning: Diễn đạt trôi chảy, tế nhị và mềm mại.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - luu_ha
+            - tau_thu
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 158. Các sao trong bộ phối hợp bằng đồng cung, chính
+      chiếu hoặc hợp chiếu. Cần ánh xạ đúng chính chiếu/hợp chiếu với engine, không mặc định mọi sao ở
+      bất cứ đâu trong lá số là hội đủ. Quy ước mã hóa các thế phối hợp bằng scope hoi_hop có trong file
+      mẫu.
+  - id: npl_tau_khoa_hung_bien
+    name: Tấu Thư – Hóa Khoa
+    page: 158
+    priority: 0
+    meaning: Thuyết phục khéo léo, gắn với kiến thức và cách trình bày có học.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - tau_thu
+            - hoa_khoa
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 158. Các sao trong bộ phối hợp bằng đồng cung, chính
+      chiếu hoặc hợp chiếu. Cần ánh xạ đúng chính chiếu/hợp chiếu với engine, không mặc định mọi sao ở
+      bất cứ đâu trong lá số là hội đủ. Quy ước mã hóa các thế phối hợp bằng scope hoi_hop có trong file
+      mẫu.
+  - id: npl_khoa_xuong_khuc_hung_bien
+    name: Hóa Khoa – Xương Khúc
+    page: 158
+    priority: 0
+    meaning: Thuyết phục bằng cả kiến thức lẫn tình cảm; diễn đạt có hệ thống.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - hoa_khoa
+            - van_xuong
+            - van_khuc
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 158. Các sao trong bộ phối hợp bằng đồng cung, chính
+      chiếu hoặc hợp chiếu. Cần ánh xạ đúng chính chiếu/hợp chiếu với engine, không mặc định mọi sao ở
+      bất cứ đâu trong lá số là hội đủ. Quy ước mã hóa các thế phối hợp bằng scope hoi_hop có trong file
+      mẫu.
+  - id: npl_ha_tau_khoa_xuong_khuc
+    name: Lưu Hà – Tấu Thư – Khoa – Xương Khúc
+    page: 158
+    priority: 0
+    meaning: Tổ hợp hùng biện được sách đánh giá cao, có khả năng tác động đến người nghe; chính tinh
+      tốt bổ sung tầm ảnh hưởng.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - luu_ha
+            - tau_thu
+            - hoa_khoa
+            - van_xuong
+            - van_khuc
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 158. Các sao trong bộ phối hợp bằng đồng cung, chính
+      chiếu hoặc hợp chiếu. Cần ánh xạ đúng chính chiếu/hợp chiếu với engine, không mặc định mọi sao ở
+      bất cứ đâu trong lá số là hội đủ. Quy ước mã hóa các thế phối hợp bằng scope hoi_hop có trong file
+      mẫu.
+  - id: npl_tru_loc
+    name: Thiên Trù – Hóa Lộc
+    page: 154
+    priority: 0
+    meaning: Sành thưởng thức món ăn và có khuynh hướng tìm hiểu, chế biến món hợp khẩu vị.
+    conditions:
+      any:
+        - type: star_with_palace
+          palace: menh
+          scope: hoi_hop
+          stars: &id001
+            - thien_tru
+            - hoa_loc
+          stars_matching_logic: all
+        - type: star_with_palace
+          palace: cung_than
+          scope: hoi_hop
+          stars: *id001
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 154. Bộ sao ở Mệnh, Thân hoặc các cung chiếu Mệnh/Thân;
+      cần xác định phạm vi chiếu.
+  - id: npl_tru_tau
+    name: Thiên Trù – Tấu Thư
+    page: 154
+    priority: 0
+    meaning: Khẩu vị tinh tế, cầu kỳ, biết phân biệt cách phối hợp món ăn và thức uống.
+    conditions:
+      any:
+        - type: star_with_palace
+          palace: menh
+          scope: hoi_hop
+          stars: &id002
+            - thien_tru
+            - tau_thu
+          stars_matching_logic: all
+        - type: star_with_palace
+          palace: cung_than
+          scope: hoi_hop
+          stars: *id002
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 154. Bộ sao ở Mệnh, Thân hoặc các cung chiếu Mệnh/Thân;
+      cần xác định phạm vi chiếu.
+  - id: npl_tru_luc
+    name: Thiên Trù – Lực Sĩ
+    page: 154
+    priority: 0
+    meaning: Sách liên hệ với sức ăn và sự ham thích ăn uống; đây là mô tả trong hệ thống luận sao.
+    conditions:
+      any:
+        - type: star_with_palace
+          palace: menh
+          scope: hoi_hop
+          stars: &id003
+            - thien_tru
+            - luc_si
+          stars_matching_logic: all
+        - type: star_with_palace
+          palace: cung_than
+          scope: hoi_hop
+          stars: *id003
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 154. Bộ sao ở Mệnh, Thân hoặc các cung chiếu Mệnh/Thân;
+      cần xác định phạm vi chiếu.
+  - id: npl_tru_hao
+    name: Thiên Trù – Song Hao
+    page: 155
+    priority: 0
+    meaning: Sách liên hệ với khoản chi lớn cho ăn uống, làm giảm phần dành dụm.
+    conditions:
+      any:
+        - type: star_with_palace
+          palace: menh
+          scope: hoi_hop
+          stars: &id004
+            - thien_tru
+            - dai_hao
+            - tieu_hao
+          stars_matching_logic: all
+        - type: star_with_palace
+          palace: cung_than
+          scope: hoi_hop
+          stars: *id004
+          stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 155. Thiên Trù phối hợp Song Hao tại Mệnh/Thân hoặc
+      các cung chiếu. Song Hao không thể đồng cung; phải biểu diễn quan hệ hội chiếu đúng.
+  - id: npl_ta_huu_khoa
+    name: Tả Hữu trợ Khoa
+    page: 178
+    priority: 0
+    meaning: Mở rộng học vấn, khả năng học thêm lĩnh vực hoặc ngôn ngữ.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - ta_phu
+            - huu_bat
+            - hoa_khoa
+    evidence: 'Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 178–179, Những sao mở rộng học vấn. Sao trợ lực
+      phối hợp khoa tinh. Quy ước mã hóa: phối hợp được biểu diễn bằng hội hợp.'
+  - id: npl_ta_huu_xuong_khuc
+    name: Tả Hữu trợ Xương Khúc
+    page: 178
+    priority: 0
+    meaning: Mở rộng phạm vi học tập, được sách liên hệ với sinh ngữ và dịch thuật.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - ta_phu
+            - huu_bat
+            - van_xuong
+            - van_khuc
+    evidence: 'Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 178–179, Những sao mở rộng học vấn. Sao trợ lực
+      phối hợp khoa tinh. Quy ước mã hóa: phối hợp được biểu diễn bằng hội hợp.'
+  - id: npl_khoa_sinh
+    name: Khoa – Tràng Sinh
+    page: 178
+    priority: 0
+    meaning: Tăng sắc thái học rộng và khả năng sáng tác.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - hoa_khoa
+            - trang_sinh
+    evidence: 'Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 178–179, Những sao mở rộng học vấn. Sao trợ lực
+      phối hợp khoa tinh. Quy ước mã hóa: phối hợp được biểu diễn bằng hội hợp.'
+  - id: npl_khoi_vuong
+    name: Khôi – Đế Vượng
+    page: 178
+    priority: 0
+    meaning: Sách liên hệ với thành tích nổi bật trong thi cử.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - thien_khoi
+            - de_vuong
+    evidence: 'Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 178–179, Những sao mở rộng học vấn. Sao trợ lực
+      phối hợp khoa tinh. Quy ước mã hóa: phối hợp được biểu diễn bằng hội hợp.'
+  - id: npl_vu_phu_loc_ma
+    name: Vũ Phủ được Lộc hoặc Mã trợ tài
+    page: 244
+    priority: 0
+    meaning: Vũ Phủ đồng cung được thêm Hóa Lộc, Lộc Tồn hoặc Thiên Mã có ý nghĩa tăng tài lực.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: dong_cung
+          stars:
+            - vu_khuc
+            - thien_phu
+        - any:
+            - type: stars_meeting
+              scope: hoi_hop
+              stars:
+                - vu_khuc
+                - hoa_loc
+            - type: stars_meeting
+              scope: hoi_hop
+              stars:
+                - vu_khuc
+                - loc_ton
+            - type: stars_meeting
+              scope: hoi_hop
+              stars:
+                - vu_khuc
+                - thien_ma
+        - not:
+            any:
+              - type: stars_meeting
+                scope: hoi_hop
+                stars:
+                  - vu_khuc
+                  - kinh_duong
+              - type: stars_meeting
+                scope: hoi_hop
+                stars:
+                  - vu_khuc
+                  - da_la
+              - type: stars_meeting
+                scope: hoi_hop
+                stars:
+                  - vu_khuc
+                  - dia_khong
+              - type: stars_meeting
+                scope: hoi_hop
+                stars:
+                  - vu_khuc
+                  - dia_kiep
+              - type: stars_meeting
+                scope: hoi_hop
+                stars:
+                  - vu_khuc
+                  - linh_tinh
+              - type: stars_meeting
+                scope: hoi_hop
+                stars:
+                  - vu_khuc
+                  - hoa_tinh
+              - type: stars_meeting
+                scope: hoi_hop
+                stars:
+                  - vu_khuc
+                  - dai_hao
+              - type: stars_meeting
+                scope: hoi_hop
+                stars:
+                  - vu_khuc
+                  - tieu_hao
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 244. Vũ Khúc và Thiên Phủ đồng cung, thêm Hóa Lộc,
+      Lộc Tồn hoặc Thiên Mã thì tài lực tăng, miễn không bị sát, hung, hao tinh xâm phạm. Quy ước mã hóa
+      trợ/xâm phạm là hội hợp với Vũ Khúc; nhóm phá dùng Lục Sát theo file mẫu và Đại Hao, Tiểu Hao. Không
+      đặt ngưỡng phải có nhiều sát tinh mới tính là xâm phạm.
+  - id: npl_song_loc_phan_biet
+    name: 'Song Lộc: hội chiếu khác đồng cung'
+    page: 249
+    priority: 0
+    meaning: Sách đánh giá hội chiếu thuận lợi hơn đồng cung; đồng cung có thể phát sinh hệ luỵ vì tiền.
+    conditions:
+      all:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - hoa_loc
+            - loc_ton
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 249. Phân biệt rõ Lộc Tồn–Hóa Lộc hội chiếu và đồng
+      cung. Giữ như ý kiến riêng của nguồn; không gộp với một nhãn Song Lộc luôn tốt. Quy ước mã hóa các
+      thế phối hợp bằng scope hoi_hop có trong file mẫu.
+  - id: npl_loc_dao_hong
+    name: Lộc đi với Đào hoặc Hồng
+    page: 252
+    priority: 0
+    meaning: Nguồn tiền hoặc cơ hội tài chính qua quan hệ tình cảm/người phối ngẫu theo lối luận trong
+      sách.
+    conditions:
+      any:
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - hoa_loc
+            - dao_hoa
+        - type: stars_meeting
+          scope: hoi_hop
+          stars:
+            - hoa_loc
+            - hong_loan
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 252. Hóa Lộc đi với Đào hoặc Hồng; không bắt buộc
+      cả hai sao Đào, Hồng. Quy ước mã hóa đi với là hội hợp.
+  - id: npl_tai_tinh_sinh_vuong
+    name: Tài tinh được Sinh hoặc Vượng trợ
+    page: 252
+    priority: 0
+    meaning: Sinh/Vượng tăng ý nghĩa quy mô, vốn sinh lợi hoặc tích luỹ thêm khi đi với tài tinh.
+    conditions:
+      all:
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          stars:
+            - trang_sinh
+            - de_vuong
+          stars_matching_logic: any
+        - type: star_with_palace
+          palace: tai_bach
+          scope: dong_cung
+          group_name: tai_tinh
+          at_least: 3
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 252. Tài tinh tại Tài đồng cung với Sinh hoặc Vượng
+      thì tăng ý nghĩa vốn sinh lợi, tích lũy. Nhóm tài tinh trực tiếp dùng ở mục này gồm Vũ Khúc, Thiên
+      Phủ, Thái Âm, Lộc Tồn, Hóa Lộc (đối chiếu trang 243–249); các sao khác có ý nghĩa tài lộc theo vị
+      trí hoặc phối hợp được xét riêng, không tự động đưa vào group này.
+  - id: npl_giu_cua_khong_dong_nghia_giau
+    name: Nhóm sao giữ của
+    page: 254
+    priority: 0
+    meaning: Gợi ý xu hướng giữ, tiết kiệm hoặc tiêu kỹ; không thể dùng riêng để kết luận giàu có.
+    conditions:
+      any:
+        - any:
+            - type: star_with_palace
+              palace: menh
+              scope: dong_cung
+              group_name: giu_cua
+              at_least: 2
+            - type: star_with_palace
+              palace: cung_than
+              scope: dong_cung
+              group_name: giu_cua
+              at_least: 2
+            - type: star_with_palace
+              palace: tai_bach
+              scope: dong_cung
+              group_name: giu_cua
+              at_least: 2
+            - type: star_with_palace
+              palace: dien_trach
+              scope: dong_cung
+              group_name: giu_cua
+              at_least: 2
+            - type: star_with_palace
+              palace: quan_loc
+              scope: dong_cung
+              group_name: giu_cua
+              at_least: 2
+            - type: star_with_palace
+              palace: thien_di
+              scope: dong_cung
+              group_name: giu_cua
+              at_least: 2
+        - all:
+            - type: star_brightness
+              stars:
+                - vu_khuc
+              brightness:
+                - ham
+            - any:
+                - type: star_with_palace
+                  palace: menh
+                  scope: dong_cung
+                  stars:
+                    - vu_khuc
+                  stars_matching_logic: all
+                - type: star_with_palace
+                  palace: cung_than
+                  scope: dong_cung
+                  stars:
+                    - vu_khuc
+                  stars_matching_logic: all
+                - type: star_with_palace
+                  palace: tai_bach
+                  scope: dong_cung
+                  stars:
+                    - vu_khuc
+                  stars_matching_logic: all
+                - type: star_with_palace
+                  palace: dien_trach
+                  scope: dong_cung
+                  stars:
+                    - vu_khuc
+                  stars_matching_logic: all
+                - type: star_with_palace
+                  palace: quan_loc
+                  scope: dong_cung
+                  stars:
+                    - vu_khuc
+                  stars_matching_logic: all
+                - type: star_with_palace
+                  palace: thien_di
+                  scope: dong_cung
+                  stars:
+                    - vu_khuc
+                  stars_matching_logic: all
+    evidence: Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 243 và 254. Sao giữ của được xét khi đóng tại Mệnh,
+      Thân, Tài, Điền, Quan hoặc Di. Nhóm gồm Cô Thần, Quả Tú, Đẩu Quân, Hỏa Tinh, Linh Tinh, Lộc Tồn;
+      Vũ Khúc chỉ thuộc trường hợp này khi hãm địa. Chỉ nhận diện có tín hiệu giữ của; không suy ra giàu
+      có hay ấn định mức độ bằng số lượng sao.
+  - id: npl_dien_vcd_tuan_triet_nhat_nguyet
+    name: Điền VCD, Tuần/Triệt và Nhật Nguyệt sáng
+    page: 261
+    priority: 0
+    meaning: Ban đầu gây dựng khó, về sau thuận lợi hơn về điền sản nếu đủ Nhật Nguyệt sáng hội chiếu.
+    conditions:
+      all:
+        - not:
+            type: star_with_palace
+            palace: dien_trach
+            scope: dong_cung
+            group_name: chinh_tinh
+            at_least: 1
+        - type: star_with_palace
+          palace: dien_trach
+          scope: dong_cung
+          stars:
+            - tuan
+            - triet
+          stars_matching_logic: any
+        - type: star_with_palace
+          palace: dien_trach
+          scope: hoi_hop
+          stars:
+            - thai_duong
+            - thai_am
+          stars_matching_logic: all
+        - type: star_brightness
+          stars:
+            - thai_duong
+          brightness:
+            - dac
+            - vuong
+            - mieu
+        - type: star_brightness
+          stars:
+            - thai_am
+          brightness:
+            - dac
+            - vuong
+            - mieu
+    evidence: 'Tử Vi Tổng Hợp – Nguyễn Phát Lộc, trang 261. Điền vô chính diệu, có Tuần hoặc Triệt án
+      ngữ, Nhật Nguyệt sáng sủa hội chiếu: ban đầu khó khăn, về sau thuận lợi về điền sản. Độ sáng được
+      mã hóa riêng cho từng sao: đắc, vượng hoặc miếu, theo phong cách file mẫu.'
