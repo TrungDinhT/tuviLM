@@ -101,6 +101,7 @@ describe("deck cards", () => {
   it.each([
     { stars: [], aura: "nebula" },
     { stars: ["Tử Vi (Miếu)"], aura: "orbit" },
+    { stars: ["Tử Vi", "Thiên Phủ"], aura: "aurora" },
   ])("uses the $aura aura for $stars.length chính tinh", ({ stars, aura }) => {
     render(
       <QueryClientProvider client={new QueryClient()}>

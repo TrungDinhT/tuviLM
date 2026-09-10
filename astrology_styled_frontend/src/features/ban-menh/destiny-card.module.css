@@ -9,7 +9,8 @@
   min-height: 0;
 }
 
-.auraFrame::before {
+.auraFrame::before,
+.auroraAura::after {
   content: "";
   position: absolute;
   inset: -8.2% -19.5%;
@@ -127,6 +128,19 @@
   animation-delay: -7.5s;
 }
 
+.auroraAura {
+  --aura-mask: url("/assets/aura/aurora-woven-contained-a-imagen-mask.png");
+  --aura-paint: var(--accent);
+  --aura-opacity: 0.88;
+}
+
+.auroraAura::after {
+  background: var(--accent-2);
+  mask-image: url("/assets/aura/aurora-woven-contained-b-imagen-mask.png");
+  mix-blend-mode: screen;
+  animation: auraCounterFloat 11s ease-in-out infinite alternate;
+}
+
 .destiny {
   position: relative;
   z-index: 1;
@@ -150,6 +164,15 @@
   }
   to {
     transform: translate3d(3px, -3px, 0) scale(1.012, 1.008);
+  }
+}
+
+@keyframes auraCounterFloat {
+  from {
+    transform: translate3d(3px, -2px, 0) scale(1.008, 0.995);
+  }
+  to {
+    transform: translate3d(-3px, 3px, 0) scale(0.994, 1.01);
   }
 }
 
@@ -185,6 +208,10 @@
 
   .orbitAura {
     --aura-opacity: 0.9;
+  }
+
+  .auroraAura {
+    --aura-opacity: 0.76;
   }
 }
 

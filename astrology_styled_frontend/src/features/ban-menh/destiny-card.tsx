@@ -38,7 +38,7 @@ export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
       ? (["nebula", cardStyles.nebulaAura] as const)
       : names.length === 1
         ? (["orbit", cardStyles.orbitAura] as const)
-        : undefined;
+        : (["aurora", cardStyles.auroraAura] as const);
 
   const boxes: readonly (readonly [number, number, number, number])[] = songTinh
     ? [
@@ -50,8 +50,8 @@ export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
   return (
     <div
       data-testid="destiny-aura"
-      data-aura={aura?.[0]}
-      className={`${cardStyles.auraFrame} ${aura?.[1] ?? ""}`}
+      data-aura={aura[0]}
+      className={`${cardStyles.auraFrame} ${aura[1]}`}
     >
       {names.length === 1 ? (
         <span
