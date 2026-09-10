@@ -9,7 +9,7 @@
   min-height: 0;
 }
 
-.nebulaAura::before {
+.auraFrame::before {
   content: "";
   position: absolute;
   inset: -8.2% -19.5%;
@@ -19,10 +19,13 @@
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
-  background: var(--aura-paint);
-  mask-image: var(--aura-mask);
   opacity: var(--aura-opacity);
   will-change: transform, opacity;
+}
+
+.auraFrame::before {
+  background: var(--aura-paint);
+  mask-image: var(--aura-mask);
   animation: auraFloat 9s ease-in-out infinite alternate;
 }
 
@@ -30,6 +33,98 @@
   --aura-mask: url("/assets/aura/nebula-silk-aligned-v3-imagen-mask.png");
   --aura-paint: var(--accent-neutral);
   --aura-opacity: 0.9;
+}
+
+.orbitAura {
+  --aura-mask: url("/assets/aura/orbit-asymmetric-lines-hard-edge-imagen-mask.png");
+  --aura-paint: linear-gradient(145deg, var(--accent-2), var(--accent) 58%, var(--accent-2));
+  --aura-opacity: 1;
+}
+
+.orbitAura::before {
+  filter: brightness(1.2) saturate(1.08);
+}
+
+.orbitTwinkles {
+  position: absolute;
+  inset: -8.2% -19.5%;
+  z-index: 0;
+  pointer-events: none;
+  animation: auraFloat 9s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.orbitTwinkle {
+  --twinkle-size: 32px;
+  position: absolute;
+  width: var(--twinkle-size);
+  height: var(--twinkle-size);
+  translate: -50% -50%;
+  color: color-mix(in srgb, var(--accent) 64%, white);
+  background: radial-gradient(circle, white 0 4%, currentColor 6% 10%, transparent 25%);
+  filter: drop-shadow(0 0 3px currentColor) brightness(1.45);
+  opacity: 0.26;
+  scale: 0.8;
+  animation: orbitTwinkle 6.4s ease-in-out infinite;
+  will-change: scale, opacity;
+}
+
+.orbitTwinkle::before,
+.orbitTwinkle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 999px;
+  background: linear-gradient(transparent, currentColor 24%, white 50%, currentColor 76%, transparent);
+}
+
+.orbitTwinkle::before {
+  width: 1px;
+}
+
+.orbitTwinkle::after {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor 24%, white 50%, currentColor 76%, transparent);
+}
+
+.orbitTwinkle:nth-child(1) {
+  --twinkle-size: 35px;
+  top: 8.1%;
+  left: 87.4%;
+  animation-duration: 7.2s;
+  animation-delay: -4.4s;
+}
+
+.orbitTwinkle:nth-child(2) {
+  top: 19.1%;
+  left: 11.8%;
+  animation-duration: 6.1s;
+  animation-delay: -1.3s;
+}
+
+.orbitTwinkle:nth-child(3) {
+  --twinkle-size: 29px;
+  top: 35.9%;
+  left: 12.9%;
+  animation-duration: 8.3s;
+  animation-delay: -6.1s;
+}
+
+.orbitTwinkle:nth-child(4) {
+  --twinkle-size: 38px;
+  top: 72.7%;
+  left: 8.8%;
+  animation-duration: 6.8s;
+  animation-delay: -3.2s;
+}
+
+.orbitTwinkle:nth-child(5) {
+  --twinkle-size: 33px;
+  top: 74.1%;
+  left: 84.9%;
+  animation-duration: 9.1s;
+  animation-delay: -7.5s;
 }
 
 .destiny {
@@ -58,9 +153,38 @@
   }
 }
 
+@keyframes orbitTwinkle {
+  0%,
+  38%,
+  100% {
+    opacity: 0.24;
+    scale: 0.8;
+  }
+  51% {
+    opacity: 1;
+    scale: 1.08;
+  }
+  67% {
+    opacity: 0.34;
+    scale: 0.88;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbitTwinkle {
+    animation: none;
+    opacity: 0.7;
+    scale: 1;
+  }
+}
+
 @media (max-width: 47.999rem) {
   .nebulaAura {
     --aura-opacity: 0.8;
+  }
+
+  .orbitAura {
+    --aura-opacity: 0.9;
   }
 }
 

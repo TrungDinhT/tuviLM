@@ -33,7 +33,12 @@ export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
   const entry = destinyFor(menhStarKey(chart));
   const songTinh = names.length === 2;
   const label = names.map(displayStarName).join(" · ");
-  const aura = names.length === 0 ? (["nebula", cardStyles.nebulaAura] as const) : undefined;
+  const aura =
+    names.length === 0
+      ? (["nebula", cardStyles.nebulaAura] as const)
+      : names.length === 1
+        ? (["orbit", cardStyles.orbitAura] as const)
+        : undefined;
 
   const boxes: readonly (readonly [number, number, number, number])[] = songTinh
     ? [
@@ -48,6 +53,17 @@ export function DestinyCard({ chart }: { chart: BuildLasoResponse }) {
       data-aura={aura?.[0]}
       className={`${cardStyles.auraFrame} ${aura?.[1] ?? ""}`}
     >
+      {names.length === 1 ? (
+        <span
+          data-testid="destiny-aura-twinkles"
+          className={cardStyles.orbitTwinkles}
+          aria-hidden="true"
+        >
+          {Array.from({ length: 5 }, (_, index) => (
+            <i key={index} className={cardStyles.orbitTwinkle} />
+          ))}
+        </span>
+      ) : null}
       <article
         data-testid="destiny-card"
         className={`${cardStyles.destiny} ${cardStyles.reveal} relative flex aspect-[9/16] min-h-0 min-w-0 flex-[1_1_auto] flex-col overflow-hidden rounded-[22px] px-6 pt-[26px] pb-6 md:pt-[28px]`}
