@@ -1,15 +1,16 @@
 "use client";
 
-import { useId } from "react";
+import { useId, type CSSProperties } from "react";
 
-import {
-  CONSTELLATION_SCATTER,
-  ConstellationGradientDefs,
-  ConstellationShape,
-} from "@/components/shared/constellation-art";
+import { CONSTELLATION_SCATTER } from "@/components/shared/constellation-art";
 import styles from "@/components/shared/constellation-art.module.css";
-import { STAR_SHAPES } from "@/content/star-shapes";
+import type { GodConstellation } from "@/content/god-constellations";
+import { GOD_GHOSTS } from "@/content/god-ghosts";
+import { GOD_LANDMARK_CONSTELLATIONS } from "@/content/god-landmark-constellations";
+import { GOD_SILHOUETTES, type GodSilhouette } from "@/content/god-silhouettes";
 import { cn } from "@/lib/utils";
+
+import rewardStyles from "./constellation-reward.module.css";
 
 interface ConstellationRewardProps {
   /**
@@ -21,20 +22,141 @@ interface ConstellationRewardProps {
   names: readonly string[];
 }
 
+/** Central tuning for the brightness-only star twinkle. Larger cycleMs is slower. */
+const STAR_TWINKLE_CONFIG = {
+  cycleMs: 12000,
+  firstPhaseMs: 400,
+  staggerStepMs: 1300,
+  staggerWindowMs: 12000,
+  haloRestOpacity: 0.08,
+  haloPeakOpacity: 0.82,
+  coreRestOpacity: 0.74,
+  corePeakOpacity: 1,
+} as const;
+
+const STAR_TWINKLE_STYLE = {
+  "--star-twinkle-cycle": `${STAR_TWINKLE_CONFIG.cycleMs}ms`,
+  "--star-halo-rest-opacity": `${STAR_TWINKLE_CONFIG.haloRestOpacity}`,
+  "--star-halo-peak-opacity": `${STAR_TWINKLE_CONFIG.haloPeakOpacity}`,
+  "--star-core-rest-opacity": `${STAR_TWINKLE_CONFIG.coreRestOpacity}`,
+  "--star-core-peak-opacity": `${STAR_TWINKLE_CONFIG.corePeakOpacity}`,
+} as CSSProperties;
+
+export function GodConstellationArt({
+  shape,
+  silhouette,
+  renderSilhouette,
+  label,
+  pointScale = 1,
+}: {
+  shape: GodConstellation;
+  silhouette: GodSilhouette;
+  renderSilhouette: boolean;
+  label: string;
+  pointScale?: number;
+}) {
+  const haloGradientId = useId();
+
+  return (
+    <svg
+      role="img"
+      aria-label={label}
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid meet"
+      className={`${rewardStyles.vectorConstellation} absolute inset-0 h-full w-full overflow-visible`}
+      style={STAR_TWINKLE_STYLE}
+    >
+      <defs>
+        <radialGradient id={haloGradientId}>
+          <stop offset="0%" stopColor="white" stopOpacity="0.92" />
+          <stop offset="38%" stopColor="var(--accent-2)" stopOpacity="0.72" />
+          <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {renderSilhouette ? (
+        <>
+          <ellipse className={rewardStyles.godAura} cx="50" cy="53" rx="35" ry="43" />
+          {silhouette.fillPaths.map((path, index) => (
+            <path key={`fill-${index}`} className={rewardStyles.godFill} d={path} />
+          ))}
+          {silhouette.detailPaths.map((path, index) => (
+            <path key={`detail-${index}`} className={rewardStyles.godDetail} d={path} />
+          ))}
+          {silhouette.symbolPaths.map((path, index) => (
+            <path key={`symbol-${index}`} className={rewardStyles.godSymbol} d={path} />
+          ))}
+        </>
+      ) : null}
+      {shape.lines.map(([fromIndex, toIndex], lineIndex) => {
+        const from = shape.points[fromIndex];
+        const to = shape.points[toIndex];
+        if (from === undefined || to === undefined) return null;
+        return (
+          <line
+            key={`${fromIndex}-${toIndex}`}
+            className={rewardStyles.starLine}
+            x1={from[0]}
+            y1={from[1]}
+            x2={to[0]}
+            y2={to[1]}
+            pathLength="1"
+            style={{ animationDelay: `${180 + lineIndex * 50}ms` }}
+          />
+        );
+      })}
+      {shape.points.map(([cx, cy, pointPower], index) => {
+        const power = pointPower ?? 1;
+        const twinklePhase =
+          STAR_TWINKLE_CONFIG.firstPhaseMs +
+          ((index * STAR_TWINKLE_CONFIG.staggerStepMs) % STAR_TWINKLE_CONFIG.staggerWindowMs);
+        const twinkleDelay = `-${twinklePhase}ms`;
+        return (
+          <g
+            key={index}
+            className={rewardStyles.starNode}
+            style={{ animationDelay: `${110 + index * 45}ms` }}
+          >
+            <circle
+              className={rewardStyles.starHalo}
+              cx={cx}
+              cy={cy}
+              r={1.45 * power * pointScale}
+              style={{ animationDelay: twinkleDelay, fill: `url(#${haloGradientId})` }}
+            />
+            <circle
+              className={rewardStyles.starCore}
+              cx={cx}
+              cy={cy}
+              r={0.52 * power * pointScale}
+              style={{ animationDelay: twinkleDelay }}
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 /**
- * The constellation that wakes as the birth data completes.
+ * The guardian portrait that wakes as the birth data completes.
  *
- * Fed by the preview endpoint — never by birth-date arithmetic. Stars with
- * authored line-art draw their constellation in the accent gradient; a star
- * without art, and vô chính diệu, get the neutral scattered sky. Portrait
- * art joins later through the content layer; until then the SVG treatment is
- * the only one, exactly as the prototype falls back.
+ * Fed by the preview endpoint — never by birth-date arithmetic. Each chính
+ * tinh maps to a tiny ghost backdrop with an anatomy-following SVG constellation;
+ * song tinh show both guardians side by side. Vô chính diệu and unknown stars
+ * retain the neutral scattered-sky fallback.
  */
 export function ConstellationReward({ stars, names }: ConstellationRewardProps) {
-  // useId carries colons, which are awkward inside url(#…) — strip them.
-  const gradientId = useId().replace(/:/g, "");
   const lit = stars !== null;
-  const drawable = lit && stars.length > 0 && stars.every((key) => STAR_SHAPES[key] !== undefined);
+  const guardians =
+    stars?.flatMap((key) => {
+      const silhouette = GOD_SILHOUETTES[key];
+      const constellation = GOD_LANDMARK_CONSTELLATIONS[key];
+      return silhouette === undefined || constellation === undefined
+        ? []
+        : [{ key, silhouette, constellation, ghostSrc: GOD_GHOSTS[key] }];
+    }) ?? [];
+  const hasGuardians = lit && stars.length > 0 && guardians.length === stars.length;
+  const isSongTinh = guardians.length > 1;
 
   const caption = !lit
     ? "CHÒM SAO MỆNH ĐANG NGỦ"
@@ -42,45 +164,80 @@ export function ConstellationReward({ stars, names }: ConstellationRewardProps) 
       ? "MỆNH VÔ CHÍNH DIỆU · TRỜI RỘNG MỞ"
       : `CHÒM SAO ${names.join(" · ").toUpperCase()} ĐÃ THỨC`;
 
-  // One centred constellation for a single star, two side by side for song tinh.
-  const boxes: readonly (readonly [number, number, number, number])[] =
-    stars !== null && stars.length === 2
-      ? [
-          [18, 14, 128, 70],
-          [176, 14, 128, 70],
-        ]
-      : [[92, 16, 136, 66]];
-
   return (
-    <div className={cn("relative mt-[6px] mb-[2px] h-[154px]", lit && styles.constelLit)} aria-hidden="true">
-      <svg
-        viewBox="0 0 320 100"
-        preserveAspectRatio="xMidYMid meet"
-        className="absolute inset-0 h-[116px] w-full overflow-visible transition-opacity duration-[350ms]"
-      >
-        {drawable ? (
-          <>
-            <ConstellationGradientDefs id={gradientId} />
-            {stars.map((key, index) => {
-              const shape = STAR_SHAPES[key];
-              const box = boxes[index];
-              if (shape === undefined || box === undefined) return null;
-              return <ConstellationShape key={key} shape={shape} box={box} gradientId={gradientId} />;
-            })}
-          </>
-        ) : (
-          CONSTELLATION_SCATTER.map(([cx, cy], index) => (
+    <div
+      className={cn(
+        "relative mt-[6px] mb-[2px]",
+        hasGuardians
+          ? isSongTinh
+            ? "h-[clamp(190px,58vw,220px)]"
+            : "h-[clamp(230px,82vw,278px)]"
+          : "h-[154px]",
+        lit && styles.constelLit,
+      )}
+    >
+      {hasGuardians ? (
+        <div
+          className={cn(
+            "absolute inset-x-0 top-0 flex items-start justify-center",
+            isSongTinh ? "h-[clamp(150px,44vw,172px)] gap-[2px]" : "h-[clamp(210px,78vw,252px)]",
+          )}
+        >
+          {guardians.map(({ key, silhouette, constellation, ghostSrc }, index) => (
+            <div
+              key={key}
+              className={cn(
+                rewardStyles.constellationFigure,
+                "relative aspect-square",
+                isSongTinh ? "w-[min(170px,44vw)]" : "w-[min(250px,78vw)]",
+              )}
+              style={{ animationDelay: `${index * 90}ms` }}
+            >
+              {ghostSrc === undefined ? null : (
+                <div
+                  aria-hidden="true"
+                  className={rewardStyles.ghostBackdrop}
+                  style={{ backgroundImage: `url(${ghostSrc})` }}
+                />
+              )}
+              <GodConstellationArt
+                shape={constellation}
+                silhouette={silhouette}
+                renderSilhouette={ghostSrc === undefined}
+                label={`Chòm sao ${names[index] ?? "chính tinh"} trong hình tượng ${silhouette.deity}`}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 320 100"
+          preserveAspectRatio="xMidYMid meet"
+          className="absolute inset-0 h-[116px] w-full overflow-visible transition-opacity duration-[350ms]"
+        >
+          {CONSTELLATION_SCATTER.map(([cx, cy], index) => (
             <circle
               key={index}
-              className={cn(styles.constelNode, lit && stars.length === 0 && styles.constelNodeNeutral)}
+              className={cn(
+                styles.constelNode,
+                lit && stars.length === 0 && styles.constelNodeNeutral,
+              )}
               cx={cx}
               cy={cy}
               r="2.4"
             />
-          ))
+          ))}
+        </svg>
+      )}
+      <div
+        className={cn(
+          "absolute right-0 bottom-[4px] left-0 z-2 px-[8px] text-center whitespace-normal text-muted",
+          isSongTinh
+            ? "text-[10px] leading-[1.45] tracking-[0.08em]"
+            : "text-[12px] tracking-[0.2em]",
         )}
-      </svg>
-      <div className="absolute right-0 bottom-[4px] left-0 z-2 text-center text-[12px] tracking-[0.2em] text-muted">
+      >
         {caption}
       </div>
     </div>

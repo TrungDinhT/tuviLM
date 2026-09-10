@@ -219,6 +219,82 @@
   animation: cardin 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+.guardianStage {
+  position: relative;
+  display: flex;
+  min-height: clamp(180px, 32vw, 260px);
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  overflow: hidden;
+  padding: 2px 0;
+  isolation: isolate;
+}
+
+.guardianStage::before {
+  position: absolute;
+  inset: 12% 10%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    transparent 68%
+  );
+  filter: blur(18px);
+  content: "";
+}
+
+.guardianPortrait {
+  position: relative;
+  width: min(100%, 270px);
+  height: clamp(180px, 32vw, 260px);
+  flex: 0 1 270px;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  animation: guardian-reveal 700ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.guardianGhost {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.58;
+  filter: brightness(1.32) contrast(1.08) saturate(1.1) drop-shadow(0 0 14px var(--accent-glow));
+  -webkit-mask-image: radial-gradient(
+    circle,
+    #000 0%,
+    #000 63%,
+    rgba(0, 0, 0, 0.7) 78%,
+    transparent 96%
+  );
+  mask-image: radial-gradient(circle, #000 0%, #000 63%, rgba(0, 0, 0, 0.7) 78%, transparent 96%);
+}
+
+.guardianPortrait svg line {
+  stroke: color-mix(in srgb, white 78%, var(--accent-2));
+  stroke-width: 0.86;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 2.2px var(--accent-glow));
+}
+
+.guardianPortrait svg g circle:first-child {
+  opacity: 0.34;
+}
+
+.guardianPortrait svg g circle:last-child {
+  opacity: 1;
+  filter: drop-shadow(0 0 1.6px var(--accent-glow));
+}
+
+.guardianStageDouble .guardianPortrait {
+  width: min(50%, 180px);
+  height: clamp(170px, 26vw, 220px);
+  flex-basis: 180px;
+}
+
 /* The entrance animates `translate`, never `transform`: the deck's focus
    scaling owns `transform` on the same element. */
 @keyframes cardin {
@@ -229,5 +305,20 @@
   to {
     opacity: 1;
     translate: 0 0;
+  }
+}
+
+@keyframes guardian-reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guardianPortrait {
+    opacity: 1;
+    transform: scale(1.08);
+    animation: none;
   }
 }
