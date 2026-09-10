@@ -25,6 +25,17 @@ export interface BuildLasoResponse {
   cung_by_position: Record<string, CungPayload>;
 }
 
+export interface CauPhuResponse {
+  vi_tri: string;
+  chinh_tinh: string[];
+  co_tuan: boolean;
+  co_triet: boolean;
+  tuan_triet: string;
+  tieu_de: string;
+  cau_phu: string;
+  cac_cau: string[];
+}
+
 export interface BuildLasoRequest {
   day: number;
   month: number;
@@ -48,6 +59,7 @@ export interface UserProfile {
 
 export interface SessionStash {
   laso: BuildLasoResponse;
+  cauPhu?: CauPhuResponse;
   profile: UserProfile;
   ownerId?: string;
   chartProfileId?: string;

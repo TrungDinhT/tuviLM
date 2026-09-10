@@ -272,6 +272,7 @@ export function ChartView() {
         <RightRail
           selectedCung={selectedCung}
           selectedSao={selectedSao}
+          cauPhu={stash.cauPhu}
           onCloseCung={() => setSelectedRole(null)}
           onCloseSao={() => setSelectedSao(null)}
           onSaoClick={(name) => setSelectedSao(name)}

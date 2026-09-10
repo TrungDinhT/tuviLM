@@ -15,6 +15,17 @@ class BuildSaoLuuRequest(BaseModel):
     observation_time: BirthInfo
 
 
+class CauPhuResponse(BaseModel):
+    vi_tri: str
+    chinh_tinh: list[str]
+    co_tuan: bool
+    co_triet: bool
+    tuan_triet: str
+    tieu_de: str
+    cau_phu: str
+    cac_cau: list[str]
+
+
 class CreateAnonymousResponse(BaseModel):
     owner_id: str
 
