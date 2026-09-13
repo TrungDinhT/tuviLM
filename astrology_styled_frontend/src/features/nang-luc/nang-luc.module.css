@@ -1,0 +1,810 @@
+.report {
+  --mint: #a8eddb;
+  --rose: #dc90ac;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 18px auto calc(32px + var(--tabbar-h));
+  padding: 30px 34px 12px;
+  max-width: 960px;
+  border: 1px solid #b5a3ec13;
+  border-radius: 32px;
+  color: #ece7f5;
+  background:
+    radial-gradient(ellipse at 50% 48%, #30224b50, transparent 46%),
+    radial-gradient(ellipse at 15% 80%, #31204430, transparent 36%), #0b0d1b;
+  box-shadow: 0 24px 90px #0003;
+}
+.report::before,
+.launcher::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(circle at 15% 17%, #a5f4e9 0 1px, transparent 1.6px),
+    radial-gradient(circle at 72% 34%, #f2d9ff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 41% 78%, #ac99e6 0 1px, transparent 1.5px);
+  background-size:
+    271px 317px,
+    397px 409px,
+    227px 293px;
+}
+.reportHeader {
+  display: grid;
+  grid-template-columns: 60px 1fr 60px;
+  align-items: center;
+  gap: 16px;
+}
+.reportHeader > span {
+  text-align: center;
+  font-size: 16px;
+  letter-spacing: 0.16em;
+  color: #dbd0ee;
+}
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 22px;
+  border: 1px solid #ffffff16;
+  background: linear-gradient(140deg, #ffffff05, #ffffff02);
+  color: #faf6ff;
+  cursor: pointer;
+}
+.iconButton svg {
+  width: 30px;
+  height: 30px;
+}
+.iconButton:hover {
+  background: #b8a0ed1a;
+}
+.intro {
+  text-align: center;
+  max-width: 670px;
+  margin: auto;
+}
+.dividerStar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #daccff;
+  font-size: 24px;
+  text-shadow: 0 0 16px #c6a0ff;
+}
+.dividerStar::before,
+.dividerStar::after {
+  content: "";
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #a593ce30, transparent);
+}
+.intro h1 {
+  font-family: var(--font-display), serif;
+  font-size: clamp(32px, 4.2vw, 48px);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 20px -8px 18px;
+  background: linear-gradient(110deg, #b6b5ff, #e7cddc);
+  color: transparent;
+  background-clip: text;
+}
+.intro p {
+  font-size: 17px;
+  line-height: 1.9;
+  color: #b9b5c4;
+  white-space: pre-line;
+}
+.strengthSection {
+  margin-top: 36px;
+}
+.sectionPill {
+  width: fit-content;
+  margin: auto;
+  border: 1px solid #c4b3e616;
+  border-radius: 30px;
+  padding: 13px 28px;
+  font-size: 14px;
+  color: #c1bdce;
+  font-weight: 400;
+  background: #ffffff02;
+}
+.sectionPill span {
+  color: var(--mint);
+  margin-left: 8px;
+  text-shadow: 0 0 12px var(--mint);
+}
+.constellation {
+  position: relative;
+  min-height: 540px;
+}
+.centralOrb {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.orbStage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+}
+.orbits {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: #9b98ed38;
+  stroke-width: 1;
+}
+.orbits > path {
+  stroke: #b4eadd80;
+}
+.orbits circle:nth-child(2) {
+  stroke: #f5d7a66b;
+}
+.orbitDot {
+  fill: #c7fff1;
+  stroke: none;
+  filter: drop-shadow(0 0 6px #8bf5d8);
+}
+.orbitDot:nth-child(3n) {
+  fill: #ddc8ff;
+  filter: drop-shadow(0 0 7px #b480ff);
+}
+.orb {
+  position: absolute;
+  inset: 26%;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid #d1b9ff;
+  background:
+    radial-gradient(ellipse at 42% 33%, #9b86e633, transparent 40%),
+    radial-gradient(ellipse at 55% 70%, #7774d865, transparent 70%), #29234f;
+  box-shadow:
+    inset 9px 3px 12px #ded0ff9c,
+    inset -8px -5px 18px #dfc1ff8c,
+    inset 4px -20px 32px #9198ee,
+    0 0 9px #ddc4ff8c,
+    0 0 38px #a087eb70,
+    0 0 90px #a084df36;
+}
+.orb::after {
+  content: "";
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  border: 2px solid #e9cdff6b;
+  transform: rotate(-35deg);
+  box-shadow: inset -10px 3px 15px #d4bdff80;
+}
+.orbMist,
+.orbMistTwo {
+  position: absolute;
+  inset: -12%;
+  border-radius: 43%;
+  background: conic-gradient(
+    from 40deg,
+    transparent,
+    #a092ed70,
+    transparent 35%,
+    #dcd8ffb0,
+    transparent 65%,
+    #b494eb85,
+    transparent
+  );
+  filter: blur(9px);
+  animation: drift 24s linear infinite;
+}
+.orbMistTwo {
+  inset: 8%;
+  border-radius: 35%;
+  transform: rotate(65deg);
+  animation-direction: reverse;
+  box-shadow:
+    10px 0 10px #b7b1ff94,
+    -6px 0 7px #a197e8;
+}
+.innerRing {
+  position: absolute;
+  inset: 24%;
+  border: 1px solid #ba96ff80;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #a98af033;
+}
+.meditation {
+  position: absolute;
+  width: var(--figure-width, 41%);
+  height: auto;
+  aspect-ratio: 5 / 6;
+  left: 50%;
+  top: 55%;
+  transform: translate(-50%, -50%);
+  color: #b3a3ef;
+  filter: drop-shadow(0 0 12px #afa5ff);
+  opacity: 0.85;
+}
+.starOne,
+.starTwo,
+.starThree {
+  position: absolute;
+  color: #e4d8ff;
+  text-shadow: 0 0 10px #c0a0ff;
+}
+.starOne {
+  top: 16%;
+  left: 43%;
+  font-size: 12px;
+}
+.starTwo {
+  bottom: 27%;
+  left: 37%;
+  color: #ffe6bf;
+  font-size: 19px;
+}
+.starThree {
+  top: 31%;
+  right: 31%;
+  font-size: 15px;
+}
+.strengthGrid {
+  min-height: inherit;
+  align-content: space-between;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 44%;
+  row-gap: 38px;
+  padding: 0 0 16px;
+}
+.strengthCard {
+  color: var(--mint);
+  min-width: 0;
+  position: relative;
+}
+.iconHalo {
+  display: grid;
+  place-items: center;
+  width: 94px;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  margin: 0 auto 16px;
+  border: 1px solid #a6efdb28;
+  border-radius: 50%;
+  background: radial-gradient(circle, #92dfc81c, transparent 69%);
+  box-shadow:
+    0 0 35px #70d6b812,
+    inset 0 0 20px #87e3c709;
+  position: relative;
+}
+.iconHalo::before {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  top: 0;
+  left: 48%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+.iconHalo svg {
+  width: 52%;
+  height: auto;
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0 10px currentColor);
+}
+.strengthCard .findingTitle {
+  font-size: 19px;
+  line-height: 1.5;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.strengthCard p,
+.weaknessCard p {
+  font-size: 14px;
+  line-height: 1.85;
+  color: #c9c3d3;
+  white-space: pre-line;
+}
+.detailButton {
+  font-size: 12px;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 12px 0 2px;
+  cursor: pointer;
+  opacity: 0.85;
+}
+.detailButton:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.weaknessSection {
+  margin-top: 28px;
+  color: var(--rose);
+}
+.warningDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.warningDivider::before,
+.warningDivider::after {
+  content: "";
+  height: 1px;
+  background: #d291bc25;
+  flex: 1;
+}
+.warningDivider span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #d18bb514;
+  box-shadow: 0 0 25px #d57fad20;
+  font-size: 24px;
+}
+.weaknessSection > h2 {
+  text-align: center;
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+  margin: 6px 0 23px;
+}
+.weaknessGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.weaknessCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid #c58fbe48;
+  border-top-color: #dca6d478;
+  border-radius: 30px;
+  padding: 24px 20px 22px;
+  background: linear-gradient(150deg, #b98ac010, #c596dc0c);
+  box-shadow: inset 0 0 40px #b89add04;
+}
+.weaknessCard .iconHalo {
+  width: 85px;
+  border-color: #ec99ba2e;
+  background: radial-gradient(circle, #c2759b1a, transparent 70%);
+  box-shadow: 0 0 30px #c773a010;
+}
+.weaknessCard .findingTitle {
+  color: #f0e6f2;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+.weaknessCard .detailButton {
+  margin-top: auto;
+  padding-top: 18px;
+}
+.cardGlint {
+  width: 29px;
+  height: 4px;
+  border-radius: 4px;
+  background: #dd96b6;
+  box-shadow: 0 0 9px #ed8cbd;
+  margin-top: 20px;
+}
+.endingStar {
+  text-align: center;
+  color: #dbb9ff;
+  font-size: 32px;
+  text-shadow: 0 0 20px #d5aaff;
+  margin: 28px 0 0;
+}
+.empty {
+  text-align: center;
+  color: #bcb4c9;
+  line-height: 1.8;
+  padding: 24px;
+}
+.explanation {
+  margin-top: 26px;
+}
+.explanation p {
+  margin-top: 12px;
+  white-space: pre-line;
+  line-height: 1.9;
+  font-size: 14px;
+}
+.closeButton {
+  padding: 12px 20px;
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  color: var(--accent);
+  cursor: pointer;
+  width: 100%;
+}
+.launcher {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  max-width: 820px;
+  min-height: 430px;
+  margin: 26px auto;
+  border: 1px solid #b6a0e346;
+  border-radius: 30px;
+  background: radial-gradient(ellipse at 50% 70%, #51377250, transparent 70%), #0d1020;
+  color: #e9def4;
+}
+.preview {
+  position: relative;
+  width: min(84%, 48vw);
+  aspect-ratio: 1;
+  margin: 12px auto 0;
+  pointer-events: none;
+}
+.preview > div:first-child {
+  width: 100%;
+}
+.floatingSkill {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 15%;
+  aspect-ratio: 1;
+  border: 1px solid #a8eddb44;
+  border-radius: 50%;
+  color: #a8eddb;
+  background: radial-gradient(circle, #20473e, #101b29 75%);
+  box-shadow: 0 0 24px #94e4d31c;
+  animation: skillFloat 5s ease-in-out infinite alternate;
+}
+.floatingSkill svg {
+  width: 52%;
+  height: auto;
+}
+.floatingSkill:nth-child(2) {
+  left: 13%;
+  top: 9%;
+}
+.floatingSkill:nth-child(3) {
+  right: 13%;
+  top: 9%;
+  animation-delay: -2s;
+}
+.floatingSkill:nth-child(4) {
+  left: 0;
+  top: 43%;
+  animation-delay: -1s;
+}
+.floatingSkill:nth-child(5) {
+  right: 0;
+  top: 43%;
+  animation-delay: -3s;
+}
+.floatingSkill:nth-child(6) {
+  left: 15%;
+  bottom: 5%;
+  animation-delay: -4s;
+}
+.floatingSkill:nth-child(7) {
+  right: 15%;
+  bottom: 5%;
+  animation-delay: -2.5s;
+}
+@keyframes skillFloat {
+  to {
+    transform: translateY(-12%) rotate(5deg);
+  }
+}
+.launcherContent {
+  position: relative;
+  min-height: 430px;
+  padding: 35px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(#0d102020, #0d102075);
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: #c3b2df;
+}
+.lockIcon {
+  width: 46px;
+  height: 46px;
+  color: #d4b1fa;
+  margin: 22px 0 14px;
+  filter: drop-shadow(0 0 16px #d1a0ff);
+}
+.launcher h2 {
+  font-family: var(--font-display), serif;
+  font-size: 34px;
+  font-weight: 400;
+  color: #e3cff8;
+}
+.launcher p {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #c2b9d0;
+  margin: 13px 0 24px;
+}
+.unlockButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 14px 28px;
+  border-radius: 30px;
+  border: 1px solid #dbc0ff7a;
+  background: linear-gradient(110deg, #9571c4, #604984);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 5px 30px #a47edf25;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+.unlockButton:hover {
+  box-shadow: 0 0 30px #ba89f34a;
+  transform: translateY(-2px);
+}
+.previewLabel {
+  font-size: 10px;
+  color: #a69ab8;
+  margin-top: 14px;
+  letter-spacing: 0.05em;
+}
+.gate {
+  padding: 25px;
+}
+.backLink {
+  color: var(--accent);
+  font-size: 14px;
+}
+.status {
+  text-align: center;
+  padding: 30px 0 70px;
+}
+.status > div {
+  width: 58%;
+  margin: auto;
+}
+.status h1 {
+  font-family: var(--font-display), serif;
+  font-size: 28px;
+}
+.status p {
+  color: #bbb2cb;
+  max-width: 470px;
+  margin: 16px auto 25px;
+  line-height: 1.8;
+  padding: 0 16px;
+}
+.report button:focus-visible,
+.report a:focus-visible,
+.launcher button:focus-visible,
+.launcher a:focus-visible {
+  outline: 2px solid #c9acff;
+  outline-offset: 5px;
+}
+@keyframes drift {
+  to {
+    rotate: 360deg;
+  }
+}
+@media (max-width: 699px) {
+  .report {
+    margin: 8px 10px calc(22px + var(--tabbar-h));
+    padding: 20px 20px 8px;
+    border-radius: 25px;
+  }
+  .reportHeader {
+    grid-template-columns: 40px 1fr 40px;
+    gap: 6px;
+  }
+  .reportHeader > span {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+  .iconButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+  }
+  .iconButton svg {
+    width: 23px;
+    height: 23px;
+  }
+  .dividerStar {
+    margin-top: 10px;
+  }
+  .intro h1 {
+    font-size: 32px;
+    margin-top: 12px;
+  }
+  .intro p {
+    font-size: 14px;
+    line-height: 1.85;
+  }
+  .strengthSection {
+    margin-top: 26px;
+  }
+  .sectionPill {
+    font-size: 12px;
+    padding: 11px 19px;
+  }
+  .centralOrb {
+    position: relative;
+    width: 76%;
+    --figure-width: 33%;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: -8px auto -10px;
+  }
+  .constellation {
+    min-height: 0;
+  }
+  .strengthGrid {
+    column-gap: 20px;
+    row-gap: 26px;
+    padding: 0;
+  }
+  .strengthCard {
+    text-align: left;
+  }
+  .strengthCard .findingTitle {
+    font-size: 16px;
+  }
+  .strengthCard p {
+    font-size: 13px;
+  }
+  .iconHalo {
+    width: min(36%, 14vw);
+    margin: 0 0 12px;
+  }
+  .weaknessGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .weaknessCard {
+    padding: 23px;
+  }
+  .weaknessCard .iconHalo {
+    width: min(24%, 14vw);
+    margin: 0 auto 12px;
+  }
+  .weaknessCard .findingTitle {
+    font-size: 18px;
+  }
+  .weaknessCard p {
+    font-size: 14px;
+  }
+  .weaknessSection {
+    margin-top: 36px;
+  }
+}
+@media (max-width: 359px) {
+  .strengthGrid {
+    grid-template-columns: 1fr;
+  }
+  .report {
+    padding: 16px;
+  }
+  .intro h1 {
+    font-size: 28px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbMist,
+  .orbMistTwo {
+    animation: none;
+  }
+  .unlockButton {
+    transition: none;
+  }
+}
+
+/* Soft ribbons leave a dark, translucent core like the reference orb. */
+.wisps {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: #d2caff;
+  stroke-width: 2;
+  opacity: 0.55;
+  filter: blur(2px) drop-shadow(0 0 4px #ada1ff);
+}
+.wisps path:nth-child(even) {
+  stroke: #a2b7ff;
+  stroke-width: 5;
+  opacity: 0.6;
+}
+.orbMist {
+  opacity: 0.55;
+}
+.orbMistTwo {
+  opacity: 0.45;
+}
+.innerRing {
+  background: radial-gradient(ellipse, #171a4e99, #25214930);
+}
+.sectionPill,
+.strengthCard .findingTitle,
+.weaknessCard .findingTitle,
+.weaknessSection > h2 {
+  font-family: var(--font-sans);
+}
+
+.strengthCard {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+}
+.strengthCard,
+.weaknessCard {
+  cursor: pointer;
+  font: inherit;
+}
+.findingTitle {
+  display: block;
+}
+.tapHint {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  opacity: 0.75;
+}
+.strengthCard:hover .iconHalo,
+.weaknessCard:hover .iconHalo {
+  box-shadow: 0 0 24px #b9a0eb44;
+}
+.explanationHeading {
+  margin-top: 24px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: #c3b2df;
+}
+@media (max-width: 699px) {
+  .preview {
+    width: 92%;
+    --figure-width: 33%;
+  }
+  .weaknessGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .weaknessCard {
+    padding: 16px 10px;
+    border-radius: 22px;
+  }
+  .weaknessCard .findingTitle {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .weaknessCard .iconHalo {
+    width: min(42%, 14vw);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .floatingSkill {
+    animation: none;
+  }
+}

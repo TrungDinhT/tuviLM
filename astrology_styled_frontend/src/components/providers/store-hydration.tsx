@@ -1,5 +1,7 @@
 "use client";
 
+import { useCapabilityStore } from "@/features/nang-luc/data";
+
 import { useEffect } from "react";
 
 import { useChartStore } from "@/store/chart-store";
@@ -17,6 +19,7 @@ import { usePreferencesStore } from "@/store/preferences-store";
 export function StoreHydration() {
   useEffect(() => {
     void useChartStore.persist.rehydrate();
+    void useCapabilityStore.persist.rehydrate();
     void usePreferencesStore.persist.rehydrate();
   }, []);
 

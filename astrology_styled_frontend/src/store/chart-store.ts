@@ -1,3 +1,4 @@
+import { useCapabilityStore } from "@/features/nang-luc/data";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -88,6 +89,7 @@ export const useChartStore = create<ChartState>()(
        */
       reset: () => {
         useToastStore.getState().dismiss();
+        useCapabilityStore.getState().clear();
         set({ ...EMPTY });
       },
     }),
