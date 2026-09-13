@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -14,9 +15,9 @@ import {
 } from "@/lib/api/hooks";
 import { describe, isApiError } from "@/lib/http/errors";
 import { starKeyFromName } from "@/lib/theme";
+import { showToast } from "@/lib/toast";
 import { useChartStore } from "@/store/chart-store";
 import { usePreferencesStore } from "@/store/preferences-store";
-import { useToastStore } from "@/store/toast-store";
 
 import { BirthConfirmDialog } from "./birth-confirm-dialog";
 import {
@@ -74,7 +75,6 @@ export function AnSaoScreen() {
   const clockRef = useRef<HTMLDivElement>(null);
   const genderRef = useRef<HTMLDivElement>(null);
 
-  const showToast = useToastStore((state) => state.show);
   const setPreviewOutcome = useChartStore((state) => state.setPreviewOutcome);
   const castChart = useChartStore((state) => state.castChart);
   const muteBirthConfirm = usePreferencesStore((state) => state.muteBirthConfirm);
@@ -110,7 +110,7 @@ export function AnSaoScreen() {
       return;
     }
     if (gender === null) {
-      showToast("Cho Nghê Sao biết giới tính của bạn nhé ✦");
+      showToast("Cho Thiên Hạc biết giới tính của bạn nhé ✦");
       genderRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -125,7 +125,7 @@ export function AnSaoScreen() {
     if (time === null || gender === null) return;
     const mapped = toApiBirthTime(date, time);
     if (!mapped.ok) {
-      showToast("Ngày giờ này vượt quá phạm vi Nghê Sao an được (năm 1990 – 2099) nhé.");
+      showToast("Ngày giờ này vượt quá phạm vi Thiên Hạc an được (năm 1990 – 2099) nhé.");
       return;
     }
 
@@ -168,8 +168,22 @@ export function AnSaoScreen() {
   // instead of hugging the top. (ScreenPad top + bottom + tab bar at md;
   // top bar + ScreenPad at lg.)
   return (
-    <div className="relative flex flex-col pt-14 md:grid md:min-h-[calc(100dvh-140px-var(--safe-t)-var(--safe-b))] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:content-center md:gap-x-10 md:gap-y-0 lg:min-h-[calc(100dvh-152px-var(--safe-t))] lg:pt-0">
-      <AuthLinks className="absolute top-0 right-0 justify-end lg:hidden" />
+    <div className="relative flex flex-col pt-[76px] md:grid md:min-h-[calc(100dvh-140px-var(--safe-t)-var(--safe-b))] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:content-center md:gap-x-10 md:gap-y-0 lg:min-h-[calc(100dvh-152px-var(--safe-t))] lg:pt-0">
+      <div className="absolute top-0 right-0 left-0 flex h-14 items-center justify-between gap-3 lg:hidden">
+        <div className="flex min-w-0 shrink-0 items-center gap-2 max-[349px]:gap-1.5">
+          <Image
+            src="/assets/icons/favicon-48x48.png"
+            alt=""
+            width={48}
+            height={48}
+            className="size-10 shrink-0 drop-shadow-[0_0_10px_rgba(255,222,143,0.26)] max-[349px]:size-8"
+          />
+          <span className="truncate font-display text-lg font-semibold text-ink max-[349px]:text-sm">
+            Thiên Hạc
+          </span>
+        </div>
+        <AuthLinks className="min-w-0 shrink-0 justify-end [&_a]:px-3 max-[349px]:gap-1 max-[349px]:[&_a]:px-2 max-[349px]:[&_a]:text-[11px]" />
+      </div>
       {/* Head — story column on the left from md up. */}
       <div className="text-center md:col-start-1 md:row-start-1 md:text-left">
         <div className="text-[10px] font-bold tracking-[0.28em] text-accent uppercase [text-shadow:0_0_14px_var(--accent-glow)]">
@@ -255,20 +269,18 @@ export function AnSaoScreen() {
         </div>
       </div>
 
-      {/* Right above the cast button on phone: the reward has to be in view at
-          the moment the dials are being turned, and by then the head of the
-          page has scrolled away. From md up it sits under the story column. */}
-      <div className="mt-2 md:col-start-1 md:row-start-2 md:mt-6 md:self-start">
-        <ConstellationReward
-          stars={preview.data?.chinh_tinh.map(starKeyFromName) ?? null}
-          names={preview.data?.chinh_tinh ?? []}
-        />
-      </div>
-
       <div className="mt-[10px] flex flex-col gap-[10px] md:col-start-2 md:row-start-3 md:mt-[22px]">
         <Pill className="w-full" onClick={requestCast}>
           ✦ Luận giải lá số của tôi
         </Pill>
+      </div>
+
+      {/* Hidden on phone; from md up it sits under the story column. */}
+      <div className="hidden md:col-start-1 md:row-start-2 md:mt-6 md:block md:self-start">
+        <ConstellationReward
+          stars={preview.data?.chinh_tinh.map(starKeyFromName) ?? null}
+          names={preview.data?.chinh_tinh ?? []}
+        />
       </div>
 
       <BirthConfirmDialog

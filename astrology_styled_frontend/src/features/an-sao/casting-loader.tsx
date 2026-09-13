@@ -9,14 +9,14 @@ import { CRANE_LOADING_SRC } from "./loading-video";
 import styles from "./casting-loader.module.css";
 
 const LOAD_SUBS = [
-  "Nghê Sao đang đọc vị trí các vì tinh tú…",
+  "Thiên Hạc đang đọc vị trí các vì tinh tú…",
   "Đang xếp 12 cung mệnh của bạn…",
   "Chòm sao bản mệnh đang dần hiện hình…",
 ] as const;
 
 const SUB_INTERVAL_MS = 900;
 
-/** The Nghê Sao star-spirit, ported from the prototype's mascotSVG. */
+/** The Thiên Hạc star-spirit, ported from the prototype's mascotSVG. */
 function Mascot({ size }: { size: number }) {
   return (
     <svg viewBox="0 0 120 120" width={size} height={size} style={{ overflow: "visible" }}>

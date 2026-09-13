@@ -15,7 +15,7 @@ describe("ChatBubble", () => {
   it("falls back to a thinking placeholder when no activity is set", () => {
     render(<ChatBubble role="assistant" status="streaming" content="" />);
 
-    expect(screen.getByText("Nghê Sao đang suy nghĩ…")).toBeTruthy();
+    expect(screen.getByText("Thiên Hạc đang suy nghĩ…")).toBeTruthy();
   });
 
   it("renders assistant markdown as formatted elements", () => {

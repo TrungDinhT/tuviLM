@@ -1,13 +1,16 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CHART_STORAGE_KEY, useChartStore } from "./chart-store";
-import { useToastStore } from "./toast-store";
+
+const toastMocks = vi.hoisted(() => ({ dismissToast: vi.fn() }));
+
+vi.mock("@/lib/toast", () => toastMocks);
 
 describe("chart store", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     localStorage.clear();
     useChartStore.setState({ hasChart: false, outcome: null, previewOutcome: null, chartId: null });
-    useToastStore.setState({ message: null });
   });
 
   it("locks navigation until a chart is cast", () => {
@@ -34,12 +37,10 @@ describe("chart store", () => {
 
   it("dismisses any transient message on reset", () => {
     useChartStore.getState().castChart({ stars: ["tuvi"] }, "1996041510M");
-    useToastStore.getState().show("Đã tạo ảnh story ✦");
-    expect(useToastStore.getState().message).not.toBeNull();
 
     useChartStore.getState().reset();
 
-    expect(useToastStore.getState().message).toBeNull();
+    expect(toastMocks.dismissToast).toHaveBeenCalledOnce();
   });
 
   it("replaces the preview outcome when a chart is cast", () => {

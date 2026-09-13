@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import type { BirthInfo } from "@/lib/api/schemas";
 import { safeStorage } from "@/lib/safe-storage";
 import type { ChartOutcome } from "@/lib/theme";
-import { useToastStore } from "@/store/toast-store";
+import { dismissToast } from "@/lib/toast";
 
 export const CHART_STORAGE_KEY = "tuvi.chart";
 
@@ -88,8 +88,8 @@ export const useChartStore = create<ChartState>()(
        * clear when it goes false — including closing any open overlay.
        */
       reset: () => {
-        useToastStore.getState().dismiss();
         useCapabilityStore.getState().clear();
+        dismissToast();
         set({ ...EMPTY });
       },
     }),

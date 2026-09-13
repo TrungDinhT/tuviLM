@@ -7,7 +7,9 @@ import { Pill } from "@/components/primitives/pill";
 import { useDeleteChartProfile } from "@/lib/api/hooks";
 import type { ChartProfile } from "@/lib/api/schemas";
 import { describe, isApiError } from "@/lib/http/errors";
-import { useToastStore } from "@/store/toast-store";
+import { showToast } from "@/lib/toast";
+
+const CARD_LAYOUT = "relative h-24 flex-[0_0_130px] overflow-hidden p-4 lg:flex-none";
 
 /** The profile's own stored birth data, formatted for display — not a reading. */
 function dateLabel(profile: ChartProfile): string {
@@ -26,7 +28,6 @@ function dateLabel(profile: ChartProfile): string {
 export function SavedChartCard({ profile }: { profile: ChartProfile }) {
   const [open, setOpen] = useState(false);
   const deleteProfile = useDeleteChartProfile();
-  const showToast = useToastStore((state) => state.show);
 
   const confirmDelete = () => {
     setOpen(false);
@@ -38,19 +39,26 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
   };
 
   return (
-    <div className="relative flex-[0_0_130px] rounded-[20px] border border-accent-glow bg-[linear-gradient(160deg,color-mix(in_srgb,var(--accent)_18%,transparent),rgba(46,26,74,0.5))] p-4 lg:flex-none">
+    <div
+      className={`${CARD_LAYOUT} rounded-[20px] border border-accent-glow bg-[linear-gradient(160deg,color-mix(in_srgb,var(--accent)_18%,transparent),rgba(46,26,74,0.5))]`}
+    >
       <button
         type="button"
         className="absolute top-[10px] right-[10px] grid h-6 w-6 cursor-pointer place-items-center rounded-full border border-glass-line bg-white/6 text-muted"
         aria-label={`Xoá lá số ${profile.display_name}`}
         onClick={() => setOpen(true)}
       >
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-[13px] w-[13px] fill-none stroke-current [stroke-width:1.5]">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+          className="h-[13px] w-[13px] fill-none stroke-current [stroke-width:1.5]"
+        >
           <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M10 11v6M14 11v6" />
         </svg>
       </button>
       <span className="text-[11px] text-muted">{dateLabel(profile)}</span>
-      <b className="mt-2 block pr-[22px] font-display text-[17px] leading-[1.15] font-semibold">
+      <b className="mt-2 line-clamp-2 pr-[22px] font-display text-[17px] leading-[1.15] font-semibold">
         {profile.display_name}
       </b>
 
@@ -72,6 +80,20 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
           </Pill>
         </div>
       </Dialog>
+    </div>
+  );
+}
+
+/** Loading placeholder with the same footprint as a saved chart card. */
+export function SavedChartSkeleton() {
+  return (
+    <div
+      className={`${CARD_LAYOUT} animate-pulse rounded-[20px] border border-glass-line bg-white/6`}
+      aria-hidden="true"
+    >
+      <span className="block h-[17px] w-[82px] rounded-full bg-white/10" />
+      <span className="mt-2 block h-5 w-[72px] rounded-full bg-white/12" />
+      <span className="absolute top-[10px] right-[10px] block h-6 w-6 rounded-full bg-white/10" />
     </div>
   );
 }

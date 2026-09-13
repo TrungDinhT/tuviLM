@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 
 import { useRecastGuard } from "@/components/shell/recast-guard";
-import { useToastStore } from "@/store/toast-store";
+import { showToast } from "@/lib/toast";
 
 const COMING_SOON = "Tính năng sẽ sớm được cập nhật ✦";
 
@@ -20,12 +20,10 @@ interface SettingRow {
  * The "Cài đặt" list.
  *
  * Three rows are not built yet and raise the coming-soon toast, matching the
- * Bản mệnh share row. "Nhập lại ngày sinh" and "Bắt đầu lại từ đầu" both run
- * the recast guard — one path, not two — so a cast chart is discarded behind
- * the same confirm as every other recast.
+ * Bản mệnh share row. "Nhập lại ngày sinh" runs the shared recast guard, so a
+ * cast chart is discarded behind the same confirm as every other recast.
  */
 export function SettingsList() {
-  const showToast = useToastStore((state) => state.show);
   const { requestRecast, confirmDialog } = useRecastGuard();
 
   const rows: SettingRow[] = [
@@ -42,7 +40,7 @@ export function SettingsList() {
     },
     {
       title: "Nhắc nhở vận hạn",
-      subtitle: "Mỗi sáng một lời từ Nghê Sao",
+      subtitle: "Mỗi sáng một lời từ Thiên Hạc",
       action: () => showToast(COMING_SOON),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className={ICON_CLASS}>
@@ -95,15 +93,6 @@ export function SettingsList() {
             </span>
           </button>
         ))}
-      </div>
-      <div className="mt-5 text-center">
-        <button
-          type="button"
-          className="cursor-pointer border-0 text-[14px] text-muted underline underline-offset-[3px]"
-          onClick={requestRecast}
-        >
-          Bắt đầu lại từ đầu
-        </button>
       </div>
       {confirmDialog}
     </>

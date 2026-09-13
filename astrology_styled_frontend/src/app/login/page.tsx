@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { AuthScreen } from "@/features/auth/auth-screen";
 
 export const metadata: Metadata = {
-  title: "Đăng nhập · Tử Vi",
+  title: "Đăng nhập · Thiên Hạc",
   description: "Đăng nhập để tiếp tục hành trình luận giải lá số của bạn.",
 };
 

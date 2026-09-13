@@ -35,7 +35,9 @@ export function Composer({
         styles.composer,
       )}
     >
-      <div className="flex items-center gap-[10px] rounded-full border border-[rgba(243,239,250,0.18)] bg-[rgba(48,29,80,0.97)] py-2 pl-[18px] pr-2 shadow-[0_8px_24px_rgba(8,4,20,0.5),inset_0_1px_0_rgba(243,239,250,0.06)]">
+      <div
+        className={`${styles.inputEnter} flex items-center gap-[10px] rounded-full border border-[rgba(243,239,250,0.18)] bg-[rgba(48,29,80,0.97)] py-2 pl-[18px] pr-2 shadow-[0_8px_24px_rgba(8,4,20,0.5),inset_0_1px_0_rgba(243,239,250,0.06)]`}
+      >
         <input
           type="text"
           name="chat_message_input"
@@ -56,7 +58,7 @@ export function Composer({
             }
           }}
           disabled={disabled}
-          placeholder="Hỏi Nghê Sao điều gì đó…"
+          placeholder="Hỏi Thiên Hạc điều gì đó…"
           className="min-w-0 flex-1 border-0 bg-transparent text-[15px] text-ink outline-none placeholder:text-muted"
         />
         <button
@@ -66,7 +68,10 @@ export function Composer({
           disabled={disabled}
           className="grid h-[42px] w-[42px] flex-none cursor-pointer place-items-center rounded-full border-0 bg-[linear-gradient(135deg,var(--accent-2),var(--accent))] disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none [stroke:var(--color-bg-0)] [stroke-width:2]">
+          <svg
+            viewBox="0 0 24 24"
+            className="h-5 w-5 fill-none [stroke:var(--color-bg-0)] [stroke-width:2]"
+          >
             <path d="M4 12h15M13 6l6 6-6 6" />
           </svg>
         </button>

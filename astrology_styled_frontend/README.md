@@ -1,6 +1,6 @@
-# TuviLM — Astrology Frontend
+# Thiên Hạc — Astrology Frontend
 
-Web client for TuviLM built around the "Luminous Twilight" astrology design.
+Web client for Thiên Hạc built around the "Luminous Twilight" astrology design.
 
 Read [`AGENTS.md`](./AGENTS.md) before changing anything — it holds the token rules,
 breakpoint system, runtime theming contract, and backend contract for this project.

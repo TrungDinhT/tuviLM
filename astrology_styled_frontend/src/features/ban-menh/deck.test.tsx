@@ -98,6 +98,67 @@ describe("BanMenhScreen", () => {
 });
 
 describe("deck cards", () => {
+  it("shows animated deity constellations for single and song tinh Mệnh", () => {
+    const { unmount } = render(
+      <QueryClientProvider client={new QueryClient()}>
+        <BanMenhScreenHarness chart={chartWith(["Tử Vi (Miếu)"])} />
+      </QueryClientProvider>,
+    );
+
+    let guardians = screen.getAllByTestId("destiny-guardian");
+    let ghosts = screen.getAllByTestId("destiny-guardian-ghost");
+    expect(guardians).toHaveLength(1);
+    expect(ghosts[0]?.getAttribute("style")).toContain("zeus.svg");
+    expect(guardians[0]?.querySelectorAll("line").length).toBeGreaterThan(0);
+    expect(guardians[0]?.querySelectorAll("circle").length).toBeGreaterThan(0);
+    unmount();
+
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <BanMenhScreenHarness chart={chartWith(["Tử Vi", "Thiên Phủ"])} />
+      </QueryClientProvider>,
+    );
+
+    guardians = screen.getAllByTestId("destiny-guardian");
+    ghosts = screen.getAllByTestId("destiny-guardian-ghost");
+    expect(guardians).toHaveLength(2);
+    expect(ghosts[0]?.getAttribute("style")).toContain("zeus.svg");
+    expect(ghosts[1]?.getAttribute("style")).toContain("hera.svg");
+    expect(guardians.every((guardian) => guardian.querySelectorAll("line").length > 0)).toBe(true);
+  });
+
+  it.each([
+    { stars: [], aura: "nebula" },
+    { stars: ["Tử Vi (Miếu)"], aura: "orbit" },
+    { stars: ["Tử Vi", "Thiên Phủ"], aura: "aurora" },
+  ])("uses the $aura aura for $stars.length chính tinh", ({ stars, aura }) => {
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <DestinyCard chart={chartWith(stars)} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByTestId("destiny-aura").getAttribute("data-aura")).toBe(aura);
+  });
+
+  it("renders independently animated twinkles only for a single chính tinh", () => {
+    const { rerender } = render(
+      <QueryClientProvider client={new QueryClient()}>
+        <DestinyCard chart={chartWith(["Tử Vi (Miếu)"])} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByTestId("destiny-aura-twinkles").children).toHaveLength(5);
+
+    rerender(
+      <QueryClientProvider client={new QueryClient()}>
+        <DestinyCard chart={chartWith(["Tử Vi", "Thiên Phủ"])} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.queryByTestId("destiny-aura-twinkles")).toBeNull();
+  });
+
   it("no card renders an empty archetype, mantra, blurb, colour, month list, or advice", () => {
     const variants = [
       chart, // the real fixture: song tinh Mệnh
@@ -114,8 +175,12 @@ describe("deck cards", () => {
       );
 
       const destiny = document.querySelector('[data-testid="destiny-card"]');
-      expect(destiny?.querySelector('[data-testid="destiny-chip"]')?.textContent?.trim().length).toBeGreaterThan(1);
-      expect(destiny?.querySelector('[data-testid="destiny-mantra"]')?.textContent?.trim()).not.toBe("");
+      expect(
+        destiny?.querySelector('[data-testid="destiny-chip"]')?.textContent?.trim().length,
+      ).toBeGreaterThan(1);
+      expect(
+        destiny?.querySelector('[data-testid="destiny-mantra"]')?.textContent?.trim(),
+      ).not.toBe("");
 
       const luck = document.querySelector('[data-testid="luck-card"]');
       const luckText = luck?.textContent ?? "";

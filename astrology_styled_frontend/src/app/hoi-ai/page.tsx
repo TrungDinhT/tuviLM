@@ -7,7 +7,7 @@ export default function Page() {
     <ScreenPad>
       <StickyHeader
         eyebrow="Hỏi AI"
-        title="Nghê Sao"
+        title="Thiên Hạc"
         subtitle="Tinh linh dẫn đường · luôn thành thật, luôn dịu dàng."
       />
       <HoiAiScreen />
