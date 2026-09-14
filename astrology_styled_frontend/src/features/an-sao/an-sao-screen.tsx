@@ -275,8 +275,7 @@ export function AnSaoScreen() {
         </Pill>
       </div>
 
-      {/* Hidden on phone; from md up it sits under the story column. */}
-      <div className="hidden md:col-start-1 md:row-start-2 md:mt-6 md:block md:self-start">
+      <div className="mt-4 md:col-start-1 md:row-start-2 md:mt-6 md:self-start">
         <ConstellationReward
           stars={preview.data?.chinh_tinh.map(starKeyFromName) ?? null}
           names={preview.data?.chinh_tinh ?? []}

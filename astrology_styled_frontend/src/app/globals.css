@@ -209,6 +209,7 @@
   }
 
   body {
+    position: relative;
     min-height: 100dvh;
     overflow-x: hidden;
     font-family: var(--font-sans);
