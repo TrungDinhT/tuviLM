@@ -64,6 +64,33 @@ describe("capability report", () => {
     fireEvent.click(screen.getByText("Đóng luận giải"));
     expect(screen.queryByRole("dialog")).toBeNull();
   });
+  it("dims other findings and restores them and focus after closing the drawer", async () => {
+    const second = { ...report.diem_manh[0]!, nang_luc_id: "phan_bien", nang_luc: "Phản biện" };
+    render(<CapabilityReport report={{ ...report, diem_manh: [...report.diem_manh, second] }} />);
+    const firstButton = screen.getByRole("button", { name: "Xem luận giải: Lập luận logic" });
+    const otherButton = screen.getByRole("button", { name: "Xem luận giải: Phản biện" });
+    firstButton.focus();
+    fireEvent.click(firstButton);
+    expect(firstButton.getAttribute("data-selected")).toBe("true");
+    expect(firstButton.getAttribute("data-dimmed")).toBe("false");
+    expect(otherButton.getAttribute("data-dimmed")).toBe("true");
+    fireEvent.click(screen.getByText("Đóng luận giải"));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(otherButton.getAttribute("data-dimmed")).toBe("false");
+    await waitFor(() => expect(document.activeElement).toBe(firstButton));
+  });
+  it("opens the overview in the same drawer and dismisses it with Escape", async () => {
+    render(<CapabilityReport report={report} />);
+    const center = screen.getByRole("button", { name: "Thấu hiểu cấu trúc Mệnh" });
+    const strength = screen.getByRole("button", { name: "Xem luận giải: Lập luận logic" });
+    center.focus();
+    fireEvent.click(center);
+    expect(screen.getByRole("dialog").textContent).toContain(report.tong_quan);
+    expect(strength.getAttribute("data-dimmed")).toBe("true");
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(strength.getAttribute("data-dimmed")).toBe("false");
+  });
   it("does not request a locked report", () => {
     const fetch = vi.fn();
     vi.stubGlobal("fetch", fetch);

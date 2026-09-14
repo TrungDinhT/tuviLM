@@ -792,3 +792,31 @@
   fill: #c7fff1;
   filter: drop-shadow(0 0 5px #8bf5d8);
 }
+
+.strengthCard,
+.weaknessCard,
+.centralOrb,
+.reportHeader {
+  transition:
+    opacity 180ms ease,
+    filter 180ms ease;
+}
+.report [data-dimmed="true"],
+.report[data-detail-open="true"] .reportHeader {
+  opacity: 0.3;
+  filter: blur(2px);
+}
+.report [data-selected="true"] .iconHalo {
+  box-shadow: 0 0 26px #b4eadd55;
+}
+.report[data-detail-open="true"] .connections {
+  opacity: 0.3;
+}
+@media (prefers-reduced-motion: reduce) {
+  .strengthCard,
+  .weaknessCard,
+  .centralOrb,
+  .reportHeader {
+    transition: none;
+  }
+}

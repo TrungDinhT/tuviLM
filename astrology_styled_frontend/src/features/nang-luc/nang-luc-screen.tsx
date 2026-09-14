@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { Dialog, DialogClose } from "@/components/primitives/dialog";
+import {
+  Drawer,
+  DrawerBody,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/primitives/drawer";
 import { useChartStore } from "@/store/chart-store";
 import { showToast } from "@/lib/toast";
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
@@ -159,11 +167,19 @@ const weaknessIcons = { han_che_truc_tiep: "person", qua_da: "work", xung_dot: "
 
 export function CapabilityReport({ report }: { report: CapabilityProfile }) {
   const constellationRef = useRef<HTMLDivElement>(null);
+  const returnFocusRef = useRef<HTMLButtonElement>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selected, setSelected] = useState<{
+    id: string;
     title: string;
     description: string;
     explanation?: string;
   } | null>(null);
+  function openFinding(element: HTMLButtonElement, finding: NonNullable<typeof selected>) {
+    returnFocusRef.current = element;
+    setSelected(finding);
+    setDrawerOpen(true);
+  }
   async function share() {
     const text = [
       "Thấu hiểu cấu trúc Mệnh",
@@ -185,7 +201,7 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
     }
   }
   return (
-    <main className={styles.report}>
+    <main className={styles.report} data-detail-open={drawerOpen}>
       <ReportHeader onShare={() => void share()} />
       <h1 className="sr-only">Khám phá năng lực</h1>
       <section className={styles.strengthSection} aria-label="Điểm mạnh">
@@ -194,15 +210,22 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
             containerRef={constellationRef}
             findingsKey={report.diem_manh.map((item) => item.nang_luc_id).join("|")}
           />
-          <div className={styles.centralOrb}>
+          <div
+            className={styles.centralOrb}
+            data-dimmed={drawerOpen && selected?.id !== "overview"}
+          >
             <CelestialOrb decorativeTrails={false} />
             <button
               type="button"
               className={styles.overviewButton}
               data-capability-center
               aria-label="Thấu hiểu cấu trúc Mệnh"
-              onClick={() =>
-                setSelected({ title: "Thấu hiểu cấu trúc Mệnh", description: report.tong_quan })
+              onClick={(event) =>
+                openFinding(event.currentTarget, {
+                  id: "overview",
+                  title: "Thấu hiểu cấu trúc Mệnh",
+                  description: report.tong_quan,
+                })
               }
               aria-haspopup="dialog"
             ></button>
@@ -213,8 +236,11 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
                 type="button"
                 key={item.nang_luc_id}
                 className={styles.strengthCard}
-                onClick={() =>
-                  setSelected({
+                data-dimmed={drawerOpen && selected?.id !== `strength:${item.nang_luc_id}`}
+                data-selected={drawerOpen && selected?.id === `strength:${item.nang_luc_id}`}
+                onClick={(event) =>
+                  openFinding(event.currentTarget, {
+                    id: `strength:${item.nang_luc_id}`,
                     title: item.nang_luc,
                     description: item.mo_ta,
                     explanation: item.giai_thich,
@@ -248,8 +274,11 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
               type="button"
               key={`${item.ten}-${index}`}
               className={styles.weaknessCard}
-              onClick={() =>
-                setSelected({
+              data-dimmed={drawerOpen && selected?.id !== `weakness:${index}`}
+              data-selected={drawerOpen && selected?.id === `weakness:${index}`}
+              onClick={(event) =>
+                openFinding(event.currentTarget, {
+                  id: `weakness:${index}`,
                   title: item.ten,
                   description: item.mo_ta,
                   explanation: item.giai_thich,
@@ -274,29 +303,36 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
       <div className={styles.endingStar} aria-hidden="true">
         ✦
       </div>
-      <Dialog
-        open={selected !== null}
-        onOpenChange={(open) => {
+      <Drawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        onOpenChangeComplete={(open) => {
           if (!open) setSelected(null);
         }}
-        variant="panel"
-        title={selected?.title}
-        description="Khám phá biểu hiện và luận giải từ lá số của bạn."
-        footer={<DialogClose className={styles.closeButton}>Đóng luận giải</DialogClose>}
       >
-        <div className={styles.explanation}>
-          <span className={styles.eyebrow}>
-            {selected?.explanation ? "MÔ TẢ NĂNG LỰC" : "TỔNG QUAN"}
-          </span>
-          <p>{selected?.description}</p>
-          {selected?.explanation && (
-            <>
-              <h3 className={styles.explanationHeading}>LUẬN GIẢI TỬ VI</h3>
-              <p>{selected.explanation}</p>
-            </>
-          )}
-        </div>
-      </Dialog>
+        <DrawerContent finalFocus={returnFocusRef}>
+          <DrawerHeader>
+            <DrawerTitle>{selected?.title}</DrawerTitle>
+          </DrawerHeader>
+          <DrawerBody>
+            <div className={styles.explanation}>
+              <span className={styles.eyebrow}>
+                {selected?.explanation ? "MÔ TẢ NĂNG LỰC" : "TỔNG QUAN"}
+              </span>
+              <p>{selected?.description}</p>
+              {selected?.explanation && (
+                <>
+                  <h3 className={styles.explanationHeading}>LUẬN GIẢI TỬ VI</h3>
+                  <p>{selected.explanation}</p>
+                </>
+              )}
+            </div>
+          </DrawerBody>
+          <DrawerFooter>
+            <DrawerClose className={styles.closeButton}>Đóng luận giải</DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </main>
   );
 }
