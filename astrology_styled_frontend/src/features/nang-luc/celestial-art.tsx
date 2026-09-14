@@ -70,29 +70,33 @@ export function CapabilityIcon({ kind = "spark" }: { kind?: string }) {
   );
 }
 
-export function CelestialOrb() {
+export function CelestialOrb({ decorativeTrails = true }: { decorativeTrails?: boolean }) {
   return (
     <div className={styles.orbStage} aria-hidden="true">
       <svg className={styles.orbits} viewBox="0 0 500 500" fill="none">
         <circle cx="250" cy="250" r="210" />
         <circle cx="250" cy="250" r="150" />
-        <path d="M4 16C155 30 77 160 193 185S425 399 495 327M11 356C120 281 176 421 313 357S299 103 492 38" />
-        {[
-          [4, 16],
-          [114, 98],
-          [157, 174],
-          [193, 185],
-          [379, 94],
-          [446, 57],
-          [313, 357],
-          [407, 310],
-          [463, 324],
-          [49, 337],
-          [116, 332],
-          [286, 444],
-        ].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r={i % 3 === 0 ? 5 : 3} className={styles.orbitDot} />
-        ))}
+        {decorativeTrails && (
+          <>
+            <path d="M4 16C155 30 77 160 193 185S425 399 495 327M11 356C120 281 176 421 313 357S299 103 492 38" />
+            {[
+              [4, 16],
+              [114, 98],
+              [157, 174],
+              [193, 185],
+              [379, 94],
+              [446, 57],
+              [313, 357],
+              [407, 310],
+              [463, 324],
+              [49, 337],
+              [116, 332],
+              [286, 444],
+            ].map(([cx, cy], i) => (
+              <circle key={i} cx={cx} cy={cy} r={i % 3 === 0 ? 5 : 3} className={styles.orbitDot} />
+            ))}
+          </>
+        )}
       </svg>
       <div className={styles.orb}>
         <div className={styles.orbMist} />

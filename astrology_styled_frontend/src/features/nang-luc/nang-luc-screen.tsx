@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Dialog, DialogClose } from "@/components/primitives/dialog";
 import { useChartStore } from "@/store/chart-store";
-import { useToastStore } from "@/store/toast-store";
+import { showToast } from "@/lib/toast";
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
 import { describe, isApiError } from "@/lib/http/errors";
+import { CapabilityConnections } from "./capability-connections";
 import { CapabilityIcon, CelestialOrb } from "./celestial-art";
 import {
   capabilityKey,
@@ -157,12 +158,12 @@ const strengthIcons: Record<string, string> = {
 const weaknessIcons = { han_che_truc_tiep: "person", qua_da: "work", xung_dot: "chat" };
 
 export function CapabilityReport({ report }: { report: CapabilityProfile }) {
+  const constellationRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<{
     title: string;
     description: string;
-    explanation: string;
+    explanation?: string;
   } | null>(null);
-  const showToast = useToastStore((state) => state.show);
   async function share() {
     const text = [
       "Thấu hiểu cấu trúc Mệnh",
@@ -186,20 +187,25 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
   return (
     <main className={styles.report}>
       <ReportHeader onShare={() => void share()} />
-      <div className={styles.intro}>
-        <div className={styles.dividerStar} aria-hidden="true">
-          ✦
-        </div>
-        <h1>Thấu hiểu cấu trúc Mệnh</h1>
-        <p>{report.tong_quan}</p>
-      </div>
-      <section className={styles.strengthSection} aria-labelledby="strengths-title">
-        <h2 id="strengths-title" className={styles.sectionPill}>
-          Năng lượng cốt lõi của bạn <span aria-hidden="true">✦</span>
-        </h2>
-        <div className={styles.constellation}>
+      <h1 className="sr-only">Khám phá năng lực</h1>
+      <section className={styles.strengthSection} aria-label="Điểm mạnh">
+        <div className={styles.constellation} ref={constellationRef}>
+          <CapabilityConnections
+            containerRef={constellationRef}
+            findingsKey={report.diem_manh.map((item) => item.nang_luc_id).join("|")}
+          />
           <div className={styles.centralOrb}>
-            <CelestialOrb />
+            <CelestialOrb decorativeTrails={false} />
+            <button
+              type="button"
+              className={styles.overviewButton}
+              data-capability-center
+              aria-label="Thấu hiểu cấu trúc Mệnh"
+              onClick={() =>
+                setSelected({ title: "Thấu hiểu cấu trúc Mệnh", description: report.tong_quan })
+              }
+              aria-haspopup="dialog"
+            ></button>
           </div>
           <div className={styles.strengthGrid}>
             {report.diem_manh.map((item) => (
@@ -217,13 +223,10 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
                 aria-label={`Xem luận giải: ${item.nang_luc}`}
                 aria-haspopup="dialog"
               >
-                <span className={styles.iconHalo}>
+                <span className={styles.iconHalo} data-capability-anchor={item.nang_luc_id}>
                   <CapabilityIcon kind={strengthIcons[item.nang_luc_id] ?? "spark"} />
                 </span>
                 <span className={styles.findingTitle}>{item.nang_luc}</span>
-                <span className={styles.tapHint} aria-hidden="true">
-                  Khám phá ↗
-                </span>
               </button>
             ))}
           </div>
@@ -259,9 +262,6 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
                 <CapabilityIcon kind={weaknessIcons[item.loai]} />
               </span>
               <span className={styles.findingTitle}>{item.ten}</span>
-              <span className={styles.tapHint} aria-hidden="true">
-                Khám phá ↗
-              </span>
             </button>
           ))}
         </div>
@@ -285,10 +285,16 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
         footer={<DialogClose className={styles.closeButton}>Đóng luận giải</DialogClose>}
       >
         <div className={styles.explanation}>
-          <span className={styles.eyebrow}>MÔ TẢ NĂNG LỰC</span>
+          <span className={styles.eyebrow}>
+            {selected?.explanation ? "MÔ TẢ NĂNG LỰC" : "TỔNG QUAN"}
+          </span>
           <p>{selected?.description}</p>
-          <h3 className={styles.explanationHeading}>LUẬN GIẢI TỬ VI</h3>
-          <p>{selected?.explanation}</p>
+          {selected?.explanation && (
+            <>
+              <h3 className={styles.explanationHeading}>LUẬN GIẢI TỬ VI</h3>
+              <p>{selected.explanation}</p>
+            </>
+          )}
         </div>
       </Dialog>
     </main>

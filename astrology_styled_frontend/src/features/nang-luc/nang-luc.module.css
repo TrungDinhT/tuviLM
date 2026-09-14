@@ -62,71 +62,19 @@
 .iconButton:hover {
   background: #b8a0ed1a;
 }
-.intro {
-  text-align: center;
-  max-width: 670px;
-  margin: auto;
-}
-.dividerStar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  color: #daccff;
-  font-size: 24px;
-  text-shadow: 0 0 16px #c6a0ff;
-}
-.dividerStar::before,
-.dividerStar::after {
-  content: "";
-  width: 80px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #a593ce30, transparent);
-}
-.intro h1 {
-  font-family: var(--font-display), serif;
-  font-size: clamp(32px, 4.2vw, 48px);
-  font-weight: 400;
-  line-height: 1.25;
-  margin: 20px -8px 18px;
-  background: linear-gradient(110deg, #b6b5ff, #e7cddc);
-  color: transparent;
-  background-clip: text;
-}
-.intro p {
-  font-size: 17px;
-  line-height: 1.9;
-  color: #b9b5c4;
-  white-space: pre-line;
-}
 .strengthSection {
-  margin-top: 36px;
-}
-.sectionPill {
-  width: fit-content;
-  margin: auto;
-  border: 1px solid #c4b3e616;
-  border-radius: 30px;
-  padding: 13px 28px;
-  font-size: 14px;
-  color: #c1bdce;
-  font-weight: 400;
-  background: #ffffff02;
-}
-.sectionPill span {
-  color: var(--mint);
-  margin-left: 8px;
-  text-shadow: 0 0 12px var(--mint);
+  margin-top: 12px;
+  container-type: inline-size;
 }
 .constellation {
   position: relative;
-  min-height: 540px;
+  min-height: min(40svh, 58cqw);
 }
 .centralOrb {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 58%;
+  width: min(58%, 40svh);
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
@@ -260,7 +208,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: 44%;
-  row-gap: 38px;
+  row-gap: 20px;
+  pointer-events: none;
   padding: 0 0 16px;
 }
 .strengthCard {
@@ -271,7 +220,7 @@
 .iconHalo {
   display: grid;
   place-items: center;
-  width: 94px;
+  width: min(38%, 8svh);
   aspect-ratio: 1;
   flex-shrink: 0;
   margin: 0 auto 16px;
@@ -328,7 +277,7 @@
   text-underline-offset: 4px;
 }
 .weaknessSection {
-  margin-top: 28px;
+  margin-top: 12px;
   color: var(--rose);
 }
 .warningDivider {
@@ -366,6 +315,7 @@
   gap: 18px;
 }
 .weaknessCard {
+  justify-content: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -373,12 +323,12 @@
   border: 1px solid #c58fbe48;
   border-top-color: #dca6d478;
   border-radius: 30px;
-  padding: 24px 20px 22px;
+  padding: 14px 16px;
   background: linear-gradient(150deg, #b98ac010, #c596dc0c);
   box-shadow: inset 0 0 40px #b89add04;
 }
 .weaknessCard .iconHalo {
-  width: 85px;
+  width: min(30%, 7svh);
   border-color: #ec99ba2e;
   background: radial-gradient(circle, #c2759b1a, transparent 70%);
   box-shadow: 0 0 30px #c773a010;
@@ -405,9 +355,9 @@
 .endingStar {
   text-align: center;
   color: #dbb9ff;
-  font-size: 32px;
+  font-size: 20px;
   text-shadow: 0 0 20px #d5aaff;
-  margin: 28px 0 0;
+  margin: 10px 0 0;
 }
 .empty {
   text-align: center;
@@ -609,7 +559,7 @@
 @media (max-width: 699px) {
   .report {
     margin: 8px 10px calc(22px + var(--tabbar-h));
-    padding: 20px 20px 8px;
+    padding: 14px 20px 8px;
     border-radius: 25px;
   }
   .reportHeader {
@@ -629,46 +579,26 @@
     width: 23px;
     height: 23px;
   }
-  .dividerStar {
-    margin-top: 10px;
-  }
-  .intro h1 {
-    font-size: 32px;
+  .strengthSection {
     margin-top: 12px;
   }
-  .intro p {
-    font-size: 14px;
-    line-height: 1.85;
-  }
-  .strengthSection {
-    margin-top: 26px;
-  }
-  .sectionPill {
-    font-size: 12px;
-    padding: 11px 19px;
-  }
   .centralOrb {
-    position: relative;
-    width: 76%;
+    width: min(72%, 34svh);
     --figure-width: 33%;
-    top: auto;
-    left: auto;
-    transform: none;
-    margin: -8px auto -10px;
   }
   .constellation {
-    min-height: 0;
+    min-height: min(34svh, 78cqw);
   }
   .strengthGrid {
-    column-gap: 20px;
-    row-gap: 26px;
+    column-gap: 40%;
+    row-gap: 16px;
     padding: 0;
   }
   .strengthCard {
-    text-align: left;
+    text-align: center;
   }
   .strengthCard .findingTitle {
-    font-size: 16px;
+    font-size: 13px;
   }
   .strengthCard p {
     font-size: 13px;
@@ -695,18 +625,12 @@
     font-size: 14px;
   }
   .weaknessSection {
-    margin-top: 36px;
+    margin-top: 14px;
   }
 }
 @media (max-width: 359px) {
-  .strengthGrid {
-    grid-template-columns: 1fr;
-  }
   .report {
     padding: 16px;
-  }
-  .intro h1 {
-    font-size: 28px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -744,7 +668,6 @@
 .innerRing {
   background: radial-gradient(ellipse, #171a4e99, #25214930);
 }
-.sectionPill,
 .strengthCard .findingTitle,
 .weaknessCard .findingTitle,
 .weaknessSection > h2 {
@@ -752,25 +675,28 @@
 }
 
 .strengthCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   border: 0;
   background: transparent;
   padding: 0;
-  text-align: left;
+  text-align: center;
 }
 .strengthCard,
 .weaknessCard {
   cursor: pointer;
+  pointer-events: auto;
   font: inherit;
 }
 .findingTitle {
   display: block;
+  width: 100%;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
-.tapHint {
-  display: block;
-  margin-top: 8px;
-  font-size: 11px;
-  opacity: 0.75;
-}
+
 .strengthCard:hover .iconHalo,
 .weaknessCard:hover .iconHalo {
   box-shadow: 0 0 24px #b9a0eb44;
@@ -807,4 +733,62 @@
   .floatingSkill {
     animation: none;
   }
+}
+
+.overviewButton {
+  position: absolute;
+  inset: 26%;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.overviewButton:hover {
+  box-shadow: 0 0 24px #dac4ff55;
+}
+@media (max-width: 699px) {
+  .strengthGrid .iconHalo {
+    margin-inline: auto;
+    width: min(48%, 12vw);
+  }
+  .strengthCard {
+    text-align: center;
+  }
+  .weaknessSection > h2 {
+    margin-bottom: 12px;
+  }
+  .weaknessCard {
+    padding: 10px;
+  }
+  .weaknessCard .iconHalo {
+    width: min(32%, 10vw);
+    margin-bottom: 7px;
+  }
+  .weaknessCard .findingTitle {
+    font-size: 12px;
+  }
+}
+
+.report > .endingStar {
+  display: none;
+}
+
+.connections {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.connections path {
+  stroke: #b4eadd80;
+  stroke-width: 1;
+}
+.connections circle {
+  fill: #c7fff1;
+  filter: drop-shadow(0 0 5px #8bf5d8);
 }

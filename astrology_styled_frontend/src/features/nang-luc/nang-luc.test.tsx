@@ -32,6 +32,14 @@ const report: CapabilityProfile = {
 };
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 beforeEach(() => {
+  // jsdom does not provide layout observers; geometry is checked in a browser.
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      observe() {}
+      disconnect() {}
+    },
+  );
   useCapabilityStore.getState().clear();
 });
 afterEach(() => {
