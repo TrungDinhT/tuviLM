@@ -6,6 +6,8 @@ import type { ChatMessage, ChatSession, ChatSessionSummary } from "@/lib/api/sch
 import { OWNER_ID_KEY, resetOwnerIdCache } from "@/lib/api/owner";
 import { useChartStore } from "@/store/chart-store";
 
+import { runFixture } from "@/lib/api/runs.test-helpers";
+
 import { HoiAiScreen } from "./hoi-ai-screen";
 
 const toastMocks = vi.hoisted(() => ({ showToast: vi.fn() }));
@@ -117,6 +119,7 @@ describe("HoiAiScreen", () => {
           }),
         );
       }
+      if (url.includes("/api/v1/runs?")) return Promise.resolve(jsonResponse([]));
       return Promise.resolve(jsonResponse({}));
     });
     vi.stubGlobal("fetch", fetchMock);
@@ -140,6 +143,7 @@ describe("HoiAiScreen", () => {
         if (url.endsWith("/api/v1/sessions/s1")) {
           return Promise.resolve(jsonResponse({ session: sessionDetail("s1", []) }));
         }
+        if (url.includes("/api/v1/runs?")) return Promise.resolve(jsonResponse([]));
         return Promise.resolve(jsonResponse({}));
       }),
     );
@@ -166,6 +170,7 @@ describe("HoiAiScreen", () => {
           jsonResponse({ session: sessionDetail("s2", [message({ content: "tin từ s2" })]) }),
         );
       }
+      if (url.includes("/api/v1/runs?")) return Promise.resolve(jsonResponse([]));
       return Promise.resolve(jsonResponse({}));
     });
     vi.stubGlobal("fetch", fetchMock);
@@ -198,6 +203,7 @@ describe("HoiAiScreen", () => {
       if (url.endsWith("/api/v1/sessions/s3")) {
         return Promise.resolve(jsonResponse({ session: sessionDetail("s3", []) }));
       }
+      if (url.includes("/api/v1/runs?")) return Promise.resolve(jsonResponse([]));
       return Promise.resolve(jsonResponse({}));
     });
     vi.stubGlobal("fetch", fetchMock);
@@ -224,6 +230,7 @@ describe("HoiAiScreen", () => {
         if (url.endsWith("/api/v1/sessions/s1")) {
           return Promise.resolve(jsonResponse({ session: sessionDetail("s1", []) }));
         }
+        if (url.includes("/api/v1/runs?")) return Promise.resolve(jsonResponse([]));
         return Promise.resolve(jsonResponse({}));
       }),
     );
@@ -236,147 +243,134 @@ describe("HoiAiScreen", () => {
     expect((button as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it("aborts the active stream before switching sessions", async () => {
+  it("sends through the shared run API and reconciles saved chat messages", async () => {
     localStorage.setItem(OWNER_ID_KEY, "anon_stored");
-    let streamSignal: AbortSignal | undefined;
-    const encoder = new TextEncoder();
+    const running = runFixture({
+      workflow: "chat",
+      resource_id: "session:s1",
+      inputs: { session_id: "s1", content: "Hỏi thử" },
+    });
+    const finished = runFixture({
+      ...running,
+      seq: 4,
+      status: "succeeded",
+      result: { answer: "Câu trả lời" },
+      state: {
+        text: "Câu trả lời",
+        progress: null,
+        metadata: { user_message_id: "u2", assistant_message_id: "a2" },
+      },
+    });
+    let saved = false;
     const fetchMock = vi.fn((url: string, init?: RequestInit) => {
-      if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+      if (url.includes("/runs?")) return Promise.resolve(jsonResponse([]));
+      if (url.endsWith("/runs") && init?.method === "POST")
+        return Promise.resolve(jsonResponse(running));
+      if (url.endsWith("/runs/r1")) {
+        saved = true;
+        return Promise.resolve(jsonResponse(finished));
+      }
+      if (url.endsWith("/chart-profiles/p1/sessions"))
         return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
-      }
-      if (url.endsWith("/api/v1/sessions/s1/chat/stream")) {
-        streamSignal = init?.signal as AbortSignal | undefined;
-        const body = new ReadableStream<Uint8Array>({
-          start(controller) {
-            controller.enqueue(
-              encoder.encode(
-                'data: {"type":"ids","user_message_id":"u2","assistant_message_id":"a2"}\n\n',
-              ),
-            );
-            streamSignal?.addEventListener("abort", () => {
-              controller.error(new DOMException("Aborted", "AbortError"));
-            });
-          },
-        });
-        return Promise.resolve(new Response(body, { status: 200 }));
-      }
-      if (url.endsWith("/api/v1/sessions/s1")) {
-        return Promise.resolve(
-          jsonResponse({ session: sessionDetail("s1", [message({ content: "tin từ s1" })]) }),
-        );
-      }
-      if (url.endsWith("/api/v1/sessions/s2")) {
-        return Promise.resolve(
-          jsonResponse({ session: sessionDetail("s2", [message({ content: "tin từ s2" })]) }),
-        );
-      }
-      return Promise.resolve(jsonResponse({}));
+      return Promise.resolve(
+        jsonResponse({
+          session: sessionDetail(
+            "s1",
+            saved
+              ? [
+                  message({ id: "u2", role: "user", content: "Hỏi thử" }),
+                  message({ id: "a2", content: "Câu trả lời" }),
+                ]
+              : [],
+          ),
+        }),
+      );
     });
     vi.stubGlobal("fetch", fetchMock);
     setChart("p1");
-
     renderScreen(new QueryClient());
-    await screen.findByText("tin từ s1");
-    fireEvent.change(screen.getByPlaceholderText("Hỏi Thiên Hạc điều gì đó…"), {
-      target: { value: "Câu hỏi đang chạy" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
-    await waitFor(() => expect(streamSignal).toBeDefined());
-
-    fireEvent.click(screen.getByText("Lịch sử"));
-    fireEvent.click(await screen.findByText(/Cuộc trò chuyện 28\/08/));
-
-    expect(streamSignal?.aborted).toBe(true);
-    expect(await screen.findByText("tin từ s2")).toBeTruthy();
-    expect(screen.queryByText("Câu hỏi đang chạy")).toBeNull();
-  });
-
-  it("surfaces a backend error event and preserves partial text", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
-    const stream =
-      [
-        'data: {"type":"ids","user_message_id":"u2","assistant_message_id":"a2"}',
-        'data: {"type":"text","delta":"Phần trả lời"}',
-        'data: {"type":"error","message":"internal details"}',
-        'data: {"type":"done","status":"failed"}',
-      ].join("\n\n") + "\n\n";
-    vi.stubGlobal(
-      "fetch",
-      vi.fn((url: string) => {
-        if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
-          return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
-        }
-        if (url.endsWith("/api/v1/sessions/s1/chat/stream")) {
-          return Promise.resolve(new Response(stream, { status: 200 }));
-        }
-        if (url.endsWith("/api/v1/sessions/s1")) {
-          return Promise.resolve(
-            jsonResponse({ session: sessionDetail("s1", [message({ content: "tin đã gửi" })]) }),
-          );
-        }
-        return Promise.resolve(jsonResponse({}));
-      }),
+    await screen.findByText(/tôi là Thiên Hạc/);
+    await waitFor(() =>
+      expect(
+        (screen.getByPlaceholderText("Hỏi Thiên Hạc điều gì đó…") as HTMLTextAreaElement).disabled,
+      ).toBe(false),
     );
-    setChart("p1");
-
-    renderScreen(new QueryClient());
-    await screen.findByText("tin đã gửi");
     fireEvent.change(screen.getByPlaceholderText("Hỏi Thiên Hạc điều gì đó…"), {
       target: { value: "Hỏi thử" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
-
-    expect(await screen.findByText("Phần trả lời")).toBeTruthy();
-    await waitFor(() =>
-      expect(toastMocks.showToast).toHaveBeenCalledWith(
-        "Thiên Hạc chưa thể trả lời trọn vẹn. Bạn thử lại nhé.",
-      ),
-    );
-    expect(screen.getByText("Tin nhắn chưa gửi trọn vẹn.")).toBeTruthy();
+    await screen.findByText("Câu trả lời", {}, { timeout: 2500 });
+    await waitFor(() => expect(screen.getAllByText("Câu trả lời")).toHaveLength(1));
+    expect(screen.getAllByText("Hỏi thử")).toHaveLength(1);
+    expect(fetchMock.mock.calls.some(([url]) => url.includes("/chat/stream"))).toBe(false);
+    expect(
+      fetchMock.mock.calls.find(
+        ([url, init]) => url.endsWith("/runs") && init?.method === "POST",
+      )?.[1]?.body,
+    ).toBe(JSON.stringify({ workflow: "chat", inputs: { session_id: "s1", content: "Hỏi thử" } }));
   });
 
-  it("reconciles a duplicate in-progress stream from the stored assistant message", async () => {
+  it("shows a recovered pending workflow and detaches when switching sessions", async () => {
     localStorage.setItem(OWNER_ID_KEY, "anon_stored");
-    let detailCalls = 0;
-    const stream =
-      [
-        'data: {"type":"duplicate_in_progress","user_message_id":"u2","assistant_message_id":"a2","status":"pending"}',
-        'data: {"type":"done","status":"duplicate_in_progress"}',
-      ].join("\n\n") + "\n\n";
+    const run = runFixture({
+      workflow: "chat",
+      resource_id: "session:s1",
+      inputs: { session_id: "s1", content: "Luận tính cách" },
+    });
+    let pollSignal: AbortSignal | undefined;
+    const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+      if (url.includes("/runs?"))
+        return Promise.resolve(jsonResponse(url.includes("session%3As1") ? [run] : []));
+      if (url.endsWith("/runs/r1")) {
+        pollSignal = init?.signal ?? undefined;
+        return new Promise<Response>((_resolve, reject) => {
+          pollSignal?.addEventListener("abort", () => reject(pollSignal?.reason));
+        });
+      }
+      if (url.endsWith("/chart-profiles/p1/sessions"))
+        return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
+      return Promise.resolve(
+        jsonResponse({ session: sessionDetail(url.endsWith("/s2") ? "s2" : "s1", []) }),
+      );
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    setChart("p1");
+    renderScreen(new QueryClient());
+    await screen.findByText("Luận tính cách");
+    await waitFor(() => expect(pollSignal).toBeDefined(), { timeout: 2500 });
+    expect(
+      (screen.getByPlaceholderText("Hỏi Thiên Hạc điều gì đó…") as HTMLTextAreaElement).disabled,
+    ).toBe(true);
+    fireEvent.click(screen.getByText("Lịch sử"));
+    fireEvent.click(await screen.findByText(/Cuộc trò chuyện 28\/08/));
+    await waitFor(() => expect(pollSignal?.aborted).toBe(true));
+    expect(screen.queryByText("Luận tính cách")).toBeNull();
+    expect(fetchMock.mock.calls.some(([url]) => url.endsWith("/cancel"))).toBe(false);
+  });
+
+  it("shows a persisted workflow failure with its partial answer", async () => {
+    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
+    const run = runFixture({
+      workflow: "chat",
+      resource_id: "session:s1",
+      status: "failed",
+      inputs: { session_id: "s1", content: "Hỏi thử" },
+      error: "Workflow could not complete",
+      state: { text: "Phần trả lời", progress: null, metadata: {} },
+    });
     vi.stubGlobal(
       "fetch",
       vi.fn((url: string) => {
-        if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+        if (url.includes("/runs?")) return Promise.resolve(jsonResponse([run]));
+        if (url.endsWith("/chart-profiles/p1/sessions"))
           return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
-        }
-        if (url.endsWith("/api/v1/sessions/s1/chat/stream")) {
-          return Promise.resolve(new Response(stream, { status: 200 }));
-        }
-        if (url.endsWith("/api/v1/sessions/s1")) {
-          detailCalls += 1;
-          const messages =
-            detailCalls === 1
-              ? [message({ content: "tin đã gửi" })]
-              : [
-                  message({ content: "tin đã gửi" }),
-                  message({ id: "a2", content: "Câu trả lời đã hoàn tất" }),
-                ];
-          return Promise.resolve(jsonResponse({ session: sessionDetail("s1", messages) }));
-        }
-        return Promise.resolve(jsonResponse({}));
+        return Promise.resolve(jsonResponse({ session: sessionDetail("s1", []) }));
       }),
     );
     setChart("p1");
-
     renderScreen(new QueryClient());
-    await screen.findByText("tin đã gửi");
-    fireEvent.change(screen.getByPlaceholderText("Hỏi Thiên Hạc điều gì đó…"), {
-      target: { value: "Hỏi lại cùng key" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
-
-    expect(await screen.findByText("Câu trả lời đã hoàn tất")).toBeTruthy();
-    expect((screen.getByRole("button", { name: "Gửi" }) as HTMLButtonElement).disabled).toBe(false);
+    expect(await screen.findByText("Phần trả lời")).toBeTruthy();
+    expect(screen.getByText("Tin nhắn chưa gửi trọn vẹn.")).toBeTruthy();
   });
 
   it("issues only one create request for repeated activation while pending", async () => {
@@ -400,6 +394,7 @@ describe("HoiAiScreen", () => {
       if (url.endsWith("/api/v1/sessions/s3")) {
         return Promise.resolve(jsonResponse({ session: sessionDetail("s3", []) }));
       }
+      if (url.includes("/api/v1/runs?")) return Promise.resolve(jsonResponse([]));
       return Promise.resolve(jsonResponse({}));
     });
     vi.stubGlobal("fetch", fetchMock);
