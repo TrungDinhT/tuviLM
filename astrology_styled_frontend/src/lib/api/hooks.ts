@@ -198,6 +198,8 @@ export function useGetSession(sessionId: string | null) {
         withOwner: true,
       }),
     enabled: sessionId !== null,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
   });
 }
 
