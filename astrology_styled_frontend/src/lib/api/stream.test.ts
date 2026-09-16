@@ -57,10 +57,117 @@ describe("streamChat", () => {
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining("/api/v1/sessions/s1/chat/stream"),
       expect.objectContaining({
-        signal: controller.signal,
+        signal: expect.any(AbortSignal),
         headers: expect.objectContaining({ "Idempotency-Key": "turn-key-1" }),
       }),
     );
+  });
+
+  it.each(["eof", "read error", "network"])(
+    "recovers %s using the same turn key",
+    async (failure) => {
+      localStorage.setItem(OWNER_ID_KEY, "anon_stored");
+      const partial = 'data: {"type":"text","delta":"Partial"}\n\n';
+      const fetchMock = vi.fn();
+      if (failure === "network") {
+        fetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+      } else if (failure === "read error") {
+        let sent = false;
+        fetchMock.mockResolvedValueOnce(
+          new Response(
+            new ReadableStream({
+              pull(controller) {
+                if (sent) controller.error(new TypeError("Connection lost"));
+                else controller.enqueue(new TextEncoder().encode(partial));
+                sent = true;
+              },
+            }),
+          ),
+        );
+      } else {
+        fetchMock.mockResolvedValueOnce(new Response(partial));
+      }
+      fetchMock.mockResolvedValueOnce(
+        new Response(
+          'data: {"type":"ids","user_message_id":"u1","assistant_message_id":"a1"}\n\n' +
+            'data: {"type":"text","delta":"Full answer"}\n\n' +
+            'data: {"type":"done","status":"confirmed"}\n\n',
+        ),
+      );
+      vi.stubGlobal("fetch", fetchMock);
+      const events = [];
+      for await (const event of streamChat("s1", "Question", { idempotencyKey: "same-turn" })) {
+        events.push(event);
+      }
+      expect(events.at(-1)).toEqual({ type: "done", status: "confirmed" });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      for (const [, init] of fetchMock.mock.calls) {
+        expect(init.headers["Idempotency-Key"]).toBe("same-turn");
+        expect(init.body).toBe(JSON.stringify({ content: "Question" }));
+      }
+    },
+  );
+
+  it("reopens a frozen connection on foreground and preserves explicit abort", async () => {
+    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
+    const caller = new AbortController();
+    const fetchMock = vi
+      .fn()
+      .mockImplementationOnce((_url, init) =>
+        Promise.resolve(
+          new Response(
+            new ReadableStream({
+              start(controller) {
+                controller.enqueue(
+                  new TextEncoder().encode('data: {"type":"text","delta":"Partial"}\n\n'),
+                );
+                init.signal.addEventListener("abort", () =>
+                  controller.error(new DOMException("Aborted", "AbortError")),
+                );
+              },
+            }),
+          ),
+        ),
+      )
+      .mockResolvedValueOnce(new Response('data: {"type":"done","status":"confirmed"}\n\n'));
+    vi.stubGlobal("fetch", fetchMock);
+    const stream = streamChat("s1", "Question", {
+      idempotencyKey: "same-turn",
+      signal: caller.signal,
+    });
+    expect((await stream.next()).value).toEqual({ type: "text", delta: "Partial" });
+    const next = stream.next();
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect((await next).value).toEqual({ type: "done", status: "confirmed" });
+    expect(caller.signal.aborted).toBe(false);
+    await stream.return(undefined);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("stops retrying when the caller aborts", async () => {
+    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
+    const caller = new AbortController();
+    const fetchMock = vi.fn().mockResolvedValue(new Response(""));
+    vi.stubGlobal("fetch", fetchMock);
+    const stream = streamChat("s1", "Question", {
+      idempotencyKey: "same-turn",
+      signal: caller.signal,
+    });
+    const pending = stream.next();
+    const assertion = expect(pending).rejects.toMatchObject({ name: "AbortError" });
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    caller.abort();
+    await assertion;
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not retry an HTTP validation failure", async () => {
+    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
+    const fetchMock = vi.fn().mockResolvedValue(new Response("{}", { status: 422 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const stream = streamChat("s1", "Question", { idempotencyKey: "same-turn" });
+    await expect(stream.next()).rejects.toMatchObject({ error: { kind: "http", status: 422 } });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 

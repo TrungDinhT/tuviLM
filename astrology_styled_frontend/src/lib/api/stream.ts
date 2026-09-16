@@ -21,9 +21,10 @@ import { sseChatEventSchema, type SseChatEvent } from "./schemas";
  * Stream a chat turn from the backend, yielding typed SSE events.
  *
  * The caller owns `idempotencyKey` so retrying this logical turn can reuse it.
- * The generator throws `ApiErrorException` for network, HTTP, and parse
- * failures; the backend's own `error` event arrives as a yielded `error`
- * event, followed by a `done` event carrying the failed status.
+ * Network interruptions and transient HTTP errors retry with bounded backoff.
+ * A duplicate running turn hands off to session polling in the caller; a
+ * completed turn replays its saved answer. Validation/parse errors still throw.
+ * The backend's `error` event is followed by `done` with the failed status.
  */
 export async function* streamChat(
   sessionId: string,
@@ -36,32 +37,87 @@ export async function* streamChat(
     "Idempotency-Key": opts.idempotencyKey,
   };
 
-  let response: Response;
-  try {
-    response = await fetch(apiUrl(`/api/v1/sessions/${sessionId}/chat/stream`), {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ content }),
-      signal: opts.signal,
-    });
-  } catch (cause) {
-    if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
-    throw new ApiErrorException({ kind: "network" });
-  }
+  let retryDelay = 1_000;
+  while (true) {
+    opts.signal?.throwIfAborted();
+    const connection = new AbortController();
+    const signal = opts.signal
+      ? AbortSignal.any([opts.signal, connection.signal])
+      : connection.signal;
+    // A mobile browser can leave a frozen fetch looking connected. On return,
+    // reopen with the same key to recover the existing run or its saved answer.
+    const resume = () => {
+      if (document.visibilityState === "visible") connection.abort();
+    };
+    document.addEventListener("visibilitychange", resume);
+    window.addEventListener("online", resume);
+    try {
+      const response = await fetch(apiUrl(`/api/v1/sessions/${sessionId}/chat/stream`), {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ content }),
+        signal,
+      });
+      if (!response.ok) {
+        throw new ApiErrorException({
+          kind: "http",
+          status: response.status,
+          body: await safeBody(response),
+        });
+      }
+      if (response.body === null) throw new ApiErrorException({ kind: "network" });
 
-  if (!response.ok) {
-    throw new ApiErrorException({
-      kind: "http",
-      status: response.status,
-      body: await safeBody(response),
-    });
+      for await (const event of parseSseStream(response.body)) {
+        yield event;
+        if (event.type === "done") return;
+      }
+      // EOF without `done` is a dropped connection, not a completed answer.
+    } catch (cause) {
+      opts.signal?.throwIfAborted();
+      if (cause instanceof ApiErrorException) {
+        const error = cause.error;
+        if (
+          error.kind !== "network" &&
+          !(error.kind === "http" && (error.status >= 500 || error.status === 429))
+        ) {
+          throw cause;
+        }
+      } else if (
+        !(cause instanceof TypeError) &&
+        !connection.signal.aborted &&
+        !(cause instanceof DOMException && cause.name === "AbortError")
+      ) {
+        throw cause;
+      }
+    } finally {
+      document.removeEventListener("visibilitychange", resume);
+      window.removeEventListener("online", resume);
+      connection.abort();
+    }
+    await waitToReconnect(retryDelay, opts.signal);
+    retryDelay = Math.min(retryDelay * 2, 10_000);
   }
+}
 
-  if (response.body === null) {
-    throw new ApiErrorException({ kind: "stream", event: "empty body" });
-  }
-
-  yield* parseSseStream(response.body);
+function waitToReconnect(delay: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve) => {
+    signal?.throwIfAborted();
+    const finish = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", abort);
+      window.removeEventListener("online", resume);
+      document.removeEventListener("visibilitychange", resume);
+      resolve();
+    };
+    const abort = () => finish();
+    const resume = () => {
+      if (document.visibilityState === "visible") finish();
+    };
+    const timer = setTimeout(finish, delay);
+    signal?.addEventListener("abort", abort, { once: true });
+    window.addEventListener("online", resume);
+    document.addEventListener("visibilitychange", resume);
+  });
 }
 
 /**
@@ -79,25 +135,30 @@ export async function* parseSseStream(
   const decoder = new TextDecoder();
   let buffer = "";
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
 
-    let boundary: number;
-    while ((boundary = buffer.indexOf("\n\n")) !== -1) {
-      const rawFrame = buffer.slice(0, boundary).replace(/\r/g, "");
-      buffer = buffer.slice(boundary + 2);
+      let boundary: number;
+      while ((boundary = buffer.indexOf("\n\n")) !== -1) {
+        const rawFrame = buffer.slice(0, boundary).replace(/\r/g, "");
+        buffer = buffer.slice(boundary + 2);
 
-      const data = extractData(rawFrame);
-      if (data === null) continue;
+        const data = extractData(rawFrame);
+        if (data === null) continue;
 
-      const parsed = sseChatEventSchema.safeParse(data);
-      if (!parsed.success) {
-        throw new ApiErrorException({ kind: "stream", event: rawFrame });
+        const parsed = sseChatEventSchema.safeParse(data);
+        if (!parsed.success) {
+          throw new ApiErrorException({ kind: "stream", event: rawFrame });
+        }
+        yield parsed.data;
       }
-      yield parsed.data;
     }
+  } finally {
+    await reader.cancel().catch(() => undefined);
+    reader.releaseLock();
   }
 }
 
