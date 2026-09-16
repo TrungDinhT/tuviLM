@@ -72,3 +72,10 @@ curl -X POST http://localhost:8000/api/v1/laso/build_sao_luu \
     }
   }'
 ```
+
+## Background chat and workflow execution
+
+Hỏi AI uses the shared run API. New workflow routes and panels can reuse its
+saved results, background execution, reconnect, and cancellation behavior.
+See [Shared workflow runs](runs/README.md) for endpoints, configuration,
+extension examples, and client-disconnect behavior.

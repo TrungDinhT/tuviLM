@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from api._parse import to_cung_payload_map
+from api.chat.background_stream import stop_chat_tasks
 from api.chat.contracts import (
     ConversationHistoryError,
     ConversationHistoryStore,
@@ -24,6 +25,9 @@ from api.chat.contracts import (
 )
 from api.chat.routes import router as chat_router
 from api.chat.storage.store import MongoConversationHistoryStore
+from api.run_routes import router as runs_router
+from api.background_runs import RunService
+from api.workflows import registered_workflows
 from api.schemas import (
     AmDuongRelationKey,
     BuildLasoRequest,
@@ -45,7 +49,6 @@ from src.refactored.components.definitions.sao import ChinhPhuTinh
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.view.builder import build_laso_view
-
 
 logger = logging.getLogger(__name__)
 
@@ -95,14 +98,20 @@ async def lifespan(app: FastAPI):
         agent_deps=agent_deps,
         conversation_history_store=conversation_history_store,
     )
+    app.state.run_service = RunService(
+        conversation_history_store, registered_workflows(app), settings.runs,
+    )
     try:
         yield
     finally:
+        await app.state.run_service.close()
+        await stop_chat_tasks(app)
         await conversation_history_store.close()
 
 
 app = FastAPI(title="TuviLM API", version="0.1.0", lifespan=lifespan)
 app.include_router(chat_router)
+app.include_router(runs_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -173,7 +182,7 @@ def preview_laso(payload: PreviewLasoRequest) -> PreviewLasoResponse:
     data cannot disturb a previously built chart.
     """
     try:
-        solar_dt = dt.datetime(
+        solar_dt = dt.datetime(  # noqa: DTZ001
             year=payload.year,
             month=payload.month,
             day=payload.day,
