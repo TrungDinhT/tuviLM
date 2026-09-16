@@ -12,7 +12,10 @@ from beanie import PydanticObjectId
 from pymongo import AsyncMongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from pydantic_ai import PartStartEvent, TextPart
+from starlette.requests import Request
 
+from api.chat.background_stream import BackgroundStream, stop_chat_tasks
+from api.chat.routes import session_chat_stream
 from api.chat.contracts import (
     ConversationHistoryStore,
     DuplicateStreamInProgressError,
@@ -41,6 +44,7 @@ from api.chat.storage.documents import (
 from api.chat.storage.mappers import chart_profile_from_document
 from api.chat.storage.store import MongoConversationHistoryStore
 from api.main import ApiState, app
+from api.schemas import SessionChatStreamRequest
 from src.agent.deps import TuviAgentDeps
 
 
@@ -83,6 +87,7 @@ async def mongo_store():
     database = client[MONGODB_TEST_DB]
     await database.drop_collection(ChartProfileDocument.Settings.name)
     await database.drop_collection(ChatSessionDocument.Settings.name)
+    await database.drop_collection("workflow_runs")
     store = MongoConversationHistoryStore(
         mongo_client=client,
         database_name=MONGODB_TEST_DB,
@@ -97,6 +102,7 @@ async def mongo_store():
     try:
         yield store
     finally:
+        await stop_chat_tasks(app)
         if previous_api_state is not None:
             app.state.api_state = previous_api_state
         elif hasattr(app.state, "api_state"):
@@ -105,6 +111,7 @@ async def mongo_store():
             del app.state.session_chat_streamer
         await database.drop_collection(ChartProfileDocument.Settings.name)
         await database.drop_collection(ChatSessionDocument.Settings.name)
+        await database.drop_collection("workflow_runs")
         await store.close()
 
 
@@ -119,6 +126,7 @@ async def fake_store():
     try:
         yield store
     finally:
+        await stop_chat_tasks(app)
         if previous_api_state is not None:
             app.state.api_state = previous_api_state
         elif hasattr(app.state, "api_state"):
@@ -689,19 +697,103 @@ async def test_session_chat_stream_cancellation_marks_assistant_cancelled(
     profile = await _create_profile(fake_store)
     session = await _create_session(fake_store, profile.id)
 
-    with pytest.raises((asyncio.CancelledError, AssertionError)):
-        await api_client.post(
-            f"/api/v1/sessions/{session.id}/chat/stream",
-            headers={
-                "X-Anonymous-Owner-Id": "anon_owner",
-                "Idempotency-Key": "message-1",
-            },
-            json={"content": "Tell me about career."},
-        )
+    await api_client.post(
+        f"/api/v1/sessions/{session.id}/chat/stream",
+        headers={
+            "X-Anonymous-Owner-Id": "anon_owner",
+            "Idempotency-Key": "message-1",
+        },
+        json={"content": "Tell me about career."},
+    )
     context = await fake_store.load_session_context("anon_owner", session.id)
 
     assert context.session.messages[-1].content == "Partial answer."
     assert context.session.messages[-1].status == ChatMessageStatus.CANCELLED
+
+
+@pytest.mark.parametrize("disconnect_after", [b'"type": "ids"', b'"type": "text"'])
+async def test_client_disconnect_keeps_generation_running(fake_store, disconnect_after):
+    release = asyncio.Event()
+    disconnected = asyncio.Event()
+
+    async def streamer(**kwargs):
+        if disconnect_after == b'"type": "ids"':
+            await release.wait()  # Model/workflow is still thinking.
+        yield {"type": "text", "delta": "Partial "}
+        await release.wait()
+        yield {"type": "text", "delta": "answer."}
+
+    app.state.session_chat_streamer = streamer
+    profile = await _create_profile(fake_store)
+    session = await _create_session(fake_store, profile.id)
+    scope = {"type": "http", "method": "POST", "path": "/", "headers": [], "app": app}
+    response = await session_chat_stream(
+        session.id,
+        SessionChatStreamRequest(content="Explain my chart"),
+        Request(scope),
+        owner_id="anon_owner",
+        idempotency_key="disconnect-turn",
+    )
+
+    async def receive():
+        await disconnected.wait()
+        return {"type": "http.disconnect"}
+
+    async def send(event):
+        if disconnect_after in event.get("body", b""):
+            disconnected.set()
+            # Give StreamingResponse's disconnect listener control.
+            await asyncio.sleep(0)
+
+    await asyncio.wait_for(response(scope, receive, send), timeout=2)
+    assert session.messages[-1].status == ChatMessageStatus.PENDING
+    tasks = list(app.state.chat_tasks)
+    assert len(tasks) == 1
+    release.set()
+    await asyncio.wait_for(asyncio.gather(*tasks), timeout=2)
+    assert session.messages[-1].status == ChatMessageStatus.CONFIRMED
+    assert session.messages[-1].content == "Partial answer."
+    assert not app.state.chat_tasks
+
+
+async def test_shutdown_finalizes_background_generation(fake_store):
+    started = asyncio.Event()
+
+    async def streamer(**kwargs):
+        yield {"type": "text", "delta": "Partial answer"}
+        started.set()
+        await asyncio.Event().wait()
+
+    app.state.session_chat_streamer = streamer
+    profile = await _create_profile(fake_store)
+    session = await _create_session(fake_store, profile.id)
+    await session_chat_stream(
+        session.id,
+        SessionChatStreamRequest(content="Explain my chart"),
+        Request({"type": "http", "app": app}),
+        owner_id="anon_owner",
+        idempotency_key="shutdown-turn",
+    )
+    await asyncio.wait_for(started.wait(), timeout=2)
+    await asyncio.wait_for(stop_chat_tasks(app), timeout=2)
+    assert session.messages[-1].status == ChatMessageStatus.CANCELLED
+    assert session.messages[-1].content == "Partial answer"
+    assert not app.state.chat_tasks
+
+
+async def test_suspended_stream_consumer_does_not_block_generation():
+    completed = asyncio.Event()
+
+    async def source():
+        for _ in range(1000):
+            yield "data: token\n\n"
+        completed.set()
+
+    run = BackgroundStream(app, source())
+    await asyncio.wait_for(completed.wait(), timeout=2)
+    assert run.queue.qsize() <= 256
+    assert [event async for event in run.events()] == []
+    await stop_chat_tasks(app)
 
 
 async def test_session_chat_stream_default_runner_reconstructs_agent_context(
