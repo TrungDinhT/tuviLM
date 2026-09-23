@@ -182,7 +182,7 @@ describe("useWorkflowRun", () => {
     await waitFor(() => expect(result.current.result).toBe("saved"), { timeout: 2500 });
     const submissions = fetchMock.mock.calls.filter(([, init]) => init.method === "POST");
     expect(submissions).toHaveLength(2);
-    expect(submissions[0][1].headers).toEqual(submissions[1][1].headers);
+    expect(submissions[0]?.[1].headers).toEqual(submissions[1]?.[1].headers);
   });
 
   it("keeps newer partial text and stops polling after the terminal snapshot", async () => {

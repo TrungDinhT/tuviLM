@@ -62,7 +62,8 @@ export function useWorkflowRun<T = unknown>({
       const owner = await getOwnerId(mintOwnerId);
       signal.throwIfAborted();
       const storageKey = `workflow-submit:${JSON.stringify([owner, workflow, resourceId])}`;
-      const cached = client.getQueryData<View>(queryKey);
+      const previous = client.getQueryData<View>(queryKey);
+      const cached = previous?.storageKey === storageKey ? previous : undefined;
       const pending = loadPending(storageKey) ?? cached?.pending;
       let run: WorkflowRun | null;
       if (pending) {
@@ -94,7 +95,7 @@ export function useWorkflowRun<T = unknown>({
     refetchOnWindowFocus: "always",
     refetchOnReconnect: "always",
     refetchInterval: ({ state }) =>
-      state.data?.run && !isRunTerminal(state.data.run) ? 1_000 : false,
+      !state.error && state.data?.run && !isRunTerminal(state.data.run) ? 1_000 : false,
     retry: (_count, error) => isTransientRunError(error),
     retryDelay: (attempt) => Math.min(1_000 * 2 ** attempt, 10_000),
     structuralSharing: (previous, incoming) => {
@@ -130,11 +131,11 @@ export function useWorkflowRun<T = unknown>({
   return {
     run,
     inputs: query.data?.pending?.inputs ?? run?.inputs ?? null,
-    loading: resourceId !== null && query.isPending,
+    loading: resourceId !== null && (query.isPending || (query.isFetching && !active)),
     submitting,
     active,
     result: decoded.result,
-    error: query.error ?? decoded.error ?? cancel.error,
+    error: query.error ?? decoded.error ?? (cancel.variables === run?.id ? cancel.error : null),
     start: (inputs: RunInputs) => {
       const view = client.getQueryData<View>(queryKey);
       if (
