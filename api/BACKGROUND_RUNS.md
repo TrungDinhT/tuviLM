@@ -1,4 +1,4 @@
-# Shared background runs
+# Background workflows
 
 This module keeps a chat or workflow running when the phone locks, the browser
 loses its connection, or the user closes the app after submitting a request.
@@ -32,11 +32,24 @@ memory. API shutdown stops outstanding tasks; startup does not restart them.
 A fixed expiry marks abandoned records failed on read so they cannot block a
 resource forever. Completed results remain available in MongoDB.
 
+## Code layout
+
+- `background_runs.py`: task execution, progress and result models.
+- `run_routes.py`: the four common HTTP endpoints below.
+- `workflows.py`: chat/personality handlers and workflow registration.
+- `chat/storage/store.py`: run persistence alongside the existing history store.
+- Frontend `use-workflow-run.ts`: uses the existing TanStack Query provider for
+  polling, retries, request cancellation on unmount, and focus/network refresh.
+
+There is no separate run-store object or transport/session state machine in the UI.
+New workflows use the same endpoints; they do not need their own submission route.
+
 ## Existing store
 
-`MongoConversationHistoryStore.workflow_runs` uses the existing MongoDB client,
-database, index initialization, and shutdown. Its `workflow_runs` collection stores
-current status, progress and result. There is no event log to replay.
+`MongoConversationHistoryStore` owns `insert_run`, `get_run`, `latest_run`,
+`update_run`, and `cancel_run`. They use its `workflow_runs` collection and the
+existing MongoDB client, database, index initialization, and shutdown. The
+collection stores current status, progress and result; there is no event log.
 
 ## Shared API
 
@@ -50,25 +63,23 @@ never reruns the model. Another active run for the same owner/resource returns 4
 | `GET /api/v1/runs?workflow=chat&resource_id=session:ID` | Discover the latest run when reopening a panel |
 | `GET /api/v1/runs/{id}` | Read status and saved result |
 | `POST /api/v1/runs/{id}/cancel` | Explicit Stop action |
-| `POST /api/v1/sessions/{id}/chat/runs` | Chat adapter accepting `{ "content": "..." }` |
-| `POST /api/v1/chart-profiles/{id}/personality/runs` | Personality adapter accepting `{ "request": "..." }` |
 
 Statuses are `queued`, `running`, `succeeded`, `failed`, `cancelled`. Snapshots
 include `inputs`, `state.text`, `state.progress`, `state.metadata`, `result`, `error`,
 and `seq` (revision). The UI replaces its view with the latest snapshot, preventing
 duplicate text. The UI polls once per second while a run is active, then stops.
 Network errors retry with backoff up to ten seconds; returning to the foreground
-or coming online wakes the next poll. Each HTTP request times out after fifteen
+or coming online lets TanStack Query refresh the snapshot. Each HTTP request times out after fifteen
 seconds so a lost connection cannot stall observation indefinitely.
 There is no SSE connection, event parser, heartbeat, or stream replay in this API.
 
-Only explicit cancellation stops generation. Client disconnection and panel unmount
+Among client actions, only explicit cancellation stops generation. Client disconnection and panel unmount
 detach observation. Cancellation is accepted until result publication starts.
 
 ## Add a workflow with any output structure
 
 Register an input model, ownership validator, handler, and optional output schema
-in `registered_workflows()` in `workflows.py`:
+in `registered_workflows()` in `api/workflows.py`:
 
 ```python
 class ReportInputs(BaseModel):
@@ -106,8 +117,9 @@ An optional `finalize(context, inputs)` publishes to another store. Read
 this callback to save its user/assistant messages. Publication runs once; a failure
 marks the run failed rather than restarting the model.
 
-Custom routes only call `request.app.state.run_service.submit(...)` and return
-`run.snapshot()`. Connection handling belongs to the shared service.
+Panels submit through `POST /api/v1/runs` with the workflow name and inputs.
+If a future feature needs a custom route, it can call
+`request.app.state.run_service.submit(...)` and return `run.snapshot()`.
 
 ## Add a panel
 
