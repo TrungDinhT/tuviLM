@@ -1,7 +1,6 @@
 """Output contracts for the strength/weakness workflow."""
 
 from .capability_profile import (
-    CAPABILITY_PROFILE_OUTPUT,
     CAPABILITY_PROFILE_OUTPUT_INSTRUCTION,
     CapabilityProfile,
     StrengthFinding,
@@ -11,7 +10,6 @@ from .capability_profile import (
 )
 
 __all__ = [
-    "CAPABILITY_PROFILE_OUTPUT",
     "CAPABILITY_PROFILE_OUTPUT_INSTRUCTION",
     "CapabilityProfile",
     "StrengthFinding",

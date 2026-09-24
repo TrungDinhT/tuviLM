@@ -13,7 +13,6 @@ from pydantic import (
     model_validator,
 )
 
-from src.agent.workflow.contracts import WorkflowOutputInstruction
 from src.agent.workflow.strength_weakness.ontology import (
     get_capability_definition,
 )
@@ -76,6 +75,8 @@ class WeaknessFinding(BaseModel):
             "evidence liên quan trong profile."
         ),
     )
+
+
 class CapabilityProfile(BaseModel):
     tong_quan: str = Field(min_length=1)
     diem_manh: list[StrengthFinding] = Field(
@@ -174,13 +175,6 @@ Trả kết quả theo đúng output type `CapabilityProfile`.
 """.strip()
 
 
-CAPABILITY_PROFILE_OUTPUT = WorkflowOutputInstruction(
-    name="capability_profile",
-    instruction=CAPABILITY_PROFILE_OUTPUT_INSTRUCTION,
-    output_type=CapabilityProfile,
-)
-
-
 _WEAKNESS_LABELS = {
     WeaknessKind.HAN_CHE_TRUC_TIEP: "Hạn chế trực tiếp",
     WeaknessKind.QUA_DA: "Biểu hiện quá đà",
@@ -224,7 +218,6 @@ def render_capability_profile(profile: CapabilityProfile) -> str:
 
 
 __all__ = [
-    "CAPABILITY_PROFILE_OUTPUT",
     "CAPABILITY_PROFILE_OUTPUT_INSTRUCTION",
     "CapabilityProfile",
     "StrengthFinding",

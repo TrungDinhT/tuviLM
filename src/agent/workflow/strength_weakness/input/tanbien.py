@@ -58,18 +58,6 @@ class MeaningReference(BaseModel):
     source: str = _BOOK_NAME
 
 
-class MeaningContent(BaseModel):
-    source: SourceReference
-    content: str
-
-
-class CapabilityMeaningEvidence(BaseModel):
-    object_name: str
-    role: Role | None = None
-    meanings: list[MeaningContent] = Field(default_factory=list)
-    note: str | None = None
-
-
 class StarEvidence(BaseModel):
     evidence_id: str
     component_id: str
@@ -386,9 +374,11 @@ def _build_palace_evidence(
     )
 
 
-def _build_all_tu_hoa_evidence(
+def _build_tu_hoa_evidence(
     la_so: LaSo,
     structure_map: dict[str, list[str]],
+    *,
+    palace_position: DiaChi | None = None,
 ) -> list[TuHoaEvidence]:
     target_mapping = load_tu_hoa_target_mapping()[la_so.natal_context.thien_can]
     evidence: list[TuHoaEvidence] = []
@@ -396,6 +386,8 @@ def _build_all_tu_hoa_evidence(
         position = la_so.position_of(component_id, NATAL_LAYER_ID)
         if position is None:
             raise ModelRetry(f"Không tìm thấy vị trí của Tứ Hóa '{component_id}'.")
+        if palace_position is not None and position != palace_position:
+            continue
         cung = la_so.cung_at(position)
         roles = (cung.natal_role,)
         if cung.is_cung_than:
@@ -413,12 +405,9 @@ def _build_all_tu_hoa_evidence(
     return evidence
 
 
-def get_strength_weakness_evidence(
-    ctx: RunContext[TuviAgentDeps],
-) -> CapabilityEvidence:
-    """Build the workflow's complete initial input contract exactly once."""
-    _logger.info("Tool get_strength_weakness_evidence bắt đầu")
-    la_so = ctx.deps.require_la_so()
+def build_strength_weakness_evidence(la_so: LaSo) -> CapabilityEvidence:
+    """Build initial evidence before the workflow's first model request."""
+    _logger.info("Dựng strength/weakness evidence ban đầu")
     menh_position = la_so.tinh_ban.menh_position
     than_position = la_so.tinh_ban.than_position
     cach_cuc = _matching_cach_cuc_evidence(
@@ -426,7 +415,7 @@ def get_strength_weakness_evidence(
         [Role.MENH, Role.CUNG_THAN],
     )
     structure_map = _component_structure_map(cach_cuc)
-    tu_hoa = _build_all_tu_hoa_evidence(la_so, structure_map)
+    tu_hoa = _build_tu_hoa_evidence(la_so, structure_map)
 
     tam_hop_positions = (menh_position + 4, menh_position + 8)
     xung_chieu_position = menh_position + 6
@@ -488,69 +477,36 @@ def get_capability_palace_evidence(
     if position is None:
         raise ModelRetry(f"Không tìm thấy cung '{role.value}'.")
     cach_cuc = _matching_cach_cuc_evidence(la_so, [role])
-    tu_hoa = _build_all_tu_hoa_evidence(
-        la_so,
-        _component_structure_map(cach_cuc),
-    )
+    structure_map = _component_structure_map(cach_cuc)
     return SupplementalPalaceEvidence(
         palace=_build_palace_evidence(
             la_so,
             position,
             menh_position=la_so.tinh_ban.menh_position,
-            structure_map=_component_structure_map(cach_cuc),
+            structure_map=structure_map,
         ),
         cach_cuc=cach_cuc,
-        tu_hoa=[item for item in tu_hoa if item.position == position],
-    )
-
-
-def get_capability_meaning(
-    ctx: RunContext[TuviAgentDeps],
-    object_name: str,
-    role: Role | None = None,
-) -> CapabilityMeaningEvidence:
-    """Read generic and role-specific Tân Biên meanings for one object."""
-    references = _meaning_references(
-        object_name,
-        (role,) if role is not None else (),
-    )
-    meanings: list[MeaningContent] = []
-    book = ctx.deps.require_book()
-    for reference in references:
-        section = book.read_section(reference.section_id)
-        meanings.append(
-            MeaningContent(
-                source=SourceReference(
-                    section_id=section.id,
-                    breadcrumb=section.breadcrumb,
-                ),
-                content=section.content,
-            )
-        )
-    note = None
-    if not meanings:
-        note = f"Không tìm thấy mục Tân Biên cho {object_name!r}."
-    return CapabilityMeaningEvidence(
-        object_name=object_name,
-        role=role,
-        meanings=meanings,
-        note=note,
+        tu_hoa=_build_tu_hoa_evidence(
+            la_so, structure_map, palace_position=position,
+        ),
     )
 
 
 STRENGTH_WEAKNESS_REASONING_INSTRUCTION = """
 ## Quy trình suy luận năng lực
 
-Tool chỉ định vị, trích xuất, detect cấu trúc và truy xuất ý nghĩa Tử Vi. Bạn là
-người đọc các ý nghĩa đó để luận; không dùng fixed mapping sao → năng lực.
+Workflow đã dựng evidence ban đầu; các tool bổ sung truy xuất ý nghĩa và context
+Tử Vi khi cần. Bạn đọc các ý nghĩa đó để luận; không dùng fixed mapping sao → năng lực.
 
-1. Luôn gọi `get_strength_weakness_evidence` đúng một lần trước khi suy luận.
+1. Đọc `CapabilityEvidence` được cung cấp sẵn trong đầu vào trước khi suy luận.
 2. Đọc cấu trúc lớn trước: Mệnh/Thân, tam phương tứ chính Mệnh, cách cục và Tứ
    Hóa. `palaces` là danh sách cung duy nhất; các object quan hệ tham chiếu bằng
    `evidence_id`, vì vậy không đếm Mệnh/Thân đồng cung hai lần.
 3. Cách cục đã có meaning và `structure_id`. Với chính tinh, phụ tinh, Tứ Hóa
-   hoặc Tuần/Triệt trở thành căn cứ quan trọng, gọi `get_capability_meaning` để
-   đọc meaning Tân Biên trước khi dùng. Không suy từ tên sao đơn thuần.
+   hoặc Tuần/Triệt trở thành căn cứ quan trọng, dùng `read_section` với các
+   `section_id` trong `meaning_references` để đọc meaning Tân Biên trước khi dùng.
+   Đọc cả mục generic và mục theo vai trò cung liên quan nếu có; mỗi section chỉ
+   cần đọc một lần. Không tự đoán section ID hoặc suy từ tên sao đơn thuần.
 4. Chỉ gọi `get_capability_palace_evidence` khi context của Nô Bộc, Tật Ách,
    Phúc Đức hoặc cung khác có thể thay đổi/làm cụ thể một kết luận quan trọng;
    không gọi thêm chỉ để đạt số lượng findings.
@@ -590,11 +546,8 @@ __all__ = [
     "STRENGTH_WEAKNESS_REASONING_INSTRUCTION",
     "CachCucEvidence",
     "CapabilityEvidence",
-    "CapabilityMeaningEvidence",
-    "MeaningContent",
     "PalaceEvidence",
     "SupplementalPalaceEvidence",
-    "get_capability_meaning",
     "get_capability_palace_evidence",
-    "get_strength_weakness_evidence",
+    "build_strength_weakness_evidence",
 ]
