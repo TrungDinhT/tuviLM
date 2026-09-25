@@ -10,11 +10,10 @@ from pydantic_ai import Agent, PromptedOutput, RunContext
 from pydantic_ai.messages import ModelMessage
 
 from src.agent.deps import TuviAgentDeps
-from src.agent.tool.book import read_section
 from src.agent.workflow.strength_weakness.input import (
     STRENGTH_WEAKNESS_REASONING_INSTRUCTION,
-    get_capability_palace_evidence,
     build_strength_weakness_evidence,
+    prepare_capability_input,
 )
 from src.agent.workflow.strength_weakness.ontology import (
     build_capability_ontology_instruction,
@@ -35,15 +34,17 @@ của mình từ lá số Tử Vi.
 
 ## Boundary bắt buộc
 
-- Chỉ kết luận từ evidence được workflow cung cấp và dữ liệu thực sự nhận qua tool.
+- Chỉ kết luận từ `evidence` và `book_sections` được workflow cung cấp.
 - Không dùng kiến thức Tử Vi ẩn hoặc fixed mapping sao → skill.
 - Không biến outcome truyền thống thành capability của bản thân.
 - Không chấm điểm danh sách kỹ năng cố định và không cố phủ hết ontology.
 - Không chẩn đoán tâm lý, định mệnh hóa hoặc phán chắc.
 
-Workflow đã cung cấp `CapabilityEvidence` của lá số hiện tại trong đầu vào.
-Dùng evidence này làm input ban đầu. Chỉ dùng supporting tools khi cần meaning
-hoặc context có khả năng thay đổi một finding quan trọng.
+Workflow đã cung cấp dữ kiện lá số trong `evidence` và nội dung sách tham chiếu
+trong `book_sections`. Phân biệt dữ kiện với kiến thức sách khi tổng hợp.
+Input luôn có Mệnh/Thân, tam phương tứ chính Mệnh, Phúc Đức và Tật Ách,
+cùng nội dung sách tương ứng. Tổng hợp trực tiếp từ dữ liệu này để trả
+`CapabilityProfile`; không cần chọn hoặc gọi tool lấy thêm cung.
 """.strip()
 
 
@@ -61,16 +62,11 @@ def build_strength_weakness_agent(model: str) -> Agent:
         deps_type=TuviAgentDeps,
         # Qwen thinking models reject the `tool_choice=required` request that
         # Pydantic AI's default ToolOutput mode emits for BaseModel outputs.
-        # PromptedOutput keeps schema validation while allowing normal tool
-        # calls followed by a JSON text response (`tool_choice=auto`).
+        # PromptedOutput validates the JSON text response without requiring
+        # an output-tool call.
         output_type=PromptedOutput(CapabilityProfile),
         instructions=STRENGTH_WEAKNESS_AGENT_INSTRUCTION,
-        tool_retries=2,
         output_retries=2,
-        tools=[
-            read_section,
-            get_capability_palace_evidence,
-        ],
     )
 
 
@@ -82,9 +78,10 @@ async def run_strength_weakness_agent(
     usage: Any = None,
     message_history: Sequence[ModelMessage] | None = None,
 ) -> CapabilityProfile:
-    """Prepare initial evidence, then run the sub-agent for structured output."""
+    """Prepare chart evidence and book knowledge before the first model request."""
     evidence = build_strength_weakness_evidence(deps.require_la_so())
-    prompt = f"{request}\n\n## Evidence ban đầu (CapabilityEvidence)\n{evidence.model_dump_json()}"
+    prepared_input = prepare_capability_input(evidence, deps.require_book())
+    prompt = f"{request}\n\n## Dữ liệu đầu vào (CapabilityInput)\n{prepared_input.model_dump_json()}"
     _logger.info("Chạy strength/weakness agent: request_chars=%d", len(request))
     result = await agent.run(
         prompt,

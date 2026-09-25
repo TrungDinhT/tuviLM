@@ -10,7 +10,6 @@ from .agent import (
 )
 from .input import (
     CapabilityEvidence,
-    get_capability_palace_evidence,
     build_strength_weakness_evidence,
 )
 from .ontology import (
@@ -43,7 +42,6 @@ __all__ = [
     "WeaknessKind",
     "build_strength_weakness_agent",
     "build_strength_weakness_agent_instruction",
-    "get_capability_palace_evidence",
     "build_strength_weakness_evidence",
     "render_capability_profile",
     "run_strength_weakness_agent",

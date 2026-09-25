@@ -157,8 +157,9 @@ Trả kết quả theo đúng output type `CapabilityProfile`.
   theo cách nào. `mo_ta` không luận sao, cung hay thuật ngữ Tử Vi.
 - `giai_thich` là phần luận giải Tử Vi chuyên sâu trả lời vì sao người này có
   đúng biểu hiện và mức độ đã nêu trong `mo_ta`. Phải phân tích sự phối hợp,
-  điều kiện hóa và xung đột giữa Mệnh/Thân, tam phương tứ chính, cách cục, chính
-  tinh/phụ tinh, Tứ Hóa và Tuần/Triệt khi chúng thực sự liên quan.
+  điều kiện hóa và xung đột giữa Mệnh/Thân, tam phương tứ chính, Phúc Đức,
+  Tật Ách, cách cục, chính tinh/phụ tinh, Tứ Hóa và Tuần/Triệt khi chúng thực sự
+  liên quan; không liệt kê mọi cung chỉ để đủ thành phần.
 - `giai_thich` không được chỉ diễn đạt lại `mo_ta`. Có thể gọi tên sao, cung và
   cấu trúc Tử Vi trong mạch phân tích, nhưng không trình bày thành danh sách
   evidence rời rạc và không suy một evidence riêng lẻ thẳng thành kết luận.
