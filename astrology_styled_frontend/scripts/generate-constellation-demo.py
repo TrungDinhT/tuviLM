@@ -77,13 +77,13 @@ def load_content():
     return content
 
 
-def portrait(path):
+def portrait(path, alpha=0.52):
     png = subprocess.check_output(
         ["rsvg-convert", "--height", str(ART_SIZE), str(ROOT / "public" / path.lstrip("/"))]
     )
     image = Image.open(io.BytesIO(png)).convert("RGBA")
     image.thumbnail((ART_SIZE, ART_SIZE), Image.Resampling.LANCZOS)
-    image.putalpha(image.getchannel("A").point(lambda a: round(a * 0.52)))
+    image.putalpha(image.getchannel("A").point(lambda a: round(a * alpha)))
     return image
 
 
@@ -178,7 +178,7 @@ def main():
     frames = []
     for number, key in enumerate(NAMES, 1):
         base = backdrop.copy()
-        art = portrait(content["ghosts"][key])
+        art = portrait(content["ghosts"][key], 1 if key == "thamlang" else 0.52)
         base.alpha_composite(art, (ART_LEFT + (ART_SIZE - art.width) // 2,
                                    ART_TOP + (ART_SIZE - art.height) // 2))
         shape = content["shapes"][key]
