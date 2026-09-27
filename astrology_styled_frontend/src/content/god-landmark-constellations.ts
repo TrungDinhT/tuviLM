@@ -143,6 +143,7 @@ export const GOD_LANDMARK_CONSTELLATIONS: Readonly<Record<string, GodConstellati
       ["leftKnee", "leftFoot"],
       ["waist", "rightKnee"],
       ["rightKnee", "rightFoot"],
+      ["rightShoulder", "crown"],
     ],
   ),
 
