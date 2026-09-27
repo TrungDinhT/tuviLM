@@ -3,6 +3,8 @@ from __future__ import annotations
 from pydantic_ai import Agent, RunContext
 
 from src.agent.deps import TuviAgentDeps
+from src.agent.workflow.strength_weakness.agent import run_strength_weakness_workflow
+
 from .tool import (
     get_cung_by_position,
     get_cung_by_role,
@@ -53,6 +55,13 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 - Không được sử dụng kiến thức của bản thân, hay luôn dùng read_book_tuvi_tan_bien để tìm kiếm thông tin trong sách.
 - Sau khi có thông tin, hãy tổng hợp, tưởng tượng và chọn lọc để trả lời, không liệt kê một cách máy móc thông tin trong sách.
 
+## Điểm mạnh, điểm yếu và năng lực
+- Khi người dùng hỏi về điểm mạnh, điểm yếu, năng lực nổi bật, khả năng họ làm
+  tốt hoặc khó huy động, luôn gọi run_strength_weakness_workflow và truyền
+  nguyên văn yêu cầu.
+- Tool này đã chọn capability theo evidence, trả bài đã render hoàn chỉnh. Phải
+  giữ nguyên kết luận; không gọi lại evidence tool và không tự thêm luận đoán.
+
 ## Tính cách
 - Sử dụng giọng điềm đạm, rõ ràng, có chiều sâu.
 - Không phán chắc những điều tool không hỗ trợ.
@@ -73,6 +82,7 @@ def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
             get_xung_chieu,
             read_catalog,
             read_section,
+            run_strength_weakness_workflow,
             get_cung_analyze_skill,
             read_book_tuvi_tan_bien,
             get_role_instruction

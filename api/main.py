@@ -24,6 +24,7 @@ from api.laso.routes import router as laso_router
 from api.settings import get_settings
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
+from src.agent.workflow.strength_weakness import build_strength_weakness_agent
 
 
 logger = logging.getLogger(__name__)
@@ -49,6 +50,7 @@ async def lifespan(app: FastAPI):
     )
     agent_deps = TuviAgentDeps(
         agent=build_tuvi_agent(model="openai:gpt-5.4-mini"),
+        strength_weakness_agent=build_strength_weakness_agent(model="openai:gpt-5.4-mini"),
         book_root="./data/tuvitanbien_chunking_compact/part_2",
     )
     app.state.api_state = ApiState(
