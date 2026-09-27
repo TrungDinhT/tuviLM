@@ -1,5 +1,3 @@
-from .deps import TuviAgentDeps
-from .main import DEFAULT_MODEL, build_tuvi_agent, run_tuvi_agent
 from src.agent.workflow.personality import (
     DEFAULT_PERSONALITY_CONFIG,
     PERSONALITY_INPUT_REGISTRY,
@@ -16,6 +14,9 @@ from src.agent.workflow.strength_weakness import (
     build_strength_weakness_agent,
     run_strength_weakness_agent,
 )
+
+from .deps import TuviAgentDeps
+from .main import DEFAULT_MODEL, build_tuvi_agent, run_tuvi_agent
 
 __all__ = [
     "DEFAULT_MODEL",
