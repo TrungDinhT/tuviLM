@@ -190,3 +190,24 @@ export const ChatResponseSchema = z.object({
   debug_events: z.array(ChatDebugEventSchema).default([]),
 });
 export type ChatResponse = z.infer<typeof ChatResponseSchema>;
+
+
+const CapabilityDescriptionSchema = {
+  mo_ta: z.string().min(1),
+  giai_thich: z.string().min(1),
+};
+
+export const CapabilityProfileSchema = z.object({
+  tong_quan: z.string().min(1),
+  diem_manh: z.array(z.object({
+    nang_luc_id: z.string().min(1),
+    nang_luc: z.string().min(1),
+    ...CapabilityDescriptionSchema,
+  })).max(6),
+  diem_yeu: z.array(z.object({
+    ten: z.string().min(1),
+    loai: z.enum(['han_che_truc_tiep', 'qua_da', 'xung_dot']),
+    ...CapabilityDescriptionSchema,
+  })).max(6),
+});
+export type CapabilityProfile = z.infer<typeof CapabilityProfileSchema>;

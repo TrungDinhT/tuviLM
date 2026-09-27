@@ -12,8 +12,15 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Empty, EmptyContent, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import { useChartStore } from '@/store/chart-store';
+import { StrengthWeaknessPanel } from '@/features/strength-weakness/strength-weakness-panel';
 import { AspectBars } from '@/features/laso-chart/components/aspect-bars';
 import { CompactChart } from '@/features/laso-chart/components/compact-chart';
 import { FullChartDialog } from '@/features/laso-chart/components/full-chart-dialog';
@@ -52,7 +59,7 @@ export function ChatScreen() {
       {/* Chat column (always visible) */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile-only: open chart in a sheet */}
-        <div className="border-b border-border bg-background px-4 py-3 lg:hidden">
+        <div className="border-border bg-background border-b px-4 py-3 lg:hidden">
           <Button
             type="button"
             variant="outline"
@@ -69,7 +76,7 @@ export function ChatScreen() {
       </div>
 
       {/* Desktop chart side panel */}
-      <aside className="hidden w-[480px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-border bg-background p-4 lg:flex xl:w-[560px]">
+      <aside className="border-border bg-background hidden w-[480px] shrink-0 flex-col gap-4 overflow-y-auto border-l p-4 lg:flex xl:w-[560px]">
         <Card size="sm">
           <CardHeader className="flex flex-row items-center justify-between gap-2">
             <CardTitle className="text-sm">Lá số</CardTitle>
@@ -88,6 +95,7 @@ export function ChatScreen() {
           </CardContent>
         </Card>
         <SaoLuuPicker />
+        <StrengthWeaknessPanel />
         <AspectBars />
       </aside>
 
@@ -112,6 +120,7 @@ export function ChatScreen() {
           <ConversationSwitcher />
           <CompactChart />
           <SaoLuuPicker />
+          <StrengthWeaknessPanel />
           <AspectBars />
         </SheetContent>
       </Sheet>

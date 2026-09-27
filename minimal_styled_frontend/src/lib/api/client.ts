@@ -1,6 +1,8 @@
 import { ZodError, type ZodType } from 'zod';
 import type { ApiError } from '@/lib/http/errors';
 import {
+  CapabilityProfileSchema,
+  type CapabilityProfile,
   BuildLasoRequestSchema,
   BuildLasoResponseSchema,
   BuildSaoLuuRequestSchema,
@@ -383,3 +385,13 @@ function parseSseEvents(raw: string, onEvent: (event: SessionChatEvent) => void)
  * error surfaces distinct.
  */
 export { ZodError };
+
+
+export function analyzeStrengthWeakness(req: BuildLasoRequest): Promise<CapabilityProfile> {
+  return call(
+    '/api/v1/laso/strength-weakness',
+    BuildLasoRequestSchema,
+    CapabilityProfileSchema,
+    req,
+  );
+}
