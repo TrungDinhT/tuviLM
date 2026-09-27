@@ -356,6 +356,7 @@ async def _stream_session_chat_events(
     agent_deps = TuviAgentDeps(
         agent=base_deps.agent,
         personality_agent=base_deps.personality_agent,
+        strength_weakness_agent=base_deps.strength_weakness_agent,
         la_so=_build_la_so(context.chart_profile.birth_info),
         book=base_deps.book,
         book_root=base_deps.book_root,

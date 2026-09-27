@@ -41,6 +41,7 @@ from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
 from src.agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
 from src.agent.workflow.personality.agent import build_personality_agent
+from src.agent.workflow.strength_weakness import build_strength_weakness_agent
 from src.refactored.components.definitions.sao import ChinhPhuTinh
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
@@ -89,6 +90,7 @@ async def lifespan(app: FastAPI):
     agent_deps = TuviAgentDeps(
         agent=build_tuvi_agent(model=model),
         personality_agent=build_personality_agent(model=model),
+        strength_weakness_agent=build_strength_weakness_agent(model=model),
         book_root="./data/tuvitanbien_chunking_compact/part_2",
     )
     app.state.api_state = ApiState(
