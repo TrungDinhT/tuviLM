@@ -19,6 +19,7 @@ import { LichSuDrawer } from "./LichSuDrawer";
 import { useResponsiveSize } from "./useResponsiveSize";
 import { useIsMobile } from "./useIsMobile";
 import { DefaultPanels } from "./DefaultPanels";
+import { CauPhuCard } from "./CauPhuCard";
 
 const TIEU_VAN_POSITION = "Ngọ";
 
@@ -265,18 +266,25 @@ export function MobileChartView() {
       {/* Body: chart only on mobile, chart + tips side-by-side on tablet */}
       <div className="flex-1 overflow-auto min-h-0">
         {isMobile ? (
-          <div
-            className="border-b border-[rgba(26,22,17,0.14)] px-3 py-2 grid place-items-center"
-            style={{ background: "rgba(255,252,245,0.4)" }}
-          >
-            <Chart
-              laso={stash.laso}
-              profile={stash.profile}
-              size={chartSize}
-              highlightedRole={selectedRole}
-              tieuVanPosition={TIEU_VAN_POSITION}
-              onCungClick={(role) => setSelectedRole((prev) => (prev === role ? null : role))}
-            />
+          <div>
+            <div
+              className="border-b border-[rgba(26,22,17,0.14)] px-3 py-2 grid place-items-center"
+              style={{ background: "rgba(255,252,245,0.4)" }}
+            >
+              <Chart
+                laso={stash.laso}
+                profile={stash.profile}
+                size={chartSize}
+                highlightedRole={selectedRole}
+                tieuVanPosition={TIEU_VAN_POSITION}
+                onCungClick={(role) => setSelectedRole((prev) => (prev === role ? null : role))}
+              />
+            </div>
+            {stash.cauPhu && (
+              <div className="px-3 py-4">
+                <CauPhuCard cauPhu={stash.cauPhu} />
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-[1fr_320px] gap-6 px-4 py-4 min-h-full">
@@ -294,7 +302,7 @@ export function MobileChartView() {
               />
             </div>
             <div className="overflow-auto">
-              <DefaultPanels />
+              <DefaultPanels cauPhu={stash.cauPhu} />
             </div>
           </div>
         )}
