@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import Link from "next/link";
 
 import { Pill } from "@/components/primitives/pill";
 import {
@@ -87,9 +88,17 @@ export function BanMenhScreen() {
             )}
           </div>
         </div>
-        <h2 className="mt-[10px] font-display text-[26px] leading-[1.06] font-semibold tracking-[-0.01em]">
-          Bạn Sao Trẻ
-        </h2>
+        <div className="mt-[10px] flex items-center justify-between gap-3">
+          <h2 className="font-display text-[26px] leading-[1.06] font-semibold tracking-[-0.01em]">
+            Bạn Sao Trẻ
+          </h2>
+          <Link
+            href="/la-so"
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-glass-line bg-glass px-4 text-xs text-ink transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+          >
+            Lá số gốc <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
         <p className="mt-[7px] max-w-[54ch] text-[13.5px] leading-[1.5] text-muted">
           Lá Bài Bản Mệnh ở đầu — vuốt sang để lật hai lá bài phụ.
         </p>
