@@ -43,6 +43,45 @@ describe("full lá số", () => {
     }
   });
 
+  it("previews requested groups, counts omitted stars, and colors their elements", () => {
+    render(
+      <LaSoBoard
+        chart={{
+          ...chart,
+          cuc_name: "Kim Tứ cục",
+          ban_menh_name: "Thành Đầu Thổ",
+          ban_menh_ngu_hanh: "Thổ",
+        }}
+      />,
+    );
+    const ty = screen.getByRole("button", { name: "Xem cung Huynh Đệ tại Tý" });
+    expect(within(ty).getByText("Hóa Quyền").style.color).toBe("var(--element-moc)");
+    expect(within(ty).getByText("Hỏa Tinh").style.color).toBe("var(--element-hoa)");
+    expect(within(ty).queryByText("Phi Liêm")).toBeNull();
+    expect(within(ty).getByText("+3")).toBeTruthy();
+
+    const suu = screen.getByRole("button", { name: "Xem cung Mệnh tại Sửu" });
+    expect(within(suu).getByText("Linh Tinh")).toBeTruthy();
+    expect(within(suu).queryByText("Hoa Cái")).toBeNull();
+    expect(within(suu).getByText("Thái Tuế").style.color).toBe("var(--element-hoa)");
+    expect(within(suu).getByText("+3")).toBeTruthy();
+
+    const than = screen.getByRole("button", { name: "Xem cung Tật Ách tại Thân" });
+    expect(within(than).getByText("Hữu Bật")).toBeTruthy();
+
+    const thin = screen.getByRole("button", { name: "Xem cung Điền Trạch tại Thìn" });
+    expect(within(thin).queryByText("Thanh Long")).toBeNull();
+    expect(within(thin).getByText("Thiếu Âm").style.color).toBe("var(--element-thuy)");
+    expect(within(thin).getByText("+2")).toBeTruthy();
+    expect(screen.getByText("Kim Tứ cục").style.color).toBe("var(--element-kim)");
+    expect(screen.getByText("Thành Đầu Thổ").style.color).toBe("var(--element-tho)");
+
+    fireEvent.click(ty);
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText("Phi Liêm").style.color).toBe("var(--element-hoa)");
+    expect(within(dialog).getByText("Hóa Quyền").style.color).toBe("var(--element-moc)");
+  });
+
   it("shows age ranges and markers, and restores focus after Escape", async () => {
     const variant: BuildLasoResponse = {
       ...chart,

@@ -38,6 +38,53 @@ const ELEMENT_COLORS: Record<string, string> = {
   Thổ: "var(--element-tho)",
 };
 
+// Lục sát / lục cát plus the twelve stars in THAI_TUE_RING_STAR_IDS
+// (src/agent/tool/thai_tue/vong_thai_tue.py). Preserve accents to distinguish
+// Quan Phù in this cycle from Quan Phủ.
+const PREVIEW_STAR_NAMES = new Set([
+  "Kình Dương",
+  "Đà La",
+  "Địa Không",
+  "Địa Kiếp",
+  "Linh Tinh",
+  "Hỏa Tinh",
+  "Tả Phù",
+  "Hữu Bật",
+  "Thiên Khôi",
+  "Thiên Việt",
+  "Văn Xương",
+  "Văn Khúc",
+  "Thái Tuế",
+  "Thiếu Dương",
+  "Tang Môn",
+  "Thiếu Âm",
+  "Quan Phù",
+  "Tử Phù",
+  "Tuế Phá",
+  "Long Đức",
+  "Bạch Hổ",
+  "Phúc Đức",
+  "Điếu Khách",
+  "Trực Phù",
+]);
+
+// The API supplies tứ hóa as names only. Elements follow the backend catalog:
+// src/refactored/components/data/tuhoa.json.
+const TU_HOA_ELEMENTS: Record<string, string> = {
+  hoaloc: "Thổ",
+  hoaquyen: "Mộc",
+  hoakhoa: "Thủy",
+  hoaky: "Thủy",
+};
+
+function elementColor(element?: string) {
+  return (element && ELEMENT_COLORS[element]) || "var(--color-ink)";
+}
+
+function secondaryStarColor(star: { name: string; element?: string }) {
+  return elementColor(star.element ?? TU_HOA_ELEMENTS[starKeyFromName(star.name)]);
+}
+
 function primaryStarColor(name: string) {
   const element = nguHanhOf(starKeyFromName(name));
   return element ? `var(--element-${element})` : "var(--color-ink)";
@@ -88,6 +135,16 @@ export function LaSoBoard({ chart }: { chart: BuildLasoResponse }) {
           );
           if (!cung) return null;
           const age = ageRange(cung);
+          const previewStars = [
+            ...cung.tuhoa.map((name) => ({
+              name,
+              element: TU_HOA_ELEMENTS[starKeyFromName(name)],
+            })),
+            ...cung.phu_tinh.filter((star) =>
+              PREVIEW_STAR_NAMES.has(displayStarName(star.name).normalize("NFC")),
+            ),
+          ].slice(0, 2);
+          const hiddenStarCount = cung.phu_tinh.length + cung.tuhoa.length - previewStars.length;
           return (
             <button
               type="button"
@@ -114,11 +171,16 @@ export function LaSoBoard({ chart }: { chart: BuildLasoResponse }) {
                 )}
               </span>
               <span className={styles.secondaryStars}>
-                {cung.phu_tinh
-                  .slice(0, 2)
-                  .map((star) => star.name)
-                  .join(" · ")}
-                {cung.phu_tinh.length > 2 ? ` · +${cung.phu_tinh.length - 2}` : ""}
+                <span className={styles.secondaryNames}>
+                  {previewStars.map((star) => (
+                    <span key={star.name} style={{ color: secondaryStarColor(star) }}>
+                      {star.name}
+                    </span>
+                  ))}
+                </span>
+                {hiddenStarCount > 0 ? (
+                  <span className={styles.hiddenCount}>+{hiddenStarCount}</span>
+                ) : null}
               </span>
               <span className={styles.markers}>{markers(cung)}</span>
               <span className={styles.cellFooter}>
@@ -144,8 +206,10 @@ export function LaSoBoard({ chart }: { chart: BuildLasoResponse }) {
             <span className={styles.spark} aria-hidden="true">
               ✦
             </span>
-            <h2>{chart.cuc_name}</h2>
-            <p>{chart.ban_menh_name}</p>
+            <h2 style={{ color: elementColor(chart.cuc_name.trim().split(/\s+/)[0]) }}>
+              {chart.cuc_name}
+            </h2>
+            <p style={{ color: elementColor(chart.ban_menh_ngu_hanh) }}>{chart.ban_menh_name}</p>
             {birth ? <p>{birth.gender === "M" ? "Nam" : "Nữ"}</p> : null}
             {than?.role ? <p className={styles.than}>Thân cư {than.role}</p> : null}
             <span className={styles.centerDivider} />
@@ -226,18 +290,9 @@ function StarSection({
           {stars.map((star, index) => (
             <li
               key={`${star.name}-${index}`}
-              style={primary ? { color: primaryStarColor(star.name) } : undefined}
+              style={{ color: primary ? primaryStarColor(star.name) : secondaryStarColor(star) }}
             >
-              <span
-                className={styles.dot}
-                style={{
-                  background: primary
-                    ? "currentColor"
-                    : star.element
-                      ? (ELEMENT_COLORS[star.element] ?? "var(--accent)")
-                      : "var(--accent)",
-                }}
-              />
+              <span className={styles.dot} style={{ background: "currentColor" }} />
               {star.name}
             </li>
           ))}
