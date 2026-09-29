@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from datetime import datetime
 from types import SimpleNamespace
 
 import pytest
@@ -24,6 +25,7 @@ from src.agent.workflow.strength_weakness.agent import run_strength_weakness_wor
 from src.agent.workflow.strength_weakness.input.tanbien import prepare_capability_input
 from src.refactored.components.definitions.cung_role import Role
 from src.refactored.la_so import LaSo
+from src.refactored.model.prior import Gender, LaSoPrior
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 
@@ -61,6 +63,41 @@ def test_profile_rejects_unknown_and_duplicate_capabilities():
     with pytest.raises(ValidationError, match="unique"):
         CapabilityProfile(tong_quan="Tổng quan", diem_manh=[finding, finding])
     assert finding.model_dump()["nang_luc"]
+
+
+@pytest.mark.parametrize(
+    "year,hour,role,component_id,generic_section",
+    [
+        (1990, 18, Role.MENH, "hoa_loc", "3.23"),
+        (1991, 14, Role.MENH, "hoa_quyen", "3.24"),
+        (1992, 0, Role.MENH, "hoa_khoa", "3.25"),
+        (1992, 14, Role.MENH, "hoa_ky", "3.26"),
+        (1990, 4, Role.CUNG_THAN, "hoa_loc", "3.23"),
+        (1990, 10, Role.CUNG_THAN, "hoa_quyen", "3.24"),
+        (1990, 8, Role.CUNG_THAN, "hoa_khoa", "3.25"),
+        (1990, 4, Role.CUNG_THAN, "hoa_ky", "3.26"),
+    ],
+)
+def test_tu_hoa_reads_generic_and_menh_than_sections(
+    year, hour, role, component_id, generic_section
+):
+    prior = LaSoPrior.from_solar_day(datetime(year, 5, 15, hour), Gender.MALE)
+    chart = LaSo.from_prior(prior)
+    evidence = build_strength_weakness_evidence(chart)
+    transformation = next(item for item in evidence.tu_hoa if item.component_id == component_id)
+    position = (
+        chart.tinh_ban.menh_position if role == Role.MENH else chart.tinh_ban.than_position
+    )
+    assert transformation.position == position
+    references = {(ref.section_id, ref.scope) for ref in transformation.meaning_references}
+    assert (generic_section, "generic") in references
+    assert ("4.2.23", f"role:{role.value}") in references
+
+    book = RecordingBook()
+    prepared = prepare_capability_input(evidence, book)
+    assert generic_section in prepared.book_sections
+    assert "4.2.23" in prepared.book_sections
+    assert book.reads.count("4.2.23") == 1
 
 
 def test_agent_receives_prepared_evidence_and_book_before_running():
