@@ -88,14 +88,17 @@ export function useCapabilityReport(birth: BirthInfo | null, unlocked: boolean) 
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     refetchOnMount: false,
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const restored = useCapabilityStore.getState().entries[key]?.report;
       if (restored) return restored;
       const report = await request("/api/v1/laso/strength-weakness", {
         method: "POST",
         body: birth,
         schema: capabilitySchema,
+        signal,
       });
+      // A reset may have unlocked the same chart again while this request ran.
+      signal.throwIfAborted();
       useCapabilityStore.getState().save(key, report);
       return report;
     },

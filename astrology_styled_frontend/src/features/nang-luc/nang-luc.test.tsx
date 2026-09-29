@@ -1,5 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CapabilityReport } from "./nang-luc-screen";
 import {
@@ -10,6 +18,7 @@ import {
   type CapabilityProfile,
 } from "./data";
 import { useChartStore } from "@/store/chart-store";
+import { bindChartResetClearing } from "@/lib/api/chart-persistence";
 const birth = {
   calendar: "solar" as const,
   year: 1996,
@@ -127,5 +136,57 @@ describe("capability report", () => {
     useChartStore.getState().reset();
     useCapabilityStore.getState().save(key, report);
     expect(useCapabilityStore.getState().entries).toEqual({});
+  });
+  it("cancels a reset request and prevents its late response overwriting a new report", async () => {
+    const key = capabilityKey(birth);
+    const newReport = { ...report, tong_quan: "Phân tích mới sau khi lập lại lá số." };
+    let completeOld!: (response: Response) => void;
+    const oldResponse = new Promise<Response>((resolve) => {
+      completeOld = resolve;
+    });
+    // Simulate a transport that still completes after cancellation.
+    const fetch = vi
+      .fn<typeof globalThis.fetch>()
+      .mockReturnValueOnce(oldResponse)
+      .mockResolvedValueOnce(new Response(JSON.stringify(newReport)));
+    vi.stubGlobal("fetch", fetch);
+    const client = new QueryClient();
+    const unbind = bindChartResetClearing(client);
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    );
+    try {
+      useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
+      useCapabilityStore.getState().unlock(key);
+      const oldHook = renderHook(() => useCapabilityReport(birth, true), { wrapper });
+      await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+      const oldSignal = fetch.mock.calls[0]?.[1]?.signal;
+
+      act(() => useChartStore.getState().reset());
+      oldHook.unmount();
+      act(() => {
+        useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
+        useCapabilityStore.getState().unlock(key);
+      });
+      const newHook = renderHook(() => useCapabilityReport(birth, true), { wrapper });
+      await waitFor(() => expect(newHook.result.current.data).toEqual(newReport));
+
+      const staleResponse = new Response(JSON.stringify(report));
+      const readStaleResponse = vi.spyOn(staleResponse, "text");
+      await act(async () => {
+        completeOld(staleResponse);
+      });
+      expect(readStaleResponse).toHaveBeenCalledOnce();
+      expect(useCapabilityStore.getState().entries[key]?.report).toEqual(newReport);
+      expect(client.getQueryData(["capability", key])).toEqual(newReport);
+      expect(oldSignal?.aborted).toBe(true);
+      expect(
+        JSON.parse(localStorage.getItem("tuvi.capability-v1")!).state.entries[key].report,
+      ).toEqual(newReport);
+    } finally {
+      unbind();
+      cleanup();
+      client.clear();
+    }
   });
 });
