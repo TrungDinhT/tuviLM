@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type CSSProperties } from "react";
+import { useEffect, useId, useMemo, useState, type CSSProperties } from "react";
 
 import { CONSTELLATION_SCATTER } from "@/components/shared/constellation-art";
 import styles from "@/components/shared/constellation-art.module.css";
@@ -8,9 +8,16 @@ import type { GodConstellation } from "@/content/god-constellations";
 import { GOD_GHOSTS } from "@/content/god-ghosts";
 import { GOD_LANDMARK_CONSTELLATIONS } from "@/content/god-landmark-constellations";
 import { GOD_SILHOUETTES, type GodSilhouette } from "@/content/god-silhouettes";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
 import rewardStyles from "./constellation-reward.module.css";
+import {
+  CONSTELLATION_WAVE,
+  STAR_PULSE_CYCLE_MS,
+  constellationStarPulsePhases,
+  constellationWaveSchedule,
+} from "./constellation-wave";
 
 interface ConstellationRewardProps {
   /**
@@ -22,24 +29,9 @@ interface ConstellationRewardProps {
   names: readonly string[];
 }
 
-/** Central tuning for the brightness-only star twinkle. Larger cycleMs is slower. */
-const STAR_TWINKLE_CONFIG = {
-  cycleMs: 12000,
-  firstPhaseMs: 400,
-  staggerStepMs: 1300,
-  staggerWindowMs: 12000,
-  haloRestOpacity: 0.08,
-  haloPeakOpacity: 0.82,
-  coreRestOpacity: 0.74,
-  corePeakOpacity: 1,
-} as const;
-
-const STAR_TWINKLE_STYLE = {
-  "--star-twinkle-cycle": `${STAR_TWINKLE_CONFIG.cycleMs}ms`,
-  "--star-halo-rest-opacity": `${STAR_TWINKLE_CONFIG.haloRestOpacity}`,
-  "--star-halo-peak-opacity": `${STAR_TWINKLE_CONFIG.haloPeakOpacity}`,
-  "--star-core-rest-opacity": `${STAR_TWINKLE_CONFIG.coreRestOpacity}`,
-  "--star-core-peak-opacity": `${STAR_TWINKLE_CONFIG.corePeakOpacity}`,
+const WAVE_STYLE = {
+  "--star-cycle": `${STAR_PULSE_CYCLE_MS}ms`,
+  "--link-travel": `${CONSTELLATION_WAVE.linkTravelMs}ms`,
 } as CSSProperties;
 
 export function GodConstellationArt({
@@ -56,6 +48,22 @@ export function GodConstellationArt({
   pointScale?: number;
 }) {
   const haloGradientId = useId();
+  const [waveIteration, setWaveIteration] = useState(0);
+  const reducedMotion = usePrefersReducedMotion();
+  const schedule = constellationWaveSchedule(shape);
+  const starPulsePhases = useMemo(
+    () => constellationStarPulsePhases(haloGradientId, shape.points.length),
+    [haloGradientId, shape.points],
+  );
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const timer = window.setInterval(
+      () => setWaveIteration((iteration) => iteration + 1),
+      CONSTELLATION_WAVE.cycleMs,
+    );
+    return () => window.clearInterval(timer);
+  }, [reducedMotion, shape.points.length]);
 
   return (
     <svg
@@ -64,7 +72,7 @@ export function GodConstellationArt({
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid meet"
       className={`${rewardStyles.vectorConstellation} absolute inset-0 h-full w-full overflow-visible`}
-      style={STAR_TWINKLE_STYLE}
+      style={WAVE_STYLE}
     >
       <defs>
         <radialGradient id={haloGradientId}>
@@ -87,48 +95,44 @@ export function GodConstellationArt({
           ))}
         </>
       ) : null}
-      {shape.lines.map(([fromIndex, toIndex], lineIndex) => {
-        const from = shape.points[fromIndex];
-        const to = shape.points[toIndex];
-        if (from === undefined || to === undefined) return null;
-        return (
-          <line
-            key={`${fromIndex}-${toIndex}`}
-            className={rewardStyles.starLine}
-            x1={from[0]}
-            y1={from[1]}
-            x2={to[0]}
-            y2={to[1]}
-            pathLength="1"
-            style={{ animationDelay: `${180 + lineIndex * 50}ms` }}
-          />
-        );
-      })}
+      <g key={waveIteration}>
+        {shape.lines.map((_, lineIndex) => {
+          const [fromIndex, toIndex] = schedule.lineDirections[lineIndex]!;
+          const from = shape.points[fromIndex];
+          const to = shape.points[toIndex];
+          if (from === undefined || to === undefined) return null;
+          return (
+            <line
+              key={`${fromIndex}-${toIndex}`}
+              className={rewardStyles.starLine}
+              x1={from[0]}
+              y1={from[1]}
+              x2={to[0]}
+              y2={to[1]}
+              pathLength="1"
+              style={{ animationDelay: `${schedule.lineDelays[lineIndex]}ms` }}
+            />
+          );
+        })}
+      </g>
       {shape.points.map(([cx, cy, pointPower], index) => {
         const power = pointPower ?? 1;
-        const twinklePhase =
-          STAR_TWINKLE_CONFIG.firstPhaseMs +
-          ((index * STAR_TWINKLE_CONFIG.staggerStepMs) % STAR_TWINKLE_CONFIG.staggerWindowMs);
-        const twinkleDelay = `-${twinklePhase}ms`;
+        const phase = starPulsePhases[index] ?? 0;
         return (
-          <g
-            key={index}
-            className={rewardStyles.starNode}
-            style={{ animationDelay: `${110 + index * 45}ms` }}
-          >
+          <g key={index}>
             <circle
               className={rewardStyles.starHalo}
               cx={cx}
               cy={cy}
-              r={1.45 * power * pointScale}
-              style={{ animationDelay: twinkleDelay, fill: `url(#${haloGradientId})` }}
+              r={1.8 * power * pointScale}
+              style={{ fill: `url(#${haloGradientId})`, animationDelay: `${-phase}ms` }}
             />
             <circle
               className={rewardStyles.starCore}
               cx={cx}
               cy={cy}
-              r={0.52 * power * pointScale}
-              style={{ animationDelay: twinkleDelay }}
+              r={0.68 * power * pointScale}
+              style={{ animationDelay: `${-phase}ms` }}
             />
           </g>
         );
