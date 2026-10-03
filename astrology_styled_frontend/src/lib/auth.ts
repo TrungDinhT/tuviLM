@@ -39,6 +39,16 @@ export const auth = betterAuth({
         defaultValue: "user",
         input: false,
       },
+      plan: {
+        type: ["normal", "full_unlock"],
+        defaultValue: "normal",
+        input: false,
+      },
+      balance: {
+        type: "number",
+        defaultValue: 0,
+        input: false,
+      },
     },
   },
   plugins: [

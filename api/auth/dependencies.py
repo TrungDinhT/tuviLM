@@ -9,8 +9,10 @@ from bson import ObjectId
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError, PyJWKClientConnectionError, PyJWKClientError
+from pydantic import ValidationError
 from pymongo.errors import PyMongoError
 
+from api.accounts.models import AccountAccess, Balance, Plan
 from api.settings import get_settings
 
 
@@ -18,6 +20,8 @@ from api.settings import get_settings
 class Principal:
     user_id: str
     role: Literal["user", "admin"] = "user"
+    plan: Plan = "normal"
+    balance: Balance = 0
 
 
 def _unauthorized() -> HTTPException:
@@ -78,16 +82,22 @@ async def require_user(
         if session is None:
             raise _unauthorized()
         user = await database["user"].find_one(
-            {"_id": ObjectId(claims["sub"])}, {"role": 1}
+            {"_id": ObjectId(claims["sub"])}, {"role": 1, "plan": 1, "balance": 1}
         )
     except PyMongoError as exc:
         raise HTTPException(503, "Authentication service unavailable.") from exc
 
     if user is None:
         raise _unauthorized()
+    try:
+        access = AccountAccess.model_validate(user)
+    except ValidationError as exc:
+        raise HTTPException(503, "Account data unavailable.") from exc
     return Principal(
         user_id=claims["sub"],
         role="admin" if user.get("role") == "admin" else "user",
+        plan=access.plan,
+        balance=access.balance,
     )
 
 
