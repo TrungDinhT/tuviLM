@@ -11,9 +11,12 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from jwt import PyJWKClient
+from pymongo import AsyncMongoClient
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from api._parse import to_cung_payload_map
+from api.auth.dependencies import CurrentUser, Principal
 from api.chat.contracts import (
     ConversationHistoryError,
     ConversationHistoryStore,
@@ -100,9 +103,15 @@ async def lifespan(app: FastAPI):
         agent_deps=agent_deps,
         conversation_history_store=conversation_history_store,
     )
+    auth_mongo = AsyncMongoClient(settings.auth.mongo_uri, serverSelectionTimeoutMS=5000)
+    app.state.auth_database = auth_mongo[settings.auth.database_name]
+    app.state.auth_jwks = PyJWKClient(
+        f"{settings.auth.base_url.rstrip('/')}/api/auth/jwks", timeout=5
+    )
     try:
         yield
     finally:
+        await auth_mongo.close()
         await conversation_history_store.close()
 
 
@@ -167,6 +176,11 @@ def health(request: Request) -> dict[str, str | bool]:
         "status": "ok",
         "la_so_created": api_state.has_la_so,
     }
+
+
+@app.get("/api/v1/me")
+def me(user: CurrentUser) -> Principal:
+    return user
 
 
 @app.post("/api/v1/laso/preview", response_model=PreviewLasoResponse)

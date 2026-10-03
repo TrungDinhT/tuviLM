@@ -3,14 +3,26 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ChatMessage, ChatSession, ChatSessionSummary } from "@/lib/api/schemas";
-import { OWNER_ID_KEY, resetOwnerIdCache } from "@/lib/api/owner";
 import { useChartStore } from "@/store/chart-store";
 
 import { HoiAiScreen } from "./hoi-ai-screen";
 
 const toastMocks = vi.hoisted(() => ({ showToast: vi.fn() }));
+const accountState = vi.hoisted(() => ({
+  data: { user: { id: "user-1", name: "Test User" } } as {
+    user: { id: string; name: string };
+  } | null,
+  isPending: false,
+}));
 
 vi.mock("@/lib/toast", () => toastMocks);
+
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: () => accountState,
+    token: vi.fn().mockResolvedValue({ data: { token: "signed-token" }, error: null }),
+  },
+}));
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -82,8 +94,8 @@ function renderScreen(client: QueryClient) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  accountState.data = { user: { id: "user-1", name: "Test User" } };
   localStorage.clear();
-  resetOwnerIdCache();
   useChartStore.setState({
     hasChart: false,
     outcome: null,
@@ -95,6 +107,19 @@ beforeEach(() => {
 });
 
 describe("HoiAiScreen", () => {
+  it("asks guests to sign in without fetching private sessions", () => {
+    accountState.data = null;
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    setChart("legacy-profile");
+
+    renderScreen(new QueryClient());
+
+    expect(screen.getByText("Sign in to save your chart and use AI chat.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Sign in" }).getAttribute("href")).toBe("/login");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("renders the re-cast empty state when a chart exists without a profile", () => {
     setChart(null);
     renderScreen(new QueryClient());
@@ -103,7 +128,6 @@ describe("HoiAiScreen", () => {
   });
 
   it("opens on the most recent session and renders its transcript", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     const fetchMock = vi.fn((url: string) => {
       if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
         return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
@@ -130,7 +154,6 @@ describe("HoiAiScreen", () => {
   });
 
   it("renders a greeting placeholder for an empty session", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     vi.stubGlobal(
       "fetch",
       vi.fn((url: string) => {
@@ -151,7 +174,6 @@ describe("HoiAiScreen", () => {
   });
 
   it("switches sessions from the history list", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     const fetchMock = vi.fn((url: string) => {
       if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
         return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
@@ -182,7 +204,6 @@ describe("HoiAiScreen", () => {
   });
 
   it("creates a new session from the Tạo mới action", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     const fetchMock = vi.fn((url: string, init?: RequestInit) => {
       if (url.endsWith("/api/v1/chart-profiles/p1/sessions") && init?.method === "POST") {
         return Promise.resolve(jsonResponse({ session: sessionDetail("s3", []) }));
@@ -214,7 +235,6 @@ describe("HoiAiScreen", () => {
   });
 
   it("disables Tạo mới while the active session has only the greeting", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     vi.stubGlobal(
       "fetch",
       vi.fn((url: string) => {
@@ -237,7 +257,6 @@ describe("HoiAiScreen", () => {
   });
 
   it("aborts the active stream before switching sessions", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     let streamSignal: AbortSignal | undefined;
     const encoder = new TextEncoder();
     const fetchMock = vi.fn((url: string, init?: RequestInit) => {
@@ -292,7 +311,6 @@ describe("HoiAiScreen", () => {
   });
 
   it("surfaces a backend error event and preserves partial text", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     const stream =
       [
         'data: {"type":"ids","user_message_id":"u2","assistant_message_id":"a2"}',
@@ -336,7 +354,6 @@ describe("HoiAiScreen", () => {
   });
 
   it("reconciles a duplicate in-progress stream from the stored assistant message", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     let detailCalls = 0;
     const stream =
       [
@@ -380,7 +397,6 @@ describe("HoiAiScreen", () => {
   });
 
   it("issues only one create request for repeated activation while pending", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     let resolveCreate: ((response: Response) => void) | undefined;
     const createResponse = new Promise<Response>((resolve) => {
       resolveCreate = resolve;

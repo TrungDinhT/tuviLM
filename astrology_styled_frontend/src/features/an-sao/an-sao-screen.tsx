@@ -13,6 +13,7 @@ import {
   useCreateChartProfile,
   useLasoPreview,
 } from "@/lib/api/hooks";
+import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
 import { starKeyFromName } from "@/lib/theme";
 import { showToast } from "@/lib/toast";
@@ -57,6 +58,7 @@ function pad2(value: number): string {
  */
 export function AnSaoScreen() {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
   const [phase, setPhase] = useState<"form" | "loading">("form");
   const [date, setDate] = useState<BirthDateInput>(DEFAULT_DATE);
   // AM/PM is picked above the face, so it stands on its own and defaults to
@@ -158,10 +160,12 @@ export function AnSaoScreen() {
         minimumLoading,
         // Auto-save starts only after a valid build. It must never fail the
         // cast, so it resolves to the profile id or null.
-        createProfile
-          .mutateAsync({ display_name: profileDisplayName(birth), birth_info: birth })
-          .then((res) => res.chart_profile.id)
-          .catch(() => null),
+        session
+          ? createProfile
+              .mutateAsync({ display_name: profileDisplayName(birth), birth_info: birth })
+              .then((res) => res.chart_profile.id)
+              .catch(() => null)
+          : Promise.resolve(null),
       ]);
       castChart(outcomeFromChart(chart), chart.id, birth, profileId);
       router.push("/ban-menh");

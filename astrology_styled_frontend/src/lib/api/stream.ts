@@ -1,7 +1,7 @@
 import { ApiErrorException } from "@/lib/http/errors";
 
-import { apiUrl, mintOwnerId, safeBody } from "./client";
-import { getOwnerId } from "./owner";
+import { getAuthHeaders } from "./auth-headers";
+import { apiUrl, safeBody } from "./client";
 import { sseChatEventSchema, type SseChatEvent } from "./schemas";
 
 /**
@@ -32,7 +32,7 @@ export async function* streamChat(
 ): AsyncGenerator<SseChatEvent> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    "X-Anonymous-Owner-Id": await getOwnerId(mintOwnerId),
+    ...(await getAuthHeaders()),
     "Idempotency-Key": opts.idempotencyKey,
   };
 

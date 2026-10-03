@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { OWNER_ID_KEY, resetOwnerIdCache } from "@/lib/api/owner";
+import { authClient } from "@/lib/auth-client";
 import { isApiError } from "@/lib/http/errors";
 
 import type { SseChatEvent } from "./schemas";
 import { parseSseStream, streamChat } from "./stream";
+
+vi.mock("@/lib/auth-client", () => ({ authClient: { token: vi.fn() } }));
 
 function sseBody(chunks: (string | Uint8Array)[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -26,7 +28,8 @@ async function collect(body: ReadableStream<Uint8Array>): Promise<SseChatEvent[]
 
 beforeEach(() => {
   localStorage.clear();
-  resetOwnerIdCache();
+  vi.mocked(authClient.token).mockReset();
+  vi.mocked(authClient.token).mockResolvedValue({ data: { token: "signed-token" }, error: null });
 });
 
 afterEach(() => {
@@ -35,7 +38,6 @@ afterEach(() => {
 
 describe("streamChat", () => {
   it("uses the logical turn's idempotency key and abort signal", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     const controller = new AbortController();
     const fetchMock = vi.fn().mockResolvedValue(
       new Response('data: {"type":"done","status":"confirmed"}\n\n', {
@@ -58,10 +60,17 @@ describe("streamChat", () => {
       expect.stringContaining("/api/v1/sessions/s1/chat/stream"),
       expect.objectContaining({
         signal: controller.signal,
-        headers: expect.objectContaining({ "Idempotency-Key": "turn-key-1" }),
+        headers: {
+          Authorization: "Bearer signed-token",
+          "Content-Type": "application/json",
+          "Idempotency-Key": "turn-key-1",
+        },
       }),
     );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(localStorage.length).toBe(0);
   });
+
 });
 
 describe("parseSseStream", () => {

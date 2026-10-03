@@ -1,9 +1,11 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 import { Pill } from "@/components/primitives/pill";
 import { useChartProfiles } from "@/lib/api/hooks";
+import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
 
 import styles from "./ho-so-screen.module.css";
@@ -18,7 +20,8 @@ const SAVED_RAIL_CLASS =
  * the shared `StickyHeader` mounted by the page, like every other tab.
  */
 export function HoSoScreen() {
-  const profiles = useChartProfiles();
+  const { data: session, isPending } = authClient.useSession();
+  const profiles = useChartProfiles(Boolean(session));
 
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-x-[30px]">
@@ -38,7 +41,20 @@ export function HoSoScreen() {
   );
 
   function renderSaved(): ReactNode {
-    if (profiles.isPending) {
+    if (!session && !isPending) {
+      return (
+        <div className="flex flex-col items-start gap-3">
+          <p className="text-[13.5px] text-muted">Sign in to view and save your charts.</p>
+          <Link
+            href="/login"
+            className="pill-ghost rounded-full px-4 py-2 text-[13px] font-semibold no-underline"
+          >
+            Sign in
+          </Link>
+        </div>
+      );
+    }
+    if (isPending || profiles.isPending) {
       return (
         <div className={SAVED_RAIL_CLASS} role="status" aria-label="Đang tải lá số đã lưu">
           {Array.from({ length: 3 }, (_, index) => (

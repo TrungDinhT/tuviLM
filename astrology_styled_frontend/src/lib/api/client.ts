@@ -3,7 +3,7 @@ import type { z } from "zod";
 import { env } from "@/config/env";
 import { ApiErrorException } from "@/lib/http/errors";
 
-import { getOwnerId } from "./owner";
+import { getAuthHeaders } from "./auth-headers";
 import { createAnonymousResponseSchema } from "./schemas";
 
 /**
@@ -11,7 +11,7 @@ import { createAnonymousResponseSchema } from "./schemas";
  *
  * Three things happen here and nowhere else:
  * - the base URL is applied
- * - identity (`X-Anonymous-Owner-Id`) and idempotency headers are attached
+ * - identity (`Authorization`) and idempotency headers are attached
  * - every response is parsed by a Zod schema and every failure is normalized
  *   to the `ApiError` union
  *
@@ -24,10 +24,10 @@ export interface RequestOptions<T> {
   body?: unknown;
   schema: z.ZodType<T>;
   /**
-   * Whether the request carries the owner identity. Everything except
-   * `/health` and `/anonymous` does.
+   * Whether the request requires a signed-in account. Public chart building,
+   * preview, health, and anonymous identity acquisition do not.
    */
-  withOwner?: boolean;
+  withAuth?: boolean;
   /**
    * Pass a stable key for anything that creates a resource or opens a stream.
    * Retrying the same logical operation must reuse the same key, or the
@@ -115,11 +115,10 @@ export async function safeBody(response: Response): Promise<unknown> {
 }
 
 export async function request<T>(path: string, options: RequestOptions<T>): Promise<T> {
-  const { method = "GET", body, schema, withOwner = false, idempotencyKey, signal } = options;
+  const { method = "GET", body, schema, withAuth = false, idempotencyKey, signal } = options;
 
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = withAuth ? await getAuthHeaders() : {};
   if (body !== undefined) headers["Content-Type"] = "application/json";
-  if (withOwner) headers["X-Anonymous-Owner-Id"] = await getOwnerId(mintOwnerId);
   if (idempotencyKey !== undefined) headers["Idempotency-Key"] = idempotencyKey;
 
   let response: Response;

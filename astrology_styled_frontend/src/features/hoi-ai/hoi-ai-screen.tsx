@@ -10,6 +10,7 @@ import { useCreateSession, useGetSession, useListSessions } from "@/lib/api/hook
 import { queryKeys } from "@/lib/api/queryKeys";
 import type { ChatMessage, SseChatEvent } from "@/lib/api/schemas";
 import { streamChat } from "@/lib/api/stream";
+import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
 import { showToast } from "@/lib/toast";
 import { useChartStore } from "@/store/chart-store";
@@ -66,6 +67,7 @@ function doneTerminal(status: string): Terminal {
  * local state that reconciles away once the backend confirms it.
  */
 export function HoiAiScreen() {
+  const { data: account, isPending: isAccountPending } = authClient.useSession();
   const hasChart = useChartStore((state) => state.hasChart);
   const chartProfileId = useChartStore((state) => state.chartProfileId);
   const queryClient = useQueryClient();
@@ -86,14 +88,15 @@ export function HoiAiScreen() {
 
   useEffect(() => () => abortActiveStream(), [abortActiveStream]);
 
-  const list = useListSessions(chartProfileId);
-  const createSession = useCreateSession(chartProfileId);
+  const accountProfileId = account ? chartProfileId : null;
+  const list = useListSessions(accountProfileId);
+  const createSession = useCreateSession(accountProfileId);
 
   const sessions = useMemo(
     () => [...(list.data?.sessions ?? [])].sort((a, b) => b.updated_at.localeCompare(a.updated_at)),
     [list.data],
   );
-  const activeSessionId = selectedId ?? sessions[0]?.id ?? null;
+  const activeSessionId = account ? (selectedId ?? sessions[0]?.id ?? null) : null;
 
   const session = useGetSession(activeSessionId);
 
@@ -133,7 +136,7 @@ export function HoiAiScreen() {
   const { isAtBottom, scrollToBottom } = useStickToBottom(contentKey);
 
   // Ensure the profile has at least one session so the chat opens on something.
-  const needsSession = chartProfileId !== null && list.isSuccess && sessions.length === 0;
+  const needsSession = accountProfileId !== null && list.isSuccess && sessions.length === 0;
   useEffect(() => {
     if (!needsSession || autoCreatedFor.current === chartProfileId) return;
     autoCreatedFor.current = chartProfileId;
@@ -141,6 +144,30 @@ export function HoiAiScreen() {
   }, [needsSession, createSession, chartProfileId]);
 
   if (!hasChart) return null;
+
+  if (isAccountPending) {
+    return (
+      <p className="py-10 text-[13.5px] text-muted" role="status">
+        Checking your account…
+      </p>
+    );
+  }
+
+  if (!account) {
+    return (
+      <div className={`${styles.enterTranscript} flex flex-col items-start gap-4 py-10`}>
+        <p className="max-w-[46ch] text-[13.5px] leading-relaxed text-muted">
+          Sign in to save your chart and use AI chat.
+        </p>
+        <Link
+          href="/login"
+          className="rounded-full border border-glass-line bg-glass px-6 py-3 text-[14px] font-semibold no-underline"
+        >
+          Sign in
+        </Link>
+      </div>
+    );
+  }
 
   if (chartProfileId === null) {
     return (

@@ -6,8 +6,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { isApiError } from "@/lib/http/errors";
 
 import { useChartProfiles, useDeleteChartProfile } from "./hooks";
-import { OWNER_ID_KEY, resetOwnerIdCache } from "./owner";
 import { emptyResponseSchema } from "./schemas";
+
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    token: vi.fn().mockResolvedValue({ data: { token: "signed-token" }, error: null }),
+  },
+}));
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -36,7 +41,6 @@ function wrapperWith(client: QueryClient) {
 
 beforeEach(() => {
   localStorage.clear();
-  resetOwnerIdCache();
 });
 
 afterEach(() => {
@@ -45,7 +49,6 @@ afterEach(() => {
 
 describe("useChartProfiles", () => {
   it("parses the profile list from the backend", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ chart_profiles: [PROFILE] })));
     const client = new QueryClient();
 
@@ -59,7 +62,6 @@ describe("useChartProfiles", () => {
 
 describe("useDeleteChartProfile", () => {
   it("invalidates the list so it refetches after a delete", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     const fetchMock = vi.fn((url: string, init?: RequestInit) => {
       if (init?.method === "DELETE") return Promise.resolve(noBody(204));
       return Promise.resolve(jsonResponse({ chart_profiles: [PROFILE] }));
@@ -90,7 +92,6 @@ describe("useDeleteChartProfile", () => {
   });
 
   it("reports a non-empty delete body as a parse error", async () => {
-    localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ ok: true }, 200)));
     const client = new QueryClient();
 

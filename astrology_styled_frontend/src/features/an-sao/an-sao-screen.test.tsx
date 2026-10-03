@@ -11,6 +11,10 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
+vi.mock("@/lib/auth-client", () => ({
+  authClient: { useSession: () => ({ data: null, isPending: false }) },
+}));
+
 vi.mock("@/lib/api/hooks", () => ({
   profileDisplayName: () => "01/01/2000",
   useBuildLaso: () => ({ mutateAsync: vi.fn() }),

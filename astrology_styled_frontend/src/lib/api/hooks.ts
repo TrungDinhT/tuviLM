@@ -106,14 +106,15 @@ export function useLasoPreview(birth: PreviewLasoRequest | null) {
  * network query with loading and error states. It is not persisted: the
  * query-cache persister whitelists only the cast-chart key family.
  */
-export function useChartProfiles() {
+export function useChartProfiles(enabled = true) {
   return useQuery({
     queryKey: queryKeys.chartProfiles.all(),
     queryFn: () =>
       request("/api/v1/chart-profiles", {
         schema: listChartProfilesResponseSchema,
-        withOwner: true,
+        withAuth: true,
       }),
+    enabled,
   });
 }
 
@@ -143,7 +144,7 @@ export function useCreateChartProfile() {
         method: "POST",
         body: createChartProfileRequestSchema.parse(input),
         schema: createChartProfileResponseSchema,
-        withOwner: true,
+        withAuth: true,
         idempotencyKey: profileIdempotencyKey(input.birth_info),
       }),
   });
@@ -163,7 +164,7 @@ export function useDeleteChartProfile() {
       request(`/api/v1/chart-profiles/${id}`, {
         method: "DELETE",
         schema: emptyResponseSchema,
-        withOwner: true,
+        withAuth: true,
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.chartProfiles.all() });
@@ -182,7 +183,7 @@ export function useListSessions(profileId: string | null) {
     queryFn: () =>
       request(`/api/v1/chart-profiles/${profileId as string}/sessions`, {
         schema: listSessionsResponseSchema,
-        withOwner: true,
+        withAuth: true,
       }),
     enabled: profileId !== null,
   });
@@ -195,7 +196,7 @@ export function useGetSession(sessionId: string | null) {
     queryFn: () =>
       request(`/api/v1/sessions/${sessionId as string}`, {
         schema: getSessionResponseSchema,
-        withOwner: true,
+        withAuth: true,
       }),
     enabled: sessionId !== null,
   });
@@ -216,7 +217,7 @@ export function useCreateSession(profileId: string | null) {
         method: "POST",
         body: createSessionRequestSchema.parse({ title: null }),
         schema: createSessionResponseSchema,
-        withOwner: true,
+        withAuth: true,
         idempotencyKey: newIdempotencyKey(),
       });
     },

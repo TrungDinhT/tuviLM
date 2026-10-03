@@ -41,6 +41,29 @@ uv run uvicorn api.main:app --reload --port 8000
 curl http://localhost:8000/api/v1/health
 ```
 
+## Authentication
+
+Better Auth runs in `astrology_styled_frontend`. Configure the backend's `.env`
+using `.env.example`; `AUTH__BASE_URL`, `AUTH__MONGO_URI` and
+`AUTH__DATABASE_NAME` must match the frontend's `BETTER_AUTH_URL`, `MONGODB_URI`
+and `MONGODB_DATABASE`.
+
+Saved chart profiles, sessions and chat require a signed-in account. The web
+client retrieves a JWT from `/api/auth/token` and sends it as
+`Authorization: Bearer <token>`. The backend verifies its signature, issuer,
+audience and expiration using `/api/auth/jwks`, then checks the associated
+Better Auth session and reads the user's current role from MongoDB.
+
+`GET /api/v1/me` returns the authenticated `user_id` and `role`. Missing,
+invalid or revoked credentials return `401`; an authenticated user lacking
+an administrator role receives `403` from `require_admin`. Authentication
+service outages return `503` rather than granting access.
+
+Health, chart preview and chart casting remain public. The legacy anonymous
+ID endpoint remains available, but `X-Anonymous-Owner-Id` no longer grants
+access to saved profiles or chat. Existing anonymous data is not reassigned
+to accounts automatically.
+
 ## Build lá số example
 
 ```bash

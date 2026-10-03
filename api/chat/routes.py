@@ -21,6 +21,7 @@ from pydantic_ai import (
 )
 from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, UserPromptPart
 
+from api.auth.dependencies import CurrentUser
 from api.chat.contracts import ConversationHistoryStore
 from api.chat.models import (
     BirthInfo,
@@ -65,11 +66,11 @@ def create_anonymous() -> CreateAnonymousResponse:
 async def create_chart_profile(
     payload: CreateChartProfileRequest,
     request: Request,
-    owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
+    user: CurrentUser,
     idempotency_key: str = Header(alias="Idempotency-Key", min_length=1),
 ) -> CreateChartProfileResponse:
     profile = await _get_store(request).create_chart_profile(
-        owner_id,
+        user.user_id,
         CreateChartProfileInput(
             display_name=payload.display_name,
             birth_info=payload.birth_info,
@@ -82,9 +83,9 @@ async def create_chart_profile(
 @router.get("/chart-profiles", response_model=ListChartProfilesResponse)
 async def list_chart_profiles(
     request: Request,
-    owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
+    user: CurrentUser,
 ) -> ListChartProfilesResponse:
-    profiles = await _get_store(request).list_chart_profiles(owner_id)
+    profiles = await _get_store(request).list_chart_profiles(user.user_id)
     return ListChartProfilesResponse(
         chart_profiles=[_chart_profile_payload(profile) for profile in profiles]
     )
@@ -94,9 +95,9 @@ async def list_chart_profiles(
 async def delete_chart_profile(
     chart_profile_id: str,
     request: Request,
-    owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
+    user: CurrentUser,
 ) -> Response:
-    await _get_store(request).delete_chart_profile(owner_id, chart_profile_id)
+    await _get_store(request).delete_chart_profile(user.user_id, chart_profile_id)
     return Response(status_code=204)
 
 
@@ -108,11 +109,11 @@ async def create_session(
     chart_profile_id: str,
     payload: CreateSessionRequest,
     request: Request,
-    owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
+    user: CurrentUser,
     idempotency_key: str = Header(alias="Idempotency-Key", min_length=1),
 ) -> CreateSessionResponse:
     session = await _get_store(request).create_session(
-        owner_id,
+        user.user_id,
         chart_profile_id,
         CreateSessionInput(title=payload.title),
         idempotency_key=idempotency_key,
@@ -127,9 +128,9 @@ async def create_session(
 async def list_sessions(
     chart_profile_id: str,
     request: Request,
-    owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
+    user: CurrentUser,
 ) -> ListSessionsResponse:
-    sessions = await _get_store(request).list_sessions(owner_id, chart_profile_id)
+    sessions = await _get_store(request).list_sessions(user.user_id, chart_profile_id)
     return ListSessionsResponse(sessions=sessions)
 
 
@@ -137,9 +138,9 @@ async def list_sessions(
 async def get_session(
     session_id: str,
     request: Request,
-    owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
+    user: CurrentUser,
 ) -> GetSessionResponse:
-    context = await _get_store(request).load_session_context(owner_id, session_id)
+    context = await _get_store(request).load_session_context(user.user_id, session_id)
     return GetSessionResponse(session=context.session)
 
 
@@ -147,9 +148,9 @@ async def get_session(
 async def delete_session(
     session_id: str,
     request: Request,
-    owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
+    user: CurrentUser,
 ) -> Response:
-    await _get_store(request).delete_session(owner_id, session_id)
+    await _get_store(request).delete_session(user.user_id, session_id)
     return Response(status_code=204)
 
 
@@ -158,13 +159,13 @@ async def session_chat_stream(
     session_id: str,
     payload: SessionChatStreamRequest,
     request: Request,
-    owner_id: str = Header(alias="X-Anonymous-Owner-Id"),
+    user: CurrentUser,
     idempotency_key: str = Header(alias="Idempotency-Key", min_length=1),
 ) -> StreamingResponse:
     store = _get_store(request)
     context, history_messages, pair = await _reserve_session_chat_stream(
         store=store,
-        owner_id=owner_id,
+        owner_id=user.user_id,
         session_id=session_id,
         content=payload.content,
         idempotency_key=idempotency_key,
@@ -179,7 +180,7 @@ async def session_chat_stream(
         _new_session_chat_stream(
             request=request,
             store=store,
-            owner_id=owner_id,
+            owner_id=user.user_id,
             session_id=session_id,
             context=context,
             history_messages=history_messages,

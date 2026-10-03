@@ -1,11 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { isApiError } from "@/lib/http/errors";
+import { authClient } from "@/lib/auth-client";
 
 import fixture from "./__fixtures__/build-laso.json";
 import { newIdempotencyKey, request, resolveBaseUrl } from "./client";
-import { OWNER_ID_KEY, resetOwnerIdCache } from "./owner";
+import { OWNER_ID_KEY } from "./owner";
 import { buildLasoResponseSchema } from "./schemas";
+
+vi.mock("@/lib/auth-client", () => ({ authClient: { token: vi.fn() } }));
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -27,11 +30,13 @@ async function errorFrom(promise: Promise<unknown>) {
 
 beforeEach(() => {
   localStorage.clear();
-  resetOwnerIdCache();
+  vi.mocked(authClient.token).mockReset();
+  vi.mocked(authClient.token).mockResolvedValue({ data: { token: "signed-token" }, error: null });
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("request", () => {
@@ -63,9 +68,7 @@ describe("request", () => {
   it("reports an unreachable backend as a network error", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
 
-    const error = await errorFrom(
-      request("/api/v1/health", { schema: buildLasoResponseSchema }),
-    );
+    const error = await errorFrom(request("/api/v1/health", { schema: buildLasoResponseSchema }));
 
     expect(error).toEqual({ kind: "network" });
   });
@@ -91,35 +94,36 @@ describe("request", () => {
     const abort = new DOMException("The operation was aborted.", "AbortError");
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(abort));
 
-    await expect(
-      request("/api/v1/health", { schema: buildLasoResponseSchema }),
-    ).rejects.toBe(abort);
+    await expect(request("/api/v1/health", { schema: buildLasoResponseSchema })).rejects.toBe(
+      abort,
+    );
   });
 });
 
 describe("headers", () => {
-  it("attaches the stored owner id without minting a new one", async () => {
+  it("attaches bearer identity and idempotency without minting an anonymous owner", async () => {
     localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(fixture));
     vi.stubGlobal("fetch", fetchMock);
 
     const key = newIdempotencyKey();
-    await request("/api/v1/laso/build", {
+    await request("/api/v1/chart-profiles", {
       method: "POST",
       body: {},
       schema: buildLasoResponseSchema,
-      withOwner: true,
+      withAuth: true,
       idempotencyKey: key,
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const headers = fetchMock.mock.calls[0]![1].headers;
-    expect(headers["X-Anonymous-Owner-Id"]).toBe("anon_stored");
+    expect(headers["Authorization"]).toBe("Bearer signed-token");
+    expect(headers["X-Anonymous-Owner-Id"]).toBeUndefined();
     expect(headers["Idempotency-Key"]).toBe(key);
     expect(headers["Content-Type"]).toBe("application/json");
   });
 
-  it("omits both headers when they are not requested", async () => {
+  it("does not acquire identity for a public request", async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(fixture));
     vi.stubGlobal("fetch", fetchMock);
 
@@ -127,54 +131,45 @@ describe("headers", () => {
 
     const headers = fetchMock.mock.calls[0]![1].headers;
     expect(headers["X-Anonymous-Owner-Id"]).toBeUndefined();
+    expect(headers["Authorization"]).toBeUndefined();
     expect(headers["Idempotency-Key"]).toBeUndefined();
+    expect(authClient.token).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("mints exactly one owner id when two first requests race", async () => {
-    const fetchMock = vi.fn((url: string, init?: RequestInit) => {
-      void init;
-      if (url.endsWith("/api/v1/anonymous")) {
-        return Promise.resolve(jsonResponse({ owner_id: `anon_${Math.random()}` }));
-      }
-      return Promise.resolve(jsonResponse(fixture));
-    });
+  it("acquires identity for each private request rather than caching a token", async () => {
+    vi.mocked(authClient.token)
+      .mockResolvedValueOnce({ data: { token: "first-token" }, error: null })
+      .mockResolvedValueOnce({ data: { token: "second-token" }, error: null });
+    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(fixture)));
     vi.stubGlobal("fetch", fetchMock);
 
-    const [a, b] = await Promise.all([
-      request("/api/v1/laso/build", { schema: buildLasoResponseSchema, withOwner: true }),
-      request("/api/v1/laso/build", { schema: buildLasoResponseSchema, withOwner: true }),
+    await request("/api/v1/chart-profiles", { schema: buildLasoResponseSchema, withAuth: true });
+    await request("/api/v1/chart-profiles", { schema: buildLasoResponseSchema, withAuth: true });
+
+    expect(authClient.token).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls.map(([, init]) => init.headers.Authorization)).toEqual([
+      "Bearer first-token",
+      "Bearer second-token",
     ]);
-
-    expect(a).toBeDefined();
-    expect(b).toBeDefined();
-
-    const mintCalls = fetchMock.mock.calls.filter(([url]) =>
-      String(url).endsWith("/api/v1/anonymous"),
-    );
-    expect(mintCalls).toHaveLength(1);
-
-    const sent = fetchMock.mock.calls
-      .filter(([url]) => url.endsWith("/api/v1/laso/build"))
-      .map(([, init]) => (init?.headers as Record<string, string>)["X-Anonymous-Owner-Id"]);
-    expect(new Set(sent).size).toBe(1);
-    expect(localStorage.getItem(OWNER_ID_KEY)).toBe(sent[0]);
+    expect(localStorage.length).toBe(0);
   });
 
-  it("does not poison later attempts when minting fails", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse({ detail: "boom" }, 500))
-      .mockResolvedValueOnce(jsonResponse({ owner_id: "anon_second" }))
-      .mockResolvedValue(jsonResponse(fixture));
+  it("does not call the backend when authentication fails or poison later attempts", async () => {
+    vi.mocked(authClient.token)
+      .mockResolvedValueOnce({ data: { token: "" }, error: null })
+      .mockResolvedValueOnce({ data: { token: "signed-token" }, error: null });
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(fixture));
     vi.stubGlobal("fetch", fetchMock);
 
-    await errorFrom(
-      request("/api/v1/laso/build", { schema: buildLasoResponseSchema, withOwner: true }),
+    const error = await errorFrom(
+      request("/api/v1/chart-profiles", { schema: buildLasoResponseSchema, withAuth: true }),
     );
+    expect(error).toMatchObject({ kind: "http", status: 401 });
+    expect(fetchMock).not.toHaveBeenCalled();
 
-    await request("/api/v1/laso/build", { schema: buildLasoResponseSchema, withOwner: true });
-
-    expect(localStorage.getItem(OWNER_ID_KEY)).toBe("anon_second");
+    await request("/api/v1/chart-profiles", { schema: buildLasoResponseSchema, withAuth: true });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 
