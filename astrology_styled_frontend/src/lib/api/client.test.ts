@@ -98,9 +98,51 @@ describe("request", () => {
       abort,
     );
   });
+
+  it("does not send a private request if the account leaves while its token loads", async () => {
+    let resolveToken!: (value: { data: { token: string }; error: null }) => void;
+    vi.mocked(authClient.token).mockReturnValue(
+      new Promise((resolve) => {
+        resolveToken = resolve;
+      }),
+    );
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const controller = new AbortController();
+    const pending = request("/api/v1/chart-profiles", {
+      method: "POST",
+      schema: buildLasoResponseSchema,
+      withAuth: true,
+      signal: controller.signal,
+    });
+    const rejected = expect(pending).rejects.toMatchObject({ name: "AbortError" });
+    controller.abort();
+    resolveToken({ data: { token: "new-account-token" }, error: null });
+    await rejected;
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });
 
 describe("headers", () => {
+  it("does not send data for account A using account B's token", async () => {
+    vi.mocked(authClient.token).mockResolvedValue({
+      data: { token: "header.eyJzdWIiOiJhY2NvdW50LWIifQ.signature" },
+      error: null,
+    });
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const error = await errorFrom(
+      request("/api/v1/chart-profiles", {
+        method: "POST",
+        body: { birth_info: "account-a-input" },
+        schema: buildLasoResponseSchema,
+        withAuth: true,
+        expectedUserId: "account-a",
+      }),
+    );
+    expect(error).toMatchObject({ kind: "http", status: 401 });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
   it("attaches bearer identity and idempotency without minting an anonymous owner", async () => {
     localStorage.setItem(OWNER_ID_KEY, "anon_stored");
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(fixture));

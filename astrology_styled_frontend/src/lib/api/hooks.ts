@@ -10,6 +10,7 @@ import {
 
 import { useChartStore } from "@/store/chart-store";
 
+import { useAccountRequestScope } from "./account-request";
 import { newIdempotencyKey, request } from "./client";
 import { queryKeys } from "./queryKeys";
 import {
@@ -33,9 +34,8 @@ import {
 /**
  * Cast a chart from birth information.
  *
- * A mutation rather than a query: the call is user-initiated and has a side
- * effect on the backend, which stores the built lá số for the sao-lưu and chat
- * endpoints to read.
+ * A mutation rather than a query because casting is user-initiated. The
+ * backend builds the chart from this request without storing shared state.
  *
  * On success the response is also written into the query cache under its
  * deterministic id — that entry is the one query the persister keeps across
@@ -44,14 +44,17 @@ import {
  */
 export function useBuildLaso() {
   const queryClient = useQueryClient();
+  const { getSignal } = useAccountRequestScope();
   return useMutation({
     mutationFn: (birth: BirthInfo) =>
       request("/api/v1/laso/build", {
         method: "POST",
         body: birth,
         schema: buildLasoResponseSchema,
+        signal: getSignal(),
       }),
     onSuccess: (data) => {
+      if (getSignal()?.aborted) return;
       queryClient.setQueryData(queryKeys.laso.chart(data.id), data);
     },
   });
@@ -84,11 +87,12 @@ export function useLasoChart() {
 export function useLasoPreview(birth: PreviewLasoRequest | null) {
   return useQuery({
     queryKey: queryKeys.laso.preview(birth),
-    queryFn: () =>
+    queryFn: ({ signal }) =>
       request("/api/v1/laso/preview", {
         method: "POST",
         body: previewLasoRequestSchema.parse(birth),
         schema: previewLasoResponseSchema,
+        signal,
       }),
     enabled: birth !== null,
     // The response is a pure function of the birth tuple — it never goes stale.
@@ -107,12 +111,15 @@ export function useLasoPreview(birth: PreviewLasoRequest | null) {
  * query-cache persister whitelists only the cast-chart key family.
  */
 export function useChartProfiles(enabled = true) {
+  const { userId } = useAccountRequestScope();
   return useQuery({
     queryKey: queryKeys.chartProfiles.all(),
-    queryFn: () =>
+    queryFn: ({ signal }) =>
       request("/api/v1/chart-profiles", {
         schema: listChartProfilesResponseSchema,
         withAuth: true,
+        expectedUserId: userId,
+        signal,
       }),
     enabled,
   });
@@ -138,6 +145,7 @@ export function profileDisplayName(birth: BirthInfo): string {
  * still a separate change.
  */
 export function useCreateChartProfile() {
+  const { getSignal, userId } = useAccountRequestScope();
   return useMutation({
     mutationFn: (input: CreateChartProfileRequest) =>
       request("/api/v1/chart-profiles", {
@@ -145,7 +153,9 @@ export function useCreateChartProfile() {
         body: createChartProfileRequestSchema.parse(input),
         schema: createChartProfileResponseSchema,
         withAuth: true,
+        expectedUserId: userId,
         idempotencyKey: profileIdempotencyKey(input.birth_info),
+        signal: getSignal(),
       }),
   });
 }
@@ -159,14 +169,18 @@ export function useCreateChartProfile() {
  */
 export function useDeleteChartProfile() {
   const queryClient = useQueryClient();
+  const { getSignal, userId } = useAccountRequestScope();
   return useMutation({
     mutationFn: (id: string) =>
       request(`/api/v1/chart-profiles/${id}`, {
         method: "DELETE",
         schema: emptyResponseSchema,
         withAuth: true,
+        expectedUserId: userId,
+        signal: getSignal(),
       }),
     onSuccess: () => {
+      if (getSignal()?.aborted) return;
       void queryClient.invalidateQueries({ queryKey: queryKeys.chartProfiles.all() });
     },
   });
@@ -178,12 +192,15 @@ export function useDeleteChartProfile() {
  * has produced a profile.
  */
 export function useListSessions(profileId: string | null) {
+  const { userId } = useAccountRequestScope();
   return useQuery({
     queryKey: queryKeys.sessions.byProfile(profileId ?? "idle"),
-    queryFn: () =>
+    queryFn: ({ signal }) =>
       request(`/api/v1/chart-profiles/${profileId as string}/sessions`, {
         schema: listSessionsResponseSchema,
         withAuth: true,
+        expectedUserId: userId,
+        signal,
       }),
     enabled: profileId !== null,
   });
@@ -191,12 +208,15 @@ export function useListSessions(profileId: string | null) {
 
 /** One session's full message transcript. Disabled while no session is active. */
 export function useGetSession(sessionId: string | null) {
+  const { userId } = useAccountRequestScope();
   return useQuery({
     queryKey: queryKeys.sessions.detail(sessionId ?? "idle"),
-    queryFn: () =>
+    queryFn: ({ signal }) =>
       request(`/api/v1/sessions/${sessionId as string}`, {
         schema: getSessionResponseSchema,
         withAuth: true,
+        expectedUserId: userId,
+        signal,
       }),
     enabled: sessionId !== null,
   });
@@ -210,6 +230,7 @@ export function useGetSession(sessionId: string | null) {
  */
 export function useCreateSession(profileId: string | null) {
   const queryClient = useQueryClient();
+  const { getSignal, userId } = useAccountRequestScope();
   return useMutation({
     mutationFn: () => {
       if (profileId === null) throw new Error("chart profile id required");
@@ -218,10 +239,13 @@ export function useCreateSession(profileId: string | null) {
         body: createSessionRequestSchema.parse({ title: null }),
         schema: createSessionResponseSchema,
         withAuth: true,
+        expectedUserId: userId,
         idempotencyKey: newIdempotencyKey(),
+        signal: getSignal(),
       });
     },
     onSuccess: () => {
+      if (getSignal()?.aborted) return;
       if (profileId === null) return;
       void queryClient.invalidateQueries({ queryKey: queryKeys.sessions.byProfile(profileId) });
     },

@@ -28,6 +28,7 @@ export interface RequestOptions<T> {
    * preview, health, and anonymous identity acquisition do not.
    */
   withAuth?: boolean;
+  expectedUserId?: string | null;
   /**
    * Pass a stable key for anything that creates a resource or opens a stream.
    * Retrying the same logical operation must reuse the same key, or the
@@ -115,9 +116,19 @@ export async function safeBody(response: Response): Promise<unknown> {
 }
 
 export async function request<T>(path: string, options: RequestOptions<T>): Promise<T> {
-  const { method = "GET", body, schema, withAuth = false, idempotencyKey, signal } = options;
+  const {
+    method = "GET",
+    body,
+    schema,
+    withAuth = false,
+    expectedUserId,
+    idempotencyKey,
+    signal,
+  } = options;
 
-  const headers: Record<string, string> = withAuth ? await getAuthHeaders() : {};
+  signal?.throwIfAborted();
+  const headers: Record<string, string> = withAuth ? await getAuthHeaders(expectedUserId) : {};
+  signal?.throwIfAborted();
   if (body !== undefined) headers["Content-Type"] = "application/json";
   if (idempotencyKey !== undefined) headers["Idempotency-Key"] = idempotencyKey;
 
@@ -136,6 +147,7 @@ export async function request<T>(path: string, options: RequestOptions<T>): Prom
   }
 
   const payload = await safeBody(response);
+  signal?.throwIfAborted();
 
   if (!response.ok) {
     throw new ApiErrorException({ kind: "http", status: response.status, body: payload });

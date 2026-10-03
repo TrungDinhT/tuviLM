@@ -9,6 +9,8 @@ import { dismissToast } from "@/lib/toast";
 export const CHART_STORAGE_KEY = "tuvi.chart";
 
 interface ChartState {
+  accountId: string | null;
+  setAccount: (accountId: string | null) => void;
   /**
    * The single source of truth for navigation locking. True once a chart has
    * been cast, false again after a reset.
@@ -61,8 +63,14 @@ const EMPTY = {
 
 export const useChartStore = create<ChartState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...EMPTY,
+      accountId: null,
+      setAccount: (accountId) => {
+        if (get().accountId === accountId) return;
+        dismissToast();
+        set({ ...EMPTY, accountId });
+      },
 
       // The real outcome replaces any preview — a stale preview must never
       // leak into the cast accent.
@@ -101,6 +109,7 @@ export const useChartStore = create<ChartState>()(
       // previewOutcome is deliberately absent: a pre-cast preview is session
       // atmosphere, not state worth restoring.
       partialize: (state) => ({
+        accountId: state.accountId,
         hasChart: state.hasChart,
         outcome: state.outcome,
         chartId: state.chartId,

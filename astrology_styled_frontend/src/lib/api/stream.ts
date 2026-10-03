@@ -28,13 +28,15 @@ import { sseChatEventSchema, type SseChatEvent } from "./schemas";
 export async function* streamChat(
   sessionId: string,
   content: string,
-  opts: { idempotencyKey: string; signal?: AbortSignal },
+  opts: { idempotencyKey: string; signal?: AbortSignal; expectedUserId?: string | null },
 ): AsyncGenerator<SseChatEvent> {
+  opts.signal?.throwIfAborted();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...(await getAuthHeaders()),
+    ...(await getAuthHeaders(opts.expectedUserId)),
     "Idempotency-Key": opts.idempotencyKey,
   };
+  opts.signal?.throwIfAborted();
 
   let response: Response;
   try {

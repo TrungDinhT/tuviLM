@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Pill } from "@/components/primitives/pill";
+import { useAccountRequestScope } from "@/lib/api/account-request";
 import { newIdempotencyKey } from "@/lib/api/client";
 import { useCreateSession, useGetSession, useListSessions } from "@/lib/api/hooks";
 import { queryKeys } from "@/lib/api/queryKeys";
@@ -71,6 +72,7 @@ export function HoiAiScreen() {
   const hasChart = useChartStore((state) => state.hasChart);
   const chartProfileId = useChartStore((state) => state.chartProfileId);
   const queryClient = useQueryClient();
+  const { getSignal: getAccountSignal, userId } = useAccountRequestScope();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -284,6 +286,7 @@ export function HoiAiScreen() {
       for await (const event of streamChat(turn.sessionId, trimmed, {
         idempotencyKey: turn.idempotencyKey,
         signal: turn.controller.signal,
+        expectedUserId: userId,
       })) {
         applyEvent(event, turn);
       }
@@ -315,12 +318,15 @@ export function HoiAiScreen() {
     if (chartProfileId === null || creatingSessionRef.current) return;
     abortActiveStream();
     creatingSessionRef.current = true;
+    const accountSignal = getAccountSignal();
     try {
       const result = await createSession.mutateAsync();
+      if (accountSignal?.aborted) return;
       setDraft(null);
       setSelectedId(result.session.id);
       setHistoryOpen(false);
     } catch (error) {
+      if (accountSignal?.aborted) return;
       showToast(isApiError(error) ? describe(error.error) : "Không tạo được cuộc trò chuyện.");
     } finally {
       creatingSessionRef.current = false;

@@ -37,6 +37,41 @@ afterEach(() => {
 });
 
 describe("streamChat", () => {
+  it("does not stream account A's message using account B's token", async () => {
+    vi.mocked(authClient.token).mockResolvedValue({
+      data: { token: "header.eyJzdWIiOiJhY2NvdW50LWIifQ.signature" },
+      error: null,
+    });
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(
+      streamChat("session-a", "Account A message", {
+        idempotencyKey: "turn-a",
+        expectedUserId: "account-a",
+      }).next(),
+    ).rejects.toMatchObject({ error: { kind: "http", status: 401 } });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+  it("does not open a stream if its account leaves while the token loads", async () => {
+    let resolveToken!: (value: { data: { token: string }; error: null }) => void;
+    vi.mocked(authClient.token).mockReturnValue(
+      new Promise((resolve) => {
+        resolveToken = resolve;
+      }),
+    );
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const controller = new AbortController();
+    const pending = streamChat("s1", "Hello", {
+      idempotencyKey: "turn-1",
+      signal: controller.signal,
+    }).next();
+    const rejected = expect(pending).rejects.toMatchObject({ name: "AbortError" });
+    controller.abort();
+    resolveToken({ data: { token: "new-account-token" }, error: null });
+    await rejected;
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
   it("uses the logical turn's idempotency key and abort signal", async () => {
     const controller = new AbortController();
     const fetchMock = vi.fn().mockResolvedValue(

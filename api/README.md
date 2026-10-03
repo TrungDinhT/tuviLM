@@ -64,6 +64,11 @@ ID endpoint remains available, but `X-Anonymous-Owner-Id` no longer grants
 access to saved profiles or chat. Existing anonymous data is not reassigned
 to accounts automatically.
 
+The web client resets chart and chat state when the active account changes.
+Its persisted chart is restored only for the matching account. Requests from
+the previous account are cancelled; private requests also check that their
+fresh token belongs to the account that started them.
+
 ## Build lá số example
 
 ```bash

@@ -81,6 +81,13 @@ export function AnSaoScreen() {
 
   const clockRef = useRef<HTMLDivElement>(null);
   const genderRef = useRef<HTMLDivElement>(null);
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const setPreviewOutcome = useChartStore((state) => state.setPreviewOutcome);
   const castChart = useChartStore((state) => state.castChart);
@@ -156,6 +163,7 @@ export function AnSaoScreen() {
     const minimumLoading = new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS));
     try {
       const chart = await buildLaso.mutateAsync(birth);
+      if (!isMounted.current) return;
       const [, profileId] = await Promise.all([
         minimumLoading,
         // Auto-save starts only after a valid build. It must never fail the
@@ -167,9 +175,11 @@ export function AnSaoScreen() {
               .catch(() => null)
           : Promise.resolve(null),
       ]);
+      if (!isMounted.current) return;
       castChart(outcomeFromChart(chart), chart.id, birth, profileId);
       router.push("/ban-menh");
     } catch (error) {
+      if (!isMounted.current) return;
       setPhase("form");
       showToast(
         isApiError(error) ? describe(error.error) : "Có lỗi xảy ra khi an sao. Bạn thử lại nhé.",

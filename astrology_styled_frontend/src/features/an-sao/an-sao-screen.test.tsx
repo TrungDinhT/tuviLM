@@ -1,31 +1,112 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import fixture from "@/lib/api/__fixtures__/build-laso.json";
+import { useChartStore } from "@/store/chart-store";
+import { usePreferencesStore } from "@/store/preferences-store";
 
 import { AnSaoScreen } from "./an-sao-screen";
 
-const { previewData } = vi.hoisted(() => ({
+const { previewData, accountState, build, createProfile, push } = vi.hoisted(() => ({
   previewData: { chinh_tinh: ["Tham Lang"] },
+  accountState: {
+    data: null as { user: { id: string; name: string } } | null,
+    isPending: false,
+  },
+  build: vi.fn(),
+  createProfile: vi.fn(),
+  push: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push }),
 }));
 
-vi.mock("@/lib/auth-client", () => ({
-  authClient: { useSession: () => ({ data: null, isPending: false }) },
-}));
+vi.mock("@/lib/auth-client", () => ({ authClient: { useSession: () => accountState } }));
 
 vi.mock("@/lib/api/hooks", () => ({
   profileDisplayName: () => "01/01/2000",
-  useBuildLaso: () => ({ mutateAsync: vi.fn() }),
-  useCreateChartProfile: () => ({ mutateAsync: vi.fn() }),
+  useBuildLaso: () => ({ mutateAsync: build }),
+  useCreateChartProfile: () => ({ mutateAsync: createProfile }),
   useLasoPreview: (birth: { hour?: number } | null) => ({
     data: birth === null ? undefined : previewData,
     isPlaceholderData: birth?.hour === 4,
   }),
 }));
 
+beforeEach(() => {
+  vi.clearAllMocks();
+  accountState.data = null;
+  build.mockResolvedValue(fixture);
+  createProfile.mockResolvedValue({ chart_profile: { id: "profile-1" } });
+  usePreferencesStore.setState({ muteBirthConfirm: false });
+  useChartStore.getState().reset();
+});
+
 describe("AnSaoScreen hierarchy", () => {
+  it("does not auto-save an old account's delayed build after the screen unmounts", async () => {
+    vi.useFakeTimers();
+    try {
+      let resolveBuild!: (value: typeof fixture) => void;
+      build.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveBuild = resolve;
+          }),
+      );
+      accountState.data = { user: { id: "account-a", name: "Account A" } };
+      usePreferencesStore.setState({ muteBirthConfirm: true });
+      const view = render(<AnSaoScreen />);
+      fireEvent.keyDown(screen.getByRole("slider", { name: "Giờ sinh" }), { key: "ArrowRight" });
+      fireEvent.click(screen.getByRole("radio", { name: "Nam" }));
+      fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
+      view.unmount();
+      accountState.data = { user: { id: "account-b", name: "Account B" } };
+      await act(async () => {
+        resolveBuild(fixture);
+        await vi.advanceTimersByTimeAsync(2600);
+      });
+      expect(createProfile).not.toHaveBeenCalled();
+      expect(useChartStore.getState().hasChart).toBe(false);
+      expect(push).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not restore an old chart after its delayed auto-save finishes", async () => {
+    vi.useFakeTimers();
+    try {
+      let resolveProfile!: (value: { chart_profile: { id: string } }) => void;
+      createProfile.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveProfile = resolve;
+          }),
+      );
+      accountState.data = { user: { id: "account-a", name: "Account A" } };
+      usePreferencesStore.setState({ muteBirthConfirm: true });
+      const view = render(<AnSaoScreen />);
+      fireEvent.keyDown(screen.getByRole("slider", { name: "Giờ sinh" }), { key: "ArrowRight" });
+      fireEvent.click(screen.getByRole("radio", { name: "Nam" }));
+      fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
+      await act(async () => {
+        await Promise.resolve();
+      });
+      expect(createProfile).toHaveBeenCalledTimes(1);
+      view.unmount();
+      await act(async () => {
+        resolveProfile({ chart_profile: { id: "profile-a" } });
+        await vi.advanceTimersByTimeAsync(2600);
+      });
+      expect(useChartStore.getState().hasChart).toBe(false);
+      expect(useChartStore.getState().chartProfileId).toBeNull();
+      expect(push).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("puts the primary action before the atmospheric reward in reading order", () => {
     render(<AnSaoScreen />);
 
