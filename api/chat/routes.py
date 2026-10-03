@@ -4,8 +4,9 @@ import asyncio
 import json
 import logging
 import secrets
+from collections.abc import AsyncIterator
 from datetime import datetime
-from typing import Any, AsyncIterator
+from typing import Any
 
 from fastapi import APIRouter, Header, Request, Response
 from fastapi.encoders import jsonable_encoder
@@ -19,8 +20,14 @@ from pydantic_ai import (
     TextPart,
     TextPartDelta,
 )
-from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, UserPromptPart
+from pydantic_ai.messages import (
+    ModelMessage,
+    ModelRequest,
+    ModelResponse,
+    UserPromptPart,
+)
 
+from api.chat.background_stream import BackgroundStream
 from api.chat.contracts import ConversationHistoryStore
 from api.chat.models import (
     BirthInfo,
@@ -49,7 +56,6 @@ from api.schemas import (
 from src.agent.deps import TuviAgentDeps
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
-
 
 logger = logging.getLogger(__name__)
 
@@ -175,7 +181,10 @@ async def session_chat_stream(
             return _streaming_response(_duplicate_in_progress_stream(pair))
         return _streaming_response(_terminal_replay_stream(pair))
 
-    return _streaming_response(
+    # Start before returning the response: even a disconnect before its first
+    # frame must not strand the reserved message or cancel the model/workflow.
+    run = BackgroundStream(
+        request.app,
         _new_session_chat_stream(
             request=request,
             store=store,
@@ -185,8 +194,9 @@ async def session_chat_stream(
             history_messages=history_messages,
             pair=pair,
             content=payload.content,
-        )
+        ),
     )
+    return _streaming_response(run.events())
 
 
 async def _reserve_session_chat_stream(
@@ -371,6 +381,8 @@ async def _stream_session_chat_events(
             msg = _serialize_agent_event(event)
             if msg is not None:
                 yield msg
+
+
 def _build_la_so(birth_info: BirthInfo) -> LaSo:
     solar_dt = datetime(
         year=birth_info.year,
