@@ -1,0 +1,18 @@
+/* The lá bài phụ skin, shared by the Vận May and Lời Khuyên cards. The glyph
+   tile and tag tint are inline utilities; here is the card's tinted border,
+   shadow, and the ::before wash, which cannot be inline. */
+
+.tarot {
+  --t-hue-glow: color-mix(in srgb, var(--t-hue) 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--t-hue) 24%, var(--color-glass-line));
+  box-shadow: 0 14px 34px rgba(12, 6, 28, 0.42);
+}
+
+.tarot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.38;
+  background: radial-gradient(120% 70% at 100% 0%, var(--t-hue-glow), transparent 55%);
+}

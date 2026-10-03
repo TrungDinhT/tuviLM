@@ -1,0 +1,659 @@
+{
+  "id": "2009040405M",
+  "summary": "Sinh dương lịch: 04/04/2009 05:00",
+  "ban_menh_name": "Tích Lịch Hỏa",
+  "cuc_name": "Thủy Nhị cục",
+  "menh_cuc_relation_label": "Cục khắc mệnh",
+  "menh_cuc_relation": "khac_nhap",
+  "am_duong_relation": "thuan_ly",
+  "dia_chi_natal_year": "suu",
+  "ban_menh_ngu_hanh": "Hỏa",
+  "cung_by_position": {
+    "Tý": {
+      "position": "Tý",
+      "role": "Huynh Đệ",
+      "chinh_tinh": [
+        "Tham Lang (Hãm)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Hỏa Tinh",
+          "display": "Hỏa Tinh (Hãm)",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Phi Liêm",
+          "display": "Phi Liêm",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Khôi",
+          "display": "Thiên Khôi",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Trực Phù",
+          "display": "Trực Phù",
+          "element": "Kim"
+        }
+      ],
+      "tuhoa": [
+        "Hóa Quyền"
+      ],
+      "trang_sinh": "Mộ",
+      "is_tuan": false,
+      "is_triet": false,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": [
+        {
+          "name": "Thiên Hư",
+          "display": "Thiên Hư",
+          "element": "Thủy"
+        },
+        {
+          "name": "Thiên Khốc",
+          "display": "Thiên Khốc",
+          "element": "Thủy"
+        }
+      ]
+    },
+    "Sửu": {
+      "position": "Sửu",
+      "role": "Mệnh",
+      "chinh_tinh": [
+        "Cự Môn (Hãm)",
+        "Thiên Đồng (Hãm)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Hoa Cái",
+          "display": "Hoa Cái",
+          "element": "Kim"
+        },
+        {
+          "name": "Linh Tinh",
+          "display": "Linh Tinh (Đắc)",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Phá Toái",
+          "display": "Phá Toái",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Tấu Thư",
+          "display": "Tấu Thư",
+          "element": "Kim"
+        },
+        {
+          "name": "Thái Tuế",
+          "display": "Thái Tuế",
+          "element": "Hỏa"
+        }
+      ],
+      "tuhoa": [],
+      "trang_sinh": "Tử",
+      "is_tuan": false,
+      "is_triet": false,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": []
+    },
+    "Dần": {
+      "position": "Dần",
+      "role": "Phụ Mẫu",
+      "chinh_tinh": [
+        "Thiên Tướng (Miếu)",
+        "Vũ Khúc (Miếu)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Đẩu Quân",
+          "display": "Đẩu Quân",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Địa Kiếp",
+          "display": "Địa Kiếp (Đắc)",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Hồng Loan",
+          "display": "Hồng Loan",
+          "element": "Thủy"
+        },
+        {
+          "name": "Kiếp Sát",
+          "display": "Kiếp Sát",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Quốc Ấn",
+          "display": "Quốc Ấn",
+          "element": "Thổ"
+        },
+        {
+          "name": "Thiên Không",
+          "display": "Thiên Không",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Phúc",
+          "display": "Thiên Phúc",
+          "element": "Thổ"
+        },
+        {
+          "name": "Thiên Tài",
+          "display": "Thiên Tài",
+          "element": "Thổ"
+        },
+        {
+          "name": "Thiếu Dương",
+          "display": "Thiếu Dương",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Tướng Quân",
+          "display": "Tướng Quân",
+          "element": "Mộc"
+        }
+      ],
+      "tuhoa": [
+        "Hóa Lộc"
+      ],
+      "trang_sinh": "Bệnh",
+      "is_tuan": false,
+      "is_triet": false,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": [
+        {
+          "name": "Bạch Hổ",
+          "display": "Bạch Hổ",
+          "element": "Kim"
+        }
+      ]
+    },
+    "Mão": {
+      "position": "Mão",
+      "role": "Phúc Đức",
+      "chinh_tinh": [
+        "Thái Dương (Miếu)",
+        "Thiên Lương (Miếu)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Ân Quang",
+          "display": "Ân Quang",
+          "element": "Mộc"
+        },
+        {
+          "name": "Tam Thai",
+          "display": "Tam Thai",
+          "element": "Thủy"
+        },
+        {
+          "name": "Tang Môn",
+          "display": "Tang Môn",
+          "element": "Mộc"
+        },
+        {
+          "name": "Thiên Diêu",
+          "display": "Thiên Diêu (Đắc)",
+          "element": "Thủy"
+        },
+        {
+          "name": "Thiên Y",
+          "display": "Thiên Y",
+          "element": "Thủy"
+        },
+        {
+          "name": "Tiểu Hao",
+          "display": "Tiểu Hao",
+          "element": "Hỏa"
+        }
+      ],
+      "tuhoa": [
+        "Hóa Khoa"
+      ],
+      "trang_sinh": "Suy",
+      "is_tuan": false,
+      "is_triet": false,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": []
+    },
+    "Thìn": {
+      "position": "Thìn",
+      "role": "Điền Trạch",
+      "chinh_tinh": [
+        "Thất Sát (Hãm)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Thanh Long",
+          "display": "Thanh Long",
+          "element": "Thủy"
+        },
+        {
+          "name": "Thiên La",
+          "display": "Thiên La",
+          "element": "Kim"
+        },
+        {
+          "name": "Thiếu Âm",
+          "display": "Thiếu Âm",
+          "element": "Thủy"
+        }
+      ],
+      "tuhoa": [],
+      "trang_sinh": "Đế Vượng",
+      "is_tuan": false,
+      "is_triet": false,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": [
+        {
+          "name": "Đà La",
+          "display": "Đà La (Hãm)",
+          "element": "Kim"
+        }
+      ]
+    },
+    "Tị": {
+      "position": "Tị",
+      "role": "Quan Lộc",
+      "chinh_tinh": [
+        "Thiên Cơ (Miếu)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Đà La",
+          "display": "Đà La (Đắc)",
+          "element": "Kim"
+        },
+        {
+          "name": "Long Trì",
+          "display": "Long Trì",
+          "element": "Thủy"
+        },
+        {
+          "name": "Lực Sĩ",
+          "display": "Lực Sĩ",
+          "element": "Thủy"
+        },
+        {
+          "name": "Phong Cáo",
+          "display": "Phong Cáo",
+          "element": "Thổ"
+        },
+        {
+          "name": "Quan Phù",
+          "display": "Quan Phù",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Khốc",
+          "display": "Thiên Khốc",
+          "element": "Thủy"
+        }
+      ],
+      "tuhoa": [],
+      "trang_sinh": "Lâm Quan",
+      "is_tuan": false,
+      "is_triet": false,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": [
+        {
+          "name": "Lộc Tồn",
+          "display": "Lộc Tồn",
+          "element": "Thổ"
+        }
+      ]
+    },
+    "Ngọ": {
+      "position": "Ngọ",
+      "role": "Nô Bộc",
+      "chinh_tinh": [
+        "Tử Vi (Miếu)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Bác Sĩ",
+          "display": "Bác Sĩ",
+          "element": "Thủy"
+        },
+        {
+          "name": "Đào Hoa",
+          "display": "Đào Hoa",
+          "element": "Mộc"
+        },
+        {
+          "name": "Lộc Tồn",
+          "display": "Lộc Tồn",
+          "element": "Thổ"
+        },
+        {
+          "name": "Lưu Hà",
+          "display": "Lưu Hà",
+          "element": "Thủy"
+        },
+        {
+          "name": "Nguyệt Đức",
+          "display": "Nguyệt Đức",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Tả Phù",
+          "display": "Tả Phù",
+          "element": "Thổ"
+        },
+        {
+          "name": "Thiên Thương",
+          "display": "Thiên Thương",
+          "element": "Thổ"
+        },
+        {
+          "name": "Tử Phù",
+          "display": "Tử Phù",
+          "element": "Kim"
+        }
+      ],
+      "tuhoa": [],
+      "trang_sinh": "Quan Đới",
+      "is_tuan": true,
+      "is_triet": false,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": [
+        {
+          "name": "Kình Dương",
+          "display": "Kình Dương (Hãm)",
+          "element": "Kim"
+        },
+        {
+          "name": "Thái Tuế",
+          "display": "Thái Tuế",
+          "element": "Hỏa"
+        }
+      ]
+    },
+    "Mùi": {
+      "position": "Mùi",
+      "role": "Thiên Di",
+      "chinh_tinh": [],
+      "phu_tinh": [
+        {
+          "name": "Cô Thần",
+          "display": "Cô Thần",
+          "element": "Thổ"
+        },
+        {
+          "name": "Kình Dương",
+          "display": "Kình Dương (Đắc)",
+          "element": "Kim"
+        },
+        {
+          "name": "Quan Phủ",
+          "display": "Quan Phủ",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Hư",
+          "display": "Thiên Hư",
+          "element": "Thủy"
+        },
+        {
+          "name": "Tuế Phá",
+          "display": "Tuế Phá",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Văn Khúc",
+          "display": "Văn Khúc (Đắc)",
+          "element": "Thủy"
+        },
+        {
+          "name": "Văn Xương",
+          "display": "Văn Xương (Đắc)",
+          "element": "Kim"
+        }
+      ],
+      "tuhoa": [
+        "Hóa Kỵ"
+      ],
+      "trang_sinh": "Mộc Dục",
+      "is_tuan": true,
+      "is_triet": false,
+      "is_cung_than": true,
+      "age_daivan": null,
+      "saoLuu": []
+    },
+    "Thân": {
+      "position": "Thân",
+      "role": "Tật Ách",
+      "chinh_tinh": [
+        "Phá Quân (Hãm)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Địa Không",
+          "display": "Địa Không (Đắc)",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Hữu Bật",
+          "display": "Hữu Bật",
+          "element": "Thủy"
+        },
+        {
+          "name": "Long Đức",
+          "display": "Long Đức",
+          "element": "Thủy"
+        },
+        {
+          "name": "Phục Binh",
+          "display": "Phục Binh",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Hỉ",
+          "display": "Thiên Hỉ",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Sứ",
+          "display": "Thiên Sứ",
+          "element": "Thủy"
+        },
+        {
+          "name": "Thiên Thọ",
+          "display": "Thiên Thọ",
+          "element": "Thổ"
+        },
+        {
+          "name": "Thiên Trù",
+          "display": "Thiên Trù",
+          "element": "Thổ"
+        },
+        {
+          "name": "Thiên Việt",
+          "display": "Thiên Việt",
+          "element": "Hỏa"
+        }
+      ],
+      "tuhoa": [],
+      "trang_sinh": "Tràng Sinh",
+      "is_tuan": false,
+      "is_triet": true,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": [
+        {
+          "name": "Tang Môn",
+          "display": "Tang Môn",
+          "element": "Mộc"
+        },
+        {
+          "name": "Thiên Mã",
+          "display": "Thiên Mã",
+          "element": "Hỏa"
+        }
+      ]
+    },
+    "Dậu": {
+      "position": "Dậu",
+      "role": "Tài Bạch",
+      "chinh_tinh": [],
+      "phu_tinh": [
+        {
+          "name": "Bạch Hổ",
+          "display": "Bạch Hổ",
+          "element": "Kim"
+        },
+        {
+          "name": "Đại Hao",
+          "display": "Đại Hao",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Địa Giải",
+          "display": "Địa Giải",
+          "element": "Thổ"
+        },
+        {
+          "name": "Giải Thần",
+          "display": "Giải Thần",
+          "element": "Mộc"
+        },
+        {
+          "name": "LN Văn Tinh",
+          "display": "LN Văn Tinh",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Phượng Các",
+          "display": "Phượng Các",
+          "element": "Thổ"
+        },
+        {
+          "name": "Thai Phụ",
+          "display": "Thai Phụ",
+          "element": "Kim"
+        },
+        {
+          "name": "Thiên Quan",
+          "display": "Thiên Quan",
+          "element": "Hỏa"
+        }
+      ],
+      "tuhoa": [],
+      "trang_sinh": "Dưỡng",
+      "is_tuan": false,
+      "is_triet": true,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": []
+    },
+    "Tuất": {
+      "position": "Tuất",
+      "role": "Tử Tức",
+      "chinh_tinh": [
+        "Liêm Trinh (Miếu)",
+        "Thiên Phủ (Miếu)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Bệnh Phù",
+          "display": "Bệnh Phù",
+          "element": "Thổ"
+        },
+        {
+          "name": "Địa Võng",
+          "display": "Địa Võng",
+          "element": "Kim"
+        },
+        {
+          "name": "Quả Tú",
+          "display": "Quả Tú",
+          "element": "Thổ"
+        },
+        {
+          "name": "Phúc Đức",
+          "display": "Phúc Đức",
+          "element": "Thổ"
+        },
+        {
+          "name": "Thiên Đức",
+          "display": "Thiên Đức",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Giải",
+          "display": "Thiên Giải",
+          "element": "Hỏa"
+        }
+      ],
+      "tuhoa": [],
+      "trang_sinh": "Thai",
+      "is_tuan": false,
+      "is_triet": false,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": []
+    },
+    "Hợi": {
+      "position": "Hợi",
+      "role": "Phu Thê",
+      "chinh_tinh": [
+        "Thái Âm (Miếu)"
+      ],
+      "phu_tinh": [
+        {
+          "name": "Bát Toạ",
+          "display": "Bát Toạ",
+          "element": "Mộc"
+        },
+        {
+          "name": "Điếu Khách",
+          "display": "Điếu Khách",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Đường Phù",
+          "display": "Đường Phù",
+          "element": "Mộc"
+        },
+        {
+          "name": "Hỷ Thần",
+          "display": "Hỷ Thần",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Hình",
+          "display": "Thiên Hình (Bình)",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Mã",
+          "display": "Thiên Mã",
+          "element": "Hỏa"
+        },
+        {
+          "name": "Thiên Quý",
+          "display": "Thiên Quý",
+          "element": "Thổ"
+        }
+      ],
+      "tuhoa": [],
+      "trang_sinh": "Tuyệt",
+      "is_tuan": false,
+      "is_triet": false,
+      "is_cung_than": false,
+      "age_daivan": null,
+      "saoLuu": []
+    }
+  }
+}

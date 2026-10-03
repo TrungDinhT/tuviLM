@@ -1,0 +1,5 @@
+@media (min-width: 1024px) {
+  .toaster[data-sonner-toaster][data-x-position="center"] {
+    left: calc(50% + var(--rail) / 2);
+  }
+}

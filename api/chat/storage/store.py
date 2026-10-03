@@ -114,7 +114,22 @@ class MongoConversationHistoryStore:
                 ChartProfileDocument.creation_idempotency_key == idempotency_key,
             )
             if existing is None:
-                raise
+                # The document holding this idempotency key is soft-deleted: it
+                # still occupies the unique index, so a fresh insert fails. The
+                # same logical cast came back, so restore the deleted profile
+                # instead of erroring.
+                deleted = await ChartProfileDocument.find_many_in_all(
+                    ChartProfileDocument.owner_id == owner_id,
+                    ChartProfileDocument.creation_idempotency_key == idempotency_key,
+                ).first_or_none()
+                if deleted is None:
+                    raise
+                if deleted.creation_request_fingerprint != fingerprint:
+                    raise IdempotencyConflictError
+                deleted.deleted_at = None
+                deleted.updated_at = utc_now()
+                await deleted.save()
+                return chart_profile_from_document(deleted)
             if existing.creation_request_fingerprint != fingerprint:
                 raise IdempotencyConflictError
             return chart_profile_from_document(existing)

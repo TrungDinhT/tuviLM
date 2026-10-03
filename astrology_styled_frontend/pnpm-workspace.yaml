@@ -1,0 +1,13 @@
+# Mirrors ../frontend/: neither native build is needed here.
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+
+allowBuilds:
+  unrs-resolver: false
+
+# vite 8.2.x declares a dependency on lightningcss ^1.33.0, which is not
+# published (latest is 1.32.0), so any install that resolves vite to 8.2.x
+# fails outright. Pin to the 8.0.x line until upstream catches up.
+overrides:
+  vite: ~8.0.0

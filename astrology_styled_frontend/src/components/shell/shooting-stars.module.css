@@ -1,0 +1,39 @@
+/* A shooting streak. Transform origin sits at the head of the streak (right),
+   so the tail trails behind it during flight. Position and timing come from
+   the inline custom properties set by shooting-stars.tsx. */
+
+.shootingStar {
+  position: absolute;
+  left: var(--sx);
+  top: var(--sy);
+  width: var(--slen, 110px);
+  height: 1.6px;
+  border-radius: 2px;
+  pointer-events: none;
+  transform-origin: 100% 50%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--accent-2) 42%, transparent) 58%,
+    #fff9e8
+  );
+  filter: drop-shadow(0 0 7px var(--accent-glow));
+  animation: shoot var(--sdur, 1.4s) cubic-bezier(0.3, 0.55, 0.35, 1) forwards;
+}
+
+@keyframes shoot {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--sang, 22deg)) translate3d(0, 0, 0) scaleX(0.2);
+  }
+  14% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--sang, 22deg)) translate3d(var(--sdist, 340px), 0, 0) scaleX(1);
+  }
+}

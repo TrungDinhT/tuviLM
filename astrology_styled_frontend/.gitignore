@@ -1,0 +1,43 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# The repo-root .gitignore is a Python template whose rules are unanchored, so
+# `lib/` there matches at any depth and silently swallows our source directory.
+# Re-include it. (Other unanchored rules to watch for if a directory ever gets
+# one of these names: build/, dist/, downloads/, parts/, share/, var/, wheels/.)
+!src/lib/
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

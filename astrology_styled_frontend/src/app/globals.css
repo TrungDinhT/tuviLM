@@ -1,0 +1,243 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   Design tokens — the single source of shared colour, radius, and layout
+   values. Every value below is transcribed from the `:root` blocks of
+   docs/design/tu-vi-app-responsible.html. Bespoke component paint lives in
+   co-located `*.module.css` files; `.tsx`/`.ts` never holds a colour literal.
+
+   Names live in Tailwind v4 namespaces so they generate utilities:
+   --color-* -> bg-/text-/border-, --radius-* -> rounded-, --font-* -> font-.
+   ========================================================================= */
+@theme {
+  /* Fixed twilight shell — never themed, never black. */
+  --color-bg-0: #1a1033;
+  --color-bg-1: #2e1a4a;
+  --color-bg-2: #3b2063;
+  --color-page: #120a24;
+
+  --color-ink: #f3effa;
+  --color-muted: #b9aed1;
+  --color-coral: #ff9e7d;
+  --color-fire: #ff5d6c;
+
+  --color-glass: rgba(255, 255, 255, 0.06);
+  --color-glass-line: rgba(243, 239, 250, 0.14);
+
+  /* Runtime accent. The literals here are only the pre-chart default;
+     ThemeProvider overwrites --accent/--accent-2/--accent-glow on :root. */
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-glow: var(--accent-glow);
+
+  --radius-card: 26px;
+
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;
+}
+
+/* ============================================================================
+   Runtime accent defaults + layout variables.
+
+   Kept out of @theme deliberately: these are not utility-generating tokens,
+   they are values that other rules compute against, and two of them change
+   per breakpoint tier.
+   ========================================================================= */
+:root {
+  color-scheme: dark;
+
+  /* --- Ngũ hành palette ---------------------------------------------------
+     The accent is the ngũ hành of cung Mệnh's chính tinh, never a per-star
+     colour: đơn tinh tints with the element's own light shade, song tinh
+     pairs the two elements. Light and glow are mixed from the element, so
+     these five literals are the only colour values.
+
+     These stay CSS custom properties on purpose: lib/theme.ts resolves an
+     outcome to `var(--element-*)` references, never to a raw colour, which is
+     what keeps every literal in this file. */
+  --element-kim: #e0dbcf;
+  --element-moc: #63c79a;
+  --element-thuy: #79b7ff;
+  --element-hoa: #ff5d57;
+  --element-tho: #b3855a;
+
+  --element-kim-light: color-mix(in srgb, var(--element-kim) 45%, var(--color-ink));
+  --element-moc-light: color-mix(in srgb, var(--element-moc) 45%, var(--color-ink));
+  --element-thuy-light: color-mix(in srgb, var(--element-thuy) 45%, var(--color-ink));
+  --element-hoa-light: color-mix(in srgb, var(--element-hoa) 45%, var(--color-ink));
+  --element-tho-light: color-mix(in srgb, var(--element-tho) 45%, var(--color-ink));
+
+  --element-kim-glow: color-mix(in srgb, var(--element-kim) 50%, transparent);
+  --element-moc-glow: color-mix(in srgb, var(--element-moc) 50%, transparent);
+  --element-thuy-glow: color-mix(in srgb, var(--element-thuy) 50%, transparent);
+  --element-hoa-glow: color-mix(in srgb, var(--element-hoa) 50%, transparent);
+  --element-tho-glow: color-mix(in srgb, var(--element-tho) 50%, transparent);
+
+  /* Vô chính diệu, and the fallback for an unrecognised star. */
+  --accent-neutral: #bca6f5;
+  --accent-neutral-light: #e8e1fb;
+  --accent-neutral-glow: rgba(188, 166, 245, 0.45);
+
+  /* Pre-chart default accent (vô chính diệu). */
+  --accent-default: var(--accent-neutral);
+  --accent-2-default: var(--accent-neutral-light);
+  --accent-glow-default: var(--accent-neutral-glow);
+
+  --accent: var(--accent-default);
+  --accent-2: var(--accent-2-default);
+  --accent-glow: var(--accent-glow-default);
+
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+
+  /* Phone: one readable column, centred on wider screens. */
+  --col: 480px;
+  --tabbar-h: calc(74px + var(--safe-b));
+  --topbar-h: 0px;
+  --rail: 250px;
+  --shell: 1200px;
+  /* Deck height is svh on purpose, against the house dvh rule: dvh grows
+     when the mobile URL bar hides on scroll, which made the cards breathe
+     in and out while reading. svh stays put. */
+  --deck-h: clamp(300px, calc(100svh - 318px), 560px);
+}
+
+/* Tablet — same product, wider column. Prototype authored this at 700px. */
+@media (min-width: 768px) {
+  :root {
+    --col: 900px;
+  }
+}
+
+/* Desktop — bottom tab bar becomes a left rail, a top bar appears.
+   Prototype authored this at 1080px; see AGENTS.md for the accepted drift. */
+@media (min-width: 1024px) {
+  :root {
+    --tabbar-h: 0px;
+    --topbar-h: 78px;
+  }
+}
+
+/* ============================================================================
+   Custom utilities.
+
+   Colour *maths* belongs here even when the colour itself is a variable set by
+   a component. A component supplies the scope (`--t-hue`), this file decides
+   what 40% of it mixed with the hairline looks like.
+   ========================================================================= */
+
+/** Surface tinted by whatever `--t-hue` the subtree sets. */
+@utility hue-surface {
+  border-color: color-mix(in srgb, var(--t-hue) 40%, var(--color-glass-line));
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--t-hue) 18%, transparent);
+}
+
+/** The accent gradient used by primary pills and highlighted surfaces. */
+@utility accent-gradient {
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
+  box-shadow: 0 14px 40px var(--accent-glow);
+}
+
+/**
+ * The frosted surface every card, sheet and bar is built from. A utility
+ * rather than a component: it is four declarations that never vary, and
+ * wrapping it would only stand between a caller and its other classes.
+ */
+@utility glass {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-line);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(16px);
+}
+
+/** Primary pill: the accent gradient plus its inner highlight. */
+@utility pill-primary {
+  color: var(--color-bg-0);
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
+  box-shadow:
+    0 14px 40px var(--accent-glow),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+/** Ghost pill: a quiet outline on the twilight. */
+@utility pill-ghost {
+  color: var(--color-ink);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-glass-line);
+}
+
+/** Overlay card: opaque enough to read against a scrolling page behind it. */
+@utility overlay-card {
+  background: linear-gradient(155deg, rgba(59, 32, 99, 0.97), rgba(26, 16, 51, 0.98));
+  border: 1px solid var(--accent-glow);
+  box-shadow:
+    0 24px 70px rgba(8, 4, 20, 0.72),
+    0 0 30px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+@utility overlay-scrim {
+  background: rgba(10, 5, 24, 0.72);
+  backdrop-filter: blur(7px);
+}
+
+@utility toast-surface {
+  background: rgba(20, 12, 40, 0.92);
+  border: 1px solid var(--accent-glow);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hide every scrollbar while keeping every region scrollable. Both syntaxes
+     are needed: scrollbar-width for Firefox and modern Chrome, the pseudo
+     element for Safari/WebKit. */
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  body {
+    min-height: 100dvh;
+    overflow-x: hidden;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--color-bg-0);
+  }
+}
+
+/* One global answer to reduced motion, so no component has to remember. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.15s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
