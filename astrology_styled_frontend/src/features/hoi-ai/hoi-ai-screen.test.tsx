@@ -310,6 +310,40 @@ describe("HoiAiScreen", () => {
     expect(screen.queryByText("Câu hỏi đang chạy")).toBeNull();
   });
 
+  it("explains the chat cost when the account has insufficient coins", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((url: string) => {
+        if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+          return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
+        }
+        if (url.endsWith("/api/v1/sessions/s1/chat/stream")) {
+          return Promise.resolve(jsonResponse({ detail: "Insufficient coins." }, 402));
+        }
+        if (url.endsWith("/api/v1/sessions/s1")) {
+          return Promise.resolve(
+            jsonResponse({ session: sessionDetail("s1", [message({ content: "Previous reply" })]) }),
+          );
+        }
+        return Promise.resolve(jsonResponse({}));
+      }),
+    );
+    setChart("p1");
+
+    renderScreen(new QueryClient());
+    await screen.findByText("Previous reply");
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "My question" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    await waitFor(() =>
+      expect(toastMocks.showToast).toHaveBeenCalledWith(
+        "Not enough coins. AI chat costs 3 coins per message.",
+      ),
+    );
+    expect((input as HTMLInputElement).disabled).toBe(false);
+  });
+
   it("surfaces a backend error event and preserves partial text", async () => {
     const stream =
       [

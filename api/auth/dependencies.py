@@ -12,6 +12,7 @@ from jwt import InvalidTokenError, PyJWKClientConnectionError, PyJWKClientError
 from pydantic import ValidationError
 from pymongo.errors import PyMongoError
 
+from api.accounts.billing import reconcile_chat_coins
 from api.accounts.models import AccountAccess, Balance, Plan
 from api.settings import get_settings
 
@@ -82,15 +83,27 @@ async def require_user(
         if session is None:
             raise _unauthorized()
         user = await database["user"].find_one(
-            {"_id": ObjectId(claims["sub"])}, {"role": 1, "plan": 1, "balance": 1}
+            {"_id": ObjectId(claims["sub"])},
+            {"role": 1, "plan": 1, "balance": 1, "chat_holds": 1},
         )
+        if user is None:
+            raise _unauthorized()
+        access = AccountAccess.model_validate(user)
+        if user.get("chat_holds"):
+            await reconcile_chat_coins(
+                database,
+                claims["sub"],
+                user["chat_holds"],
+                request.app.state.api_state.conversation_history_store,
+            )
+            user = await database["user"].find_one(
+                {"_id": ObjectId(claims["sub"])}, {"role": 1, "plan": 1, "balance": 1}
+            )
+            if user is None:
+                raise _unauthorized()
+            access = AccountAccess.model_validate(user)
     except PyMongoError as exc:
         raise HTTPException(503, "Authentication service unavailable.") from exc
-
-    if user is None:
-        raise _unauthorized()
-    try:
-        access = AccountAccess.model_validate(user)
     except ValidationError as exc:
         raise HTTPException(503, "Account data unavailable.") from exc
     return Principal(

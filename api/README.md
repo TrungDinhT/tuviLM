@@ -74,7 +74,7 @@ fresh token belongs to the account that started them.
 Role and plan are separate: `role` is `user` or `admin`; `plan` is `normal`
 or `full_unlock`. New accounts start with `normal` and a balance of `0`.
 Existing accounts without these fields receive the same defaults when read by
-the API, without a migration or read-time database writes.
+the API, without a migration or default-field backfill.
 
 Both fields are stored on the existing Better Auth `user` document and cannot
 be supplied through signup or user profile updates. The API reads their current
@@ -98,9 +98,50 @@ unknown user returns `404`; this endpoint never creates users or changes roles.
 Database outages or invalid stored access data return `503` rather than
 granting access.
 
-This is manual account management, not a payment or top-up API. Balance units,
-feature prices, charging, full-unlock expiration, and refunds are not defined
-yet. Existing feature access is unchanged in this step.
+An absolute balance update returns `409` while the target account has reserved
+chat coins. Plan-only updates remain allowed. This prevents balance assignments
+from overwriting in-flight debits or refunds.
+
+This is manual account management, not a payment or top-up API. Payments,
+full-unlock expiration, and pricing for features other than chat are not defined.
+
+## Chat pricing
+
+`POST /api/v1/sessions/{session_id}/chat/stream` costs **3 coins per successful
+user message** on the `normal` plan. `full_unlock` includes AI chat without
+spending coins. The plan is checked from the live account when the request starts;
+changing it during generation does not change that request's price.
+
+For a new paid request, the server reserves 3 coins before starting AI generation.
+`balance` is the available balance, excluding outstanding reservations. A normal
+account with fewer than 3 available coins receives `402` with
+`Not enough coins. AI chat costs 3 coins per message.` The AI does not run.
+The already-reserved message pair is marked failed and remains in chat history.
+
+Successful completion means generation finished and the assistant message was
+durably saved as `confirmed`. Only then is the reservation committed. AI errors,
+cancellation or disconnects before completion return the reserved coins. A
+disconnect after server-side completion does not reverse an already-completed
+request; streaming cannot guarantee that the client received the final event.
+
+Replaying the same `Idempotency-Key` uses the existing message operation: it
+never starts generation or reserves coins again, even if the balance is now zero.
+Concurrent reservations cannot spend the same coins, and repeated refunds cannot
+add coins twice. Reservations and settlement use conditional, single-user-document
+updates, following [MongoDB's atomic update guarantees](https://www.mongodb.com/docs/manual/core/write-operations-atomicity/).
+
+Outstanding reservations are stored as `chat_holds` on the existing user document;
+there is no new collection or payment framework. On the next authenticated
+request, the server checks these holds against the stored assistant messages:
+confirmed messages commit; failed, cancelled or missing messages refund; pending
+messages keep their holds. Existing stale-message cleanup marks abandoned pending
+messages failed after `stale_pending_after_seconds` (15 minutes by default).
+Recovery is lazy, not a background job. During database outages, a hold can remain
+reserved until a later request can reconcile it. If finalization cannot be saved
+but the refund succeeds, the message can remain pending until stale cleanup.
+
+Other feature access is unchanged. No admin role exemption or free-chat quota is
+added: chat pricing depends only on plan and coins.
 
 ## Build lá số example
 

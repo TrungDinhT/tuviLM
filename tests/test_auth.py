@@ -154,6 +154,43 @@ def test_invalid_persisted_account_access_is_unavailable(auth_context) -> None:
     assert response.json() == {"detail": "Account data unavailable."}
 
 
+def test_me_reconciles_coin_holds_and_returns_updated_balance(
+    auth_context, monkeypatch
+) -> None:
+    account = auth_context.database["user"].document
+    holds = {"assistant-id": {"amount": 3, "session_id": "session-id"}}
+    account.update(plan="normal", balance=0, chat_holds=holds)
+
+    async def reconcile(*args):
+        account.update(balance=3, chat_holds={})
+
+    reconciler = AsyncMock(side_effect=reconcile)
+    monkeypatch.setattr(dependencies, "reconcile_chat_coins", reconciler)
+
+    response = auth_context.client.get("/api/v1/me", headers=bearer(auth_context))
+
+    assert response.status_code == 200
+    assert response.json()["balance"] == 3
+    reconciler.assert_awaited_once_with(
+        auth_context.database, str(USER_ID), holds, auth_context.store
+    )
+
+
+def test_invalid_access_is_not_repaired_by_coin_reconciliation(
+    auth_context, monkeypatch
+) -> None:
+    auth_context.database["user"].document.update(
+        balance=-1, chat_holds={"assistant-id": {"amount": 3, "session_id": "session-id"}}
+    )
+    reconciler = AsyncMock()
+    monkeypatch.setattr(dependencies, "reconcile_chat_coins", reconciler)
+
+    response = auth_context.client.get("/api/v1/me", headers=bearer(auth_context))
+
+    assert response.status_code == 503
+    reconciler.assert_not_awaited()
+
+
 def test_missing_token_and_anonymous_owner_are_unauthorized(auth_context) -> None:
     response = auth_context.client.get(
         "/api/v1/chart-profiles", headers={"X-Anonymous-Owner-Id": str(USER_ID)}

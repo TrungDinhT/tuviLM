@@ -106,6 +106,22 @@ describe("streamChat", () => {
     expect(localStorage.length).toBe(0);
   });
 
+  it("preserves an insufficient-coins response before streaming", async () => {
+    const body = { detail: "Not enough coins. AI chat costs 3 coins per message." };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify(body), {
+          status: 402,
+          headers: { "Content-Type": "application/json" },
+        }),
+      ),
+    );
+
+    await expect(
+      streamChat("s1", "Hello", { idempotencyKey: "turn-1" }).next(),
+    ).rejects.toMatchObject({ error: { kind: "http", status: 402, body } });
+  });
 });
 
 describe("parseSseStream", () => {

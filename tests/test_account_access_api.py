@@ -131,6 +131,44 @@ async def test_repeating_an_absolute_update_does_not_add_balance(account_client)
 
 
 @pytest.mark.anyio
+async def test_balance_update_is_blocked_during_chat_but_plan_update_is_allowed(
+    account_client,
+) -> None:
+    client, database = account_client
+    holds = {"assistant-id": {"amount": 3, "session_id": "session-id"}}
+    await database["user"].insert_one(
+        {"_id": USER_ID, "plan": "normal", "balance": 7, "chat_holds": holds}
+    )
+
+    response = await client.patch(
+        ACCESS_PATH, headers=ADMIN_HEADERS, json={"balance": 100}
+    )
+    assert response.status_code == 409
+    document = await database["user"].find_one({"_id": USER_ID})
+    assert document["balance"] == 7
+    assert document["chat_holds"] == holds
+
+    response = await client.patch(
+        ACCESS_PATH, headers=ADMIN_HEADERS, json={"plan": "full_unlock"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"plan": "full_unlock", "balance": 7}
+
+
+@pytest.mark.anyio
+async def test_balance_update_is_allowed_after_chat_holds_are_cleared(
+    account_client,
+) -> None:
+    client, database = account_client
+    await database["user"].insert_one({"_id": USER_ID, "balance": 7, "chat_holds": {}})
+
+    response = await client.patch(ACCESS_PATH, headers=ADMIN_HEADERS, json={"balance": 10})
+
+    assert response.status_code == 200
+    assert response.json() == {"plan": "normal", "balance": 10}
+
+
+@pytest.mark.anyio
 async def test_unknown_user_does_not_create_an_account(account_client) -> None:
     client, database = account_client
 

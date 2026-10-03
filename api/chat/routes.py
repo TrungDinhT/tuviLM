@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import secrets
 from datetime import datetime
-from typing import Any, AsyncIterator
+from typing import Any, AsyncIterator, Awaitable, Callable
 
+import anyio
 from fastapi import APIRouter, Header, Request, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import StreamingResponse
@@ -20,7 +20,9 @@ from pydantic_ai import (
     TextPartDelta,
 )
 from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, UserPromptPart
+from starlette.types import Receive, Scope, Send
 
+from api.accounts.billing import reserve_chat_coins, settle_chat_coins
 from api.auth.dependencies import CurrentUser
 from api.chat.contracts import ConversationHistoryStore
 from api.chat.models import (
@@ -176,17 +178,77 @@ async def session_chat_stream(
             return _streaming_response(_duplicate_in_progress_stream(pair))
         return _streaming_response(_terminal_replay_stream(pair))
 
-    return _streaming_response(
+    assistant_content: list[str] = []
+    finished = False
+    terminal_status: ChatMessageStatus | None = None
+
+    async def finalize(status: ChatMessageStatus) -> ChatMessage:
+        nonlocal finished, terminal_status
+        message = await store.finalize_assistant_message(
+            user.user_id,
+            session_id,
+            pair.assistant_message.id,
+            content="".join(assistant_content),
+            status=status,
+        )
+        terminal_status = message.status
+        await settle_chat_coins(
+            request.app.state.auth_database,
+            user.user_id,
+            pair.assistant_message.id,
+            confirmed=terminal_status == ChatMessageStatus.CONFIRMED,
+        )
+        finished = True
+        return message
+
+    async def cleanup(status: ChatMessageStatus = ChatMessageStatus.CANCELLED) -> None:
+        if finished:
+            return
+        try:
+            await finalize(status)
+        except Exception:
+            logger.exception(
+                "Failed to finalize session chat: owner_id=%s session_id=%s",
+                user.user_id,
+                session_id,
+            )
+            try:
+                await settle_chat_coins(
+                    request.app.state.auth_database,
+                    user.user_id,
+                    pair.assistant_message.id,
+                    confirmed=terminal_status == ChatMessageStatus.CONFIRMED,
+                )
+            except Exception:
+                logger.exception(
+                    "Failed to settle chat coins; pending hold will be reconciled."
+                )
+
+    try:
+        await reserve_chat_coins(
+            request.app.state.auth_database,
+            user.user_id,
+            session_id,
+            pair.assistant_message.id,
+        )
+    except BaseException:
+        with anyio.move_on_after(5, shield=True):
+            await cleanup(ChatMessageStatus.FAILED)
+        raise
+
+    return _ChatStreamingResponse(
         _new_session_chat_stream(
             request=request,
-            store=store,
             owner_id=user.user_id,
             session_id=session_id,
             context=context,
             history_messages=history_messages,
             pair=pair,
             content=payload.content,
-        )
+            assistant_content=assistant_content,
+            finalize=finalize,
+        ),
+        cleanup,
     )
 
 
@@ -239,24 +301,23 @@ async def _terminal_replay_stream(pair: ReservedMessagePair) -> AsyncIterator[st
 async def _new_session_chat_stream(
     *,
     request: Request,
-    store: ConversationHistoryStore,
     owner_id: str,
     session_id: str,
     context: SessionContext,
     history_messages: list[ChatMessage],
     pair: ReservedMessagePair,
     content: str,
+    assistant_content: list[str],
+    finalize: Callable[[ChatMessageStatus], Awaitable[ChatMessage]],
 ) -> AsyncIterator[str]:
-    assistant_content: list[str] = []
-    yield _sse(
-        {
-            "type": "ids",
-            "user_message_id": pair.user_message.id,
-            "assistant_message_id": pair.assistant_message.id,
-        }
-    )
-
     try:
+        yield _sse(
+            {
+                "type": "ids",
+                "user_message_id": pair.user_message.id,
+                "assistant_message_id": pair.assistant_message.id,
+            }
+        )
         async for event in _stream_session_chat_events(
             request=request,
             context=context,
@@ -267,43 +328,8 @@ async def _new_session_chat_stream(
                 assistant_content.append(str(event.get("delta", "")))
             yield _sse(event)
 
-        await store.finalize_assistant_message(
-            owner_id,
-            session_id,
-            pair.assistant_message.id,
-            content="".join(assistant_content),
-            status=ChatMessageStatus.CONFIRMED,
-        )
-        yield _sse({"type": "done", "status": ChatMessageStatus.CONFIRMED})
-    except asyncio.CancelledError:
-        logger.info(
-            "Session chat stream cancelled: owner_id=%s session_id=%s assistant_message_id=%s",
-            owner_id,
-            session_id,
-            pair.assistant_message.id,
-        )
-        try:
-            await asyncio.wait_for(
-                asyncio.shield(
-                    store.finalize_assistant_message(
-                        owner_id,
-                        session_id,
-                        pair.assistant_message.id,
-                        content="".join(assistant_content),
-                        status=ChatMessageStatus.CANCELLED,
-                    )
-                ),
-                timeout=2,
-            )
-        except Exception:
-            logger.exception(
-                "Failed to finalize cancelled session chat stream: "
-                "owner_id=%s session_id=%s assistant_message_id=%s",
-                owner_id,
-                session_id,
-                pair.assistant_message.id,
-            )
-        raise
+        message = await finalize(ChatMessageStatus.CONFIRMED)
+        yield _sse({"type": "done", "status": message.status})
     except Exception as exc:
         logger.exception(
             "Session chat stream failed: owner_id=%s session_id=%s assistant_message_id=%s",
@@ -311,15 +337,36 @@ async def _new_session_chat_stream(
             session_id,
             pair.assistant_message.id,
         )
-        await store.finalize_assistant_message(
-            owner_id,
-            session_id,
-            pair.assistant_message.id,
-            content="".join(assistant_content),
-            status=ChatMessageStatus.FAILED,
-        )
+        message = await finalize(ChatMessageStatus.FAILED)
         yield _sse({"type": "error", "message": str(exc)})
-        yield _sse({"type": "done", "status": ChatMessageStatus.FAILED})
+        yield _sse({"type": "done", "status": message.status})
+
+
+class _ChatStreamingResponse(StreamingResponse):
+    def __init__(
+        self,
+        stream: AsyncIterator[str],
+        cleanup: Callable[[], Awaitable[None]],
+    ) -> None:
+        super().__init__(
+            stream,
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+        self._stream = stream
+        self._cleanup = cleanup
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        try:
+            await super().__call__(scope, receive, send)
+        finally:
+            # Disconnects can interrupt sending while the generator is suspended.
+            with anyio.CancelScope(shield=True):
+                try:
+                    with anyio.move_on_after(5):
+                        await self._cleanup()
+                finally:
+                    await self._stream.aclose()
 
 
 def _streaming_response(stream: AsyncIterator[str]) -> StreamingResponse:

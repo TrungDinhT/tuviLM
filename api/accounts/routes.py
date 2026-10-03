@@ -20,13 +20,25 @@ async def update_account_access(
     if not ObjectId.is_valid(user_id):
         raise HTTPException(404, "User not found.")
 
+    query = {"_id": ObjectId(user_id)}
+    if "balance" in payload.model_fields_set:
+        query["$or"] = [
+            {"chat_holds": {"$exists": False}},
+            {"chat_holds": {}},
+        ]
     try:
         user = await request.app.state.auth_database["user"].find_one_and_update(
-            {"_id": ObjectId(user_id)},
+            query,
             {"$set": payload.model_dump(exclude_unset=True)},
             projection={"plan": 1, "balance": 1},
             return_document=ReturnDocument.AFTER,
         )
+        if user is None and await request.app.state.auth_database["user"].find_one(
+            {"_id": ObjectId(user_id)}, {"_id": 1}
+        ):
+            raise HTTPException(
+                409, "Cannot change balance while chat coins are reserved."
+            )
     except PyMongoError as exc:
         raise HTTPException(503, "Account service unavailable.") from exc
 

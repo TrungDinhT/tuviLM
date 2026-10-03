@@ -4,6 +4,7 @@ import asyncio
 import logging
 import os
 from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock
 from uuid import uuid4
 
 import httpx
@@ -64,14 +65,18 @@ def anyio_backend() -> str:
 
 
 @pytest.fixture()
-async def api_client():
+async def api_client(monkeypatch):
     async def test_user(request: Request) -> Principal:
         authorization = request.headers.get("Authorization", "")
         if not authorization.startswith("Bearer ") or not authorization[7:].strip():
             raise HTTPException(status_code=401, detail="Authentication required.")
-        return Principal(user_id=authorization[7:])
+        return Principal(user_id=authorization[7:], plan="full_unlock")
 
     app.dependency_overrides[require_user] = test_user
+    monkeypatch.setattr("api.chat.routes.reserve_chat_coins", AsyncMock())
+    monkeypatch.setattr("api.chat.routes.settle_chat_coins", AsyncMock())
+    previous_auth_database = getattr(app.state, "auth_database", None)
+    app.state.auth_database = {}
     transport = httpx.ASGITransport(app=app)
     try:
         async with httpx.AsyncClient(
@@ -81,6 +86,10 @@ async def api_client():
             yield client
     finally:
         app.dependency_overrides.pop(require_user, None)
+        if previous_auth_database is None:
+            del app.state.auth_database
+        else:
+            app.state.auth_database = previous_auth_database
 
 
 @pytest.fixture()
