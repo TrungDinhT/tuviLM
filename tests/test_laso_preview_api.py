@@ -84,7 +84,8 @@ async def test_preview_does_not_touch_la_so_state(api_client, fresh_api_state) -
 
     health = await api_client.get("/api/v1/health")
     assert health.status_code == 200
-    assert health.json()["la_so_created"] is False
+    assert health.json() == {"status": "ok"}
+    assert app.state.api_state.agent_deps.la_so is None
 
 
 async def test_preview_needs_no_identity_headers(api_client, fresh_api_state) -> None:

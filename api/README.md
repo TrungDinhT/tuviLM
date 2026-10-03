@@ -4,7 +4,7 @@ FastAPI backend for TuviLM UI.
 
 ## Current status
 - Real route: `POST /api/v1/laso/build`
-- Real route: `GET /api/v1/laso/cau-phu`
+- Real route: `POST /api/v1/laso/cau-phu`
 - Real route: `POST /api/v1/laso/build_sao_luu`
 - Conversation history routes are mounted from `api/chat/routes.py`:
   - `POST /api/v1/anonymous`
@@ -80,28 +80,42 @@ curl -X POST http://localhost:8000/api/v1/laso/build \
 
 ## Get the introductory Câu Phú
 
-Call this route after `POST /api/v1/laso/build`. It matches the completed
-chart by cung Mệnh position, main stars, Tuần and Triệt, then returns the
-original phú text from
+Send the birth data directly, using the same body as `POST /api/v1/laso/build`.
+It matches the chart by cung Mệnh position, main stars, Tuần and Triệt, then
+returns the original phú text from
 `data/cung_menh_phu_luc_bat_v3_tieu_de_moi.json`.
 
 ```bash
-curl http://localhost:8000/api/v1/laso/cau-phu
+curl -X POST http://localhost:8000/api/v1/laso/cau-phu \
+  -H "Content-Type: application/json" \
+  -d '{"day": 4, "month": 4, "year": 1998, "hour": 8, "gender": "M"}'
 ```
 
 The response includes `tieu_de`, the unmodified four-line `cau_phu`, and the
-same lines separately in `cac_cau`. Calling it before building a chart returns
-HTTP `409`.
+same lines separately in `cac_cau`. No earlier build request is needed.
 
-## Build sao lưu from server state
+## Build sao lưu from birth data
 
 `/api/v1/laso/build_sao_luu` takes:
+
+- `birth_info`: the chart's birth data, with the same shape as `/laso/build`
 - `observation_time`: same shape as build time (`day/month/year/hour/gender`)
+
+Chart endpoints do not store a shared current chart. Each request calculates
+its result from the supplied birth data, so requests from different users
+cannot overwrite one another's chart.
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/laso/build_sao_luu \
   -H "Content-Type: application/json" \
   -d '{
+    "birth_info": {
+      "day": 4,
+      "month": 4,
+      "year": 1998,
+      "hour": 8,
+      "gender": "M"
+    },
     "observation_time": {
       "day": 8,
       "month": 3,

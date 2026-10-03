@@ -25,6 +25,7 @@ from api.chat.contracts import (
     MissingOwnerIdError,
     NotFoundError,
 )
+from api.chat.models import BirthInfo
 from api.chat.routes import router as chat_router
 from api.chat.storage.store import MongoConversationHistoryStore
 from api.schemas import (
@@ -75,16 +76,6 @@ logging.basicConfig(
 class ApiState:
     agent_deps: TuviAgentDeps
     conversation_history_store: ConversationHistoryStore
-
-    @property
-    def has_la_so(self) -> bool:
-        return self.agent_deps.la_so is not None
-
-    def set_la_so(self, la_so: LaSo) -> None:
-        self.agent_deps.la_so = la_so
-
-    def require_la_so(self) -> LaSo:
-        return self.agent_deps.require_la_so()
 
 
 @asynccontextmanager
@@ -165,17 +156,9 @@ def _log_http_exception(request: Request, *, status_code: int, detail: object) -
     )
 
 
-def get_api_state(request: Request) -> ApiState:
-    return request.app.state.api_state
-
-
 @app.get("/api/v1/health")
-def health(request: Request) -> dict[str, str | bool]:
-    api_state = get_api_state(request)
-    return {
-        "status": "ok",
-        "la_so_created": api_state.has_la_so,
-    }
+def health() -> dict[str, str]:
+    return {"status": "ok"}
 
 
 @app.get("/api/v1/me")
@@ -185,12 +168,7 @@ def me(user: CurrentUser) -> Principal:
 
 @app.post("/api/v1/laso/preview", response_model=PreviewLasoResponse)
 def preview_laso(payload: PreviewLasoRequest) -> PreviewLasoResponse:
-    """Return cung Mệnh's chính tinh for the reward preview.
-
-    Side-effect free on purpose: unlike `/laso/build` this does not touch the
-    process-wide la-so state, so debounced calls while the user enters birth
-    data cannot disturb a previously built chart.
-    """
+    """Return the main stars for a preview without storing chart state."""
     try:
         solar_dt = dt.datetime(
             year=payload.year,
@@ -220,27 +198,27 @@ def preview_laso(payload: PreviewLasoRequest) -> PreviewLasoResponse:
     )
 
 
-@app.post("/api/v1/laso/build", response_model=BuildLasoResponse)
-def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse:
+def _build_la_so(birth_info: BirthInfo) -> LaSo:
     try:
         solar_dt = dt.datetime(
-            year=payload.year,
-            month=payload.month,
-            day=payload.day,
-            hour=payload.hour,
+            year=birth_info.year,
+            month=birth_info.month,
+            day=birth_info.day,
+            hour=birth_info.hour,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     prior = LaSoPrior.from_solar_day(
-        solar_dt, Gender.MALE if payload.gender == "M" else Gender.FEMALE
+        solar_dt, Gender.MALE if birth_info.gender == "M" else Gender.FEMALE
     )
+    return LaSo.from_prior(prior)
 
-    # TODO : This is inefficient as we are building the LaSo and LaSoView again in the agent deps.
-    # We should refactor to build it only once and reuse.
-    la_so = LaSo.from_prior(prior)
+
+@app.post("/api/v1/laso/build", response_model=BuildLasoResponse)
+def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
+    la_so = _build_la_so(payload)
     la_so_view = build_laso_view(la_so, study_year=datetime.now().year)
-    get_api_state(request).set_la_so(la_so)
 
     cung_by_position = to_cung_payload_map(la_so_view)
 
@@ -272,17 +250,10 @@ def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse
     )
 
 
-@app.get("/api/v1/laso/cau-phu", response_model=CauPhuResponse)
-def read_cau_phu(request: Request) -> CauPhuResponse:
-    api_state = get_api_state(request)
-    if not api_state.has_la_so:
-        raise HTTPException(
-            status_code=409,
-            detail="Chưa an lá số. Hãy gọi POST /api/v1/laso/build trước.",
-        )
-
+@app.post("/api/v1/laso/cau-phu", response_model=CauPhuResponse)
+def read_cau_phu(payload: BuildLasoRequest) -> CauPhuResponse:
     try:
-        entry = get_cau_phu(api_state.require_la_so())
+        entry = get_cau_phu(_build_la_so(payload))
     except CauPhuNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
@@ -299,7 +270,7 @@ def read_cau_phu(request: Request) -> CauPhuResponse:
 
 
 @app.post("/api/v1/laso/build_sao_luu", response_model=BuildSaoLuuResponse)
-def build_sao_luu(payload: BuildSaoLuuRequest, request: Request) -> BuildSaoLuuResponse:
+def build_sao_luu(payload: BuildSaoLuuRequest) -> BuildSaoLuuResponse:
     try:
         observed_solar_dt = dt.datetime(
             year=payload.observation_time.year,
@@ -310,7 +281,7 @@ def build_sao_luu(payload: BuildSaoLuuRequest, request: Request) -> BuildSaoLuuR
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    la_so = get_api_state(request).require_la_so()
+    la_so = _build_la_so(payload.birth_info)
     la_so_view = build_laso_view(la_so, study_year=observed_solar_dt.year)
 
     return BuildSaoLuuResponse(

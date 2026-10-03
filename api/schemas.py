@@ -26,6 +26,7 @@ class PreviewLasoResponse(BaseModel):
 
 
 class BuildSaoLuuRequest(BaseModel):
+    birth_info: BirthInfo
     observation_time: BirthInfo
 
 

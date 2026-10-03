@@ -287,5 +287,4 @@ export const listSessionsResponseSchema = z.object({
 
 export const healthResponseSchema = z.object({
   status: z.string(),
-  la_so_created: z.boolean(),
 });

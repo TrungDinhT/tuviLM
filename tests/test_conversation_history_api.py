@@ -360,6 +360,24 @@ async def test_authenticated_user_cannot_access_another_users_data(
     assert context.session.messages == []
 
 
+async def test_mongo_store_rejects_cross_owner_access(mongo_store) -> None:
+    profile = await _create_profile(mongo_store)
+    session = await _create_session(mongo_store, profile.id)
+
+    with pytest.raises(NotFoundError):
+        await mongo_store.load_session_context("other_owner", session.id)
+    with pytest.raises(NotFoundError):
+        await mongo_store.reserve_message_pair(
+            "other_owner",
+            session.id,
+            user_content="Tell me about career.",
+            idempotency_key="other-user-message",
+        )
+
+    context = await mongo_store.load_session_context("anon_owner", session.id)
+    assert context.session.messages == []
+
+
 async def test_create_chart_profile_requires_owner_id(mongo_store) -> None:
     with pytest.raises(MissingOwnerIdError):
         await mongo_store.create_chart_profile(
