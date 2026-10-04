@@ -17,6 +17,14 @@ export const accountAccessSchema = z.object({
 
 export type AccountAccess = z.infer<typeof accountAccessSchema>;
 
+export const redeemCodeRequestSchema = z.object({
+  code: z.string().trim().toUpperCase().min(1),
+});
+
+export const redeemCodeResponseSchema = z.object({
+  coins: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+});
+
 // --- api/chat/models.py ----------------------------------------------------
 
 export const birthInfoSchema = z.object({

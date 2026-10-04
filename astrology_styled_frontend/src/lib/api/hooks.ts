@@ -31,6 +31,8 @@ import {
   listSessionsResponseSchema,
   previewLasoRequestSchema,
   previewLasoResponseSchema,
+  redeemCodeRequestSchema,
+  redeemCodeResponseSchema,
 } from "./schemas";
 
 export function useAccountAccess() {
@@ -46,6 +48,29 @@ export function useAccountAccess() {
       }),
     enabled: Boolean(userId),
     staleTime: 0,
+  });
+}
+
+export function useRedeemCode() {
+  const queryClient = useQueryClient();
+  const { getSignal, userId } = useAccountRequestScope();
+  return useMutation({
+    mutationFn: (code: string) =>
+      request(apiEndpoints.redeemCode, {
+        method: "POST",
+        body: redeemCodeRequestSchema.parse({ code }),
+        schema: redeemCodeResponseSchema,
+        withAuth: true,
+        expectedUserId: userId,
+        signal: getSignal(),
+      }),
+    onSuccess: async () => {
+      if (getSignal()?.aborted) return;
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.accountAccess(userId ?? null),
+        exact: true,
+      });
+    },
   });
 }
 

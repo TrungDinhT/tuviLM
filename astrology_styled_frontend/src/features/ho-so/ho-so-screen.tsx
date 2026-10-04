@@ -9,6 +9,7 @@ import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
 
 import styles from "./ho-so-screen.module.css";
+import { RedeemCodeForm } from "./redeem-code-form";
 import { SavedChartCard, SavedChartSkeleton } from "./saved-chart-card";
 import { SettingsList } from "./settings-list";
 
@@ -36,6 +37,7 @@ export function HoSoScreen() {
           <h2 className="text-[22px] font-semibold">Cài đặt</h2>
         </div>
         <SettingsList />
+        {session && <RedeemCodeForm />}
       </div>
     </div>
   );

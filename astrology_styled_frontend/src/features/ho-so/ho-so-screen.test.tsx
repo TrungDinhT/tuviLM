@@ -29,6 +29,7 @@ describe("HoSoScreen", () => {
 
     expect(screen.getByText("Đăng nhập để xem và lưu lá số của bạn.")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Đăng nhập" }).getAttribute("href")).toBe("/login");
+    expect(screen.queryByLabelText("Mã ưu đãi")).toBeNull();
     expect(authClient.token).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
   });

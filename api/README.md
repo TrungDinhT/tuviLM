@@ -115,7 +115,8 @@ The `201` response includes the generated `code` and these three fields.
 
 Signed-in users submit `{"code": "CODE"}` to
 `POST /api/v1/account/redeem-code`. Leading/trailing spaces and letter case are
-ignored. A successful response is `{"coins": 30}` for a 30-coin reward.
+ignored. A successful response is `{"coins": 30}` for a 30-coin reward. The web
+client refetches `/api/v1/me` through TanStack Query to update the shared balance.
 
 - `single_use`: one redemption total, by one account.
 - `per_account`: one redemption per account.
