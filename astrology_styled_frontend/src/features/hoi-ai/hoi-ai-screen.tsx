@@ -349,8 +349,9 @@ function ChatConversation() {
       if (!accountSignal?.aborted && userId) {
         if (!turn.receivedDone) {
           try {
-            // A disconnected stream can end before the server releases its coin hold.
-            while (!accountSignal?.aborted) {
+            // A disconnected stream can end before the server releases its coin hold;
+            // the server settles within seconds, so stop polling after 30 tries.
+            for (let attempt = 0; attempt < 30 && !accountSignal?.aborted; attempt++) {
               const result = await request(apiEndpoints.session(turn.sessionId), {
                 schema: getSessionResponseSchema,
                 withAuth: true,
