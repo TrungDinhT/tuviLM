@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { Pill } from "@/components/primitives/pill";
+import { SignOutButton } from "@/components/shell/sign-out-button";
 import { ADMIN_REDEEM_CODES_ROUTE } from "@/config/site";
 import { useAccountAccess, useChartProfiles } from "@/lib/api/hooks";
 import { authClient } from "@/lib/auth-client";
@@ -45,6 +46,9 @@ export function HoSoScreen() {
           <h2 className="text-[22px] font-semibold">Cài đặt</h2>
         </div>
         <SettingsList />
+        {session && (
+          <SignOutButton className="pill-ghost mt-3 min-h-11 w-full justify-center rounded-2xl px-4 py-3 text-sm font-semibold lg:hidden" />
+        )}
         {isAdmin && (
           <Link
             href={ADMIN_REDEEM_CODES_ROUTE}
