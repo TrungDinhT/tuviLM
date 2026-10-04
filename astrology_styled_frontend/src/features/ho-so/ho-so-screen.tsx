@@ -11,11 +11,11 @@ import { describe, isApiError } from "@/lib/http/errors";
 
 import styles from "./ho-so-screen.module.css";
 import { RedeemCodeForm } from "./redeem-code-form";
-import { SavedChartCard, SavedChartSkeleton } from "./saved-chart-card";
+import { SavedChartSkeleton } from "./saved-chart-card";
+import { SavedChartList } from "./saved-chart-list";
 import { SettingsList } from "./settings-list";
 
-const SAVED_RAIL_CLASS =
-  "grid min-w-0 gap-3 py-1 md:grid-cols-2 md:gap-[14px] lg:grid-cols-1";
+const SAVED_RAIL_CLASS = "grid min-w-0 gap-3 py-1 md:grid-cols-2 md:gap-[14px] lg:grid-cols-1";
 
 /**
  * The Hồ sơ body — saved charts and settings. The header is
@@ -104,12 +104,6 @@ export function HoSoScreen() {
     if (data.chart_profiles.length === 0) {
       return <p className="text-[13.5px] text-muted">Chưa có lá số nào được lưu.</p>;
     }
-    return (
-      <div className={SAVED_RAIL_CLASS}>
-        {data.chart_profiles.map((profile) => (
-          <SavedChartCard key={profile.id} profile={profile} />
-        ))}
-      </div>
-    );
+    return <SavedChartList profiles={data.chart_profiles} />;
   }
 }

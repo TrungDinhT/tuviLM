@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChartProfile } from "@/lib/api/schemas";
 import { ApiErrorException } from "@/lib/http/errors";
 
-import { SavedChartCard } from "./saved-chart-card";
+import { SavedChartCard, SavedChartSkeleton } from "./saved-chart-card";
 
 const mocks = vi.hoisted(() => ({
   rename: vi.fn(),
@@ -35,7 +35,7 @@ beforeEach(() => {
 describe("SavedChartCard", () => {
   it("shows the full wrapped name, birth date and canh hour without fixed card height", () => {
     const longName = "Gia đình và những người thân yêu ".repeat(4);
-    const { rerender } = render(
+    const { container, rerender } = render(
       <SavedChartCard profile={{ ...PROFILE, display_name: longName }} />,
     );
     const heading = screen.getByRole("heading", { name: longName.trim() });
@@ -43,13 +43,23 @@ describe("SavedChartCard", () => {
     expect(heading.className).not.toMatch(/line-clamp|truncate/);
     expect(heading.className).toContain("[overflow-wrap:anywhere]");
     expect(screen.getByRole("article").className).not.toMatch(/\bh-\d/);
-    expect(screen.getByRole("article").className).toContain("flex-col p-4 lg:min-h-[128px] lg:flex-row");
+    expect(screen.getByRole("article").className).toContain(
+      "min-h-[128px] w-full min-w-0 flex-row",
+    );
     expect(screen.getByText("Ngày sinh: 15/04/1996")).toBeTruthy();
     expect(screen.getByText("Giờ sinh: Thìn · 07:00 – 09:00")).toBeTruthy();
     expect(screen.getByRole("button", { name: /Đổi tên lá số/ }).className).toContain("min-h-11");
-    expect(screen.getByRole("button", { name: /Đổi tên lá số/ }).parentElement?.className).toContain("lg:flex-col");
+    expect(screen.getByRole("button", { name: /Đổi tên lá số/ }).parentElement?.className).toBe(
+      "flex shrink-0 flex-col gap-2",
+    );
     rerender(<SavedChartCard profile={PROFILE} />);
     expect(screen.getByRole("heading").textContent).toBe("Lá số 1");
+    rerender(<SavedChartSkeleton />);
+    expect(container.firstElementChild?.className).toContain(
+      "min-h-[128px] w-full min-w-0 flex-row",
+    );
+    expect(container.firstElementChild?.lastElementChild?.className).toBe("shrink-0 space-y-2");
+    expect(container.firstElementChild?.lastElementChild?.children).toHaveLength(2);
   });
 
   it("trims renames, keeps pending edits open, shows failures and closes after success", () => {

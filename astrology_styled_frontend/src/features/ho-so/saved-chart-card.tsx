@@ -10,8 +10,7 @@ import type { ChartProfile } from "@/lib/api/schemas";
 import { describe, isApiError } from "@/lib/http/errors";
 import { showToast } from "@/lib/toast";
 
-const CARD_LAYOUT =
-  "flex min-h-[180px] w-full min-w-0 flex-col p-4 lg:min-h-[128px] lg:flex-row lg:items-center lg:gap-4";
+const CARD_LAYOUT = "flex min-h-[128px] w-full min-w-0 flex-row items-center gap-3 p-4 lg:gap-4";
 
 /** The profile's own stored birth data, formatted for display — not a reading. */
 function dateLabel(profile: ChartProfile): string {
@@ -53,7 +52,7 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
     <article
       className={`${CARD_LAYOUT} rounded-[20px] border border-accent-glow bg-[linear-gradient(160deg,color-mix(in_srgb,var(--accent)_18%,transparent),rgba(46,26,74,0.5))]`}
     >
-      <div className="min-w-0 lg:flex-1">
+      <div className="min-w-0 flex-1">
         <h3 className="font-display text-[19px] leading-snug font-semibold [overflow-wrap:anywhere]">
           {name}
         </h3>
@@ -64,7 +63,7 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
           </p>
         </div>
       </div>
-      <div className="mt-auto flex flex-wrap gap-2 pt-4 lg:mt-0 lg:shrink-0 lg:flex-col lg:flex-nowrap lg:pt-0">
+      <div className="flex shrink-0 flex-col gap-2">
         <button
           type="button"
           className="pill-ghost min-h-11 cursor-pointer rounded-full px-4 text-[13px] font-semibold disabled:pointer-events-none disabled:opacity-40"
@@ -166,14 +165,14 @@ export function SavedChartSkeleton() {
       className={`${CARD_LAYOUT} animate-pulse rounded-[20px] border border-glass-line bg-white/6`}
       aria-hidden="true"
     >
-      <div className="min-w-0 lg:flex-1">
+      <div className="min-w-0 flex-1">
         <span className="block h-6 w-3/4 rounded-full bg-white/12" />
         <span className="mt-3 block h-4 w-2/3 rounded-full bg-white/10" />
         <span className="mt-2 block h-4 w-1/2 rounded-full bg-white/10" />
       </div>
-      <div className="mt-auto lg:mt-0 lg:shrink-0 lg:space-y-2">
-        <span className="block h-11 w-24 rounded-full bg-white/10 lg:w-20" />
-        <span className="hidden h-11 w-20 rounded-full bg-white/10 lg:block" />
+      <div className="shrink-0 space-y-2">
+        <span className="block h-11 w-20 rounded-full bg-white/10" />
+        <span className="block h-11 w-20 rounded-full bg-white/10" />
       </div>
     </div>
   );
