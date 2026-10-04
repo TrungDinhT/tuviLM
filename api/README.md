@@ -188,6 +188,8 @@ durably saved as `confirmed`. Only then is the reservation committed. AI errors,
 cancellation or disconnects before completion return the reserved coins. A
 disconnect after server-side completion does not reverse an already-completed
 request; streaming cannot guarantee that the client received the final event.
+Deleting the session or its chart profile while a reply is reserved does not
+refund the reservation.
 
 Replaying the same `Idempotency-Key` uses the existing message operation: it
 never starts generation or reserves coins again, even if the balance is now zero.
@@ -198,9 +200,10 @@ updates, following [MongoDB's atomic update guarantees](https://www.mongodb.com/
 Outstanding reservations are stored as `chat_holds` on the existing user document;
 there is no new collection or payment framework. On the next authenticated
 request, the server checks these holds against the stored assistant messages:
-confirmed messages commit; failed, cancelled or missing messages refund; pending
-messages keep their holds. Existing stale-message cleanup marks abandoned pending
-messages failed after `stale_pending_after_seconds` (15 minutes by default).
+confirmed messages and deleted sessions commit; failed, cancelled or missing
+messages refund; pending messages keep their holds. Existing stale-message
+cleanup marks abandoned pending messages failed after
+`stale_pending_after_seconds` (15 minutes by default).
 Recovery is lazy, not a background job. During database outages, a hold can remain
 reserved until a later request can reconcile it. If finalization cannot be saved
 but the refund succeeds, the message can remain pending until stale cleanup.

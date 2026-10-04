@@ -18,6 +18,7 @@ from api.accounts.billing import (
     reserve_chat_coins,
 )
 from api.auth.dependencies import Principal, require_user
+from api.chat.contracts import NotFoundError
 from api.chat.models import (
     BirthInfo,
     ChatMessageStatus,
@@ -293,6 +294,48 @@ async def test_disconnect_event_while_ai_is_blocked_refunds(billing_context) -> 
     assert replay.status_code == 200
     assert '"status": "cancelled"' in replay.text
     await _assert_balance(database, user_id, 6)
+
+
+async def test_deleting_session_while_streaming_keeps_the_charge(billing_context) -> None:
+    _, database, store, user_id, session_id = billing_context
+
+    async def deleting_streamer(**kwargs):
+        yield {"type": "text", "delta": "An answer, "}
+        await store.delete_session(user_id, session_id)
+        yield {"type": "text", "delta": "delivered in full."}
+
+    app.state.session_chat_streamer = deleting_streamer
+    scope = {"type": "http", "app": app, "asgi": {"spec_version": "2.4"}}
+    response = await session_chat_stream(
+        session_id,
+        SessionChatStreamRequest(content="Question?"),
+        Request(scope),
+        Principal(user_id=user_id, balance=6),
+        idempotency_key="message-1",
+    )
+
+    async def receive():
+        await asyncio.Future()
+
+    async def send(message):
+        return None
+
+    with pytest.raises(NotFoundError):
+        await asyncio.wait_for(response(scope, receive, send), timeout=2)
+
+    await _assert_balance(database, user_id, 3)
+
+
+async def test_reconcile_keeps_the_charge_for_a_deleted_session(billing_context) -> None:
+    _, database, store, user_id, session_id = billing_context
+    await _reserve_pair(database, store, user_id, session_id)
+    await store.delete_session(user_id, session_id)
+    account = await _account(database, user_id)
+
+    for _ in range(2):
+        await reconcile_chat_coins(database, user_id, account["chat_holds"], store)
+
+    await _assert_balance(database, user_id, 3)
 
 
 async def _create_session(store, user_id: str) -> str:

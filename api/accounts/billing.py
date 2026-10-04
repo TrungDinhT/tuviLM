@@ -94,7 +94,8 @@ async def reconcile_chat_coins(
             try:
                 context = await store.load_session_context(user_id, hold["session_id"])
             except NotFoundError:
-                message = None
+                # Deleting the session does not refund the chat charge.
+                confirmed = True
             else:
                 message = next(
                     (
@@ -104,14 +105,13 @@ async def reconcile_chat_coins(
                     ),
                     None,
                 )
-            if message is not None and message.status == ChatMessageStatus.PENDING:
-                continue
+                if message is not None and message.status == ChatMessageStatus.PENDING:
+                    continue
+                confirmed = (
+                    message is not None and message.status == ChatMessageStatus.CONFIRMED
+                )
             await settle_chat_coins(
-                database,
-                user_id,
-                assistant_message_id,
-                confirmed=message is not None
-                and message.status == ChatMessageStatus.CONFIRMED,
+                database, user_id, assistant_message_id, confirmed=confirmed
             )
     except PyMongoError as exc:
         raise HTTPException(503, "Account service unavailable.") from exc

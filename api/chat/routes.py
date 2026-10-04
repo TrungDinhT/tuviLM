@@ -24,7 +24,7 @@ from starlette.types import Receive, Scope, Send
 
 from api.accounts.billing import CHAT_MESSAGE_COST, reserve_chat_coins, settle_chat_coins
 from api.auth.dependencies import CurrentUser
-from api.chat.contracts import ConversationHistoryStore
+from api.chat.contracts import ConversationHistoryStore, NotFoundError
 from api.chat.models import (
     BirthInfo,
     ChartProfile,
@@ -201,13 +201,18 @@ async def session_chat_stream(
 
     async def finalize(status: ChatMessageStatus) -> ChatMessage:
         nonlocal finished, terminal_status
-        message = await store.finalize_assistant_message(
-            user.user_id,
-            session_id,
-            pair.assistant_message.id,
-            content="".join(assistant_content),
-            status=status,
-        )
+        try:
+            message = await store.finalize_assistant_message(
+                user.user_id,
+                session_id,
+                pair.assistant_message.id,
+                content="".join(assistant_content),
+                status=status,
+            )
+        except NotFoundError:
+            # Deleting the session does not refund the chat charge.
+            terminal_status = ChatMessageStatus.CONFIRMED
+            raise
         terminal_status = message.status
         await settle_chat_coins(
             request.app.state.auth_database,
