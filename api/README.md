@@ -105,6 +105,39 @@ from overwriting in-flight debits or refunds.
 This is manual account management, not a payment or top-up API. Payments,
 full-unlock expiration, and pricing for features other than chat are not defined.
 
+## Coin redemption codes
+
+Administrators create a randomly generated code with
+`POST /api/v1/admin/redeem-codes`. The body contains `coins` (a positive integer),
+`kind` (`single_use` or `per_account`), and `expires_at` (a future ISO 8601 timestamp
+with a timezone). For a three-day lifetime, set the deadline three days from now.
+The `201` response includes the generated `code` and these three fields.
+
+Signed-in users submit `{"code": "CODE"}` to
+`POST /api/v1/account/redeem-code`. Leading/trailing spaces and letter case are
+ignored. A successful response is `{"coins": 30}` for a 30-coin reward.
+
+- `single_use`: one redemption total, by one account.
+- `per_account`: one redemption per account.
+- Invalid or expired codes return `404`; already-used codes return `409`.
+- Active chat reservations or balance overflow return `409` without consuming
+  the code. Authentication and administrator checks use the existing middleware.
+
+Codes expire at their deadline and are automatically removed by a MongoDB TTL
+index. TTL cleanup can be delayed; the redemption query always checks the
+deadline, so an expired code cannot be used while waiting for cleanup.
+
+Code claims and balance credits use one MongoDB transaction. If either fails,
+neither is saved. **Redemption requires a MongoDB replica set or sharded cluster;
+standalone MongoDB returns `503`.** The current local standalone database must
+be converted before this feature can be used locally. Never remove its data
+volume during conversion. A separate one-node replica set can be used for tests:
+
+```bash
+CONVERSATION_HISTORY_STORE__URI='mongodb://localhost:27018/?directConnection=true' \
+  uv run pytest tests/test_redeem_codes_api.py -q
+```
+
 ## Chat pricing
 
 `POST /api/v1/sessions/{session_id}/chat/stream` costs **3 coins per successful

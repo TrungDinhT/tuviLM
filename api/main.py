@@ -17,6 +17,10 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from api._parse import to_cung_payload_map
 from api.accounts.routes import router as accounts_router
+from api.accounts.redeem_codes import (
+    ensure_redeem_code_indexes,
+    router as redeem_codes_router,
+)
 from api.auth.dependencies import CurrentUser, Principal
 from api.chat.contracts import (
     ConversationHistoryError,
@@ -99,6 +103,7 @@ async def lifespan(app: FastAPI):
     app.state.auth_database = auth_mongo[settings.auth.database_name]
     app.state.auth_jwks = PyJWKClient(settings.auth.jwks_url, timeout=5)
     try:
+        await ensure_redeem_code_indexes(app.state.auth_database)
         yield
     finally:
         await auth_mongo.close()
@@ -108,6 +113,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="TuviLM API", version="0.1.0", lifespan=lifespan)
 app.include_router(chat_router)
 app.include_router(accounts_router)
+app.include_router(redeem_codes_router)
 
 app.add_middleware(
     CORSMiddleware,
