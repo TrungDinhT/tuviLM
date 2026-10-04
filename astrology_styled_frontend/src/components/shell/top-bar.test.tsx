@@ -39,7 +39,7 @@ function header(client: QueryClient, mobile = false) {
     <QueryClientProvider client={client}>
       <AccountRequestContext.Provider value={{ getSignal: () => undefined, userId: "user-1" }}>
         {mobile ? (
-          <StickyHeader eyebrow="Your chart" title="Your profile" />
+          <StickyHeader eyebrow="Lá số của bạn" title="Hồ sơ của bạn" />
         ) : (
           <>
             <TopBar />
@@ -64,22 +64,20 @@ describe("TopBar balance", () => {
     vi.stubGlobal("fetch", fetchMock);
     const client = new QueryClient();
     const view = render(header(client));
-    expect(await screen.findByText("1,234 coins")).toBeTruthy();
-    expect(screen.getByLabelText("Account balance").closest("header")).not.toBeNull();
-    expect(screen.getByLabelText("Account balance").getAttribute("title")).toContain(
-      "Plan: Normal",
-    );
+    expect(await screen.findByText("1.234 xu")).toBeTruthy();
+    expect(screen.getByLabelText("Số dư tài khoản").closest("header")).not.toBeNull();
+    expect(screen.getByLabelText("Số dư tài khoản").getAttribute("title")).toContain("Gói Cơ bản");
     navigation.pathname = "/";
     view.rerender(header(client));
     const indexBanner = screen.getByRole("banner");
     expect(within(indexBanner).queryByRole("heading", { name: "An sao" })).toBeNull();
     expect(within(indexBanner).queryByText("Lá số của bạn")).toBeNull();
-    expect(within(indexBanner).getByLabelText("Account balance")).toBeTruthy();
+    expect(within(indexBanner).getByLabelText("Số dư tài khoản")).toBeTruthy();
     expect(within(indexBanner).getByText("Test User")).toBeTruthy();
     navigation.pathname = "/van-han";
     view.rerender(header(client));
     expect(screen.getByRole("heading", { name: "Vận hạn 2026" })).toBeTruthy();
-    expect(screen.getByText("1,234 coins")).toBeTruthy();
+    expect(screen.getByText("1.234 xu")).toBeTruthy();
     expect(screen.queryByLabelText("Account plan and balance")).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(
@@ -115,8 +113,8 @@ describe("TopBar balance", () => {
     expect(navigation.refresh).toHaveBeenCalledTimes(1);
     view.unmount();
     render(header(client, true));
-    expect(await screen.findByText("1,234 coins")).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Your profile" })).toBeTruthy();
+    expect(await screen.findByText("1.234 xu")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Hồ sơ của bạn" })).toBeTruthy();
   });
 
   it("does not invent a loading balance and hides stale coins until Retry succeeds", async () => {
@@ -134,16 +132,16 @@ describe("TopBar balance", () => {
     );
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(header(client));
-    expect(screen.getByText("Balance…")).toBeTruthy();
-    expect(screen.queryByText("0 coins")).toBeNull();
+    expect(screen.getByText("Số dư…")).toBeTruthy();
+    expect(screen.queryByText("0 xu")).toBeNull();
     await act(async () => resolveAccess(jsonResponse(ACCESS)));
-    await screen.findByText("1,234 coins");
+    await screen.findByText("1.234 xu");
     await act(async () => {
       await client.invalidateQueries({ queryKey: queryKeys.accountAccess("user-1") });
     });
-    expect(await screen.findByRole("button", { name: "Retry balance" })).toBeTruthy();
-    expect(screen.queryByText("1,234 coins")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Retry balance" }));
-    expect(await screen.findByText("1,234 coins")).toBeTruthy();
+    expect(await screen.findByRole("button", { name: "Thử lại" })).toBeTruthy();
+    expect(screen.queryByText("1.234 xu")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Thử lại" }));
+    expect(await screen.findByText("1.234 xu")).toBeTruthy();
   });
 });

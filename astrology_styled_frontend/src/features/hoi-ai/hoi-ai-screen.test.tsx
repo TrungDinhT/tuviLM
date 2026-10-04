@@ -154,12 +154,14 @@ describe("HoiAiScreen", () => {
   it("shows Full unlock without exposing its coin balance", async () => {
     mockBillingChat("", () => ({ ...ACCESS, plan: "full_unlock", balance: 1234 }));
     renderScreen(new QueryClient(), true);
-    expect(await screen.findByText("Chat AI đã được bao gồm trong gói Full unlock.")).toBeTruthy();
-    expect(screen.getByText("Full unlock")).toBeTruthy();
-    expect(screen.queryByText(/coins|1,234|1234/i)).toBeNull();
-    expect(screen.queryByLabelText("Account balance")).toBeNull();
-    expect(screen.getByLabelText("Full unlock").getAttribute("title") ?? "").not.toMatch(
-      /coins|1,234|1234/i,
+    expect(
+      await screen.findByText("Trò chuyện với AI đã được bao gồm trong gói Mở khóa toàn bộ."),
+    ).toBeTruthy();
+    expect(screen.getByText("Mở khóa toàn bộ")).toBeTruthy();
+    expect(screen.queryByText(/xu|1\.234|1234/i)).toBeNull();
+    expect(screen.queryByLabelText("Số dư tài khoản")).toBeNull();
+    expect(screen.getByLabelText("Mở khóa toàn bộ").getAttribute("title") ?? "").not.toMatch(
+      /xu|1\.234|1234/i,
     );
     await screen.findByText("Previous reply");
     expect((screen.getByRole("textbox") as HTMLInputElement).disabled).toBe(false);
@@ -184,16 +186,16 @@ describe("HoiAiScreen", () => {
     let reads = 0;
     mockBillingChat(stream, () => ({ ...ACCESS, balance: ++reads === 1 ? 6 : 3 }));
     renderScreen(new QueryClient(), true);
-    await screen.findByText("6 coins");
+    await screen.findByText("6 xu");
     expect(
-      screen.getByText("Chat AI: 3 coins mỗi tin nhắn. Chỉ trừ coins khi AI trả lời hoàn tất."),
+      screen.getByText("Trò chuyện với AI: 3 xu mỗi tin nhắn. Chỉ trừ xu khi AI trả lời hoàn tất."),
     ).toBeTruthy();
     await sendQuestion();
     await screen.findByText("Working reply");
-    expect(screen.getByText("6 coins")).toBeTruthy();
+    expect(screen.getByText("6 xu")).toBeTruthy();
     expect(reads).toBe(1);
     finish();
-    expect(await screen.findByText("3 coins")).toBeTruthy();
+    expect(await screen.findByText("3 xu")).toBeTruthy();
     expect(reads).toBe(2);
   });
 
@@ -206,10 +208,10 @@ describe("HoiAiScreen", () => {
       return ACCESS;
     });
     renderScreen(new QueryClient(), true);
-    await screen.findByText("6 coins");
+    await screen.findByText("6 xu");
     await sendQuestion();
     await waitFor(() => expect(reads).toBe(2));
-    expect(screen.getByText("6 coins")).toBeTruthy();
+    expect(screen.getByText("6 xu")).toBeTruthy();
     expect((screen.getByRole("textbox") as HTMLInputElement).disabled).toBe(false);
   });
 
@@ -221,8 +223,8 @@ describe("HoiAiScreen", () => {
 
     renderScreen(new QueryClient());
 
-    expect(screen.getByText("Sign in to save your chart and use AI chat.")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Sign in" }).getAttribute("href")).toBe("/login");
+    expect(screen.getByText("Đăng nhập để lưu lá số và trò chuyện với AI.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Đăng nhập" }).getAttribute("href")).toBe("/login");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -428,11 +430,11 @@ describe("HoiAiScreen", () => {
     expect(screen.queryByText("Câu hỏi đang chạy")).toBeNull();
     await waitFor(() => expect(cancellationReads).toBe(1));
     expect(balanceReads).toBe(0);
-    expect(screen.getByText("6 coins")).toBeTruthy();
-    expect(screen.queryByText("3 coins")).toBeNull();
+    expect(screen.getByText("6 xu")).toBeTruthy();
+    expect(screen.queryByText("3 xu")).toBeNull();
     await waitFor(() => expect(balanceReads).toBe(1), { timeout: 2500 });
     expect(cancelled).toBe(true);
-    expect(screen.getByText("6 coins")).toBeTruthy();
+    expect(screen.getByText("6 xu")).toBeTruthy();
   });
 
   it("explains the chat cost when the account has insufficient coins", async () => {
@@ -465,7 +467,7 @@ describe("HoiAiScreen", () => {
 
     await waitFor(() =>
       expect(toastMocks.showToast).toHaveBeenCalledWith(
-        "Not enough coins. AI chat costs 3 coins per message.",
+        "Bạn không đủ xu. Trò chuyện với AI cần 3 xu cho mỗi tin nhắn.",
       ),
     );
     expect((input as HTMLInputElement).disabled).toBe(false);
@@ -564,7 +566,7 @@ describe("HoiAiScreen", () => {
 
     expect(await screen.findByText("Câu trả lời đã hoàn tất", {}, { timeout: 2500 })).toBeTruthy();
     await waitFor(() => expect(balanceReads).toBeGreaterThanOrEqual(2));
-    expect(screen.getByText("3 coins")).toBeTruthy();
+    expect(screen.getByText("3 xu")).toBeTruthy();
     expect((screen.getByRole("button", { name: "Gửi" }) as HTMLButtonElement).disabled).toBe(false);
   });
 

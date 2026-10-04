@@ -12,7 +12,7 @@ const TOOL_LABELS: Record<string, string> = {
   get_star_role_interaction: "Đang tra cứu tương tác sao",
   get_tinh_cach_b3_b4_context: "Đang tra cứu tính cách",
   get_cung_analyze_skill: "Đang phân tích cung",
-  run_tinh_cach_workflow: "Đang chạy workflow tính cách",
+  run_tinh_cach_workflow: "Đang phân tích tính cách",
   read_book_tuvi_tan_bien: "Đang tra cứu Tử Vi Tân Biên",
   get_role_instruction: "Đang đọc hướng dẫn luận giải",
 };

@@ -167,7 +167,7 @@ export function HoiAiScreen() {
   if (isAccountPending) {
     return (
       <p className="py-10 text-[13.5px] text-muted" role="status">
-        Checking your account…
+        Đang kiểm tra tài khoản…
       </p>
     );
   }
@@ -176,13 +176,13 @@ export function HoiAiScreen() {
     return (
       <div className={`${styles.enterTranscript} flex flex-col items-start gap-4 py-10`}>
         <p className="max-w-[46ch] text-[13.5px] leading-relaxed text-muted">
-          Sign in to save your chart and use AI chat.
+          Đăng nhập để lưu lá số và trò chuyện với AI.
         </p>
         <Link
           href="/login"
           className="rounded-full border border-glass-line bg-glass px-6 py-3 text-[14px] font-semibold no-underline"
         >
-          Sign in
+          Đăng nhập
         </Link>
       </div>
     );
@@ -412,8 +412,8 @@ export function HoiAiScreen() {
       {accountAccess.data && !accountAccess.isError ? (
         <p className="text-xs leading-relaxed text-muted">
           {accountAccess.data.plan === "full_unlock"
-            ? "Chat AI đã được bao gồm trong gói Full unlock."
-            : "Chat AI: 3 coins mỗi tin nhắn. Chỉ trừ coins khi AI trả lời hoàn tất."}
+            ? "Trò chuyện với AI đã được bao gồm trong gói Mở khóa toàn bộ."
+            : "Trò chuyện với AI: 3 xu mỗi tin nhắn. Chỉ trừ xu khi AI trả lời hoàn tất."}
         </p>
       ) : null}
 

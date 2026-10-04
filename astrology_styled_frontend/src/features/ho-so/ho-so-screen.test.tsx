@@ -27,8 +27,8 @@ describe("HoSoScreen", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByText("Sign in to view and save your charts.")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Sign in" }).getAttribute("href")).toBe("/login");
+    expect(screen.getByText("Đăng nhập để xem và lưu lá số của bạn.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Đăng nhập" }).getAttribute("href")).toBe("/login");
     expect(authClient.token).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
   });

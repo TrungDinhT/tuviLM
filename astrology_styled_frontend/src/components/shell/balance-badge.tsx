@@ -20,11 +20,11 @@ function AccountBalance() {
       <button
         type="button"
         className={`${BADGE_CLASS} cursor-pointer border-0 disabled:opacity-50`}
-        title="Unable to load current balance. Retry."
+        title="Không tải được số dư. Bấm để thử lại."
         disabled={account.isFetching}
         onClick={() => void account.refetch()}
       >
-        <span className="min-w-0 truncate">Retry balance</span>
+        <span className="min-w-0 truncate">Thử lại</span>
       </button>
     );
   }
@@ -32,20 +32,20 @@ function AccountBalance() {
   if (account.data === undefined) {
     return (
       <span className={BADGE_CLASS} role="status">
-        <span className="min-w-0 truncate">Balance…</span>
+        <span className="min-w-0 truncate">Số dư…</span>
       </span>
     );
   }
 
   const unlocked = account.data.plan === "full_unlock";
-  const label = unlocked ? "Full unlock" : `${account.data.balance.toLocaleString("en-US")} coins`;
+  const label = unlocked ? "Mở khóa toàn bộ" : `${account.data.balance.toLocaleString("vi-VN")} xu`;
   return (
     <span
       className={`${BADGE_CLASS} ${unlocked ? styles.fullUnlock : styles.coins}`}
       role="status"
-      aria-label={unlocked ? "Full unlock" : "Account balance"}
+      aria-label={unlocked ? "Mở khóa toàn bộ" : "Số dư tài khoản"}
       aria-busy={account.isFetching}
-      title={unlocked ? "Full unlock · AI chat included." : `Plan: Normal · ${label}`}
+      title={unlocked ? "Mở khóa toàn bộ · Bao gồm trò chuyện với AI." : `Gói Cơ bản · ${label}`}
     >
       <svg
         viewBox="0 0 24 24"

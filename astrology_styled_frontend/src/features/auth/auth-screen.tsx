@@ -617,7 +617,7 @@ function authErrorMessage(message: string | undefined, isLogin: boolean): string
   const normalizedMessage = message?.toLocaleLowerCase("vi");
 
   if (normalizedMessage?.includes("provider")) {
-    return "Google OAuth chưa được cấu hình trên máy chủ.";
+    return "Đăng nhập bằng Google chưa được cấu hình trên máy chủ.";
   }
   if (normalizedMessage?.includes("already")) {
     return "Email này đã có tài khoản. Hãy đăng nhập nhé.";

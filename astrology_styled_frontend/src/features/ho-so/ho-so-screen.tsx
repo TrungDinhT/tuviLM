@@ -44,12 +44,12 @@ export function HoSoScreen() {
     if (!session && !isPending) {
       return (
         <div className="flex flex-col items-start gap-3">
-          <p className="text-[13.5px] text-muted">Sign in to view and save your charts.</p>
+          <p className="text-[13.5px] text-muted">Đăng nhập để xem và lưu lá số của bạn.</p>
           <Link
             href="/login"
             className="pill-ghost rounded-full px-4 py-2 text-[13px] font-semibold no-underline"
           >
-            Sign in
+            Đăng nhập
           </Link>
         </div>
       );
