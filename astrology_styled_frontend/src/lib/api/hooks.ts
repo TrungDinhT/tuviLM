@@ -18,6 +18,7 @@ import {
   type BuildLasoResponse,
   type CreateChartProfileRequest,
   type PreviewLasoRequest,
+  accountAccessSchema,
   buildLasoResponseSchema,
   createChartProfileRequestSchema,
   createChartProfileResponseSchema,
@@ -30,6 +31,22 @@ import {
   previewLasoRequestSchema,
   previewLasoResponseSchema,
 } from "./schemas";
+
+export function useAccountAccess() {
+  const { userId } = useAccountRequestScope();
+  return useQuery({
+    queryKey: queryKeys.accountAccess(userId ?? null),
+    queryFn: ({ signal }) =>
+      request("/api/v1/me", {
+        schema: accountAccessSchema,
+        withAuth: true,
+        expectedUserId: userId,
+        signal,
+      }),
+    enabled: Boolean(userId),
+    staleTime: 0,
+  });
+}
 
 /**
  * Cast a chart from birth information.

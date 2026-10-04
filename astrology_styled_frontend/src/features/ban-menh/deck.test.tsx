@@ -74,6 +74,9 @@ describe("BanMenhScreen", () => {
     expect(await screen.findByText("TỬ VI CÁ NHÂN")).toBeTruthy();
     expect(screen.getByText("Vận May")).toBeTruthy();
     expect(screen.getByText("Lời Khuyên")).toBeTruthy();
+    const header = screen.getByRole("heading", { name: "Bạn Sao Trẻ" }).parentElement;
+    expect(header?.textContent).not.toMatch(/Cự Môn|Thiên Đồng/);
+    expect(screen.getByTestId("destiny-card").textContent).toContain("Cự Môn");
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 

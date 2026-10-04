@@ -8,6 +8,7 @@ import type { BirthInfo, PreviewLasoRequest } from "./schemas";
  */
 export const queryKeys = {
   health: () => ["health"] as const,
+  accountAccess: (userId: string | null) => ["accountAccess", userId ?? "guest"] as const,
 
   laso: {
     all: () => ["laso"] as const,

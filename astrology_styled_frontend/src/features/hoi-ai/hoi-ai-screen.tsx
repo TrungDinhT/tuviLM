@@ -6,10 +6,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Pill } from "@/components/primitives/pill";
 import { useAccountRequestScope } from "@/lib/api/account-request";
-import { newIdempotencyKey } from "@/lib/api/client";
-import { useCreateSession, useGetSession, useListSessions } from "@/lib/api/hooks";
+import { newIdempotencyKey, request } from "@/lib/api/client";
+import {
+  useAccountAccess,
+  useCreateSession,
+  useGetSession,
+  useListSessions,
+} from "@/lib/api/hooks";
 import { queryKeys } from "@/lib/api/queryKeys";
-import type { ChatMessage, SseChatEvent } from "@/lib/api/schemas";
+import { getSessionResponseSchema, type ChatMessage, type SseChatEvent } from "@/lib/api/schemas";
 import { streamChat } from "@/lib/api/stream";
 import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
@@ -41,6 +46,8 @@ interface ActiveStream {
   controller: AbortController;
   sessionId: string;
   idempotencyKey: string;
+  assistantMessageId: string | null;
+  receivedDone: boolean;
 }
 
 const GREETING =
@@ -73,6 +80,7 @@ export function HoiAiScreen() {
   const chartProfileId = useChartStore((state) => state.chartProfileId);
   const queryClient = useQueryClient();
   const { getSignal: getAccountSignal, userId } = useAccountRequestScope();
+  const accountAccess = useAccountAccess();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -133,6 +141,15 @@ export function HoiAiScreen() {
     }, 1_000);
     return () => window.clearInterval(timer);
   }, [duplicateStillPending, refetchSession]);
+
+  const completedDuplicateId =
+    draft?.duplicateInProgress && duplicateMessage?.status !== "pending"
+      ? duplicateMessage?.id
+      : undefined;
+  useEffect(() => {
+    if (!completedDuplicateId || !userId) return;
+    void queryClient.invalidateQueries({ queryKey: queryKeys.accountAccess(userId) });
+  }, [completedDuplicateId, queryClient, userId]);
 
   const contentKey = `${transcript.length}:${renderedDraft?.assistantText.length ?? 0}:${renderedDraft?.activity ?? ""}:${renderedDraft?.userContent.length ?? 0}`;
   const { isAtBottom, scrollToBottom } = useStickToBottom(contentKey);
@@ -221,6 +238,7 @@ export function HoiAiScreen() {
     if (activeStreamRef.current !== turn) return;
     switch (event.type) {
       case "ids":
+        turn.assistantMessageId = event.assistant_message_id;
         updateTurnDraft(turn, (current) => ({
           ...current,
           assistantMessageId: event.assistant_message_id,
@@ -241,6 +259,7 @@ export function HoiAiScreen() {
         showToast("Thiên Hạc chưa thể trả lời trọn vẹn. Bạn thử lại nhé.");
         break;
       case "done":
+        turn.receivedDone = true;
         updateTurnDraft(turn, (current) => ({
           ...current,
           terminal: doneTerminal(event.status),
@@ -249,6 +268,7 @@ export function HoiAiScreen() {
         invalidateSession(turn.sessionId);
         break;
       case "duplicate_in_progress":
+        turn.assistantMessageId = event.assistant_message_id;
         updateTurnDraft(turn, (current) => ({
           ...current,
           assistantMessageId: event.assistant_message_id,
@@ -265,11 +285,14 @@ export function HoiAiScreen() {
     if (activeSessionId === null || streaming || activeStreamRef.current !== null) return;
     const trimmed = content.trim();
     if (trimmed === "") return;
+    const accountSignal = getAccountSignal();
 
     const turn: ActiveStream = {
       controller: new AbortController(),
       sessionId: activeSessionId,
       idempotencyKey: newIdempotencyKey(),
+      assistantMessageId: null,
+      receivedDone: false,
     };
     activeStreamRef.current = turn;
     setDraft({
@@ -304,6 +327,34 @@ export function HoiAiScreen() {
       );
     } finally {
       if (activeStreamRef.current === turn) activeStreamRef.current = null;
+      if (!accountSignal?.aborted && userId) {
+        if (!turn.receivedDone) {
+          try {
+            // A disconnected stream can end before the server releases its coin hold.
+            while (!accountSignal?.aborted) {
+              const result = await request(`/api/v1/sessions/${turn.sessionId}`, {
+                schema: getSessionResponseSchema,
+                withAuth: true,
+                expectedUserId: userId,
+                signal: accountSignal,
+              });
+              const pending = result.session.messages.some(
+                (message) =>
+                  message.role === "assistant" &&
+                  message.status === "pending" &&
+                  (turn.assistantMessageId === null || message.id === turn.assistantMessageId),
+              );
+              if (!pending) break;
+              await new Promise((resolve) => window.setTimeout(resolve, 1_000));
+            }
+          } catch {
+            // The next balance refresh will retry reconciliation if the session is unavailable.
+          }
+        }
+        if (!accountSignal?.aborted) {
+          void queryClient.invalidateQueries({ queryKey: queryKeys.accountAccess(userId) });
+        }
+      }
     }
   };
 
@@ -357,6 +408,14 @@ export function HoiAiScreen() {
           </Pill>
         </div>
       </div>
+
+      {accountAccess.data && !accountAccess.isError ? (
+        <p className="text-xs leading-relaxed text-muted">
+          {accountAccess.data.plan === "full_unlock"
+            ? "Chat AI đã được bao gồm trong gói Full unlock."
+            : "Chat AI: 3 coins mỗi tin nhắn. Chỉ trừ coins khi AI trả lời hoàn tất."}
+        </p>
+      ) : null}
 
       <div className={`${styles.enterTranscript} flex flex-col gap-3`}>
         {list.isError || createSession.isError ? (

@@ -143,6 +143,12 @@ describe("QueryProvider account isolation", () => {
     fireEvent.change(screen.getByLabelText("Draft"), { target: { value: "Account A draft" } });
     fireEvent.click(screen.getByText("Capture signal"));
     clients[0]!.setQueryData(queryKeys.sessions.detail("session-a"), { private: "A" });
+    clients[0]!.setQueryData(queryKeys.accountAccess("account-a"), {
+      user_id: "account-a",
+      role: "user",
+      plan: "full_unlock",
+      balance: 99,
+    });
 
     account.data = { user: { id: "account-b" } };
     view.rerender(
@@ -158,5 +164,7 @@ describe("QueryProvider account isolation", () => {
     expect(clients[0]!.getQueryCache().getAll()).toEqual([]);
     expect(clients[1]).not.toBe(clients[0]);
     expect(clients[1]!.getQueryData(queryKeys.sessions.detail("session-a"))).toBeUndefined();
+    expect(clients[1]!.getQueryData(queryKeys.accountAccess("account-a"))).toBeUndefined();
+    expect(clients[1]!.getQueryData(queryKeys.accountAccess("account-b"))).toBeUndefined();
   });
 });

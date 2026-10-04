@@ -2,7 +2,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ChatMessage, ChatSession, ChatSessionSummary } from "@/lib/api/schemas";
+import { BalanceBadge } from "@/components/shell/balance-badge";
+import { AccountRequestContext } from "@/lib/api/account-request";
+import { queryKeys } from "@/lib/api/queryKeys";
+import type {
+  AccountAccess,
+  ChatMessage,
+  ChatSession,
+  ChatSessionSummary,
+} from "@/lib/api/schemas";
 import { useChartStore } from "@/store/chart-store";
 
 import { HoiAiScreen } from "./hoi-ai-screen";
@@ -20,7 +28,10 @@ vi.mock("@/lib/toast", () => toastMocks);
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
     useSession: () => accountState,
-    token: vi.fn().mockResolvedValue({ data: { token: "signed-token" }, error: null }),
+    token: vi.fn().mockResolvedValue({
+      data: { token: "header.eyJzdWIiOiJ1c2VyLTEifQ.signature" },
+      error: null,
+    }),
   },
 }));
 
@@ -84,12 +95,45 @@ function setChart(profileId: string | null) {
   });
 }
 
-function renderScreen(client: QueryClient) {
+const ACCESS: AccountAccess = { user_id: "user-1", role: "user", plan: "normal", balance: 6 };
+
+function renderScreen(client: QueryClient, loadAccess = false) {
+  const userId = accountState.data?.user.id ?? null;
+  if (!loadAccess && userId !== null) {
+    client.setQueryDefaults(queryKeys.accountAccess(userId), { refetchOnMount: false });
+    client.setQueryData(queryKeys.accountAccess(userId), ACCESS);
+  }
   return render(
     <QueryClientProvider client={client}>
-      <HoiAiScreen />
+      <AccountRequestContext.Provider value={{ getSignal: () => undefined, userId }}>
+        <header>
+          <BalanceBadge />
+        </header>
+        <HoiAiScreen />
+      </AccountRequestContext.Provider>
     </QueryClientProvider>,
   );
+}
+
+function mockBillingChat(stream: string | ReadableStream<Uint8Array>, access: () => AccountAccess) {
+  const fetchMock = vi.fn((url: string) => {
+    if (url.endsWith("/api/v1/me")) return Promise.resolve(jsonResponse(access()));
+    if (url.endsWith("/chat/stream")) return Promise.resolve(new Response(stream, { status: 200 }));
+    if (url.endsWith("/sessions")) return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
+    return Promise.resolve(
+      jsonResponse({ session: sessionDetail("s1", [message({ content: "Previous reply" })]) }),
+    );
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  setChart("p1");
+  return fetchMock;
+}
+
+async function sendQuestion() {
+  await screen.findByText("Previous reply");
+  const input = screen.getByRole("textbox");
+  fireEvent.change(input, { target: { value: "My question" } });
+  fireEvent.keyDown(input, { key: "Enter" });
 }
 
 beforeEach(() => {
@@ -107,6 +151,68 @@ beforeEach(() => {
 });
 
 describe("HoiAiScreen", () => {
+  it("shows Full unlock without exposing its coin balance", async () => {
+    mockBillingChat("", () => ({ ...ACCESS, plan: "full_unlock", balance: 1234 }));
+    renderScreen(new QueryClient(), true);
+    expect(await screen.findByText("Chat AI đã được bao gồm trong gói Full unlock.")).toBeTruthy();
+    expect(screen.getByText("Full unlock")).toBeTruthy();
+    expect(screen.queryByText(/coins|1,234|1234/i)).toBeNull();
+    expect(screen.queryByLabelText("Account balance")).toBeNull();
+    expect(screen.getByLabelText("Full unlock").getAttribute("title") ?? "").not.toMatch(
+      /coins|1,234|1234/i,
+    );
+    await screen.findByText("Previous reply");
+    expect((screen.getByRole("textbox") as HTMLInputElement).disabled).toBe(false);
+  });
+
+  it("keeps the displayed balance until a successful reply refreshes it from the server", async () => {
+    let finish!: () => void;
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            'data: {"type":"ids","user_message_id":"u2","assistant_message_id":"a2"}\n\ndata: {"type":"text","delta":"Working reply"}\n\n',
+          ),
+        );
+        finish = () => {
+          controller.enqueue(encoder.encode('data: {"type":"done","status":"confirmed"}\n\n'));
+          controller.close();
+        };
+      },
+    });
+    let reads = 0;
+    mockBillingChat(stream, () => ({ ...ACCESS, balance: ++reads === 1 ? 6 : 3 }));
+    renderScreen(new QueryClient(), true);
+    await screen.findByText("6 coins");
+    expect(
+      screen.getByText("Chat AI: 3 coins mỗi tin nhắn. Chỉ trừ coins khi AI trả lời hoàn tất."),
+    ).toBeTruthy();
+    await sendQuestion();
+    await screen.findByText("Working reply");
+    expect(screen.getByText("6 coins")).toBeTruthy();
+    expect(reads).toBe(1);
+    finish();
+    expect(await screen.findByText("3 coins")).toBeTruthy();
+    expect(reads).toBe(2);
+  });
+
+  it("refreshes the server balance after a failed reply without charging locally", async () => {
+    let reads = 0;
+    const stream =
+      'data: {"type":"error","message":"AI unavailable"}\n\ndata: {"type":"done","status":"failed"}\n\n';
+    mockBillingChat(stream, () => {
+      reads += 1;
+      return ACCESS;
+    });
+    renderScreen(new QueryClient(), true);
+    await screen.findByText("6 coins");
+    await sendQuestion();
+    await waitFor(() => expect(reads).toBe(2));
+    expect(screen.getByText("6 coins")).toBeTruthy();
+    expect((screen.getByRole("textbox") as HTMLInputElement).disabled).toBe(false);
+  });
+
   it("asks guests to sign in without fetching private sessions", () => {
     accountState.data = null;
     const fetchMock = vi.fn();
@@ -141,7 +247,7 @@ describe("HoiAiScreen", () => {
           }),
         );
       }
-      return Promise.resolve(jsonResponse({}));
+      return Promise.resolve(jsonResponse(ACCESS));
     });
     vi.stubGlobal("fetch", fetchMock);
     setChart("p1");
@@ -163,7 +269,7 @@ describe("HoiAiScreen", () => {
         if (url.endsWith("/api/v1/sessions/s1")) {
           return Promise.resolve(jsonResponse({ session: sessionDetail("s1", []) }));
         }
-        return Promise.resolve(jsonResponse({}));
+        return Promise.resolve(jsonResponse(ACCESS));
       }),
     );
     setChart("p1");
@@ -188,7 +294,7 @@ describe("HoiAiScreen", () => {
           jsonResponse({ session: sessionDetail("s2", [message({ content: "tin từ s2" })]) }),
         );
       }
-      return Promise.resolve(jsonResponse({}));
+      return Promise.resolve(jsonResponse(ACCESS));
     });
     vi.stubGlobal("fetch", fetchMock);
     setChart("p1");
@@ -219,7 +325,7 @@ describe("HoiAiScreen", () => {
       if (url.endsWith("/api/v1/sessions/s3")) {
         return Promise.resolve(jsonResponse({ session: sessionDetail("s3", []) }));
       }
-      return Promise.resolve(jsonResponse({}));
+      return Promise.resolve(jsonResponse(ACCESS));
     });
     vi.stubGlobal("fetch", fetchMock);
     setChart("p1");
@@ -244,7 +350,7 @@ describe("HoiAiScreen", () => {
         if (url.endsWith("/api/v1/sessions/s1")) {
           return Promise.resolve(jsonResponse({ session: sessionDetail("s1", []) }));
         }
-        return Promise.resolve(jsonResponse({}));
+        return Promise.resolve(jsonResponse(ACCESS));
       }),
     );
     setChart("p1");
@@ -258,8 +364,15 @@ describe("HoiAiScreen", () => {
 
   it("aborts the active stream before switching sessions", async () => {
     let streamSignal: AbortSignal | undefined;
+    let cancelled = false;
+    let cancellationReads = 0;
+    let balanceReads = 0;
     const encoder = new TextEncoder();
     const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+      if (url.endsWith("/api/v1/me")) {
+        balanceReads += 1;
+        return Promise.resolve(jsonResponse({ ...ACCESS, balance: cancelled ? 6 : 3 }));
+      }
       if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
         return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
       }
@@ -280,16 +393,21 @@ describe("HoiAiScreen", () => {
         return Promise.resolve(new Response(body, { status: 200 }));
       }
       if (url.endsWith("/api/v1/sessions/s1")) {
-        return Promise.resolve(
-          jsonResponse({ session: sessionDetail("s1", [message({ content: "tin từ s1" })]) }),
-        );
+        const messages = [message({ content: "tin từ s1" })];
+        if (streamSignal?.aborted) {
+          cancelled = ++cancellationReads > 1;
+          messages.push(
+            message({ id: "a2", content: "", status: cancelled ? "cancelled" : "pending" }),
+          );
+        }
+        return Promise.resolve(jsonResponse({ session: sessionDetail("s1", messages) }));
       }
       if (url.endsWith("/api/v1/sessions/s2")) {
         return Promise.resolve(
           jsonResponse({ session: sessionDetail("s2", [message({ content: "tin từ s2" })]) }),
         );
       }
-      return Promise.resolve(jsonResponse({}));
+      return Promise.resolve(jsonResponse(ACCESS));
     });
     vi.stubGlobal("fetch", fetchMock);
     setChart("p1");
@@ -308,6 +426,13 @@ describe("HoiAiScreen", () => {
     expect(streamSignal?.aborted).toBe(true);
     expect(await screen.findByText("tin từ s2")).toBeTruthy();
     expect(screen.queryByText("Câu hỏi đang chạy")).toBeNull();
+    await waitFor(() => expect(cancellationReads).toBe(1));
+    expect(balanceReads).toBe(0);
+    expect(screen.getByText("6 coins")).toBeTruthy();
+    expect(screen.queryByText("3 coins")).toBeNull();
+    await waitFor(() => expect(balanceReads).toBe(1), { timeout: 2500 });
+    expect(cancelled).toBe(true);
+    expect(screen.getByText("6 coins")).toBeTruthy();
   });
 
   it("explains the chat cost when the account has insufficient coins", async () => {
@@ -322,10 +447,12 @@ describe("HoiAiScreen", () => {
         }
         if (url.endsWith("/api/v1/sessions/s1")) {
           return Promise.resolve(
-            jsonResponse({ session: sessionDetail("s1", [message({ content: "Previous reply" })]) }),
+            jsonResponse({
+              session: sessionDetail("s1", [message({ content: "Previous reply" })]),
+            }),
           );
         }
-        return Promise.resolve(jsonResponse({}));
+        return Promise.resolve(jsonResponse(ACCESS));
       }),
     );
     setChart("p1");
@@ -366,7 +493,7 @@ describe("HoiAiScreen", () => {
             jsonResponse({ session: sessionDetail("s1", [message({ content: "tin đã gửi" })]) }),
           );
         }
-        return Promise.resolve(jsonResponse({}));
+        return Promise.resolve(jsonResponse(ACCESS));
       }),
     );
     setChart("p1");
@@ -389,6 +516,7 @@ describe("HoiAiScreen", () => {
 
   it("reconciles a duplicate in-progress stream from the stored assistant message", async () => {
     let detailCalls = 0;
+    let balanceReads = 0;
     const stream =
       [
         'data: {"type":"duplicate_in_progress","user_message_id":"u2","assistant_message_id":"a2","status":"pending"}',
@@ -397,6 +525,10 @@ describe("HoiAiScreen", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn((url: string) => {
+        if (url.endsWith("/api/v1/me")) {
+          balanceReads += 1;
+          return Promise.resolve(jsonResponse({ ...ACCESS, balance: 3 }));
+        }
         if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
           return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
         }
@@ -410,11 +542,15 @@ describe("HoiAiScreen", () => {
               ? [message({ content: "tin đã gửi" })]
               : [
                   message({ content: "tin đã gửi" }),
-                  message({ id: "a2", content: "Câu trả lời đã hoàn tất" }),
+                  message({
+                    id: "a2",
+                    content: "Câu trả lời đã hoàn tất",
+                    status: detailCalls > 2 ? "confirmed" : "pending",
+                  }),
                 ];
           return Promise.resolve(jsonResponse({ session: sessionDetail("s1", messages) }));
         }
-        return Promise.resolve(jsonResponse({}));
+        return Promise.resolve(jsonResponse(ACCESS));
       }),
     );
     setChart("p1");
@@ -426,7 +562,9 @@ describe("HoiAiScreen", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Gửi" }));
 
-    expect(await screen.findByText("Câu trả lời đã hoàn tất")).toBeTruthy();
+    expect(await screen.findByText("Câu trả lời đã hoàn tất", {}, { timeout: 2500 })).toBeTruthy();
+    await waitFor(() => expect(balanceReads).toBeGreaterThanOrEqual(2));
+    expect(screen.getByText("3 coins")).toBeTruthy();
     expect((screen.getByRole("button", { name: "Gửi" }) as HTMLButtonElement).disabled).toBe(false);
   });
 
@@ -450,7 +588,7 @@ describe("HoiAiScreen", () => {
       if (url.endsWith("/api/v1/sessions/s3")) {
         return Promise.resolve(jsonResponse({ session: sessionDetail("s3", []) }));
       }
-      return Promise.resolve(jsonResponse({}));
+      return Promise.resolve(jsonResponse(ACCESS));
     });
     vi.stubGlobal("fetch", fetchMock);
     setChart("p1");

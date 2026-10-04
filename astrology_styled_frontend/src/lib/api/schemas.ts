@@ -8,6 +8,15 @@ import { z } from "zod";
  * which is the point.
  */
 
+export const accountAccessSchema = z.object({
+  user_id: z.string(),
+  role: z.enum(["user", "admin"]),
+  plan: z.enum(["normal", "full_unlock"]),
+  balance: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+});
+
+export type AccountAccess = z.infer<typeof accountAccessSchema>;
+
 // --- api/chat/models.py ----------------------------------------------------
 
 export const birthInfoSchema = z.object({

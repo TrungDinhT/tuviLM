@@ -1,0 +1,29 @@
+.badge {
+  border: 1px solid var(--color-glass-line);
+  background: var(--color-glass);
+  color: var(--color-muted);
+}
+
+.coins {
+  border-color: #ffe6a0;
+  color: #482606;
+  background: linear-gradient(135deg, #fff2a8, #ffd058 45%, #ff9b42);
+  box-shadow:
+    0 0 18px rgb(255 183 62 / 32%),
+    inset 0 1px 0 rgb(255 255 255 / 65%);
+}
+
+.fullUnlock {
+  border-color: #f5b5ff;
+  color: #fff4d0;
+  background: linear-gradient(125deg, #a02ede, #923de0 45%, #c3278d);
+  box-shadow:
+    0 0 22px rgb(194 78 255 / 42%),
+    0 0 10px rgb(255 109 192 / 24%),
+    inset 0 1px 0 rgb(255 255 255 / 36%);
+}
+
+.fullUnlock svg {
+  color: #ffe7a0;
+  filter: drop-shadow(0 0 4px rgb(255 218 123 / 50%));
+}

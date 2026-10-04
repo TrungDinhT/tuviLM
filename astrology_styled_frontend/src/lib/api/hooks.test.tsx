@@ -5,12 +5,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { isApiError } from "@/lib/http/errors";
 
-import { useChartProfiles, useDeleteChartProfile } from "./hooks";
-import { emptyResponseSchema } from "./schemas";
+import { AccountRequestContext } from "./account-request";
+import { useAccountAccess, useChartProfiles, useDeleteChartProfile } from "./hooks";
+import { queryKeys } from "./queryKeys";
+import { accountAccessSchema, emptyResponseSchema } from "./schemas";
 
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
-    token: vi.fn().mockResolvedValue({ data: { token: "signed-token" }, error: null }),
+    token: vi.fn().mockResolvedValue({
+      data: { token: "header.eyJzdWIiOiJ1c2VyLTEifQ.signature" },
+      error: null,
+    }),
   },
 }));
 
@@ -33,9 +38,15 @@ const PROFILE = {
   updated_at: "2026-08-28T00:00:00+00:00",
 };
 
-function wrapperWith(client: QueryClient) {
+function wrapperWith(client: QueryClient, userId?: string | null) {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+    return (
+      <QueryClientProvider client={client}>
+        <AccountRequestContext.Provider value={{ getSignal: () => undefined, userId }}>
+          {children}
+        </AccountRequestContext.Provider>
+      </QueryClientProvider>
+    );
   };
 }
 
@@ -45,6 +56,52 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+describe("useAccountAccess", () => {
+  it("fetches the signed-in account's current plan and balance", async () => {
+    const access = { user_id: "user-1", role: "user", plan: "normal", balance: 6 };
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(access));
+    vi.stubGlobal("fetch", fetchMock);
+    const client = new QueryClient();
+    const { result } = renderHook(() => useAccountAccess(), {
+      wrapper: wrapperWith(client, "user-1"),
+    });
+
+    await waitFor(() => expect(result.current.data).toEqual(access));
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/me"),
+      expect.objectContaining({
+        headers: { Authorization: "Bearer header.eyJzdWIiOiJ1c2VyLTEifQ.signature" },
+      }),
+    );
+    expect(client.getQueryData(queryKeys.accountAccess("user-1"))).toEqual(access);
+  });
+
+  it("does not request account access for guests or unresolved accounts", () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const client = new QueryClient();
+    renderHook(() => useAccountAccess(), { wrapper: wrapperWith(client, null) });
+    renderHook(() => useAccountAccess(), { wrapper: wrapperWith(client) });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid account data instead of caching an invented balance", async () => {
+    const access = { user_id: "user-1", role: "user", plan: "normal", balance: -3 };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(access)));
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const { result } = renderHook(() => useAccountAccess(), {
+      wrapper: wrapperWith(client, "user-1"),
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.data).toBeUndefined();
+    expect(isApiError(result.current.error) && result.current.error.error.kind).toBe("parse");
+    expect(accountAccessSchema.safeParse({ ...access, plan: "vip", balance: 0 }).success).toBe(
+      false,
+    );
+  });
 });
 
 describe("useChartProfiles", () => {
