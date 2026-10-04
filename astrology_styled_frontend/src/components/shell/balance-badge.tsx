@@ -49,9 +49,9 @@ function AccountBalance() {
     >
       <svg
         viewBox="0 0 24 24"
-        className="size-[18px] shrink-0"
-        fill="none"
-        stroke="currentColor"
+        className={unlocked ? "size-[18px] shrink-0" : "size-3 shrink-0"}
+        fill={unlocked ? "none" : "currentColor"}
+        stroke={unlocked ? "currentColor" : "none"}
         strokeWidth={1.8}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -63,13 +63,10 @@ function AccountBalance() {
             <path d="M6 20h12" />
           </>
         ) : (
-          <>
-            <circle cx="12" cy="12" r="8.5" />
-            <path d="m12 7 3 5-3 5-3-5 3-5Z" />
-          </>
+          <path d="m12 1 9 11-9 11-9-11 9-11Z" />
         )}
       </svg>
-      <span className="max-w-[11ch] truncate tabular-nums lg:max-w-none">{label}</span>
+      <span className="min-w-0 truncate tabular-nums">{label}</span>
     </span>
   );
 }

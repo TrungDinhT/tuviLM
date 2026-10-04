@@ -5,12 +5,14 @@
 }
 
 .coins {
-  border-color: #ffe6a0;
-  color: #482606;
-  background: linear-gradient(135deg, #fff2a8, #ffd058 45%, #ff9b42);
-  box-shadow:
-    0 0 18px rgb(255 183 62 / 32%),
-    inset 0 1px 0 rgb(255 255 255 / 65%);
+  border-color: #ffd98d55;
+  color: #ffd98d;
+  background: linear-gradient(120deg, #ad632f55, #703e9222);
+  box-shadow: 0 0 22px #f3ba4920;
+}
+
+.coins:hover {
+  border-color: #ffd98d99;
 }
 
 .fullUnlock {
