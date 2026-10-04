@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { BalanceBadge } from "@/components/shell/balance-badge";
@@ -309,6 +309,50 @@ describe("HoiAiScreen", () => {
 
     expect(await screen.findByText("tin từ s2")).toBeTruthy();
     await waitFor(() => expect(screen.queryByText("tin từ s1")).toBeNull());
+  });
+
+  it("drops the selected session and draft when the saved chart changes", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity } } });
+    const detail = (id: string) => ({
+      ...sessionDetail(id, [message({ content: `Reply from ${id}` })]),
+      chart_profile_id: id === "s3" ? "p2" : "p1",
+    });
+    client.setQueryData(queryKeys.sessions.byProfile("p1"), { sessions: SESSIONS });
+    client.setQueryData(queryKeys.sessions.byProfile("p2"), {
+      sessions: [{ ...SESSIONS[0], id: "s3", chart_profile_id: "p2" }],
+    });
+    for (const id of ["s1", "s2", "s3"]) {
+      client.setQueryData(queryKeys.sessions.detail(id), { session: detail(id) });
+    }
+    const stream =
+      'data: {"type":"text","delta":"Old draft"}\n\ndata: {"type":"done","status":"failed"}\n\n';
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((url: string) => {
+        if (url.endsWith("/chat/stream")) return Promise.resolve(new Response(stream));
+        if (url.endsWith("/sessions")) return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
+        if (url.endsWith("/api/v1/me")) return Promise.resolve(jsonResponse(ACCESS));
+        return Promise.resolve(jsonResponse({ session: detail(url.split("/").at(-1)!) }));
+      }),
+    );
+    setChart("p1");
+    renderScreen(client);
+    fireEvent.click(screen.getByText("Lịch sử"));
+    fireEvent.click(await screen.findByText(/Cuộc trò chuyện 28\/08/));
+    await screen.findByText("Reply from s2");
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Old question" } });
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
+    await screen.findByText("Old draft");
+    fireEvent.click(screen.getByText("Lịch sử"));
+
+    act(() => setChart("p2"));
+
+    expect(await screen.findByText("Reply from s3")).toBeTruthy();
+    expect(screen.queryByText("Reply from s2")).toBeNull();
+    expect(screen.queryByText("Old draft")).toBeNull();
+    expect(screen.queryByText("Old question")).toBeNull();
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect((screen.getByRole("textbox") as HTMLInputElement).value).toBe("");
   });
 
   it("creates a new session from the Tạo mới action", async () => {

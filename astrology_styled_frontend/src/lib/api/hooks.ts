@@ -17,6 +17,7 @@ import { queryKeys } from "./queryKeys";
 import {
   type BirthInfo,
   type BuildLasoResponse,
+  type ChartProfile,
   type CreateChartProfileRequest,
   type CreateRedeemCodeRequest,
   type PreviewLasoRequest,
@@ -118,6 +119,51 @@ export function useBuildLaso() {
     onSuccess: (data) => {
       if (getSignal()?.aborted) return;
       queryClient.setQueryData(queryKeys.laso.chart(data.id), data);
+    },
+  });
+}
+
+/** Restore a saved chart and every conversation before activating it. */
+export function useOpenChartProfile() {
+  const queryClient = useQueryClient();
+  const { getSignal, userId } = useAccountRequestScope();
+  return useMutation({
+    mutationFn: async (profile: ChartProfile) => {
+      const signal = getSignal();
+      const [chart, sessions] = await Promise.all([
+        request(apiEndpoints.buildLaso, {
+          method: "POST",
+          body: profile.birth_info,
+          schema: buildLasoResponseSchema,
+          signal,
+        }),
+        request(apiEndpoints.profileSessions(profile.id), {
+          schema: listSessionsResponseSchema,
+          withAuth: true,
+          expectedUserId: userId,
+          signal,
+        }),
+      ]);
+      const transcripts = await Promise.all(
+        sessions.sessions.map(({ id }) =>
+          request(apiEndpoints.session(id), {
+            schema: getSessionResponseSchema,
+            withAuth: true,
+            expectedUserId: userId,
+            signal,
+          }),
+        ),
+      );
+      signal?.throwIfAborted();
+      return { chart, sessions, transcripts };
+    },
+    onSuccess: ({ chart, sessions, transcripts }, profile) => {
+      getSignal()?.throwIfAborted();
+      queryClient.setQueryData(queryKeys.laso.chart(chart.id), chart);
+      queryClient.setQueryData(queryKeys.sessions.byProfile(profile.id), sessions);
+      for (const transcript of transcripts) {
+        queryClient.setQueryData(queryKeys.sessions.detail(transcript.session.id), transcript);
+      }
     },
   });
 }

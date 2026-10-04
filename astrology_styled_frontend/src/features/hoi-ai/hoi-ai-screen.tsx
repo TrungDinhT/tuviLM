@@ -76,6 +76,11 @@ function doneTerminal(status: string): Terminal {
  * local state that reconciles away once the backend confirms it.
  */
 export function HoiAiScreen() {
+  const chartKey = useChartStore((state) => state.chartProfileId ?? state.chartId ?? "idle");
+  return <ChatConversation key={chartKey} />;
+}
+
+function ChatConversation() {
   const { data: account, isPending: isAccountPending } = authClient.useSession();
   const hasChart = useChartStore((state) => state.hasChart);
   const chartProfileId = useChartStore((state) => state.chartProfileId);

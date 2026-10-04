@@ -53,6 +53,41 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("AnSaoScreen hierarchy", () => {
+  it("prefills saved birth data without changing it when casting again", async () => {
+    vi.useFakeTimers();
+    try {
+      accountState.data = { user: { id: "account-a", name: "Account A" } };
+      usePreferencesStore.setState({ muteBirthConfirm: true });
+      for (const hour of [0, 12, 22]) {
+        const birth = {
+          calendar: "solar" as const,
+          year: 1996,
+          month: 4,
+          day: 15,
+          hour,
+          gender: "F" as const,
+        };
+        useChartStore.setState({ birthInfo: birth });
+        const view = render(<AnSaoScreen />);
+        expect(
+          screen.getByRole("radio", { name: hour < 12 ? "AM" : "PM" }).getAttribute("aria-checked"),
+        ).toBe("true");
+        expect(screen.getByRole("radio", { name: "Nữ" }).getAttribute("aria-checked")).toBe("true");
+        fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
+        await act(async () => vi.advanceTimersByTimeAsync(2600));
+        expect(build).toHaveBeenLastCalledWith(birth);
+        expect(createProfile).toHaveBeenLastCalledWith({
+          display_name: "01/01/2000",
+          birth_info: birth,
+        });
+        expect(push).toHaveBeenLastCalledWith("/ban-menh");
+        view.unmount();
+      }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("does not auto-save an old account's delayed build after the screen unmounts", async () => {
     vi.useFakeTimers();
     try {

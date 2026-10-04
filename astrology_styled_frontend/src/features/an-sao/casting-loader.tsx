@@ -55,11 +55,10 @@ function Mascot({ size }: { size: number }) {
 }
 
 /**
- * The "đang luận giải" interlude while the build mutation is in flight. The
- * caller guarantees the ~2.6 s minimum; this component only animates. All
- * motion collapses under prefers-reduced-motion via the global rule.
+ * The chart-loading interlude; the caller controls its duration. All motion
+ * collapses under prefers-reduced-motion via the global rule.
  */
-export function CastingLoader() {
+export function CastingLoader({ title = "đang luận giải" }: { title?: string }) {
   const [subIndex, setSubIndex] = useState(0);
   const [craneFailed, setCraneFailed] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
@@ -76,7 +75,7 @@ export function CastingLoader() {
   }, []);
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-[26px] p-10">
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-[26px] px-10 pt-[max(2.5rem,var(--safe-t))] pb-[max(2.5rem,var(--safe-b))]">
       <div className="relative h-[190px] w-[190px]">
         <div className={`${styles.spin22} absolute inset-0 rounded-full border border-accent-glow opacity-40`} />
         <div className={`${styles.spin14} absolute inset-[22px] rounded-full border border-accent-glow border-dashed opacity-40`} />
@@ -100,7 +99,7 @@ export function CastingLoader() {
       </div>
       <div className="text-center">
         <div className="font-display text-[26px] font-medium">
-          đang luận giải
+          {title}
           <span className={styles.loadDots}>
             <span>.</span>
             <span>.</span>

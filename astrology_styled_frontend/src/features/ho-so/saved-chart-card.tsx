@@ -19,7 +19,12 @@ function dateLabel(profile: ChartProfile): string {
   return `${pad(day)}/${pad(month)}/${year}`;
 }
 
-export function SavedChartCard({ profile }: { profile: ChartProfile }) {
+interface SavedChartCardProps {
+  profile: ChartProfile;
+  onOpen: (profile: ChartProfile) => void;
+}
+
+export function SavedChartCard({ profile, onOpen }: SavedChartCardProps) {
   const [dialog, setDialog] = useState<"rename" | "delete" | null>(null);
   const [draftName, setDraftName] = useState("");
   const deleteProfile = useDeleteChartProfile();
@@ -50,9 +55,16 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
 
   return (
     <article
-      className={`${CARD_LAYOUT} rounded-[20px] border border-accent-glow bg-[linear-gradient(160deg,color-mix(in_srgb,var(--accent)_18%,transparent),rgba(46,26,74,0.5))]`}
+      className={`${CARD_LAYOUT} relative rounded-[20px] border border-accent-glow bg-[linear-gradient(160deg,color-mix(in_srgb,var(--accent)_18%,transparent),rgba(46,26,74,0.5))]`}
     >
-      <div className="min-w-0 flex-1">
+      <button
+        type="button"
+        aria-label={`Mở lá số ${name}`}
+        disabled={pending}
+        onClick={() => onOpen(profile)}
+        className="absolute inset-0 cursor-pointer rounded-[20px] outline-none hover:bg-white/4 focus-visible:ring-2 focus-visible:ring-accent disabled:pointer-events-none"
+      />
+      <div className="pointer-events-none relative min-w-0 flex-1">
         <h3 className="font-display text-[19px] leading-snug font-semibold [overflow-wrap:anywhere]">
           {name}
         </h3>
@@ -63,7 +75,7 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
           </p>
         </div>
       </div>
-      <div className="flex shrink-0 flex-col gap-2">
+      <div className="relative flex shrink-0 flex-col gap-2">
         <button
           type="button"
           className="pill-ghost min-h-11 cursor-pointer rounded-full px-4 text-[13px] font-semibold disabled:pointer-events-none disabled:opacity-40"

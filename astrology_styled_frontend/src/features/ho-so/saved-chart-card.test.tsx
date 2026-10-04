@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   renameHook: vi.fn(),
   remove: vi.fn(),
   reset: vi.fn(),
+  open: vi.fn(),
 }));
 vi.mock("@/lib/api/hooks", () => ({
   useDeleteChartProfile: () => ({ mutate: mocks.remove, isPending: false }),
@@ -36,7 +37,7 @@ describe("SavedChartCard", () => {
   it("shows the full wrapped name, birth date and canh hour without fixed card height", () => {
     const longName = "Gia đình và những người thân yêu ".repeat(4);
     const { container, rerender } = render(
-      <SavedChartCard profile={{ ...PROFILE, display_name: longName }} />,
+      <SavedChartCard profile={{ ...PROFILE, display_name: longName }} onOpen={mocks.open} />,
     );
     const heading = screen.getByRole("heading", { name: longName.trim() });
     expect(heading.textContent).toBe(longName);
@@ -50,10 +51,12 @@ describe("SavedChartCard", () => {
     expect(screen.getByText("Giờ sinh: Thìn · 07:00 – 09:00")).toBeTruthy();
     expect(screen.getByRole("button", { name: /Đổi tên lá số/ }).className).toContain("min-h-11");
     expect(screen.getByRole("button", { name: /Đổi tên lá số/ }).parentElement?.className).toBe(
-      "flex shrink-0 flex-col gap-2",
+      "relative flex shrink-0 flex-col gap-2",
     );
-    rerender(<SavedChartCard profile={PROFILE} />);
+    rerender(<SavedChartCard profile={PROFILE} onOpen={mocks.open} />);
     expect(screen.getByRole("heading").textContent).toBe("Lá số 1");
+    fireEvent.click(screen.getByRole("button", { name: "Mở lá số Lá số 1" }));
+    expect(mocks.open).toHaveBeenCalledWith(PROFILE);
     rerender(<SavedChartSkeleton />);
     expect(container.firstElementChild?.className).toContain(
       "min-h-[128px] w-full min-w-0 flex-row",
@@ -63,8 +66,10 @@ describe("SavedChartCard", () => {
   });
 
   it("trims renames, keeps pending edits open, shows failures and closes after success", () => {
-    const { rerender } = render(<SavedChartCard profile={PROFILE} />);
+    const { rerender } = render(<SavedChartCard profile={PROFILE} onOpen={mocks.open} />);
+    const openButton = screen.getByRole("button", { name: /Mở lá số/ }) as HTMLButtonElement;
     fireEvent.click(screen.getByRole("button", { name: /Đổi tên lá số/ }));
+    expect(mocks.open).not.toHaveBeenCalled();
     const input = screen.getByLabelText("Tên lá số") as HTMLInputElement;
     expect(input.value).toBe("Lá số 1");
     expect(input.maxLength).toBe(80);
@@ -76,7 +81,8 @@ describe("SavedChartCard", () => {
     );
 
     mocks.renameHook.mockReturnValue({ ...RENAME, isPending: true });
-    rerender(<SavedChartCard profile={PROFILE} />);
+    rerender(<SavedChartCard profile={PROFILE} onOpen={mocks.open} />);
+    expect(openButton.disabled).toBe(true);
     expect((screen.getByRole("button", { name: "Hủy" }) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
     expect(screen.getByRole("dialog")).toBeTruthy();
@@ -86,19 +92,19 @@ describe("SavedChartCard", () => {
       isError: true,
       error: new ApiErrorException({ kind: "network" }),
     });
-    rerender(<SavedChartCard profile={PROFILE} />);
+    rerender(<SavedChartCard profile={PROFILE} onOpen={mocks.open} />);
     expect(screen.getByRole("alert").textContent).toContain("Không kết nối được máy chủ.");
     mocks.renameHook.mockReturnValue(RENAME);
     mocks.rename.mockImplementation((_input: unknown, options: { onSuccess: () => void }) =>
       options.onSuccess(),
     );
-    rerender(<SavedChartCard profile={PROFILE} />);
+    rerender(<SavedChartCard profile={PROFILE} onOpen={mocks.open} />);
     fireEvent.click(screen.getByRole("button", { name: "Lưu" }));
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
   it("cancels renaming without a write and still requires delete confirmation", () => {
-    render(<SavedChartCard profile={PROFILE} />);
+    render(<SavedChartCard profile={PROFILE} onOpen={mocks.open} />);
     fireEvent.click(screen.getByRole("button", { name: /Đổi tên lá số/ }));
     fireEvent.click(screen.getByRole("button", { name: "Hủy" }));
     expect(mocks.rename).not.toHaveBeenCalled();
@@ -112,5 +118,6 @@ describe("SavedChartCard", () => {
       "p1",
       expect.objectContaining({ onError: expect.any(Function) }),
     );
+    expect(mocks.open).not.toHaveBeenCalled();
   });
 });

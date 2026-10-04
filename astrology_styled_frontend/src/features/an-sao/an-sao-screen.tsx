@@ -59,13 +59,20 @@ function pad2(value: number): string {
 export function AnSaoScreen() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const savedBirth = useChartStore((state) => state.birthInfo);
   const [phase, setPhase] = useState<"form" | "loading">("form");
-  const [date, setDate] = useState<BirthDateInput>(DEFAULT_DATE);
-  // AM/PM is picked above the face, so it stands on its own and defaults to
-  // AM; the hour stays unpicked until touched, which is what the guard reads.
-  const [meridiem, setMeridiem] = useState<Meridiem>(MERIDIEM.AM);
-  const [hour12, setHour12] = useState<number | null>(null);
-  const [gender, setGender] = useState<"M" | "F" | null>(null);
+  const [date, setDate] = useState<BirthDateInput>(() =>
+    savedBirth
+      ? { year: savedBirth.year, month: savedBirth.month, day: savedBirth.day }
+      : DEFAULT_DATE,
+  );
+  const [meridiem, setMeridiem] = useState<Meridiem>(() =>
+    savedBirth && savedBirth.hour >= 12 ? MERIDIEM.PM : MERIDIEM.AM,
+  );
+  const [hour12, setHour12] = useState<number | null>(() =>
+    savedBirth ? savedBirth.hour % 12 || 12 : null,
+  );
+  const [gender, setGender] = useState<"M" | "F" | null>(() => savedBirth?.gender ?? null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [clockPulse, setClockPulse] = useState(0);
   const [rewardPreview, setRewardPreview] = useState<{
