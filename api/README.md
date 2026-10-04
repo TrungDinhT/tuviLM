@@ -59,6 +59,11 @@ Missing, invalid or revoked credentials return `401`; an authenticated user lack
 an administrator role receives `403` from `require_admin`. Authentication
 service outages return `503` rather than granting access.
 
+To bootstrap an administrator, register a normal account and run the private
+`api.auth.bootstrap_admin` script. Follow the [administrator setup guide](../README.md#bootstrap-an-administrator)
+for configuration, confirmation and session revocation. No public endpoint grants
+administrator roles.
+
 Health, chart preview and chart casting remain public. The legacy anonymous
 ID endpoint remains available, but `X-Anonymous-Owner-Id` no longer grants
 access to saved profiles or chat. Existing anonymous data is not reassigned
