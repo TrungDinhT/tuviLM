@@ -123,7 +123,7 @@ export function useBuildLaso() {
   });
 }
 
-/** Restore a saved chart and every conversation before activating it. */
+/** Restore a saved chart and its newest conversation before activating it. */
 export function useOpenChartProfile() {
   const queryClient = useQueryClient();
   const { getSignal, userId } = useAccountRequestScope();
@@ -144,24 +144,27 @@ export function useOpenChartProfile() {
           signal,
         }),
       ]);
-      const transcripts = await Promise.all(
-        sessions.sessions.map(({ id }) =>
-          request(apiEndpoints.session(id), {
-            schema: getSessionResponseSchema,
-            withAuth: true,
-            expectedUserId: userId,
-            signal,
-          }),
-        ),
-      );
+      // The chat opens on the newest conversation; the others load when selected.
+      const newest = [...sessions.sessions].sort((a, b) =>
+        b.updated_at.localeCompare(a.updated_at),
+      )[0];
+      const transcript =
+        newest === undefined
+          ? null
+          : await request(apiEndpoints.session(newest.id), {
+              schema: getSessionResponseSchema,
+              withAuth: true,
+              expectedUserId: userId,
+              signal,
+            });
       signal?.throwIfAborted();
-      return { chart, sessions, transcripts };
+      return { chart, sessions, transcript };
     },
-    onSuccess: ({ chart, sessions, transcripts }, profile) => {
+    onSuccess: ({ chart, sessions, transcript }, profile) => {
       getSignal()?.throwIfAborted();
       queryClient.setQueryData(queryKeys.laso.chart(chart.id), chart);
       queryClient.setQueryData(queryKeys.sessions.byProfile(profile.id), sessions);
-      for (const transcript of transcripts) {
+      if (transcript !== null) {
         queryClient.setQueryData(queryKeys.sessions.detail(transcript.session.id), transcript);
       }
     },

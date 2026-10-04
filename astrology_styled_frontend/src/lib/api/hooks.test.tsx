@@ -127,10 +127,13 @@ describe("useChartProfiles", () => {
 describe("useOpenChartProfile", () => {
   const chart = buildLasoResponseSchema.parse(buildLasoFixture);
 
-  it("rebuilds the chart and freshly loads every conversation into its cache", async () => {
-    const sessions = ["s1", "s2"].map((id) => ({
+  it("rebuilds the chart and freshly loads only the newest conversation", async () => {
+    const sessions = [
+      { id: "s1", updated_at: "2026-01-01T00:00:00Z" },
+      { id: "s2", updated_at: "2026-02-01T00:00:00Z" },
+    ].map(({ id, updated_at }) => ({
       id, chart_profile_id: PROFILE.id, title: null, message_count: 1,
-      created_at: PROFILE.created_at, updated_at: PROFILE.updated_at,
+      created_at: PROFILE.created_at, updated_at,
     }));
     const transcripts = sessions.map((session) => ({ session: { ...session, messages: [{
       id: `message-${session.id}`, role: "user", content: session.id, status: "confirmed",
@@ -147,16 +150,15 @@ describe("useOpenChartProfile", () => {
 
     await act(async () => { await result.current.mutateAsync(PROFILE); });
 
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/laso/build"),
       expect.objectContaining({ method: "POST", body: JSON.stringify(PROFILE.birth_info) }));
     expect(client.getQueryData(queryKeys.laso.chart(chart.id))).toEqual(chart);
     expect(client.getQueryData(queryKeys.sessions.byProfile(PROFILE.id))).toEqual({ sessions });
-    for (const { session } of transcripts) {
-      expect(client.getQueryData(queryKeys.sessions.detail(session.id))).toMatchObject({
-        session: { id: session.id, messages: session.messages },
-      });
-    }
+    expect(client.getQueryData(queryKeys.sessions.detail("s2"))).toMatchObject({
+      session: { id: "s2", messages: transcripts[1]!.session.messages },
+    });
+    expect(client.getQueryData(queryKeys.sessions.detail("s1"))).toBeUndefined();
   });
 
   it("opens a chart without creating a conversation when its history is empty", async () => {
