@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,22 @@ import { SignOutButton } from "./sign-out-button";
 
 export function AuthLinks({ className }: { className?: string }) {
   const { data: session, isPending } = authClient.useSession();
+  const [showRegistration, setShowRegistration] = useState(false);
+  const guestRef = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+    const links = node.querySelectorAll("a");
+    const observer = new ResizeObserver(() => {
+      const requiredWidth = Array.from(links).reduce(
+        (width, link) => width + link.getBoundingClientRect().width,
+        0,
+      );
+      const gap = Number.parseFloat(window.getComputedStyle(node).columnGap) || 0;
+      setShowRegistration(requiredWidth + gap <= node.getBoundingClientRect().width);
+    });
+    observer.observe(node);
+    links.forEach((link) => observer.observe(link));
+    return () => observer.disconnect();
+  }, []);
 
   if (session !== null && session !== undefined) {
     const initial = session.user.name.trim().charAt(0).toLocaleUpperCase("vi") || "✦";
@@ -17,7 +34,7 @@ export function AuthLinks({ className }: { className?: string }) {
     return (
       <div className={cn("flex min-w-0 items-center gap-2", className)} aria-label="Tài khoản">
         <BalanceBadge />
-        <span className="pill-ghost inline-flex min-h-9 min-w-0 items-center gap-2 rounded-full px-2.5 text-[13px] font-semibold">
+        <span className="pill-ghost inline-flex min-h-9 min-w-0 shrink-0 items-center gap-2 rounded-full px-2.5 text-[13px] font-semibold">
           <span className="accent-gradient grid size-6 shrink-0 place-items-center rounded-full text-[11px] text-bg-0">
             {initial}
           </span>
@@ -30,18 +47,28 @@ export function AuthLinks({ className }: { className?: string }) {
 
   return (
     <div
-      className={cn("flex items-center gap-2", isPending && "opacity-70", className)}
+      ref={guestRef}
+      className={cn(
+        "relative flex min-w-0 flex-1 items-center justify-end gap-2",
+        isPending && "opacity-70",
+        className,
+      )}
       aria-label="Tài khoản"
     >
       <Link
         href="/login"
-        className="pill-ghost inline-flex min-h-9 items-center justify-center rounded-full px-4 text-[13px] font-semibold transition-transform active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-glow)]"
+        className="pill-ghost inline-flex h-9 w-max shrink-0 items-center justify-center rounded-full px-4 text-[13px] font-semibold whitespace-nowrap transition-transform active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-glow)]"
       >
         Đăng nhập
       </Link>
       <Link
         href="/register"
-        className="pill-primary inline-flex min-h-9 items-center justify-center rounded-full px-4 text-[13px] font-semibold transition-transform active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-glow)]"
+        aria-hidden={!showRegistration}
+        tabIndex={showRegistration ? undefined : -1}
+        className={cn(
+          "pill-primary inline-flex h-9 w-max shrink-0 items-center justify-center rounded-full px-4 text-[13px] font-semibold whitespace-nowrap transition-transform active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-glow)]",
+          !showRegistration && "pointer-events-none invisible absolute",
+        )}
       >
         Đăng ký
       </Link>

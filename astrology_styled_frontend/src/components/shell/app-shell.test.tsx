@@ -15,7 +15,9 @@ vi.mock("./app-nav", () => ({
 }));
 
 vi.mock("./top-bar", () => ({
-  TopBar: () => <header data-testid="top-bar" />,
+  TopBar: ({ showBrand }: { showBrand?: boolean }) => (
+    <header data-testid="top-bar" data-show-brand={String(showBrand)} />
+  ),
 }));
 
 afterEach(() => {
@@ -27,6 +29,7 @@ describe("AppShell navigation", () => {
     const { container, rerender } = render(<AppShell>content</AppShell>);
 
     expect(screen.queryByTestId("app-nav")).toBeNull();
+    expect(screen.getByTestId("top-bar").getAttribute("data-show-brand")).toBe("true");
     expect(container.firstElementChild?.className).not.toContain("lg:pl-[var(--rail)]");
 
     rerender(
@@ -35,6 +38,7 @@ describe("AppShell navigation", () => {
       </AccountRequestContext.Provider>,
     );
     expect(screen.getByTestId("app-nav")).toBeTruthy();
+    expect(screen.getByTestId("top-bar").getAttribute("data-show-brand")).toBe("false");
     expect(container.firstElementChild?.className).toContain("lg:pl-[var(--rail)]");
   });
 
@@ -44,6 +48,7 @@ describe("AppShell navigation", () => {
     const { container } = render(<AppShell>content</AppShell>);
 
     expect(screen.getByTestId("app-nav")).toBeTruthy();
+    expect(screen.getByTestId("top-bar").getAttribute("data-show-brand")).toBe("false");
     expect(container.firstElementChild?.className).toContain("lg:pl-[var(--rail)]");
   });
 });

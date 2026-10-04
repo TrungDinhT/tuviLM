@@ -69,6 +69,13 @@ describe("TopBar balance", () => {
     expect(screen.getByLabelText("Account balance").getAttribute("title")).toContain(
       "Plan: Normal",
     );
+    navigation.pathname = "/";
+    view.rerender(header(client));
+    const indexBanner = screen.getByRole("banner");
+    expect(within(indexBanner).queryByRole("heading", { name: "An sao" })).toBeNull();
+    expect(within(indexBanner).queryByText("Lá số của bạn")).toBeNull();
+    expect(within(indexBanner).getByLabelText("Account balance")).toBeTruthy();
+    expect(within(indexBanner).getByText("Test User")).toBeTruthy();
     navigation.pathname = "/van-han";
     view.rerender(header(client));
     expect(screen.getByRole("heading", { name: "Vận hạn 2026" })).toBeTruthy();
@@ -84,7 +91,10 @@ describe("TopBar balance", () => {
       within(nav)
         .getAllByRole("link")
         .map((link) => link.getAttribute("href")),
-    ).toEqual(["/ho-so"]);
+    ).toEqual(["/", "/ho-so"]);
+    const brand = within(nav).getByRole("link", { name: "Thiên Hạc — về trang chủ" });
+    expect(brand.getAttribute("href")).toBe("/");
+    expect(brand.querySelector("img")?.getAttribute("src")).toContain("favicon-48x48.png");
     const sidebarSignOut = within(nav).getByRole("button", { name: "Đăng xuất" });
     expect(sidebarSignOut.parentElement?.className).toMatch(/hidden.*lg:block/);
     let finishSignOut!: () => void;

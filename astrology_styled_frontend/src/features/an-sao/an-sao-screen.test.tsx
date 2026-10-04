@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import fixture from "@/lib/api/__fixtures__/build-laso.json";
 import { useChartStore } from "@/store/chart-store";
@@ -36,12 +36,21 @@ vi.mock("@/lib/api/hooks", () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      observe() {}
+      disconnect() {}
+    },
+  );
   accountState.data = null;
   build.mockResolvedValue(fixture);
   createProfile.mockResolvedValue({ chart_profile: { id: "profile-1" } });
   usePreferencesStore.setState({ muteBirthConfirm: false });
   useChartStore.getState().reset();
 });
+
+afterEach(() => vi.unstubAllGlobals());
 
 describe("AnSaoScreen hierarchy", () => {
   it("does not auto-save an old account's delayed build after the screen unmounts", async () => {
@@ -109,6 +118,9 @@ describe("AnSaoScreen hierarchy", () => {
 
   it("puts the primary action before the atmospheric reward in reading order", () => {
     render(<AnSaoScreen />);
+    const brand = screen.getByRole("link", { name: "Thiên Hạc — về trang chủ" });
+    expect(brand.getAttribute("href")).toBe("/");
+    expect(brand.querySelector("img")?.getAttribute("src")).toContain("favicon-48x48.png");
 
     const action = screen.getByRole("button", { name: /Luận giải lá số của tôi/ });
     const reward = screen.getByText("CHÒM SAO MỆNH ĐANG NGỦ").parentElement;

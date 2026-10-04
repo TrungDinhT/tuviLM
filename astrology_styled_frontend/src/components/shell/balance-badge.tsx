@@ -24,7 +24,7 @@ function AccountBalance() {
         disabled={account.isFetching}
         onClick={() => void account.refetch()}
       >
-        Retry balance
+        <span className="min-w-0 truncate">Retry balance</span>
       </button>
     );
   }
@@ -32,7 +32,7 @@ function AccountBalance() {
   if (account.data === undefined) {
     return (
       <span className={BADGE_CLASS} role="status">
-        Balance…
+        <span className="min-w-0 truncate">Balance…</span>
       </span>
     );
   }

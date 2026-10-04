@@ -33,7 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={cn("relative z-1 min-h-dvh", showNavigation && "lg:pl-[var(--rail)]")}>
-      <TopBar />
+      <TopBar showBrand={!showNavigation} />
       <div className="mx-auto w-full max-w-[var(--col)] lg:max-w-[var(--shell)]">{children}</div>
       {showNavigation ? <AppNav /> : null}
     </div>

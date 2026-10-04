@@ -7,6 +7,7 @@ import { AN_SAO_ROUTE, isActive, NAV_ITEMS, type NavItem } from "@/config/site";
 import { useAccountRequestScope } from "@/lib/api/account-request";
 import { useChartStore } from "@/store/chart-store";
 
+import { BrandLink } from "./brand-link";
 import { NavIconGlyph } from "./nav-icons";
 import { SignOutButton } from "./sign-out-button";
 
@@ -44,16 +45,8 @@ export function AppNav() {
         "lg:px-4 lg:pt-[22px] lg:pb-[calc(20px+var(--safe-b))]",
       ].join(" ")}
     >
-      <div className="hidden items-center gap-[11px] px-2 pt-0.5 pb-5 lg:flex" aria-hidden="true">
-        <span className="accent-gradient grid size-9 flex-none place-items-center rounded-[11px] text-[17px] text-bg-0">
-          ✦
-        </span>
-        <span>
-          <b className="font-display text-[17px] font-semibold tracking-[0.18em]">TỬ VI</b>
-          <small className="mt-0.5 block text-[9px] font-semibold tracking-[0.16em] text-muted uppercase">
-            An sao &amp; luận giải
-          </small>
-        </span>
+      <div className="hidden pt-0.5 pb-5 lg:block">
+        <BrandLink className="px-2" showTagline />
       </div>
 
       {NAV_ITEMS.filter((item) => hasChart || !item.requiresChart).map((item) => (
