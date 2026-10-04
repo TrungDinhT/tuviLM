@@ -27,6 +27,7 @@ from api.chat.contracts import (
     ConversationHistoryStore,
     DuplicateStreamInProgressError,
     IdempotencyConflictError,
+    InsufficientChatCoinsError,
     MissingOwnerIdError,
     NotFoundError,
 )
@@ -149,6 +150,8 @@ def _conversation_history_http_error(exc: ConversationHistoryError) -> tuple[int
         return 409, "Idempotency key conflict."
     if isinstance(exc, DuplicateStreamInProgressError):
         return 409, "Stream already in progress."
+    if isinstance(exc, InsufficientChatCoinsError):
+        return 402, "Not enough coins. AI chat costs 3 coins per message."
     return 500, "Conversation history error."
 
 

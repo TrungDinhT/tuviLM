@@ -152,7 +152,11 @@ beforeEach(() => {
 
 describe("HoiAiScreen", () => {
   it("shows Full unlock without exposing its coin balance", async () => {
-    mockBillingChat("", () => ({ ...ACCESS, plan: "full_unlock", balance: 1234 }));
+    const fetchMock = mockBillingChat('data: {"type":"done","status":"confirmed"}\n\n', () => ({
+      ...ACCESS,
+      plan: "full_unlock",
+      balance: 0,
+    }));
     renderScreen(new QueryClient(), true);
     expect(
       await screen.findByText("Trò chuyện với AI đã được bao gồm trong gói Mở khóa toàn bộ."),
@@ -165,6 +169,25 @@ describe("HoiAiScreen", () => {
     );
     await screen.findByText("Previous reply");
     expect((screen.getByRole("textbox") as HTMLInputElement).disabled).toBe(false);
+    await sendQuestion();
+    await waitFor(() =>
+      expect(fetchMock.mock.calls.some(([url]) => url.endsWith("/chat/stream"))).toBe(true),
+    );
+  });
+
+  it("blocks sending with fewer than three coins without adding a draft", async () => {
+    const fetchMock = mockBillingChat("", () => ({ ...ACCESS, balance: 2 }));
+    renderScreen(new QueryClient(), true);
+    await screen.findByText("Previous reply");
+    await screen.findByText(/Bạn không đủ xu/);
+    const input = screen.getByRole("textbox") as HTMLInputElement;
+    expect(input.disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Gửi" }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.change(input, { target: { value: "My question" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(fetchMock.mock.calls.some(([url]) => url.endsWith("/chat/stream"))).toBe(false);
+    expect(screen.queryByText("My question")).toBeNull();
+    expect(screen.queryByText("Tin nhắn chưa gửi trọn vẹn.")).toBeNull();
   });
 
   it("keeps the displayed balance until a successful reply refreshes it from the server", async () => {
@@ -481,7 +504,7 @@ describe("HoiAiScreen", () => {
     expect(screen.getByText("6 xu")).toBeTruthy();
   });
 
-  it("explains the chat cost when the account has insufficient coins", async () => {
+  it("removes the draft when the server rejects a stale balance with insufficient coins", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn((url: string) => {
@@ -515,6 +538,8 @@ describe("HoiAiScreen", () => {
       ),
     );
     expect((input as HTMLInputElement).disabled).toBe(false);
+    expect(screen.queryByText("My question")).toBeNull();
+    expect(screen.queryByText("Tin nhắn chưa gửi trọn vẹn.")).toBeNull();
   });
 
   it("surfaces a backend error event and preserves partial text", async () => {

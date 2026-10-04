@@ -22,7 +22,7 @@ from pydantic_ai import (
 from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, UserPromptPart
 from starlette.types import Receive, Scope, Send
 
-from api.accounts.billing import reserve_chat_coins, settle_chat_coins
+from api.accounts.billing import CHAT_MESSAGE_COST, reserve_chat_coins, settle_chat_coins
 from api.auth.dependencies import CurrentUser
 from api.chat.contracts import ConversationHistoryStore
 from api.chat.models import (
@@ -187,6 +187,7 @@ async def session_chat_stream(
         session_id=session_id,
         content=payload.content,
         idempotency_key=idempotency_key,
+        allow_new=user.plan == "full_unlock" or user.balance >= CHAT_MESSAGE_COST,
     )
 
     if pair.replayed:
@@ -249,7 +250,19 @@ async def session_chat_stream(
         )
     except BaseException:
         with anyio.move_on_after(5, shield=True):
-            await cleanup(ChatMessageStatus.FAILED)
+            try:
+                await store.discard_message_pair(user.user_id, session_id, pair)
+            except Exception:
+                logger.exception("Failed to discard a rejected chat message pair.")
+            try:
+                await settle_chat_coins(
+                    request.app.state.auth_database,
+                    user.user_id,
+                    pair.assistant_message.id,
+                    confirmed=False,
+                )
+            except Exception:
+                logger.exception("Failed to refund rejected chat; hold will be reconciled.")
         raise
 
     return _ChatStreamingResponse(
@@ -275,6 +288,7 @@ async def _reserve_session_chat_stream(
     session_id: str,
     content: str,
     idempotency_key: str,
+    allow_new: bool,
 ) -> tuple[SessionContext, list[ChatMessage], ReservedMessagePair]:
     context = await store.load_session_context(owner_id, session_id)
     history_messages = list(context.session.messages)
@@ -283,6 +297,7 @@ async def _reserve_session_chat_stream(
         session_id,
         user_content=content,
         idempotency_key=idempotency_key,
+        allow_new=allow_new,
     )
     return context, history_messages, pair
 

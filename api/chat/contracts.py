@@ -35,6 +35,10 @@ class NotFoundError(ConversationHistoryError):
     """Raised when a requested conversation history resource does not exist."""
 
 
+class InsufficientChatCoinsError(ConversationHistoryError):
+    """Raised when the account cannot start a new paid conversation turn."""
+
+
 class ConversationHistoryStore(Protocol):
     async def create_chart_profile(
         self,
@@ -76,7 +80,12 @@ class ConversationHistoryStore(Protocol):
         *,
         user_content: str,
         idempotency_key: str,
+        allow_new: bool = True,
     ) -> ReservedMessagePair: ...
+
+    async def discard_message_pair(
+        self, owner_id: str, session_id: str, pair: ReservedMessagePair
+    ) -> None: ...
 
     async def finalize_assistant_message(
         self,

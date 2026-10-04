@@ -63,7 +63,10 @@ async def billing_context(monkeypatch):
         authorization = request.headers.get("Authorization", "")
         if not authorization.startswith("Bearer "):
             raise HTTPException(401, "Authentication required.")
-        return Principal(user_id=authorization[7:], balance=100)
+        account = await _account(database, authorization[7:])
+        return Principal(
+            user_id=authorization[7:], plan=account["plan"], balance=account["balance"]
+        )
 
     async def successful_streamer(**kwargs):
         yield {"type": "text", "delta": "A complete answer."}
@@ -115,15 +118,36 @@ async def test_full_unlock_chat_is_free_with_zero_balance(billing_context) -> No
 
 async def test_insufficient_balance_does_not_start_ai(billing_context) -> None:
     client, database, store, user_id, session_id = billing_context
+    await _chat(client, user_id, session_id, idempotency_key="previous")
+    previous = (await store.load_session_context(user_id, session_id)).session.messages
     await _set_access(database, user_id, balance=2)
 
+    successful_streamer = app.state.session_chat_streamer
     app.state.session_chat_streamer = _never_generate
     response = await _chat(client, user_id, session_id)
 
     assert response.status_code == 402
     await _assert_balance(database, user_id, 2)
     context = await store.load_session_context(user_id, session_id)
-    assert context.session.messages[-1].status == ChatMessageStatus.FAILED
+    assert context.session.messages == previous
+
+    with pytest.raises(HTTPException) as caught:
+        await session_chat_stream(
+            session_id, SessionChatStreamRequest(content="Question?"),
+            Request({"type": "http", "app": app}), Principal(user_id=user_id, balance=100),
+            idempotency_key="message-1",
+        )
+    assert caught.value.status_code == 402
+    assert (await store.load_session_context(user_id, session_id)).session.messages == previous
+    await _assert_balance(database, user_id, 2)
+
+    await _set_access(database, user_id, balance=3)
+    app.state.session_chat_streamer = successful_streamer
+    assert (await _chat(client, user_id, session_id)).status_code == 200
+    context = await store.load_session_context(user_id, session_id)
+    assert context.session.messages[:2] == previous
+    assert len(context.session.messages) == 4
+    await _assert_balance(database, user_id, 0)
 
 
 async def test_failed_ai_refunds_once_and_failed_replay_is_free(billing_context) -> None:
@@ -227,6 +251,9 @@ async def test_concurrent_chats_in_different_sessions_allow_only_one_payment(
 
     assert sorted(response.status_code for response in responses) == [200, 402]
     await _assert_balance(database, user_id, 0)
+    for response, target in zip(responses, (session_id, second_session_id)):
+        context = await store.load_session_context(user_id, target)
+        assert len(context.session.messages) == (2 if response.status_code == 200 else 0)
 
 
 async def test_disconnect_event_while_ai_is_blocked_refunds(billing_context) -> None:
@@ -244,7 +271,7 @@ async def test_disconnect_event_while_ai_is_blocked_refunds(billing_context) -> 
         session_id,
         SessionChatStreamRequest(content="Question?"),
         Request(scope),
-        Principal(user_id=user_id),
+        Principal(user_id=user_id, balance=6),
         idempotency_key="message-1",
     )
 
@@ -283,10 +310,10 @@ async def _create_session(store, user_id: str) -> str:
     return session.id
 
 
-async def _chat(client, user_id: str, session_id: str):
+async def _chat(client, user_id: str, session_id: str, *, idempotency_key="message-1"):
     return await client.post(
         f"/api/v1/sessions/{session_id}/chat/stream",
-        headers={"Authorization": f"Bearer {user_id}", "Idempotency-Key": "message-1"},
+        headers={"Authorization": f"Bearer {user_id}", "Idempotency-Key": idempotency_key},
         json={"content": "Question?"},
     )
 

@@ -11,7 +11,7 @@ from uuid import uuid4
 from beanie import PydanticObjectId, init_beanie
 from beanie.odm.operators.find.array import ElemMatch
 from beanie.odm.operators.find.logical import Not
-from beanie.odm.operators.update.array import Push
+from beanie.odm.operators.update.array import Pull, Push
 from beanie.odm.operators.update.general import Set
 from beanie.odm.queries.update import UpdateResponse
 from bson.errors import InvalidId
@@ -22,6 +22,7 @@ from pymongo.errors import DuplicateKeyError
 from api.chat.contracts import (
     DuplicateStreamInProgressError,
     IdempotencyConflictError,
+    InsufficientChatCoinsError,
     MissingOwnerIdError,
     NotFoundError,
 )
@@ -265,6 +266,7 @@ class MongoConversationHistoryStore:
         *,
         user_content: str,
         idempotency_key: str,
+        allow_new: bool = True,
     ) -> ReservedMessagePair:
         await _cleanup_stale_pending_messages(
             owner_id=owner_id,
@@ -275,6 +277,8 @@ class MongoConversationHistoryStore:
         fingerprint = _compute_fingerprint(user_content)
         existing_operation = _find_message_operation(session, idempotency_key)
         if existing_operation is None:
+            if not allow_new:
+                raise InsufficientChatCoinsError
             return await _reserve_new_message_pair(
                 session,
                 user_content=user_content,
@@ -285,6 +289,27 @@ class MongoConversationHistoryStore:
             session,
             existing_operation,
             fingerprint=fingerprint,
+        )
+
+    async def discard_message_pair(
+        self, owner_id: str, session_id: str, pair: ReservedMessagePair
+    ) -> None:
+        if pair.replayed:
+            return
+        session = await _get_session_for_owner(owner_id, session_id)
+        await ChatSessionDocument.find_one(
+            ChatSessionDocument.id == session.id,
+            _pending_assistant_message_filter(pair.assistant_message.id),
+        ).update(
+            Pull({
+                ChatSessionDocument.messages: {
+                    "id": {"$in": [pair.user_message.id, pair.assistant_message.id]}
+                },
+                ChatSessionDocument.message_operations: {
+                    "assistant_message_id": pair.assistant_message.id
+                },
+            }),
+            Set({ChatSessionDocument.updated_at: utc_now()}),
         )
 
     async def finalize_assistant_message(

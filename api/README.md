@@ -179,7 +179,9 @@ For a new paid request, the server reserves 3 coins before starting AI generatio
 `balance` is the available balance, excluding outstanding reservations. A normal
 account with fewer than 3 available coins receives `402` with
 `Not enough coins. AI chat costs 3 coins per message.` The AI does not run.
-The already-reserved message pair is marked failed and remains in chat history.
+Rejected requests leave the conversation history unchanged. If a concurrent
+reservation exhausts the balance, only that rejected request's new pending pair
+is discarded. After topping up, the same idempotency key can be retried.
 
 Successful completion means generation finished and the assistant message was
 durably saved as `confirmed`. Only then is the reservation committed. AI errors,

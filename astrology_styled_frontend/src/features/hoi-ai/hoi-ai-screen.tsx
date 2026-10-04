@@ -220,6 +220,14 @@ function ChatConversation() {
     transcript.length === 0 && draft === null && !session.isPending && activeSessionId !== null;
 
   const streaming = renderedDraft !== null && renderedDraft.terminal === "streaming";
+  const canChat =
+    accountAccess.isSuccess &&
+    accountAccess.data.user_id === userId &&
+    (accountAccess.data.plan === "full_unlock" || accountAccess.data.balance >= 3);
+  const insufficientCoins =
+    accountAccess.isSuccess &&
+    accountAccess.data.plan === "normal" &&
+    accountAccess.data.balance < 3;
 
   // A fresh conversation (only the greeting, no real message) offers nothing to
   // fork from, so "Tạo mới" is disabled until the active session has a message.
@@ -288,7 +296,8 @@ function ChatConversation() {
   };
 
   const send = async (content: string) => {
-    if (activeSessionId === null || streaming || activeStreamRef.current !== null) return;
+    if (!canChat || activeSessionId === null || streaming || activeStreamRef.current !== null)
+      return;
     const trimmed = content.trim();
     if (trimmed === "") return;
     const accountSignal = getAccountSignal();
@@ -325,7 +334,11 @@ function ChatConversation() {
         updateTurnDraft(turn, (current) => ({ ...current, terminal: "cancelled" }));
         return;
       }
-      updateTurnDraft(turn, (current) => ({ ...current, terminal: "failed" }));
+      if (isApiError(error) && error.error.kind === "http" && error.error.status === 402) {
+        setDraft((current) => (current?.idempotencyKey === turn.idempotencyKey ? null : current));
+      } else {
+        updateTurnDraft(turn, (current) => ({ ...current, terminal: "failed" }));
+      }
       showToast(
         isApiError(error)
           ? describe(error.error)
@@ -423,6 +436,12 @@ function ChatConversation() {
         </p>
       ) : null}
 
+      {insufficientCoins ? (
+        <p role="status" className="text-[13px] text-accent">
+          Bạn không đủ xu. Cần ít nhất 3 xu hoặc gói Mở khóa toàn bộ để gửi tin nhắn.
+        </p>
+      ) : null}
+
       <div className={`${styles.enterTranscript} flex flex-col gap-3`}>
         {list.isError || createSession.isError ? (
           <div className="flex items-center gap-3">
@@ -495,7 +514,7 @@ function ChatConversation() {
       ) : null}
 
       <Composer
-        disabled={activeSessionId === null || streaming}
+        disabled={!canChat || activeSessionId === null || streaming}
         onSend={(content) => void send(content)}
       />
 

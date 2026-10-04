@@ -1099,6 +1099,7 @@ class FakeConversationHistoryStore:
         *,
         user_content: str,
         idempotency_key: str,
+        allow_new: bool = True,
     ) -> ReservedMessagePair:
         if self.reserve_result is not None:
             return self.reserve_result
