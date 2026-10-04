@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from api.chat.models import BirthInfo, ChatSession, ChatSessionSummary
 
@@ -48,6 +48,12 @@ class CreateAnonymousResponse(BaseModel):
 class CreateChartProfileRequest(BaseModel):
     display_name: str
     birth_info: BirthInfo
+
+
+class UpdateChartProfileRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    display_name: str = Field(min_length=1, max_length=80)
 
 
 class ChartProfilePayload(BaseModel):

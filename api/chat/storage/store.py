@@ -3,7 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import timedelta
 from hashlib import sha256
+from itertools import count
 from typing import Self
+from unicodedata import normalize
 from uuid import uuid4
 
 from beanie import PydanticObjectId, init_beanie
@@ -12,6 +14,7 @@ from beanie.odm.operators.find.logical import Not
 from beanie.odm.operators.update.array import Push
 from beanie.odm.operators.update.general import Set
 from beanie.odm.queries.update import UpdateResponse
+from bson.errors import InvalidId
 from pydantic import BaseModel
 from pymongo import AsyncMongoClient
 from pymongo.errors import DuplicateKeyError
@@ -83,6 +86,31 @@ class MongoConversationHistoryStore:
             database=self._mongo_client[self._database_name],
             document_models=[ChartProfileDocument, ChatSessionDocument],
         )
+        await self._backfill_chart_names()
+
+    async def _backfill_chart_names(self) -> None:
+        profiles = await ChartProfileDocument.find_many_in_all().to_list()
+        profiles = [profile for profile in profiles
+                    if profile.name_key is None or profile.display_name != profile.display_name.strip()]
+        profiles.sort(key=lambda profile: (_is_automatic_name(profile), profile.created_at, str(profile.id)))
+        collection = self._mongo_client[self._database_name]["chart_profiles"]
+        for profile in profiles:
+            name = None if _is_automatic_name(profile) else profile.display_name.strip()
+            while True:
+                if name is None:
+                    name, _ = await _available_chart_name(
+                        profile.owner_id, profile.display_name,
+                        automatic=_is_automatic_name(profile), exclude_id=profile.id,
+                    )
+                try:
+                    await collection.update_one(
+                        {"_id": profile.id, "owner_id": profile.owner_id,
+                         "name_key": profile.name_key, "display_name": profile.display_name},
+                        {"$set": {"display_name": name, "name_key": _name_key(name)}},
+                    )
+                    break
+                except DuplicateKeyError:
+                    name = None
 
     async def close(self) -> None:
         await self._mongo_client.close()
@@ -98,43 +126,37 @@ class MongoConversationHistoryStore:
             raise MissingOwnerIdError
 
         fingerprint = _compute_fingerprint(payload)
-        document = ChartProfileDocument(
-            owner_id=owner_id,
-            display_name=payload.display_name,
-            birth_info=payload.birth_info,
-            creation_idempotency_key=idempotency_key,
-            creation_request_fingerprint=fingerprint,
-        )
-
-        try:
-            await document.insert()
-        except DuplicateKeyError:
-            existing = await ChartProfileDocument.find_one(
-                ChartProfileDocument.owner_id == owner_id,
-                ChartProfileDocument.creation_idempotency_key == idempotency_key,
+        while True:
+            name, name_key = await _available_chart_name(
+                owner_id, payload.display_name, automatic=_is_automatic_name(payload)
             )
-            if existing is None:
-                # The document holding this idempotency key is soft-deleted: it
-                # still occupies the unique index, so a fresh insert fails. The
-                # same logical cast came back, so restore the deleted profile
-                # instead of erroring.
-                deleted = await ChartProfileDocument.find_many_in_all(
+            document = ChartProfileDocument(
+                owner_id=owner_id,
+                display_name=name,
+                name_key=name_key,
+                birth_info=payload.birth_info,
+                creation_idempotency_key=idempotency_key,
+                creation_request_fingerprint=fingerprint,
+            )
+            try:
+                await document.insert()
+                return chart_profile_from_document(document)
+            except DuplicateKeyError:
+                existing = await ChartProfileDocument.find_many_in_all(
                     ChartProfileDocument.owner_id == owner_id,
                     ChartProfileDocument.creation_idempotency_key == idempotency_key,
                 ).first_or_none()
-                if deleted is None:
-                    raise
-                if deleted.creation_request_fingerprint != fingerprint:
+                if existing is None:
+                    continue
+                if existing.creation_request_fingerprint != fingerprint:
                     raise IdempotencyConflictError
-                deleted.deleted_at = None
-                deleted.updated_at = utc_now()
-                await deleted.save()
-                return chart_profile_from_document(deleted)
-            if existing.creation_request_fingerprint != fingerprint:
-                raise IdempotencyConflictError
-            return chart_profile_from_document(existing)
-
-        return chart_profile_from_document(document)
+                if existing.deleted_at is not None:
+                    await self._mongo_client[self._database_name]["chart_profiles"].update_one(
+                        {"_id": existing.id, "owner_id": owner_id},
+                        {"$set": {"deleted_at": None, "updated_at": utc_now()}},
+                    )
+                    existing = await _require_chart_profile(owner_id, str(existing.id))
+                return chart_profile_from_document(existing)
 
     async def list_chart_profiles(self, owner_id: str) -> list[ChartProfile]:
         documents = await ChartProfileDocument.find(
@@ -142,9 +164,36 @@ class MongoConversationHistoryStore:
         ).to_list()
         return [chart_profile_from_document(document) for document in documents]
 
+    async def rename_chart_profile(
+        self, owner_id: str, chart_profile_id: str, display_name: str
+    ) -> ChartProfile:
+        profile = await _require_chart_profile(owner_id, chart_profile_id)
+        while True:
+            name, name_key = await _available_chart_name(
+                owner_id, display_name, exclude_id=profile.id
+            )
+            try:
+                updated = await ChartProfileDocument.find_one(
+                    ChartProfileDocument.id == profile.id,
+                    ChartProfileDocument.owner_id == owner_id,
+                ).update(
+                    Set({"display_name": name, "name_key": name_key, "updated_at": utc_now()}),
+                    response_type=UpdateResponse.NEW_DOCUMENT,
+                )
+                if updated is None:
+                    raise NotFoundError
+                return chart_profile_from_document(updated)
+            except DuplicateKeyError:
+                continue
+
     async def delete_chart_profile(self, owner_id: str, chart_profile_id: str) -> None:
         profile = await _require_chart_profile(owner_id, chart_profile_id)
-        await profile.delete()
+        result = await ChartProfileDocument.find_one(
+            ChartProfileDocument.id == profile.id,
+            ChartProfileDocument.owner_id == owner_id,
+        ).update(Set({"deleted_at": utc_now()}))
+        if not result.matched_count:
+            raise NotFoundError
         async for session in ChatSessionDocument.find(
             ChatSessionDocument.chart_profile_id == chart_profile_id
         ):
@@ -630,10 +679,39 @@ def _has_pending_assistant_message(session: ChatSessionDocument) -> bool:
     )
 
 
+def _name_key(name: str) -> str:
+    return normalize("NFC", " ".join(name.split())).casefold()
+
+
+def _is_automatic_name(profile: CreateChartProfileInput | ChartProfileDocument) -> bool:
+    birth = profile.birth_info
+    return profile.display_name.strip() == f"{birth.day:02d}/{birth.month:02d}/{birth.year}"
+
+
+async def _available_chart_name(
+    owner_id: str, requested: str, *, automatic: bool = False,
+    exclude_id: PydanticObjectId | None = None,
+) -> tuple[str, str]:
+    profiles = await ChartProfileDocument.find_many_in_all(
+        ChartProfileDocument.owner_id == owner_id, {"_id": {"$ne": exclude_id}},
+    ).to_list()
+    names = {profile.name_key or _name_key(profile.display_name) for profile in profiles}
+    base = requested.strip()
+    for number in count(1):
+        if automatic:
+            candidate = f"Lá số {number}"
+        else:
+            suffix = "" if number == 1 else f" ({number})"
+            candidate = f"{base[:80 - len(suffix)].rstrip()}{suffix}"
+        key = _name_key(candidate)
+        if key not in names:
+            return candidate, key
+
+
 def _object_id(value: str) -> PydanticObjectId | None:
     try:
         return PydanticObjectId(value)
-    except (TypeError, ValueError):
+    except (InvalidId, TypeError, ValueError):
         return None
 
 

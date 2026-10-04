@@ -46,6 +46,10 @@ class ConversationHistoryStore(Protocol):
 
     async def list_chart_profiles(self, owner_id: str) -> list[ChartProfile]: ...
 
+    async def rename_chart_profile(
+        self, owner_id: str, chart_profile_id: str, display_name: str
+    ) -> ChartProfile: ...
+
     async def delete_chart_profile(self, owner_id: str, chart_profile_id: str) -> None: ...
 
     async def create_session(

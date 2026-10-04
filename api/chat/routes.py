@@ -48,6 +48,7 @@ from api.schemas import (
     ListChartProfilesResponse,
     ListSessionsResponse,
     SessionChatStreamRequest,
+    UpdateChartProfileRequest,
 )
 from src.agent.deps import TuviAgentDeps
 from src.refactored.la_so import LaSo
@@ -91,6 +92,21 @@ async def list_chart_profiles(
     return ListChartProfilesResponse(
         chart_profiles=[_chart_profile_payload(profile) for profile in profiles]
     )
+
+
+@router.patch(
+    "/chart-profiles/{chart_profile_id}", response_model=CreateChartProfileResponse
+)
+async def rename_chart_profile(
+    chart_profile_id: str,
+    payload: UpdateChartProfileRequest,
+    request: Request,
+    user: CurrentUser,
+) -> CreateChartProfileResponse:
+    profile = await _get_store(request).rename_chart_profile(
+        user.user_id, chart_profile_id, payload.display_name
+    )
+    return CreateChartProfileResponse(chart_profile=_chart_profile_payload(profile))
 
 
 @router.delete("/chart-profiles/{chart_profile_id}", status_code=204)

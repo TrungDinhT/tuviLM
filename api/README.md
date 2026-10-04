@@ -10,6 +10,7 @@ FastAPI backend for TuviLM UI.
   - `POST /api/v1/anonymous`
   - `POST /api/v1/chart-profiles`
   - `GET /api/v1/chart-profiles`
+  - `PATCH /api/v1/chart-profiles/{chart_profile_id}`
   - `POST /api/v1/chart-profiles/{chart_profile_id}/sessions`
   - `GET /api/v1/chart-profiles/{chart_profile_id}/sessions`
   - `GET /api/v1/sessions/{session_id}`
@@ -73,6 +74,24 @@ The web client resets chart and chat state when the active account changes.
 Its persisted chart is restored only for the matching account. Requests from
 the previous account are cancelled; private requests also check that their
 fresh token belongs to the account that started them.
+
+Saved chart names can be changed with
+`PATCH /api/v1/chart-profiles/{chart_profile_id}` and
+`{"display_name": "My chart"}`. The name is trimmed and must contain 1–80
+characters. Only the profile owner may rename it; missing, deleted or another
+account's profiles return `404`. Renaming leaves birth data and chat history
+unchanged, and re-casting the same birth data preserves the edited name.
+
+Automatically saved charts are named `Lá số 1`, `Lá số 2`, and so on, rather
+than using birth or save dates. Names are allocated and stored by the server,
+not derived from the list order. Existing automatic birth-date names are
+converted once during storage initialization; custom names are retained.
+Names are stripped before storage, including existing padded names.
+Within an account, duplicate names receive a suffix such as `Family (2)`.
+Matching ignores letter case and extra whitespace, but preserves Vietnamese
+accents. A unique database index also prevents concurrent requests from
+creating duplicate names. Deleted profiles keep their names reserved so
+restoring the same chart does not change its name.
 
 ## Account plans and balance
 
