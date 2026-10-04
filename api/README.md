@@ -198,11 +198,11 @@ add coins twice. Reservations and settlement use conditional, single-user-docume
 updates, following [MongoDB's atomic update guarantees](https://www.mongodb.com/docs/manual/core/write-operations-atomicity/).
 
 Outstanding reservations are stored as `chat_holds` on the existing user document;
-there is no new collection or payment framework. On the next authenticated
-request, the server checks these holds against the stored assistant messages:
-confirmed messages and deleted sessions commit; failed, cancelled or missing
-messages refund; pending messages keep their holds. Existing stale-message
-cleanup marks abandoned pending messages failed after
+there is no new collection or payment framework. On the next `/api/v1/me`, chat
+stream or code redemption request, the server checks these holds against the
+stored assistant messages: confirmed messages and deleted sessions commit;
+failed, cancelled or missing messages refund; pending messages keep their holds.
+Existing stale-message cleanup marks abandoned pending messages failed after
 `stale_pending_after_seconds` (15 minutes by default).
 Recovery is lazy, not a background job. During database outages, a hold can remain
 reserved until a later request can reconcile it. If finalization cannot be saved

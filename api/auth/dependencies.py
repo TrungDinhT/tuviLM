@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from typing import Annotated, Literal
 
@@ -83,25 +83,11 @@ async def require_user(
         if session is None:
             raise _unauthorized()
         user = await database["user"].find_one(
-            {"_id": ObjectId(claims["sub"])},
-            {"role": 1, "plan": 1, "balance": 1, "chat_holds": 1},
+            {"_id": ObjectId(claims["sub"])}, {"role": 1, "plan": 1, "balance": 1}
         )
         if user is None:
             raise _unauthorized()
         access = AccountAccess.model_validate(user)
-        if user.get("chat_holds"):
-            await reconcile_chat_coins(
-                database,
-                claims["sub"],
-                user["chat_holds"],
-                request.app.state.api_state.conversation_history_store,
-            )
-            user = await database["user"].find_one(
-                {"_id": ObjectId(claims["sub"])}, {"role": 1, "plan": 1, "balance": 1}
-            )
-            if user is None:
-                raise _unauthorized()
-            access = AccountAccess.model_validate(user)
     except PyMongoError as exc:
         raise HTTPException(503, "Authentication service unavailable.") from exc
     except ValidationError as exc:
@@ -115,6 +101,39 @@ async def require_user(
 
 
 CurrentUser = Annotated[Principal, Depends(require_user)]
+
+
+async def require_reconciled_user(request: Request, user: CurrentUser) -> Principal:
+    """Settle finished chat holds first, for routes that show or spend coins."""
+    database = request.app.state.auth_database
+    try:
+        account = await database["user"].find_one(
+            {"_id": ObjectId(user.user_id)}, {"chat_holds": 1}
+        )
+        if account is None:
+            raise _unauthorized()
+        if not account.get("chat_holds"):
+            return user
+        await reconcile_chat_coins(
+            database,
+            user.user_id,
+            account["chat_holds"],
+            request.app.state.api_state.conversation_history_store,
+        )
+        account = await database["user"].find_one(
+            {"_id": ObjectId(user.user_id)}, {"plan": 1, "balance": 1}
+        )
+        if account is None:
+            raise _unauthorized()
+        access = AccountAccess.model_validate(account)
+    except PyMongoError as exc:
+        raise HTTPException(503, "Authentication service unavailable.") from exc
+    except ValidationError as exc:
+        raise HTTPException(503, "Account data unavailable.") from exc
+    return replace(user, plan=access.plan, balance=access.balance)
+
+
+ReconciledUser = Annotated[Principal, Depends(require_reconciled_user)]
 
 
 def require_admin(user: CurrentUser) -> Principal:

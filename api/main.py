@@ -21,7 +21,7 @@ from api.accounts.redeem_codes import (
     ensure_redeem_code_indexes,
     router as redeem_codes_router,
 )
-from api.auth.dependencies import CurrentUser, Principal
+from api.auth.dependencies import Principal, ReconciledUser
 from api.chat.contracts import (
     ConversationHistoryError,
     ConversationHistoryStore,
@@ -171,7 +171,7 @@ def health() -> dict[str, str]:
 
 
 @app.get("/api/v1/me")
-def me(user: CurrentUser) -> Principal:
+def me(user: ReconciledUser) -> Principal:
     return user
 
 

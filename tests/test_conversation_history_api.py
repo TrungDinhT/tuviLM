@@ -15,7 +15,7 @@ from pymongo import AsyncMongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from pydantic_ai import PartStartEvent, TextPart
 
-from api.auth.dependencies import Principal, require_user
+from api.auth.dependencies import Principal, require_reconciled_user, require_user
 from api.chat.contracts import (
     ConversationHistoryStore,
     DuplicateStreamInProgressError,
@@ -73,6 +73,7 @@ async def api_client(monkeypatch):
         return Principal(user_id=authorization[7:], plan="full_unlock")
 
     app.dependency_overrides[require_user] = test_user
+    app.dependency_overrides[require_reconciled_user] = test_user
     monkeypatch.setattr("api.chat.routes.reserve_chat_coins", AsyncMock())
     monkeypatch.setattr("api.chat.routes.settle_chat_coins", AsyncMock())
     previous_auth_database = getattr(app.state, "auth_database", None)
@@ -86,6 +87,7 @@ async def api_client(monkeypatch):
             yield client
     finally:
         app.dependency_overrides.pop(require_user, None)
+        app.dependency_overrides.pop(require_reconciled_user, None)
         if previous_auth_database is None:
             del app.state.auth_database
         else:

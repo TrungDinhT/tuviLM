@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import os
 from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
@@ -16,6 +17,7 @@ from pymongo.errors import PyMongoError
 
 from api.accounts.redeem_codes import ensure_redeem_code_indexes, router
 from api.auth.dependencies import Principal, require_user
+from api.chat.models import ChatMessageStatus
 
 
 pytestmark = pytest.mark.anyio
@@ -49,6 +51,14 @@ async def redeem_client():
     app.include_router(router)
     app.dependency_overrides[require_user] = test_user
     app.state.auth_database = database
+    # Chat holds in these tests belong to replies that are still streaming.
+    pending_reply = SimpleNamespace(id="reply", status=ChatMessageStatus.PENDING)
+    store = SimpleNamespace(
+        load_session_context=AsyncMock(
+            return_value=SimpleNamespace(session=SimpleNamespace(messages=[pending_reply]))
+        )
+    )
+    app.state.api_state = SimpleNamespace(conversation_history_store=store)
     try:
         hello = await mongo.admin.command("hello")
         assert hello.get("setName"), "Redemption tests require a MongoDB replica set."

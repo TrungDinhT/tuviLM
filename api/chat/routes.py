@@ -23,7 +23,7 @@ from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, User
 from starlette.types import Receive, Scope, Send
 
 from api.accounts.billing import CHAT_MESSAGE_COST, reserve_chat_coins, settle_chat_coins
-from api.auth.dependencies import CurrentUser
+from api.auth.dependencies import CurrentUser, ReconciledUser
 from api.chat.contracts import ConversationHistoryStore, NotFoundError
 from api.chat.models import (
     BirthInfo,
@@ -177,7 +177,7 @@ async def session_chat_stream(
     session_id: str,
     payload: SessionChatStreamRequest,
     request: Request,
-    user: CurrentUser,
+    user: ReconciledUser,
     idempotency_key: str = Header(alias="Idempotency-Key", min_length=1),
 ) -> StreamingResponse:
     store = _get_store(request)

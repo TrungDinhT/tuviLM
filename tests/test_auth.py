@@ -176,6 +176,21 @@ def test_me_reconciles_coin_holds_and_returns_updated_balance(
     )
 
 
+def test_routes_without_coins_do_not_reconcile_coin_holds(
+    auth_context, monkeypatch
+) -> None:
+    auth_context.database["user"].document.update(
+        chat_holds={"assistant-id": {"amount": 3, "session_id": "session-id"}}
+    )
+    reconciler = AsyncMock()
+    monkeypatch.setattr(dependencies, "reconcile_chat_coins", reconciler)
+
+    response = auth_context.client.get("/private", headers=bearer(auth_context))
+
+    assert response.status_code == 200
+    reconciler.assert_not_awaited()
+
+
 def test_invalid_access_is_not_repaired_by_coin_reconciliation(
     auth_context, monkeypatch
 ) -> None:

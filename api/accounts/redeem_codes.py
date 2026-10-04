@@ -19,7 +19,7 @@ from api.accounts.models import (
     RedeemCodeInput,
     RedeemCodeResult,
 )
-from api.auth.dependencies import CurrentUser, require_admin
+from api.auth.dependencies import ReconciledUser, require_admin
 
 
 router = APIRouter(prefix="/api/v1")
@@ -48,7 +48,7 @@ async def create_redeem_code(payload: RedeemCodeCreate, request: Request) -> Red
 
 @router.post("/account/redeem-code", response_model=RedeemCodeResult)
 async def redeem_code(
-    payload: RedeemCodeInput, request: Request, user: CurrentUser
+    payload: RedeemCodeInput, request: Request, user: ReconciledUser
 ) -> RedeemCodeResult:
     database = request.app.state.auth_database
 
