@@ -107,6 +107,11 @@ full-unlock expiration, and pricing for features other than chat are not defined
 
 ## Coin redemption codes
 
+The web creation form is available at `/admin/redeem-codes`, with a link in
+the profile settings for administrators. Its server-rendered page checks the
+current session and role before showing the form; the API checks them again
+on submission. The form accepts a coin amount, code type and lifetime in days.
+
 Administrators create a randomly generated code with
 `POST /api/v1/admin/redeem-codes`. The body contains `coins` (a positive integer),
 `kind` (`single_use` or `per_account`), and `expires_at` (a future ISO 8601 timestamp

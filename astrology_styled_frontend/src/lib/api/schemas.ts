@@ -25,6 +25,18 @@ export const redeemCodeResponseSchema = z.object({
   coins: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
 });
 
+export const createRedeemCodeRequestSchema = z.object({
+  coins: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  kind: z.enum(["single_use", "per_account"]),
+  expires_at: z.iso.datetime({ offset: true }),
+});
+
+export type CreateRedeemCodeRequest = z.infer<typeof createRedeemCodeRequestSchema>;
+
+export const createRedeemCodeResponseSchema = createRedeemCodeRequestSchema.extend({
+  code: z.string().min(1),
+});
+
 // --- api/chat/models.py ----------------------------------------------------
 
 export const birthInfoSchema = z.object({

@@ -1,6 +1,7 @@
 export const apiEndpoints = {
   accountAccess: "/api/v1/me",
   redeemCode: "/api/v1/account/redeem-code",
+  createRedeemCode: "/api/v1/admin/redeem-codes",
   buildLaso: "/api/v1/laso/build",
   previewLaso: "/api/v1/laso/preview",
   anonymous: "/api/v1/anonymous",

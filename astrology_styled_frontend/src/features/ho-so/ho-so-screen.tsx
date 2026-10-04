@@ -4,7 +4,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { Pill } from "@/components/primitives/pill";
-import { useChartProfiles } from "@/lib/api/hooks";
+import { ADMIN_REDEEM_CODES_ROUTE } from "@/config/site";
+import { useAccountAccess, useChartProfiles } from "@/lib/api/hooks";
 import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
 
@@ -23,6 +24,13 @@ const SAVED_RAIL_CLASS =
 export function HoSoScreen() {
   const { data: session, isPending } = authClient.useSession();
   const profiles = useChartProfiles(Boolean(session));
+  const account = useAccountAccess();
+  const isAdmin =
+    session &&
+    account.isSuccess &&
+    !account.isFetching &&
+    account.data.user_id === session.user.id &&
+    account.data.role === "admin";
 
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-x-[30px]">
@@ -37,6 +45,15 @@ export function HoSoScreen() {
           <h2 className="text-[22px] font-semibold">Cài đặt</h2>
         </div>
         <SettingsList />
+        {isAdmin && (
+          <Link
+            href={ADMIN_REDEEM_CODES_ROUTE}
+            className="glass mt-5 flex items-center justify-between gap-3 p-4 text-sm no-underline"
+          >
+            <span className="font-semibold">Tạo mã nhận xu</span>
+            <span className="text-xs text-accent">Quản trị ›</span>
+          </Link>
+        )}
         {session && <RedeemCodeForm />}
       </div>
     </div>

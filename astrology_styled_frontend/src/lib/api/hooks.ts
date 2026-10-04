@@ -18,11 +18,14 @@ import {
   type BirthInfo,
   type BuildLasoResponse,
   type CreateChartProfileRequest,
+  type CreateRedeemCodeRequest,
   type PreviewLasoRequest,
   accountAccessSchema,
   buildLasoResponseSchema,
   createChartProfileRequestSchema,
   createChartProfileResponseSchema,
+  createRedeemCodeRequestSchema,
+  createRedeemCodeResponseSchema,
   createSessionRequestSchema,
   createSessionResponseSchema,
   emptyResponseSchema,
@@ -71,6 +74,21 @@ export function useRedeemCode() {
         exact: true,
       });
     },
+  });
+}
+
+export function useCreateRedeemCode() {
+  const { getSignal, userId } = useAccountRequestScope();
+  return useMutation({
+    mutationFn: (input: CreateRedeemCodeRequest) =>
+      request(apiEndpoints.createRedeemCode, {
+        method: "POST",
+        body: createRedeemCodeRequestSchema.parse(input),
+        schema: createRedeemCodeResponseSchema,
+        withAuth: true,
+        expectedUserId: userId,
+        signal: getSignal(),
+      }),
   });
 }
 
