@@ -3,7 +3,7 @@ import type { z } from "zod";
 import { env } from "@/config/env";
 import { ApiErrorException } from "@/lib/http/errors";
 
-import { getAuthHeaders } from "./auth-headers";
+import { clearAuthToken, getAuthHeaders } from "./auth-headers";
 import { apiEndpoints } from "./endpoints";
 import { createAnonymousResponseSchema } from "./schemas";
 
@@ -127,24 +127,30 @@ export async function request<T>(path: string, options: RequestOptions<T>): Prom
     signal,
   } = options;
 
-  signal?.throwIfAborted();
-  const headers: Record<string, string> = withAuth ? await getAuthHeaders(expectedUserId) : {};
-  signal?.throwIfAborted();
-  if (body !== undefined) headers["Content-Type"] = "application/json";
-  if (idempotencyKey !== undefined) headers["Idempotency-Key"] = idempotencyKey;
+  const send = async (headers: Record<string, string>): Promise<Response> => {
+    signal?.throwIfAborted();
+    if (body !== undefined) headers["Content-Type"] = "application/json";
+    if (idempotencyKey !== undefined) headers["Idempotency-Key"] = idempotencyKey;
+    try {
+      return await fetch(apiUrl(path), {
+        method,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal,
+      });
+    } catch (cause) {
+      // An aborted request is the caller's own doing, not a network failure.
+      if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
+      throw new ApiErrorException({ kind: "network" });
+    }
+  };
 
-  let response: Response;
-  try {
-    response = await fetch(apiUrl(path), {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-      signal,
-    });
-  } catch (cause) {
-    // An aborted request is the caller's own doing, not a network failure.
-    if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
-    throw new ApiErrorException({ kind: "network" });
+  signal?.throwIfAborted();
+  let response = await send(withAuth ? await getAuthHeaders(expectedUserId) : {});
+  if (withAuth && response.status === 401) {
+    // A cached token can outlive its session; retry once with a new one.
+    clearAuthToken();
+    response = await send(await getAuthHeaders(expectedUserId));
   }
 
   const payload = await safeBody(response);

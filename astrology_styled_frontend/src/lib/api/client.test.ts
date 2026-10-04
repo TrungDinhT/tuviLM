@@ -4,6 +4,7 @@ import { isApiError } from "@/lib/http/errors";
 import { authClient } from "@/lib/auth-client";
 
 import fixture from "./__fixtures__/build-laso.json";
+import { clearAuthToken } from "./auth-headers";
 import { newIdempotencyKey, request, resolveBaseUrl } from "./client";
 import { OWNER_ID_KEY } from "./owner";
 import { buildLasoResponseSchema } from "./schemas";
@@ -16,6 +17,16 @@ function jsonResponse(body: unknown, status = 200) {
     headers: { "Content-Type": "application/json" },
   });
 }
+
+function signedToken(claims: Record<string, unknown>) {
+  const payload = btoa(JSON.stringify(claims))
+    .replace(/=+$/, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+  return `header.${payload}.signature`;
+}
+
+const inAnHour = () => Math.floor(Date.now() / 1000) + 3600;
 
 /** Unwrap the ApiError the client threw, failing the test if it threw anything else. */
 async function errorFrom(promise: Promise<unknown>) {
@@ -30,6 +41,7 @@ async function errorFrom(promise: Promise<unknown>) {
 
 beforeEach(() => {
   localStorage.clear();
+  clearAuthToken();
   vi.mocked(authClient.token).mockReset();
   vi.mocked(authClient.token).mockResolvedValue({ data: { token: "signed-token" }, error: null });
 });
@@ -179,22 +191,82 @@ describe("headers", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("acquires identity for each private request rather than caching a token", async () => {
+  it("reuses an unexpired token for the same account", async () => {
+    const token = signedToken({ sub: "account-a", exp: inAnHour() });
+    vi.mocked(authClient.token).mockResolvedValue({ data: { token }, error: null });
+    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(fixture)));
+    vi.stubGlobal("fetch", fetchMock);
+    const options = {
+      schema: buildLasoResponseSchema,
+      withAuth: true,
+      expectedUserId: "account-a",
+    };
+
+    await Promise.all([
+      request("/api/v1/chart-profiles", options),
+      request("/api/v1/chart-profiles", options),
+    ]);
+    await request("/api/v1/chart-profiles", options);
+
+    expect(authClient.token).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls.map(([, init]) => init.headers.Authorization)).toEqual(
+      Array(3).fill(`Bearer ${token}`),
+    );
+    expect(localStorage.length).toBe(0);
+  });
+
+  it("does not reuse a token that is about to expire or belongs to another account", async () => {
+    const expiring = signedToken({ sub: "account-a", exp: Math.floor(Date.now() / 1000) + 30 });
+    const accountA = signedToken({ sub: "account-a", exp: inAnHour() });
+    const accountB = signedToken({ sub: "account-b", exp: inAnHour() });
     vi.mocked(authClient.token)
-      .mockResolvedValueOnce({ data: { token: "first-token" }, error: null })
-      .mockResolvedValueOnce({ data: { token: "second-token" }, error: null });
+      .mockResolvedValueOnce({ data: { token: expiring }, error: null })
+      .mockResolvedValueOnce({ data: { token: accountA }, error: null })
+      .mockResolvedValueOnce({ data: { token: accountB }, error: null });
     const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(fixture)));
     vi.stubGlobal("fetch", fetchMock);
 
-    await request("/api/v1/chart-profiles", { schema: buildLasoResponseSchema, withAuth: true });
-    await request("/api/v1/chart-profiles", { schema: buildLasoResponseSchema, withAuth: true });
+    for (const expectedUserId of ["account-a", "account-a", "account-b"]) {
+      await request("/api/v1/chart-profiles", {
+        schema: buildLasoResponseSchema,
+        withAuth: true,
+        expectedUserId,
+      });
+    }
 
-    expect(authClient.token).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls.map(([, init]) => init.headers.Authorization)).toEqual([
-      "Bearer first-token",
-      "Bearer second-token",
+      `Bearer ${expiring}`,
+      `Bearer ${accountA}`,
+      `Bearer ${accountB}`,
     ]);
-    expect(localStorage.length).toBe(0);
+  });
+
+  it("retries once with a new token when the API rejects a cached one", async () => {
+    const revoked = signedToken({ sub: "account-a", exp: inAnHour(), sid: "revoked" });
+    const current = signedToken({ sub: "account-a", exp: inAnHour(), sid: "current" });
+    vi.mocked(authClient.token)
+      .mockResolvedValueOnce({ data: { token: revoked }, error: null })
+      .mockResolvedValueOnce({ data: { token: current }, error: null });
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(fixture))
+      .mockResolvedValueOnce(jsonResponse({ detail: "Session expired." }, 401))
+      .mockResolvedValueOnce(jsonResponse(fixture));
+    vi.stubGlobal("fetch", fetchMock);
+    const options = {
+      schema: buildLasoResponseSchema,
+      withAuth: true,
+      expectedUserId: "account-a",
+    };
+
+    await request("/api/v1/chart-profiles", options);
+    await request("/api/v1/chart-profiles", options);
+
+    expect(fetchMock.mock.calls.map(([, init]) => init.headers.Authorization)).toEqual([
+      `Bearer ${revoked}`,
+      `Bearer ${revoked}`,
+      `Bearer ${current}`,
+    ]);
   });
 
   it("does not call the backend when authentication fails or poison later attempts", async () => {

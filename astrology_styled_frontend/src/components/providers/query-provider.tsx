@@ -6,6 +6,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { useEffect, useState } from "react";
 
 import { AccountRequestContext } from "@/lib/api/account-request";
+import { clearAuthToken } from "@/lib/api/auth-headers";
 import {
   bindChartResetClearing,
   reconcileChartState,
@@ -27,7 +28,11 @@ function createAccountScope() {
     start: () => {
       if (controller.signal.aborted) controller = new AbortController();
     },
-    stop: () => controller.abort(),
+    stop: () => {
+      controller.abort();
+      // The next account must not reuse this account's token.
+      clearAuthToken();
+    },
     persister: createSyncStoragePersister({
       key: QUERY_CACHE_KEY,
       throttleTime: 0,

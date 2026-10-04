@@ -1,6 +1,6 @@
 import { ApiErrorException } from "@/lib/http/errors";
 
-import { getAuthHeaders } from "./auth-headers";
+import { clearAuthToken, getAuthHeaders } from "./auth-headers";
 import { apiUrl, safeBody } from "./client";
 import { apiEndpoints } from "./endpoints";
 import { sseChatEventSchema, type SseChatEvent } from "./schemas";
@@ -31,25 +31,32 @@ export async function* streamChat(
   content: string,
   opts: { idempotencyKey: string; signal?: AbortSignal; expectedUserId?: string | null },
 ): AsyncGenerator<SseChatEvent> {
-  opts.signal?.throwIfAborted();
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    ...(await getAuthHeaders(opts.expectedUserId)),
-    "Idempotency-Key": opts.idempotencyKey,
+  const send = async (): Promise<Response> => {
+    opts.signal?.throwIfAborted();
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(await getAuthHeaders(opts.expectedUserId)),
+      "Idempotency-Key": opts.idempotencyKey,
+    };
+    opts.signal?.throwIfAborted();
+    try {
+      return await fetch(apiUrl(apiEndpoints.chatStream(sessionId)), {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ content }),
+        signal: opts.signal,
+      });
+    } catch (cause) {
+      if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
+      throw new ApiErrorException({ kind: "network" });
+    }
   };
-  opts.signal?.throwIfAborted();
 
-  let response: Response;
-  try {
-    response = await fetch(apiUrl(apiEndpoints.chatStream(sessionId)), {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ content }),
-      signal: opts.signal,
-    });
-  } catch (cause) {
-    if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
-    throw new ApiErrorException({ kind: "network" });
+  let response = await send();
+  if (response.status === 401) {
+    // A cached token can outlive its session; retry once with a new one.
+    clearAuthToken();
+    response = await send();
   }
 
   if (!response.ok) {
