@@ -90,7 +90,9 @@ class MongoConversationHistoryStore:
         await self._backfill_chart_names()
 
     async def _backfill_chart_names(self) -> None:
-        profiles = await ChartProfileDocument.find_many_in_all().to_list()
+        profiles = await ChartProfileDocument.find_many_in_all(
+            {"$or": [{"name_key": None}, {"display_name": {"$regex": r"^\s|\s$"}}]}
+        ).to_list()
         profiles = [profile for profile in profiles
                     if profile.name_key is None or profile.display_name != profile.display_name.strip()]
         profiles.sort(key=lambda profile: (_is_automatic_name(profile), profile.created_at, str(profile.id)))
@@ -710,7 +712,8 @@ def _name_key(name: str) -> str:
 
 def _is_automatic_name(profile: CreateChartProfileInput | ChartProfileDocument) -> bool:
     birth = profile.birth_info
-    return profile.display_name.strip() == f"{birth.day:02d}/{birth.month:02d}/{birth.year}"
+    name = profile.display_name.strip()
+    return not name or name == f"{birth.day:02d}/{birth.month:02d}/{birth.year}"
 
 
 async def _available_chart_name(
