@@ -34,6 +34,7 @@ import {
   listSessionsResponseSchema,
   previewLasoRequestSchema,
   previewLasoResponseSchema,
+  renameChartProfileRequestSchema,
   redeemCodeRequestSchema,
   redeemCodeResponseSchema,
 } from "./schemas";
@@ -206,6 +207,7 @@ export function profileDisplayName(birth: BirthInfo): string {
  * still a separate change.
  */
 export function useCreateChartProfile() {
+  const queryClient = useQueryClient();
   const { getSignal, userId } = useAccountRequestScope();
   return useMutation({
     mutationFn: (input: CreateChartProfileRequest) =>
@@ -218,6 +220,10 @@ export function useCreateChartProfile() {
         idempotencyKey: profileIdempotencyKey(input.birth_info),
         signal: getSignal(),
       }),
+    onSuccess: () => {
+      if (getSignal()?.aborted) return;
+      void queryClient.invalidateQueries({ queryKey: queryKeys.chartProfiles.all() });
+    },
   });
 }
 
@@ -243,6 +249,26 @@ export function useDeleteChartProfile() {
     onSuccess: () => {
       if (getSignal()?.aborted) return;
       void queryClient.invalidateQueries({ queryKey: queryKeys.chartProfiles.all() });
+    },
+  });
+}
+
+export function useRenameChartProfile() {
+  const queryClient = useQueryClient();
+  const { getSignal, userId } = useAccountRequestScope();
+  return useMutation({
+    mutationFn: ({ id, display_name }: { id: string; display_name: string }) =>
+      request(apiEndpoints.chartProfile(id), {
+        method: "PATCH",
+        body: renameChartProfileRequestSchema.parse({ display_name }),
+        schema: createChartProfileResponseSchema,
+        withAuth: true,
+        expectedUserId: userId,
+        signal: getSignal(),
+      }),
+    onSuccess: async () => {
+      if (getSignal()?.aborted) return;
+      await queryClient.invalidateQueries({ queryKey: queryKeys.chartProfiles.all() });
     },
   });
 }

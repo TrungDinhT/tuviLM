@@ -21,7 +21,7 @@ import { createAnonymousResponseSchema } from "./schemas";
  */
 
 export interface RequestOptions<T> {
-  method?: "GET" | "POST" | "DELETE";
+  method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
   schema: z.ZodType<T>;
   /**

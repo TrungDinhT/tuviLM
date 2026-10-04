@@ -6,7 +6,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { isApiError } from "@/lib/http/errors";
 
 import { AccountRequestContext } from "./account-request";
-import { useAccountAccess, useChartProfiles, useDeleteChartProfile } from "./hooks";
+import {
+  useAccountAccess,
+  useChartProfiles,
+  useDeleteChartProfile,
+  useRenameChartProfile,
+} from "./hooks";
 import { queryKeys } from "./queryKeys";
 import { accountAccessSchema, emptyResponseSchema } from "./schemas";
 
@@ -114,6 +119,36 @@ describe("useChartProfiles", () => {
     });
 
     await waitFor(() => expect(result.current.data).toEqual({ chart_profiles: [PROFILE] }));
+  });
+});
+
+describe("useRenameChartProfile", () => {
+  it("patches the trimmed name and refetches the active saved-chart list", async () => {
+    let profile = PROFILE;
+    const fetchMock = vi.fn((_: string, init?: RequestInit) => {
+      if (init?.method === "PATCH") {
+        profile = { ...PROFILE, display_name: "Gia đình" };
+        return Promise.resolve(jsonResponse({ chart_profile: profile }));
+      }
+      return Promise.resolve(jsonResponse({ chart_profiles: [profile] }));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const client = new QueryClient();
+    const { result: list } = renderHook(() => useChartProfiles(), {
+      wrapper: wrapperWith(client, "user-1"),
+    });
+    const { result: rename } = renderHook(() => useRenameChartProfile(), {
+      wrapper: wrapperWith(client, "user-1"),
+    });
+    await waitFor(() => expect(list.current.data?.chart_profiles[0]).toEqual(PROFILE));
+    await act(async () => {
+      await rename.current.mutateAsync({ id: PROFILE.id, display_name: "  Gia đình  " });
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/chart-profiles/p1"),
+      expect.objectContaining({ method: "PATCH", body: JSON.stringify({ display_name: "Gia đình" }) }),
+    );
+    await waitFor(() => expect(list.current.data?.chart_profiles[0]?.display_name).toBe("Gia đình"));
   });
 });
 

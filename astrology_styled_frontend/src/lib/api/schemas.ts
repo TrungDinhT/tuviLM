@@ -283,6 +283,10 @@ export const createChartProfileRequestSchema = z.object({
 
 export type CreateChartProfileRequest = z.infer<typeof createChartProfileRequestSchema>;
 
+export const renameChartProfileRequestSchema = z.strictObject({
+  display_name: z.string().trim().min(1).max(80),
+});
+
 export const createChartProfileResponseSchema = z.object({
   chart_profile: chartProfileSchema,
 });
