@@ -90,6 +90,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
 /** Screens that have no tab of their own but still title the top bar. */
 const EXTRA_SCREENS: Record<string, ScreenMeta> = {
   "/": { href: "/", group: GROUP_CHART, title: "An sao", requiresChart: false },
+  "/goi": { href: "/goi", group: "Tài khoản", title: "Gói sử dụng", requiresChart: false },
   "/la-so": {
     href: "/la-so",
     group: GROUP_DEEP,

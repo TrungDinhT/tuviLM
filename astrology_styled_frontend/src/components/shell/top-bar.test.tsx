@@ -65,6 +65,7 @@ describe("TopBar balance", () => {
     const client = new QueryClient();
     const view = render(header(client));
     expect(await screen.findByText("1.234 xu")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Số dư tài khoản" }).getAttribute("href")).toBe("/goi");
     expect(screen.getByLabelText("Số dư tài khoản").closest("header")).not.toBeNull();
     expect(screen.getByLabelText("Số dư tài khoản").getAttribute("title")).toContain("Gói Cơ bản");
     navigation.pathname = "/";

@@ -1,0 +1,72 @@
+.page {
+  --plans-gold: #ffd98d;
+  --plans-purple: #d9b8ff;
+}
+
+.gold {
+  color: var(--plans-gold);
+}
+
+.wallet {
+  background: var(--color-bg-1);
+}
+
+.balance {
+  border-bottom: 1px solid var(--color-glass-line);
+  background: radial-gradient(ellipse at top right, #553474, transparent 75%);
+}
+
+.chip {
+  display: inline-flex;
+  border: 1px solid color-mix(in srgb, var(--plans-gold) 40%, transparent);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--plans-gold);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.option {
+  background: #25143e;
+  transition:
+    border-color 150ms,
+    background 150ms;
+}
+
+.option:has(input:checked) {
+  border-color: var(--plans-purple);
+  background: #42245f;
+  box-shadow: inset 0 0 0 1px var(--plans-purple);
+}
+
+.option:has(input:focus-visible) {
+  outline: 2px solid var(--plans-gold);
+  outline-offset: 4px;
+}
+
+.option input {
+  accent-color: var(--plans-purple);
+}
+
+.premium {
+  border-color: #b887c0;
+  background:
+    radial-gradient(ellipse at top right, #72476f, transparent 65%),
+    linear-gradient(150deg, #49275f, #28163e);
+}
+
+.coinButton {
+  color: #342040;
+  background: linear-gradient(120deg, var(--plans-purple), #b48ae7);
+}
+
+.unlockButton {
+  color: #342040;
+  background: linear-gradient(120deg, #ffeab4, var(--plans-gold), #e6b281);
+}
+
+.feature::before {
+  content: "✓";
+  margin-right: 8px;
+  color: var(--plans-gold);
+}

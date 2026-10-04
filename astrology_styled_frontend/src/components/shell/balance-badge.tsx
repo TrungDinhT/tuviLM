@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useAccountRequestScope } from "@/lib/api/account-request";
 import { useAccountAccess } from "@/lib/api/hooks";
 
@@ -40,9 +42,9 @@ function AccountBalance() {
   const unlocked = account.data.plan === "full_unlock";
   const label = unlocked ? "Mở khóa toàn bộ" : `${account.data.balance.toLocaleString("vi-VN")} xu`;
   return (
-    <span
-      className={`${BADGE_CLASS} ${unlocked ? styles.fullUnlock : styles.coins}`}
-      role="status"
+    <Link
+      href="/goi"
+      className={`${BADGE_CLASS} ${unlocked ? styles.fullUnlock : styles.coins} no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffd98d]`}
       aria-label={unlocked ? "Mở khóa toàn bộ" : "Số dư tài khoản"}
       aria-busy={account.isFetching}
       title={unlocked ? "Mở khóa toàn bộ · Bao gồm trò chuyện với AI." : `Gói Cơ bản · ${label}`}
@@ -67,6 +69,6 @@ function AccountBalance() {
         )}
       </svg>
       <span className="min-w-0 truncate tabular-nums">{label}</span>
-    </span>
+    </Link>
   );
 }
