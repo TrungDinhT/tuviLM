@@ -1,3 +1,5 @@
+import { BalanceBadge } from "./balance-badge";
+
 /**
  * The screen header shared by every tab — phone and tablet only.
  *
@@ -42,8 +44,11 @@ export function StickyHeader({
         "lg:-mt-[calc(18px+var(--safe-t))] lg:-mx-10 lg:px-10",
       ].join(" ")}
     >
-      <div className="text-[10px] font-bold tracking-[0.26em] text-accent uppercase">
-        {eyebrow}
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-[10px] font-bold tracking-[0.26em] text-accent uppercase">
+          {eyebrow}
+        </div>
+        <BalanceBadge />
       </div>
       <h2 className="mt-[7px] font-display text-[26px] leading-[1.06] font-semibold tracking-[-0.01em] md:text-[29px]">
         {title}

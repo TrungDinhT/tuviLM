@@ -8,6 +8,35 @@ import { z } from "zod";
  * which is the point.
  */
 
+export const accountAccessSchema = z.object({
+  user_id: z.string(),
+  role: z.enum(["user", "admin"]),
+  plan: z.enum(["normal", "full_unlock"]),
+  balance: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+});
+
+export type AccountAccess = z.infer<typeof accountAccessSchema>;
+
+export const redeemCodeRequestSchema = z.object({
+  code: z.string().trim().toUpperCase().min(1),
+});
+
+export const redeemCodeResponseSchema = z.object({
+  coins: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+});
+
+export const createRedeemCodeRequestSchema = z.object({
+  coins: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  kind: z.enum(["single_use", "per_account"]),
+  expires_at: z.iso.datetime({ offset: true }),
+});
+
+export type CreateRedeemCodeRequest = z.infer<typeof createRedeemCodeRequestSchema>;
+
+export const createRedeemCodeResponseSchema = createRedeemCodeRequestSchema.extend({
+  code: z.string().min(1),
+});
+
 // --- api/chat/models.py ----------------------------------------------------
 
 export const birthInfoSchema = z.object({
@@ -254,6 +283,10 @@ export const createChartProfileRequestSchema = z.object({
 
 export type CreateChartProfileRequest = z.infer<typeof createChartProfileRequestSchema>;
 
+export const renameChartProfileRequestSchema = z.strictObject({
+  display_name: z.string().trim().min(1).max(80),
+});
+
 export const createChartProfileResponseSchema = z.object({
   chart_profile: chartProfileSchema,
 });
@@ -287,5 +320,4 @@ export const listSessionsResponseSchema = z.object({
 
 export const healthResponseSchema = z.object({
   status: z.string(),
-  la_so_created: z.boolean(),
 });

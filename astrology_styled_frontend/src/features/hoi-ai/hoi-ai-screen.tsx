@@ -5,11 +5,19 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Pill } from "@/components/primitives/pill";
-import { newIdempotencyKey } from "@/lib/api/client";
-import { useCreateSession, useGetSession, useListSessions } from "@/lib/api/hooks";
+import { useAccountRequestScope } from "@/lib/api/account-request";
+import { newIdempotencyKey, request } from "@/lib/api/client";
+import { apiEndpoints } from "@/lib/api/endpoints";
+import {
+  useAccountAccess,
+  useCreateSession,
+  useGetSession,
+  useListSessions,
+} from "@/lib/api/hooks";
 import { queryKeys } from "@/lib/api/queryKeys";
-import type { ChatMessage, SseChatEvent } from "@/lib/api/schemas";
+import { getSessionResponseSchema, type ChatMessage, type SseChatEvent } from "@/lib/api/schemas";
 import { streamChat } from "@/lib/api/stream";
+import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
 import { showToast } from "@/lib/toast";
 import { useChartStore } from "@/store/chart-store";
@@ -39,6 +47,8 @@ interface ActiveStream {
   controller: AbortController;
   sessionId: string;
   idempotencyKey: string;
+  assistantMessageId: string | null;
+  receivedDone: boolean;
 }
 
 const GREETING =
@@ -66,9 +76,17 @@ function doneTerminal(status: string): Terminal {
  * local state that reconciles away once the backend confirms it.
  */
 export function HoiAiScreen() {
+  const chartKey = useChartStore((state) => state.chartProfileId ?? state.chartId ?? "idle");
+  return <ChatConversation key={chartKey} />;
+}
+
+function ChatConversation() {
+  const { data: account, isPending: isAccountPending } = authClient.useSession();
   const hasChart = useChartStore((state) => state.hasChart);
   const chartProfileId = useChartStore((state) => state.chartProfileId);
   const queryClient = useQueryClient();
+  const { getSignal: getAccountSignal, userId } = useAccountRequestScope();
+  const accountAccess = useAccountAccess();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -86,14 +104,15 @@ export function HoiAiScreen() {
 
   useEffect(() => () => abortActiveStream(), [abortActiveStream]);
 
-  const list = useListSessions(chartProfileId);
-  const createSession = useCreateSession(chartProfileId);
+  const accountProfileId = account ? chartProfileId : null;
+  const list = useListSessions(accountProfileId);
+  const createSession = useCreateSession(accountProfileId);
 
   const sessions = useMemo(
     () => [...(list.data?.sessions ?? [])].sort((a, b) => b.updated_at.localeCompare(a.updated_at)),
     [list.data],
   );
-  const activeSessionId = selectedId ?? sessions[0]?.id ?? null;
+  const activeSessionId = account ? (selectedId ?? sessions[0]?.id ?? null) : null;
 
   const session = useGetSession(activeSessionId);
 
@@ -129,11 +148,20 @@ export function HoiAiScreen() {
     return () => window.clearInterval(timer);
   }, [duplicateStillPending, refetchSession]);
 
+  const completedDuplicateId =
+    draft?.duplicateInProgress && duplicateMessage?.status !== "pending"
+      ? duplicateMessage?.id
+      : undefined;
+  useEffect(() => {
+    if (!completedDuplicateId || !userId) return;
+    void queryClient.invalidateQueries({ queryKey: queryKeys.accountAccess(userId) });
+  }, [completedDuplicateId, queryClient, userId]);
+
   const contentKey = `${transcript.length}:${renderedDraft?.assistantText.length ?? 0}:${renderedDraft?.activity ?? ""}:${renderedDraft?.userContent.length ?? 0}`;
   const { isAtBottom, scrollToBottom } = useStickToBottom(contentKey);
 
   // Ensure the profile has at least one session so the chat opens on something.
-  const needsSession = chartProfileId !== null && list.isSuccess && sessions.length === 0;
+  const needsSession = accountProfileId !== null && list.isSuccess && sessions.length === 0;
   useEffect(() => {
     if (!needsSession || autoCreatedFor.current === chartProfileId) return;
     autoCreatedFor.current = chartProfileId;
@@ -141,6 +169,30 @@ export function HoiAiScreen() {
   }, [needsSession, createSession, chartProfileId]);
 
   if (!hasChart) return null;
+
+  if (isAccountPending) {
+    return (
+      <p className="py-10 text-[13.5px] text-muted" role="status">
+        Đang kiểm tra tài khoản…
+      </p>
+    );
+  }
+
+  if (!account) {
+    return (
+      <div className={`${styles.enterTranscript} flex flex-col items-start gap-4 py-10`}>
+        <p className="max-w-[46ch] text-[13.5px] leading-relaxed text-muted">
+          Đăng nhập để lưu lá số và trò chuyện với AI.
+        </p>
+        <Link
+          href="/login"
+          className="rounded-full border border-glass-line bg-glass px-6 py-3 text-[14px] font-semibold no-underline"
+        >
+          Đăng nhập
+        </Link>
+      </div>
+    );
+  }
 
   if (chartProfileId === null) {
     return (
@@ -168,6 +220,14 @@ export function HoiAiScreen() {
     transcript.length === 0 && draft === null && !session.isPending && activeSessionId !== null;
 
   const streaming = renderedDraft !== null && renderedDraft.terminal === "streaming";
+  const canChat =
+    accountAccess.isSuccess &&
+    accountAccess.data.user_id === userId &&
+    (accountAccess.data.plan === "full_unlock" || accountAccess.data.balance >= 3);
+  const insufficientCoins =
+    accountAccess.isSuccess &&
+    accountAccess.data.plan === "normal" &&
+    accountAccess.data.balance < 3;
 
   // A fresh conversation (only the greeting, no real message) offers nothing to
   // fork from, so "Tạo mới" is disabled until the active session has a message.
@@ -192,6 +252,7 @@ export function HoiAiScreen() {
     if (activeStreamRef.current !== turn) return;
     switch (event.type) {
       case "ids":
+        turn.assistantMessageId = event.assistant_message_id;
         updateTurnDraft(turn, (current) => ({
           ...current,
           assistantMessageId: event.assistant_message_id,
@@ -212,6 +273,7 @@ export function HoiAiScreen() {
         showToast("Thiên Hạc chưa thể trả lời trọn vẹn. Bạn thử lại nhé.");
         break;
       case "done":
+        turn.receivedDone = true;
         updateTurnDraft(turn, (current) => ({
           ...current,
           terminal: doneTerminal(event.status),
@@ -220,6 +282,7 @@ export function HoiAiScreen() {
         invalidateSession(turn.sessionId);
         break;
       case "duplicate_in_progress":
+        turn.assistantMessageId = event.assistant_message_id;
         updateTurnDraft(turn, (current) => ({
           ...current,
           assistantMessageId: event.assistant_message_id,
@@ -233,14 +296,18 @@ export function HoiAiScreen() {
   };
 
   const send = async (content: string) => {
-    if (activeSessionId === null || streaming || activeStreamRef.current !== null) return;
+    if (!canChat || activeSessionId === null || streaming || activeStreamRef.current !== null)
+      return;
     const trimmed = content.trim();
     if (trimmed === "") return;
+    const accountSignal = getAccountSignal();
 
     const turn: ActiveStream = {
       controller: new AbortController(),
       sessionId: activeSessionId,
       idempotencyKey: newIdempotencyKey(),
+      assistantMessageId: null,
+      receivedDone: false,
     };
     activeStreamRef.current = turn;
     setDraft({
@@ -257,6 +324,7 @@ export function HoiAiScreen() {
       for await (const event of streamChat(turn.sessionId, trimmed, {
         idempotencyKey: turn.idempotencyKey,
         signal: turn.controller.signal,
+        expectedUserId: userId,
       })) {
         applyEvent(event, turn);
       }
@@ -266,7 +334,11 @@ export function HoiAiScreen() {
         updateTurnDraft(turn, (current) => ({ ...current, terminal: "cancelled" }));
         return;
       }
-      updateTurnDraft(turn, (current) => ({ ...current, terminal: "failed" }));
+      if (isApiError(error) && error.error.kind === "http" && error.error.status === 402) {
+        setDraft((current) => (current?.idempotencyKey === turn.idempotencyKey ? null : current));
+      } else {
+        updateTurnDraft(turn, (current) => ({ ...current, terminal: "failed" }));
+      }
       showToast(
         isApiError(error)
           ? describe(error.error)
@@ -274,6 +346,35 @@ export function HoiAiScreen() {
       );
     } finally {
       if (activeStreamRef.current === turn) activeStreamRef.current = null;
+      if (!accountSignal?.aborted && userId) {
+        if (!turn.receivedDone) {
+          try {
+            // A disconnected stream can end before the server releases its coin hold;
+            // the server settles within seconds, so stop polling after 30 tries.
+            for (let attempt = 0; attempt < 30 && !accountSignal?.aborted; attempt++) {
+              const result = await request(apiEndpoints.session(turn.sessionId), {
+                schema: getSessionResponseSchema,
+                withAuth: true,
+                expectedUserId: userId,
+                signal: accountSignal,
+              });
+              const pending = result.session.messages.some(
+                (message) =>
+                  message.role === "assistant" &&
+                  message.status === "pending" &&
+                  (turn.assistantMessageId === null || message.id === turn.assistantMessageId),
+              );
+              if (!pending) break;
+              await new Promise((resolve) => window.setTimeout(resolve, 1_000));
+            }
+          } catch {
+            // The next balance refresh will retry reconciliation if the session is unavailable.
+          }
+        }
+        if (!accountSignal?.aborted) {
+          void queryClient.invalidateQueries({ queryKey: queryKeys.accountAccess(userId) });
+        }
+      }
     }
   };
 
@@ -288,12 +389,15 @@ export function HoiAiScreen() {
     if (chartProfileId === null || creatingSessionRef.current) return;
     abortActiveStream();
     creatingSessionRef.current = true;
+    const accountSignal = getAccountSignal();
     try {
       const result = await createSession.mutateAsync();
+      if (accountSignal?.aborted) return;
       setDraft(null);
       setSelectedId(result.session.id);
       setHistoryOpen(false);
     } catch (error) {
+      if (accountSignal?.aborted) return;
       showToast(isApiError(error) ? describe(error.error) : "Không tạo được cuộc trò chuyện.");
     } finally {
       creatingSessionRef.current = false;
@@ -324,6 +428,20 @@ export function HoiAiScreen() {
           </Pill>
         </div>
       </div>
+
+      {accountAccess.data && !accountAccess.isError ? (
+        <p className="text-xs leading-relaxed text-muted">
+          {accountAccess.data.plan === "full_unlock"
+            ? "Trò chuyện với AI đã được bao gồm trong gói Mở khóa toàn bộ."
+            : "Trò chuyện với AI: 3 xu mỗi tin nhắn. Chỉ trừ xu khi AI trả lời hoàn tất."}
+        </p>
+      ) : null}
+
+      {insufficientCoins ? (
+        <p role="status" className="text-[13px] text-accent">
+          Bạn không đủ xu. Cần ít nhất 3 xu hoặc gói Mở khóa toàn bộ để gửi tin nhắn.
+        </p>
+      ) : null}
 
       <div className={`${styles.enterTranscript} flex flex-col gap-3`}>
         {list.isError || createSession.isError ? (
@@ -397,7 +515,7 @@ export function HoiAiScreen() {
       ) : null}
 
       <Composer
-        disabled={activeSessionId === null || streaming}
+        disabled={!canChat || activeSessionId === null || streaming}
         onSend={(content) => void send(content)}
       />
 

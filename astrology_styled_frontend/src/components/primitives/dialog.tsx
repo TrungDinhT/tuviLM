@@ -48,12 +48,13 @@ function useRestoreFocus(open: boolean) {
  * wrong: focus trap, focus restore, Escape, `aria-modal`, and background
  * scroll lock. Everything visual is ours.
  *
- * Two variants, because the design has two real shapes:
+ * Three variants for the application's overlay shapes:
  *
  * - `center` — a card in the middle of the viewport. The two confirm boxes.
  * - `panel`  — full-screen on phone and tablet, a right-anchored drawer from
  *              the `lg` tier where the scrim disappears entirely and the panel
  *              sits beside the content rather than over it.
+ * - `fullscreen` — an opaque loading screen covering the entire viewport.
  *
  * The panel pins its title to the top edge and `footer` to the bottom edge;
  * only the body between them scrolls. The center card scrolls as one block.
@@ -61,7 +62,7 @@ function useRestoreFocus(open: boolean) {
  * Padding accounts for the safe-area insets and for `--tabbar-h`, which is
  * `0px` at the desktop tier — so the same expression is correct at every size.
  */
-type DialogVariant = "center" | "panel";
+type DialogVariant = "center" | "panel" | "fullscreen";
 
 const CONTENT: Record<DialogVariant, string> = {
   center: [
@@ -80,6 +81,7 @@ const CONTENT: Record<DialogVariant, string> = {
     "lg:top-[calc(var(--topbar-h)+18px)] lg:bottom-7 lg:left-auto lg:right-7",
     "lg:w-[376px] lg:max-w-none lg:translate-x-0",
   ].join(" "),
+  fullscreen: "fixed inset-0 z-55 overflow-y-auto bg-bg-0",
 };
 
 export function Dialog({
@@ -150,7 +152,7 @@ export function Dialog({
             </>
           ) : (
             <>
-              {header}
+              {variant === "fullscreen" ? <div className="sr-only">{header}</div> : header}
               {children}
               {footer}
             </>

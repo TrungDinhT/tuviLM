@@ -4,8 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AN_SAO_ROUTE, isActive, NAV_ITEMS, type NavItem } from "@/config/site";
+import { useAccountRequestScope } from "@/lib/api/account-request";
+import { useChartStore } from "@/store/chart-store";
 
+import { BrandLink } from "./brand-link";
 import { NavIconGlyph } from "./nav-icons";
+import { SignOutButton } from "./sign-out-button";
 
 /**
  * The application's only navigation.
@@ -16,17 +20,14 @@ import { NavIconGlyph } from "./nav-icons";
  * resizing across the boundary never remounts anything or loses the active
  * item.
  *
- * The brand block is the single desktop-only element: a bottom bar has no room
- * for a product name, a rail needs one.
+ * The brand and account actions are desktop-only.
  */
 export function AppNav() {
   const pathname = usePathname();
+  const hasChart = useChartStore((state) => state.hasChart);
+  const { userId } = useAccountRequestScope();
 
-  // The casting screen is a full-bleed flow: the bottom tab bar never shows
-  // there — it appears once the cast lands on Bản mệnh. AppShell only mounts
-  // this navigation after a chart exists, so the desktop rail follows the
-  // same rule without leaving an empty rail-sized gutter behind.
-  const hiddenBelowDesktop = pathname === AN_SAO_ROUTE;
+  const hiddenBelowDesktop = !hasChart || pathname === AN_SAO_ROUTE;
 
   return (
     <nav
@@ -44,21 +45,18 @@ export function AppNav() {
         "lg:px-4 lg:pt-[22px] lg:pb-[calc(20px+var(--safe-b))]",
       ].join(" ")}
     >
-      <div className="hidden items-center gap-[11px] px-2 pt-0.5 pb-5 lg:flex" aria-hidden="true">
-        <span className="accent-gradient grid size-9 flex-none place-items-center rounded-[11px] text-[17px] text-bg-0">
-          ✦
-        </span>
-        <span>
-          <b className="font-display text-[17px] font-semibold tracking-[0.18em]">TỬ VI</b>
-          <small className="mt-0.5 block text-[9px] font-semibold tracking-[0.16em] text-muted uppercase">
-            An sao &amp; luận giải
-          </small>
-        </span>
+      <div className="hidden pt-0.5 pb-5 lg:block">
+        <BrandLink className="px-2" showTagline />
       </div>
 
-      {NAV_ITEMS.map((item) => (
+      {NAV_ITEMS.filter((item) => hasChart || !item.requiresChart).map((item) => (
         <NavButton key={item.href} item={item} pathname={pathname} />
       ))}
+      {userId ? (
+        <div className="mt-auto hidden border-t border-glass-line pt-3 lg:block">
+          <SignOutButton className="w-full rounded-xl px-[13px] py-[11px] text-sm font-medium text-muted hover:bg-white/6 hover:text-ink" />
+        </div>
+      ) : null}
     </nav>
   );
 }

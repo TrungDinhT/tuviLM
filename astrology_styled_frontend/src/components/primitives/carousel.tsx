@@ -121,7 +121,7 @@ export function CarouselItem({
   return (
     <div
       role="group"
-      aria-roledescription="slide"
+      aria-roledescription="lá bài"
       className={cn("shrink-0 snap-center", index === active && "is-active", className)}
       style={
         {

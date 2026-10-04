@@ -149,7 +149,6 @@
   background:
     linear-gradient(180deg, rgba(13, 7, 28, 0.88) 0%, rgba(13, 7, 28, 0.54) 20%, transparent 36%),
     linear-gradient(0deg, rgba(13, 7, 28, 0.92) 0%, rgba(13, 7, 28, 0.66) 13%, transparent 31%),
-    url("/assets/bg-la-bai-chinh.png") center/cover no-repeat,
     linear-gradient(168deg, #3b2569 0%, #2b1b4e 44%, #1d1136 100%);
   border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
   box-shadow:

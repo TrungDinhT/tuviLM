@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { z } from "zod";
 
+import { Pill } from "@/components/primitives/pill";
+import { AN_SAO_ROUTE } from "@/config/site";
+import { useChartProfiles } from "@/lib/api/hooks";
 import { authClient } from "@/lib/auth-client";
 import { showToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
@@ -36,7 +39,7 @@ const registerFormSchema = z
 
 export function AuthScreen({ mode }: { mode: AuthMode }) {
   const isLogin = mode === "login";
-  const router = useRouter();
+  const { data: session } = authClient.useSession();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordValue, setPasswordValue] = useState("");
@@ -81,9 +84,6 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
         showToast(authErrorMessage(result.error.message, isLogin));
         return;
       }
-
-      router.replace("/");
-      router.refresh();
     } catch {
       showToast("Không thể kết nối máy chủ xác thực. Vui lòng thử lại sau.");
     } finally {
@@ -96,7 +96,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
     try {
       const result = await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: "/login",
         errorCallbackURL: "/login",
       });
       if (result.error) {
@@ -108,6 +108,8 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
       setPendingAction(null);
     }
   };
+
+  if (session) return <SignedInRedirect />;
 
   return (
     <div className="min-h-dvh bg-bg-0">
@@ -138,6 +140,32 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
           </div>
         </section>
       </main>
+    </div>
+  );
+}
+
+function SignedInRedirect() {
+  const router = useRouter();
+  const profiles = useChartProfiles();
+
+  useEffect(() => {
+    if (profiles.isSuccess && !profiles.isFetching) {
+      router.replace(profiles.data.chart_profiles.length > 0 ? "/ho-so" : AN_SAO_ROUTE);
+    }
+  }, [profiles.data, profiles.isFetching, profiles.isSuccess, router]);
+
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-5 text-center">
+      {profiles.isError && !profiles.isFetching ? (
+        <>
+          <p role="alert">Không tải được lá số đã lưu. Vui lòng thử lại.</p>
+          <Pill variant="ghost" onClick={() => void profiles.refetch()}>
+            Thử lại
+          </Pill>
+        </>
+      ) : (
+        <p role="status">Đang kiểm tra lá số đã lưu…</p>
+      )}
     </div>
   );
 }
@@ -617,7 +645,7 @@ function authErrorMessage(message: string | undefined, isLogin: boolean): string
   const normalizedMessage = message?.toLocaleLowerCase("vi");
 
   if (normalizedMessage?.includes("provider")) {
-    return "Google OAuth chưa được cấu hình trên máy chủ.";
+    return "Đăng nhập bằng Google chưa được cấu hình trên máy chủ.";
   }
   if (normalizedMessage?.includes("already")) {
     return "Email này đã có tài khoản. Hãy đăng nhập nhé.";

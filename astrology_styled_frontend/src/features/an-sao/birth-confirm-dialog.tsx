@@ -55,7 +55,7 @@ export function BirthConfirmDialog({
         {summary}
       </p>
       <p className="mt-[11px] text-[13.5px] leading-relaxed text-muted">
-        Lá số sẽ được an theo đúng ngày giờ này. Sau này muốn đổi, bạn vào tab <b>Hồ sơ</b> →{" "}
+        Lá số sẽ được an theo đúng ngày giờ này. Sau này muốn đổi, bạn vào mục <b>Hồ sơ</b> →{" "}
         <b>Nhập lại ngày sinh</b>.
       </p>
       <label className="mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-[9px] text-[13.5px] text-muted">
