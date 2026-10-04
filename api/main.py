@@ -97,9 +97,7 @@ async def lifespan(app: FastAPI):
     )
     auth_mongo = AsyncMongoClient(settings.auth.mongo_uri, serverSelectionTimeoutMS=5000)
     app.state.auth_database = auth_mongo[settings.auth.database_name]
-    app.state.auth_jwks = PyJWKClient(
-        f"{settings.auth.base_url.rstrip('/')}/api/auth/jwks", timeout=5
-    )
+    app.state.auth_jwks = PyJWKClient(settings.auth.jwks_url, timeout=5)
     try:
         yield
     finally:

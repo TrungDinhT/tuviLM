@@ -4,6 +4,7 @@ import { env } from "@/config/env";
 import { ApiErrorException } from "@/lib/http/errors";
 
 import { getAuthHeaders } from "./auth-headers";
+import { apiEndpoints } from "./endpoints";
 import { createAnonymousResponseSchema } from "./schemas";
 
 /**
@@ -90,7 +91,7 @@ export function newIdempotencyKey(): string {
 }
 
 export async function mintOwnerId(): Promise<string> {
-  const response = await fetch(apiUrl("/api/v1/anonymous"), { method: "POST" });
+  const response = await fetch(apiUrl(apiEndpoints.anonymous), { method: "POST" });
   if (!response.ok) {
     throw new ApiErrorException({
       kind: "http",

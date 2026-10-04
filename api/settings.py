@@ -13,6 +13,10 @@ class AuthSettings(BaseModel):
     mongo_uri: str = "mongodb://localhost:27017"
     database_name: str = "tuvilm"
 
+    @property
+    def jwks_url(self) -> str:
+        return f"{self.base_url.rstrip('/')}/api/auth/jwks"
+
 
 class ApiSettings(BaseSettings):
     model_config = SettingsConfigDict(

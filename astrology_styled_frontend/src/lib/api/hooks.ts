@@ -12,6 +12,7 @@ import { useChartStore } from "@/store/chart-store";
 
 import { useAccountRequestScope } from "./account-request";
 import { newIdempotencyKey, request } from "./client";
+import { apiEndpoints } from "./endpoints";
 import { queryKeys } from "./queryKeys";
 import {
   type BirthInfo,
@@ -37,7 +38,7 @@ export function useAccountAccess() {
   return useQuery({
     queryKey: queryKeys.accountAccess(userId ?? null),
     queryFn: ({ signal }) =>
-      request("/api/v1/me", {
+      request(apiEndpoints.accountAccess, {
         schema: accountAccessSchema,
         withAuth: true,
         expectedUserId: userId,
@@ -64,7 +65,7 @@ export function useBuildLaso() {
   const { getSignal } = useAccountRequestScope();
   return useMutation({
     mutationFn: (birth: BirthInfo) =>
-      request("/api/v1/laso/build", {
+      request(apiEndpoints.buildLaso, {
         method: "POST",
         body: birth,
         schema: buildLasoResponseSchema,
@@ -105,7 +106,7 @@ export function useLasoPreview(birth: PreviewLasoRequest | null) {
   return useQuery({
     queryKey: queryKeys.laso.preview(birth),
     queryFn: ({ signal }) =>
-      request("/api/v1/laso/preview", {
+      request(apiEndpoints.previewLaso, {
         method: "POST",
         body: previewLasoRequestSchema.parse(birth),
         schema: previewLasoResponseSchema,
@@ -132,7 +133,7 @@ export function useChartProfiles(enabled = true) {
   return useQuery({
     queryKey: queryKeys.chartProfiles.all(),
     queryFn: ({ signal }) =>
-      request("/api/v1/chart-profiles", {
+      request(apiEndpoints.chartProfiles, {
         schema: listChartProfilesResponseSchema,
         withAuth: true,
         expectedUserId: userId,
@@ -165,7 +166,7 @@ export function useCreateChartProfile() {
   const { getSignal, userId } = useAccountRequestScope();
   return useMutation({
     mutationFn: (input: CreateChartProfileRequest) =>
-      request("/api/v1/chart-profiles", {
+      request(apiEndpoints.chartProfiles, {
         method: "POST",
         body: createChartProfileRequestSchema.parse(input),
         schema: createChartProfileResponseSchema,
@@ -189,7 +190,7 @@ export function useDeleteChartProfile() {
   const { getSignal, userId } = useAccountRequestScope();
   return useMutation({
     mutationFn: (id: string) =>
-      request(`/api/v1/chart-profiles/${id}`, {
+      request(apiEndpoints.chartProfile(id), {
         method: "DELETE",
         schema: emptyResponseSchema,
         withAuth: true,
@@ -213,7 +214,7 @@ export function useListSessions(profileId: string | null) {
   return useQuery({
     queryKey: queryKeys.sessions.byProfile(profileId ?? "idle"),
     queryFn: ({ signal }) =>
-      request(`/api/v1/chart-profiles/${profileId as string}/sessions`, {
+      request(apiEndpoints.profileSessions(profileId as string), {
         schema: listSessionsResponseSchema,
         withAuth: true,
         expectedUserId: userId,
@@ -229,7 +230,7 @@ export function useGetSession(sessionId: string | null) {
   return useQuery({
     queryKey: queryKeys.sessions.detail(sessionId ?? "idle"),
     queryFn: ({ signal }) =>
-      request(`/api/v1/sessions/${sessionId as string}`, {
+      request(apiEndpoints.session(sessionId as string), {
         schema: getSessionResponseSchema,
         withAuth: true,
         expectedUserId: userId,
@@ -251,7 +252,7 @@ export function useCreateSession(profileId: string | null) {
   return useMutation({
     mutationFn: () => {
       if (profileId === null) throw new Error("chart profile id required");
-      return request(`/api/v1/chart-profiles/${profileId}/sessions`, {
+      return request(apiEndpoints.profileSessions(profileId), {
         method: "POST",
         body: createSessionRequestSchema.parse({ title: null }),
         schema: createSessionResponseSchema,

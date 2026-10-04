@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pill } from "@/components/primitives/pill";
 import { useAccountRequestScope } from "@/lib/api/account-request";
 import { newIdempotencyKey, request } from "@/lib/api/client";
+import { apiEndpoints } from "@/lib/api/endpoints";
 import {
   useAccountAccess,
   useCreateSession,
@@ -332,7 +333,7 @@ export function HoiAiScreen() {
           try {
             // A disconnected stream can end before the server releases its coin hold.
             while (!accountSignal?.aborted) {
-              const result = await request(`/api/v1/sessions/${turn.sessionId}`, {
+              const result = await request(apiEndpoints.session(turn.sessionId), {
                 schema: getSessionResponseSchema,
                 withAuth: true,
                 expectedUserId: userId,

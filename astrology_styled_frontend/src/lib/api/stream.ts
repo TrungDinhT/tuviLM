@@ -2,6 +2,7 @@ import { ApiErrorException } from "@/lib/http/errors";
 
 import { getAuthHeaders } from "./auth-headers";
 import { apiUrl, safeBody } from "./client";
+import { apiEndpoints } from "./endpoints";
 import { sseChatEventSchema, type SseChatEvent } from "./schemas";
 
 /**
@@ -40,7 +41,7 @@ export async function* streamChat(
 
   let response: Response;
   try {
-    response = await fetch(apiUrl(`/api/v1/sessions/${sessionId}/chat/stream`), {
+    response = await fetch(apiUrl(apiEndpoints.chatStream(sessionId)), {
       method: "POST",
       headers,
       body: JSON.stringify({ content }),
