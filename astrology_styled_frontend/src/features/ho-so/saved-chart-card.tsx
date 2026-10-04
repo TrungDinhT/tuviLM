@@ -1,36 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 
 import { Dialog, DialogClose } from "@/components/primitives/dialog";
 import { Pill } from "@/components/primitives/pill";
-import { useDeleteChartProfile } from "@/lib/api/hooks";
+import { canhGioOf, MERIDIEM } from "@/features/an-sao/birth-time";
+import { useDeleteChartProfile, useRenameChartProfile } from "@/lib/api/hooks";
 import type { ChartProfile } from "@/lib/api/schemas";
 import { describe, isApiError } from "@/lib/http/errors";
 import { showToast } from "@/lib/toast";
 
-const CARD_LAYOUT = "relative h-24 flex-[0_0_130px] overflow-hidden p-4 lg:flex-none";
+const CARD_LAYOUT =
+  "flex min-h-[180px] w-full min-w-0 flex-col p-4 lg:min-h-[128px] lg:flex-row lg:items-center lg:gap-4";
 
 /** The profile's own stored birth data, formatted for display — not a reading. */
 function dateLabel(profile: ChartProfile): string {
   const { year, month, day } = profile.birth_info;
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(day)} · ${pad(month)} · ${year}`;
+  return `${pad(day)}/${pad(month)}/${year}`;
 }
 
-/**
- * One saved lá số in the "Lá số đã lưu" rail.
- *
- * The `display_name` is the title and the birth date is a small label. Delete
- * is destructive and unrecoverable until a save flow exists, so it is gated
- * behind the same confirm-dialog treatment as the recast and birth confirm.
- */
 export function SavedChartCard({ profile }: { profile: ChartProfile }) {
-  const [open, setOpen] = useState(false);
+  const [dialog, setDialog] = useState<"rename" | "delete" | null>(null);
+  const [draftName, setDraftName] = useState("");
   const deleteProfile = useDeleteChartProfile();
+  const renameProfile = useRenameChartProfile();
+  const name = profile.display_name;
+  const hour = profile.birth_info.hour;
+  const canh = canhGioOf(hour % 12 || 12, hour < 12 ? MERIDIEM.AM : MERIDIEM.PM);
+  const pending = deleteProfile.isPending || renameProfile.isPending;
+
+  function saveName(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const displayName = draftName.trim();
+    if (!displayName || pending) return;
+    renameProfile.mutate(
+      { id: profile.id, display_name: displayName },
+      { onSuccess: () => setDialog(null) },
+    );
+  }
 
   const confirmDelete = () => {
-    setOpen(false);
+    setDialog(null);
     deleteProfile.mutate(profile.id, {
       onError: (error) => {
         if (isApiError(error)) showToast(describe(error.error));
@@ -39,35 +50,99 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
   };
 
   return (
-    <div
+    <article
       className={`${CARD_LAYOUT} rounded-[20px] border border-accent-glow bg-[linear-gradient(160deg,color-mix(in_srgb,var(--accent)_18%,transparent),rgba(46,26,74,0.5))]`}
     >
-      <button
-        type="button"
-        className="absolute top-[10px] right-[10px] grid h-6 w-6 cursor-pointer place-items-center rounded-full border border-glass-line bg-white/6 text-muted"
-        aria-label={`Xoá lá số ${profile.display_name}`}
-        onClick={() => setOpen(true)}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          aria-hidden="true"
-          className="h-[13px] w-[13px] fill-none stroke-current [stroke-width:1.5]"
+      <div className="min-w-0 lg:flex-1">
+        <h3 className="font-display text-[19px] leading-snug font-semibold [overflow-wrap:anywhere]">
+          {name}
+        </h3>
+        <div className="mt-3 space-y-1 text-[13px] text-muted">
+          <p>Ngày sinh: {dateLabel(profile)}</p>
+          <p>
+            Giờ sinh: {canh.chi} · {canh.range}
+          </p>
+        </div>
+      </div>
+      <div className="mt-auto flex flex-wrap gap-2 pt-4 lg:mt-0 lg:shrink-0 lg:flex-col lg:flex-nowrap lg:pt-0">
+        <button
+          type="button"
+          className="pill-ghost min-h-11 cursor-pointer rounded-full px-4 text-[13px] font-semibold disabled:pointer-events-none disabled:opacity-40"
+          aria-label={`Đổi tên lá số ${name}`}
+          disabled={pending}
+          onClick={() => {
+            setDraftName(name);
+            renameProfile.reset();
+            setDialog("rename");
+          }}
         >
-          <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M10 11v6M14 11v6" />
-        </svg>
-      </button>
-      <span className="text-[11px] text-muted">{dateLabel(profile)}</span>
-      <b className="mt-2 line-clamp-2 pr-[22px] font-display text-[17px] leading-[1.15] font-semibold">
-        {profile.display_name}
-      </b>
+          Đổi tên
+        </button>
+        <button
+          type="button"
+          className="pill-ghost min-h-11 cursor-pointer rounded-full px-4 text-[13px] text-muted disabled:pointer-events-none disabled:opacity-40"
+          aria-label={`Xoá lá số ${name}`}
+          disabled={pending}
+          onClick={() => setDialog("delete")}
+        >
+          Xoá
+        </button>
+      </div>
 
       <Dialog
-        open={open}
-        onOpenChange={setOpen}
+        open={dialog === "rename"}
+        onOpenChange={(open) => {
+          if (!pending) setDialog(open ? "rename" : null);
+        }}
+        title="Đổi tên lá số"
+        description="Đặt một tên dễ nhớ cho lá số của bạn."
+      >
+        <form className="mt-5" onSubmit={saveName}>
+          <label htmlFor={`chart-name-${profile.id}`} className="text-sm font-medium">
+            Tên lá số
+          </label>
+          <input
+            id={`chart-name-${profile.id}`}
+            value={draftName}
+            onChange={(event) => {
+              setDraftName(event.target.value);
+              renameProfile.reset();
+            }}
+            maxLength={80}
+            required
+            disabled={pending}
+            className="mt-2 min-h-[50px] w-full rounded-[14px] border border-glass-line bg-bg-1 px-3.5 py-3 text-[15px] text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent-glow"
+          />
+          <p className="mt-2 text-xs leading-relaxed text-muted">
+            Tên trùng sẽ được thêm số để dễ phân biệt.
+          </p>
+          {renameProfile.isError && (
+            <p role="alert" className="mt-3 text-[13px] leading-relaxed text-fire">
+              {isApiError(renameProfile.error)
+                ? describe(renameProfile.error.error)
+                : "Không đổi tên được lá số. Bạn thử lại nhé."}
+            </p>
+          )}
+          <div className="mt-5 grid grid-cols-2 gap-2.5">
+            <Pill variant="ghost" disabled={pending} onClick={() => setDialog(null)}>
+              Hủy
+            </Pill>
+            <Pill type="submit" disabled={pending || !draftName.trim()}>
+              {renameProfile.isPending ? "Đang lưu…" : "Lưu"}
+            </Pill>
+          </div>
+        </form>
+      </Dialog>
+      <Dialog
+        open={dialog === "delete"}
+        onOpenChange={(open) => setDialog(open ? "delete" : null)}
         variant="center"
         title="Xoá lá số này?"
-        description={`Lá số “${profile.display_name}” sẽ bị xoá khỏi danh sách đã lưu.`}
+        description={
+          <span className="[overflow-wrap:anywhere]">
+            Lá số “{name}” sẽ bị xoá khỏi danh sách đã lưu.
+          </span>
+        }
       >
         <div className="mt-[22px] grid grid-cols-2 gap-2.5">
           <DialogClose asChild>
@@ -80,7 +155,7 @@ export function SavedChartCard({ profile }: { profile: ChartProfile }) {
           </Pill>
         </div>
       </Dialog>
-    </div>
+    </article>
   );
 }
 
@@ -91,9 +166,15 @@ export function SavedChartSkeleton() {
       className={`${CARD_LAYOUT} animate-pulse rounded-[20px] border border-glass-line bg-white/6`}
       aria-hidden="true"
     >
-      <span className="block h-[17px] w-[82px] rounded-full bg-white/10" />
-      <span className="mt-2 block h-5 w-[72px] rounded-full bg-white/12" />
-      <span className="absolute top-[10px] right-[10px] block h-6 w-6 rounded-full bg-white/10" />
+      <div className="min-w-0 lg:flex-1">
+        <span className="block h-6 w-3/4 rounded-full bg-white/12" />
+        <span className="mt-3 block h-4 w-2/3 rounded-full bg-white/10" />
+        <span className="mt-2 block h-4 w-1/2 rounded-full bg-white/10" />
+      </div>
+      <div className="mt-auto lg:mt-0 lg:shrink-0 lg:space-y-2">
+        <span className="block h-11 w-24 rounded-full bg-white/10 lg:w-20" />
+        <span className="hidden h-11 w-20 rounded-full bg-white/10 lg:block" />
+      </div>
     </div>
   );
 }
