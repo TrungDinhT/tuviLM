@@ -271,6 +271,10 @@ def streamlit_main(argv: Sequence[str] | None = None) -> None:
             with st.expander("Report details"):
                 render_yaml_value(metadata)
 
+        if "metrics" in selected_result:
+            with st.expander("Profile metrics"):
+                render_yaml_value(selected_result["metrics"])
+
         st.subheader(selected_label)
         render_yaml_value(selected_payload)
         raw_value = selected_payload

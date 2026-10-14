@@ -11,10 +11,12 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
+from time import perf_counter
 from typing import Any
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic_ai.usage import RunUsage
 
 from src.agent.deps import TuviAgentDeps
 from src.agent.workflow.personality import (
@@ -103,7 +105,7 @@ class ProfileInput(BaseModel):
         return LaSo.from_prior(LaSoPrior.from_solar_day(solar_time, gender))
 
 
-WorkflowRunner = Callable[[Any, TuviAgentDeps], Awaitable[Any]]
+WorkflowRunner = Callable[[Any, TuviAgentDeps, RunUsage], Awaitable[Any]]
 
 _PERSONALITY_PROMPT = "Hãy luận giải tính cách và chân dung con người của tôi."
 _STRENGTH_WEAKNESS_PROMPT = (
@@ -120,22 +122,25 @@ class WorkflowDefinition:
     run: WorkflowRunner
 
 
-async def _run_personality(agent: Any, deps: TuviAgentDeps) -> str:
+async def _run_personality(agent: Any, deps: TuviAgentDeps, usage: RunUsage) -> str:
     return await run_personality_workflow(
         agent=agent,
         deps=deps,
         request=_PERSONALITY_PROMPT,
+        usage=usage,
     )
 
 
 async def _run_strength_weakness(
     agent: Any,
     deps: TuviAgentDeps,
+    usage: RunUsage,
 ) -> BaseModel:
     return await run_strength_weakness_agent(
         agent=agent,
         deps=deps,
         request=_STRENGTH_WEAKNESS_PROMPT,
+        usage=usage,
     )
 
 
@@ -201,6 +206,22 @@ def _write_output(output_path: Path, document: Mapping[str, Any]) -> None:
     os.replace(temporary_path, output_path)
 
 
+def _usage_metrics(usage: RunUsage, duration_seconds: float) -> dict[str, Any]:
+    """Keep provider details; absent reasoning counts are unknown, not zero."""
+    return {
+        "duration_seconds": round(duration_seconds, 6),
+        "input_tokens": usage.input_tokens,
+        "output_tokens": usage.output_tokens,
+        "total_tokens": usage.total_tokens,
+        "thinking_tokens": usage.details.get("reasoning_tokens"),
+        "cache_read_tokens": usage.cache_read_tokens,
+        "cache_write_tokens": usage.cache_write_tokens,
+        "requests": usage.requests,
+        "tool_calls": usage.tool_calls,
+        "provider_details": dict(usage.details),
+    }
+
+
 async def run_workflow_batch(
     *,
     definition: WorkflowDefinition,
@@ -211,10 +232,13 @@ async def run_workflow_batch(
     status: Callable[[str], None] | None = print,
 ) -> BatchRunSummary:
     """Run profiles sequentially and checkpoint the result after each profile."""
+    batch_started = perf_counter()
+    total_usage = RunUsage()
     document: dict[str, Any] = {
         "workflow": definition.name,
         "model": model,
         "results": [],
+        "metrics": _usage_metrics(total_usage, 0),
     }
     _write_output(output_path, document)
 
@@ -226,13 +250,15 @@ async def run_workflow_batch(
     for index, profile in enumerate(profiles, start=1):
         if status is not None:
             status(f"[{index}/{len(profiles)}] Running {profile.name}...")
+        profile_started = perf_counter()
+        usage = RunUsage()
         result: dict[str, Any] = {"profile": profile.as_payload()}
         try:
             deps = TuviAgentDeps(
                 la_so=profile.build_la_so(),
                 book_root=book_root,
             )
-            workflow_output = await definition.run(agent, deps)
+            workflow_output = await definition.run(agent, deps, usage)
             result["output"] = _serialize_workflow_output(workflow_output)
             succeeded += 1
         except Exception as exc:  # Preserve other profiles after one model failure.
@@ -243,13 +269,17 @@ async def run_workflow_batch(
             failed += 1
             if status is not None:
                 status(f"[{index}/{len(profiles)}] Failed {profile.name}: {exc}")
+        result["metrics"] = _usage_metrics(usage, perf_counter() - profile_started)
+        total_usage.incr(usage)
         results.append(result)
+        document["metrics"] = _usage_metrics(total_usage, perf_counter() - batch_started)
         _write_output(output_path, document)
 
     document["completed_at"] = (
         dt.datetime.now().astimezone().isoformat(timespec="seconds")
     )
     document["summary"] = {"succeeded": succeeded, "failed": failed}
+    document["metrics"] = _usage_metrics(total_usage, perf_counter() - batch_started)
     _write_output(output_path, document)
     return BatchRunSummary(
         output_path=output_path,

@@ -8,6 +8,7 @@ from typing import Any
 import yaml
 import pytest
 from pydantic import BaseModel, ValidationError
+from pydantic_ai.usage import RunUsage
 
 from src.agent.deps import TuviAgentDeps
 from src.cli.workflow import (
@@ -118,11 +119,16 @@ def test_batch_preserves_structured_workflow_output_and_checkpoints_failures(
     async def run(
         agent: Any,
         deps: TuviAgentDeps,
+        usage: RunUsage,
     ) -> FakeStructuredOutput:
         del agent
         assert deps.la_so is not None
         name = profiles[len(calls)].name
         calls.append(name)
+        usage.input_tokens += 100
+        usage.output_tokens += 40
+        usage.requests += 1
+        usage.details["reasoning_tokens"] = 12
         if name == "Dung":
             raise RuntimeError("model unavailable")
         return FakeStructuredOutput(summary=f"Result for {name}", score=7)
@@ -161,3 +167,46 @@ def test_batch_preserves_structured_workflow_output_and_checkpoints_failures(
     assert "request" not in saved
     assert "started_at" not in saved
     assert "input_file" not in saved
+
+    for result in saved["results"]:
+        assert result["metrics"]["input_tokens"] == 100
+        assert result["metrics"]["output_tokens"] == 40
+        assert result["metrics"]["thinking_tokens"] == 12
+        assert result["metrics"]["duration_seconds"] >= 0
+    assert saved["metrics"]["total_tokens"] == 280
+    assert saved["metrics"]["thinking_tokens"] == 24
+    assert saved["metrics"]["requests"] == 2
+
+
+def test_unreported_thinking_tokens_are_unknown():
+    from src.cli.workflow import _usage_metrics
+
+    assert _usage_metrics(RunUsage(), 0)["thinking_tokens"] is None
+    assert _usage_metrics(RunUsage(details={"reasoning_tokens": 0}), 0)["thinking_tokens"] == 0
+
+
+@pytest.mark.parametrize(
+    ("workflow_name", "runner_name"),
+    [
+        ("strength_weakness", "run_strength_weakness_agent"),
+        ("personality", "run_personality_workflow"),
+    ],
+)
+def test_workflow_passes_usage_to_agent(monkeypatch, workflow_name, runner_name):
+    from src.cli import workflow
+
+    usage = RunUsage()
+    agent = object()
+    deps = TuviAgentDeps()
+
+    async def record_usage(**kwargs):
+        assert kwargs["agent"] is agent
+        assert kwargs["deps"] is deps
+        assert kwargs["usage"] is usage
+        kwargs["usage"].input_tokens += 42
+        return "result"
+
+    monkeypatch.setattr(workflow, runner_name, record_usage)
+    output = asyncio.run(workflow.WORKFLOWS[workflow_name].run(agent, deps, usage))
+    assert output == "result"
+    assert usage.input_tokens == 42

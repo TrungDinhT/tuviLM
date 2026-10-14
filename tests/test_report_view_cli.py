@@ -181,6 +181,9 @@ results:
       narrative: Khanh output only
       dynamic_section:
         score: 8
+    metrics:
+      input_tokens: 12345
+      thinking_tokens: 6789
   - profile:
       name: Dung
       birth_time: 14
@@ -206,6 +209,8 @@ results:
         [element.value for element in (*app.markdown, *app.caption, *app.code)]
     )
     assert "Khanh output only" in rendered
+    assert "12345" in rendered
+    assert "6789" in rendered
     assert "Dung output only" not in rendered
     assert "birth_time" not in rendered
     assert "hidden request" not in rendered
@@ -219,4 +224,5 @@ results:
     )
     assert "Dung output only" in rendered
     assert "Khanh output only" not in rendered
+    assert "12345" not in rendered
     assert "another_future_shape" in rendered
