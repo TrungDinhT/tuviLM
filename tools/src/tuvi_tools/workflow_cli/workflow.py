@@ -15,6 +15,7 @@ from time import perf_counter
 from typing import Any
 
 import yaml
+from dotenv import dotenv_values
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 from pydantic_ai.models.openrouter import OpenRouterModelSettings
 from pydantic_ai.usage import RunUsage
@@ -24,6 +25,10 @@ from tuvi_agent.workflow.personality import (
     build_personality_agent,
     run_personality_workflow,
 )
+from tuvi_agent.workflow.personality_overview import (
+    build_personality_overview_agent,
+    run_personality_overview_workflow,
+)
 from tuvi_agent.workflow.strength_weakness import (
     build_strength_weakness_agent,
     run_strength_weakness_agent,
@@ -32,6 +37,7 @@ from tuvi_engine.la_so import LaSo
 from tuvi_engine.model.prior import Gender, LaSoPrior
 
 DEFAULT_MODEL = "openrouter:qwen/qwen3.7-max"
+API_ENV_FILE = Path(__file__).resolve().parents[4] / "apps" / "api" / ".env"
 # The book files are not in git. Resolved from the repo root (tools are installed editable).
 DEFAULT_BOOK_ROOT = (
     Path(__file__).resolve().parents[4] / "data" / "tuvitanbien_chunking_compact" / "part_2"
@@ -142,6 +148,28 @@ def _build_strength_weakness_agent(model: str) -> Any:
     )
 
 
+def _build_personality_overview_agent(model: str) -> Any:
+    return build_personality_overview_agent(
+        model,
+        model_settings=OpenRouterModelSettings(
+            openrouter_provider={
+                "only": ["wafer", "together", "parasail"],
+                "allow_fallbacks": False,
+                "sort": "latency"
+            }
+        ),
+    )
+
+
+async def _run_personality_overview(agent: Any, deps: TuviAgentDeps, usage: RunUsage) -> str:
+    return await run_personality_overview_workflow(
+        agent=agent,
+        deps=deps,
+        request="Hãy phân tích nét tính cách chủ đạo của tôi.",
+        usage=usage,
+    )
+
+
 async def _run_strength_weakness(
     agent: Any,
     deps: TuviAgentDeps,
@@ -161,6 +189,12 @@ WORKFLOWS: dict[str, WorkflowDefinition] = {
         description="Luận tính cách theo bảy câu hỏi nền tảng",
         build_agent=build_personality_agent,
         run=_run_personality,
+    ),
+    "personality_overview": WorkflowDefinition(
+        name="personality_overview",
+        description="Phân tích nét tính cách chủ đạo",
+        build_agent=_build_personality_overview_agent,
+        run=_run_personality_overview,
     ),
     "strength_weakness": WorkflowDefinition(
         name="strength_weakness",
@@ -233,6 +267,13 @@ def _usage_metrics(usage: RunUsage, duration_seconds: float) -> dict[str, Any]:
     }
 
 
+def _load_openrouter_api_key() -> None:
+    if not os.getenv("OPENROUTER_API_KEY"):
+        key = dotenv_values(API_ENV_FILE).get("OPENROUTER_API_KEY")
+        if key:
+            os.environ["OPENROUTER_API_KEY"] = key
+
+
 async def run_workflow_batch(
     *,
     definition: WorkflowDefinition,
@@ -253,6 +294,7 @@ async def run_workflow_batch(
     }
     _write_output(output_path, document)
 
+    _load_openrouter_api_key()
     agent = definition.build_agent(model)
     succeeded = 0
     failed = 0

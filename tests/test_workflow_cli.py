@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import datetime as dt
+import os
 from pathlib import Path
 from typing import Any
 
@@ -13,7 +14,9 @@ from pydantic_ai.usage import RunUsage
 from tuvi_agent.deps import TuviAgentDeps
 from tuvi_tools.workflow_cli.workflow import (
     ProfileGender,
+    WORKFLOWS,
     WorkflowDefinition,
+    _load_openrouter_api_key,
     build_parser,
     default_output_path,
     load_profiles,
@@ -24,6 +27,29 @@ from tuvi_tools.workflow_cli.workflow import (
 class FakeStructuredOutput(BaseModel):
     summary: str
     score: int
+
+
+def test_openrouter_key_is_loaded_from_api_env_without_overriding_existing_key(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+):
+    env_file = tmp_path / ".env"
+    env_file.write_text("OPENROUTER_API_KEY=from-file\nOTHER_SECRET=ignored\n", encoding="utf-8")
+    monkeypatch.setattr("tuvi_tools.workflow_cli.workflow.API_ENV_FILE", env_file)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("OTHER_SECRET", raising=False)
+
+    _load_openrouter_api_key()
+    assert os.environ["OPENROUTER_API_KEY"] == "from-file"
+    assert "OTHER_SECRET" not in os.environ
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "existing")
+    _load_openrouter_api_key()
+    assert os.environ["OPENROUTER_API_KEY"] == "existing"
+
+
+def test_personality_overview_is_available_in_cli():
+    args = build_parser().parse_args(["profiles.yaml", "--workflow", "personality_overview"])
+    assert WORKFLOWS[args.workflow].name == "personality_overview"
 
 
 def test_workflow_cli_only_accepts_profile_input_not_a_request():
@@ -190,6 +216,7 @@ def test_unreported_thinking_tokens_are_unknown():
     [
         ("strength_weakness", "run_strength_weakness_agent"),
         ("personality", "run_personality_workflow"),
+        ("personality_overview", "run_personality_overview_workflow"),
     ],
 )
 def test_workflow_passes_usage_to_agent(monkeypatch, workflow_name, runner_name):
