@@ -8,6 +8,9 @@ from typing import Any
 
 from pydantic_ai import Agent, PromptedOutput, RunContext
 from pydantic_ai.messages import ModelMessage
+from pydantic_ai.models.openrouter import (
+    OpenRouterModelSettings,
+)
 
 from src.agent.deps import TuviAgentDeps
 from src.agent.workflow.strength_weakness.input import (
@@ -88,6 +91,12 @@ async def run_strength_weakness_agent(
         deps=deps,
         usage=usage,
         message_history=message_history,
+        model_settings=OpenRouterModelSettings(
+            openrouter_provider={
+                "only": ["together"],
+                "allow_fallbacks": False,
+            }
+        ),
     )
     return result.output
 
