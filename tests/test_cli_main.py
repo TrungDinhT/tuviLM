@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from pathlib import Path
 
 import pytest
 
@@ -46,4 +47,34 @@ def test_top_level_cli_rejects_unknown_command():
     with pytest.raises(SystemExit) as error:
         cli.main(["missing"])
 
+    assert error.value.code == 2
+
+
+@pytest.mark.parametrize(
+    ("arguments", "expected_model"),
+    [
+        (["--model", "openrouter:qwen/qwen3.8-flash", "run", "input.yaml"],
+         "openrouter:qwen/qwen3.8-flash"),
+        (["run", "input.yaml", "--model", "openrouter:deepseek/deepseek-v4.1-flash"],
+         "openrouter:deepseek/deepseek-v4.1-flash"),
+        (["--model", "global-model", "run", "input.yaml", "--model", "run-model"],
+         "run-model"),
+    ],
+)
+def test_main_forwards_model_to_workflow_parser(arguments, expected_model, monkeypatch):
+    received = []
+
+    def fake_run(argv):
+        options = build_workflow_parser().parse_args(argv)
+        received.append((options.input, options.model))
+        return 0
+
+    monkeypatch.setitem(cli.COMMANDS, "run", fake_run)
+    assert cli.main(arguments) == 0
+    assert received == [(Path("input.yaml"), expected_model)]
+
+
+def test_main_rejects_model_for_view():
+    with pytest.raises(SystemExit) as error:
+        cli.main(["--model", "some-model", "view"])
     assert error.value.code == 2
