@@ -15,6 +15,8 @@ class ApiSettings(BaseSettings):
         extra="ignore",
     )
 
+    strength_weakness_model: str = "openrouter:deepseek/deepseek-v4.1-flash"
+
     conversation_history_store: MongoConversationHistorySettings = Field(
         default_factory=MongoConversationHistorySettings
     )

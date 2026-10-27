@@ -32,8 +32,44 @@ pip install fastapi uvicorn pydantic
 From repo root:
 
 ```bash
+export OPENROUTER_API_KEY="your-openrouter-api-key"
 uv run uvicorn api.main:app --reload --port 8000
 ```
+
+### Strength/weakness provider routing
+
+The strength/weakness workflow uses `openrouter:deepseek/deepseek-v4.1-flash`
+by default and calls OpenRouter with `OPENROUTER_API_KEY`.
+Its requests restrict the upstream inference provider to Together using Pydantic
+AI's `OpenRouterModelSettings`:
+
+```json
+{"provider": {"only": ["together"], "allow_fallbacks": false}}
+```
+
+This applies to both `POST /api/v1/laso/strength-weakness` and the workflow called
+from chat. The chat and personality agents keep their normal OpenRouter routing.
+A separate `TOGETHER_API_KEY` is not required.
+
+Export `OPENROUTER_API_KEY` in the shell running the server. Putting the key only
+in `.env` does not populate the environment read by Pydantic AI's provider.
+Set `STRENGTH_WEAKNESS_MODEL` in the environment or `.env` to an
+`openrouter:<model-id>` value, then restart the server. For example:
+
+```bash
+export STRENGTH_WEAKNESS_MODEL="openrouter:deepseek/deepseek-v4.1-flash"
+```
+
+The selected model must have a Together endpoint in OpenRouter's catalog.
+As checked on 2026-10-27, `deepseek/deepseek-v4.1-flash` lists Together;
+`qwen/qwen3.7-max` currently lists only Alibaba. Restricting a model without a
+Together endpoint returns an OpenRouter error. Requests never fall back to
+another provider.
+
+References: [OpenRouter provider routing](https://openrouter.ai/docs/guides/routing/provider-selection),
+[Pydantic AI OpenRouter settings](https://pydantic.dev/docs/ai/models/openrouter/),
+[DeepSeek V4.1 Flash endpoints](https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints),
+and [Qwen3.7 Max endpoints](https://openrouter.ai/api/v1/models/qwen/qwen3.7-max/endpoints).
 
 ## Health check
 

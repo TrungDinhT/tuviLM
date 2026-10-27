@@ -100,7 +100,9 @@ async def lifespan(app: FastAPI):
     agent_deps = TuviAgentDeps(
         agent=build_tuvi_agent(model=model),
         personality_agent=build_personality_agent(model=model),
-        strength_weakness_agent=build_strength_weakness_agent(model=model),
+        strength_weakness_agent=build_strength_weakness_agent(
+            model=settings.strength_weakness_model,
+        ),
         book_root="./data/tuvitanbien_chunking_compact/part_2",
     )
     app.state.api_state = ApiState(
