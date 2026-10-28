@@ -533,6 +533,10 @@
   width: 58%;
   margin: auto;
 }
+.status > .loadingVisual {
+  width: min(100%, 420px);
+  margin: 8px auto 24px;
+}
 .status h1 {
   font-family: var(--font-display), serif;
   font-size: 28px;

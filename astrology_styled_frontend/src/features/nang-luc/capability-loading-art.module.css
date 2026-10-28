@@ -1,0 +1,155 @@
+.art {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+
+.core {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.halo {
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 5%,
+    #c9b0ff85 18%,
+    transparent 33%,
+    #a8eddb70 50%,
+    transparent 66%,
+    #efd2a66b 83%,
+    transparent
+  );
+  mask-image: radial-gradient(circle, transparent 43%, #000 59%, transparent 73%);
+  filter: blur(5px);
+  animation: auraBreathe 8s ease-in-out infinite alternate;
+}
+
+.radiance {
+  position: absolute;
+  inset: 25%;
+}
+
+.radiance span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #c5b2fa70;
+  border-radius: 50%;
+  box-shadow: 0 0 18px #b7a1ed20;
+  opacity: 0;
+  animation: radiate 7.5s ease-out infinite;
+}
+
+.radiance span:nth-child(2) {
+  animation-delay: -2.5s;
+}
+
+.radiance span:nth-child(3) {
+  animation-delay: -5s;
+}
+
+.floatAnchor {
+  position: absolute;
+  z-index: 2;
+  width: 12%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #c5b6f44a;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, #4c416b70, #15162720 78%);
+  color: #ddc9ff;
+  box-shadow:
+    0 0 20px #bca0ef20,
+    inset 0 0 12px #cfb6ff0c;
+  animation:
+    hoverDrift var(--duration) ease-in-out var(--delay) infinite,
+    appear var(--duration) ease-in-out var(--delay) infinite;
+}
+
+.floatAnchor:nth-of-type(even) .icon {
+  color: #b3eddd;
+  border-color: #a8eddb45;
+}
+
+.icon svg {
+  width: 54%;
+  height: 54%;
+}
+
+@keyframes auraBreathe {
+  from {
+    transform: scale(0.94) rotate(-8deg);
+    opacity: 0.45;
+  }
+  to {
+    transform: scale(1.08) rotate(8deg);
+    opacity: 0.85;
+  }
+}
+
+@keyframes radiate {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes hoverDrift {
+  0%,
+  100% {
+    transform: translate3d(0, 10%, 0) rotate(-3deg);
+  }
+  40% {
+    transform: translate3d(var(--drift-x), var(--drift-y), 0) rotate(4deg);
+  }
+  75% {
+    transform: translate3d(calc(var(--drift-x) * -0.5), calc(var(--drift-y) * 0.5), 0) rotate(-1deg);
+  }
+}
+
+@keyframes appear {
+  0%,
+  12%,
+  90%,
+  100% {
+    opacity: 0;
+  }
+  35%,
+  60% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halo,
+  .radiance span,
+  .icon {
+    animation: none;
+  }
+  .icon {
+    opacity: 0.7;
+  }
+}

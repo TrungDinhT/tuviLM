@@ -9,7 +9,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { CapabilityReport } from "./nang-luc-screen";
+import { CapabilityReport, NangLucScreen } from "./nang-luc-screen";
 import {
   capabilityKey,
   capabilitySchema,
@@ -59,6 +59,49 @@ function wrapper({ children }: { children: React.ReactNode }) {
   return <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>;
 }
 describe("capability report", () => {
+  it("shows the loading animation until a report arrives", async () => {
+    let complete!: (response: Response) => void;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockReturnValue(
+        new Promise<Response>((resolve) => {
+          complete = resolve;
+        }),
+      ),
+    );
+    useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
+    useCapabilityStore.getState().unlock(capabilityKey(birth));
+    render(<NangLucScreen />, { wrapper });
+
+    expect(
+      screen
+        .getByTestId("capability-loading-art")
+        .closest("[aria-busy]")
+        ?.getAttribute("aria-busy"),
+    ).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain("Đang tổng hợp lá số");
+    await act(async () => complete(new Response(JSON.stringify(report))));
+    await waitFor(() => expect(screen.queryByTestId("capability-loading-art")).toBeNull());
+    expect(screen.getByRole("button", { name: "Thấu hiểu cấu trúc Mệnh" })).toBeTruthy();
+  });
+
+  it("stops the loading animation on failure and resumes it on retry", async () => {
+    const fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockReturnValue(new Promise<Response>(() => {}));
+    vi.stubGlobal("fetch", fetch);
+    useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
+    useCapabilityStore.getState().unlock(capabilityKey(birth));
+    render(<NangLucScreen />, { wrapper });
+
+    await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
+    expect(screen.queryByTestId("capability-loading-art")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Thử lại" }));
+    await waitFor(() => expect(screen.getByTestId("capability-loading-art")).toBeTruthy());
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
   it("accepts independent empty lists and rejects malformed findings", () => {
     expect(capabilitySchema.safeParse(report).success).toBe(true);
     expect(capabilitySchema.safeParse({ ...report, diem_yeu: [{ ten: "A" }] }).success).toBe(false);
