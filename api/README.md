@@ -47,6 +47,12 @@ AI's `OpenRouterModelSettings`:
 {"provider": {"only": ["together"], "allow_fallbacks": false}}
 ```
 
+Provider routing and thinking effort are configured together near the top of
+`api/main.py`: `STRENGTH_WEAKNESS_PROVIDER`, `STRENGTH_WEAKNESS_ALLOW_FALLBACKS`,
+and `STRENGTH_WEAKNESS_REASONING_EFFORT`. Effort is currently `low`; use `high`
+for more reasoning or `none` to request no reasoning. Restart the API after
+editing these constants. The agent factory receives these settings explicitly.
+
 This applies to both `POST /api/v1/laso/strength-weakness` and the workflow called
 from chat. The chat and personality agents keep their normal OpenRouter routing.
 A separate `TOGETHER_API_KEY` is not required.
