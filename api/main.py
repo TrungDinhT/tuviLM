@@ -5,7 +5,7 @@ import logging
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Literal, cast
+from typing import cast
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exception_handlers import http_exception_handler
@@ -61,14 +61,6 @@ from src.refactored.view.builder import build_laso_view
 
 logger = logging.getLogger(__name__)
 
-# Strength/weakness inference settings. Restart the API after changing these.
-# Requests still go through OpenRouter with OPENROUTER_API_KEY.
-STRENGTH_WEAKNESS_PROVIDER = "together"
-STRENGTH_WEAKNESS_ALLOW_FALLBACKS = False
-STRENGTH_WEAKNESS_REASONING_EFFORT: Literal[
-    "none", "minimal", "low", "medium", "high", "xhigh"
-] = "low"
-
 # The foundation payload's polarity relation is a Vietnamese phrase; the API
 # exposes it as a stable slug so clients can key content off it.
 _AM_DUONG_RELATION_KEYS: dict[str, AmDuongRelationKey] = {
@@ -110,13 +102,14 @@ async def lifespan(app: FastAPI):
         agent=build_tuvi_agent(model=model),
         personality_agent=build_personality_agent(model=model),
         strength_weakness_agent=build_strength_weakness_agent(
-            model=settings.strength_weakness_model,
+            model=settings.strength_weakness.model,
             model_settings=OpenRouterModelSettings(
                 openrouter_provider={
-                    "only": [STRENGTH_WEAKNESS_PROVIDER],
-                    "allow_fallbacks": STRENGTH_WEAKNESS_ALLOW_FALLBACKS,
+                    "order": [settings.strength_weakness.provider],
+                    "allow_fallbacks": settings.strength_weakness.allow_fallbacks,
+                    "sort": settings.strength_weakness.provider_sort,
                 },
-                openrouter_reasoning={"effort": STRENGTH_WEAKNESS_REASONING_EFFORT},
+                openrouter_reasoning={"effort": settings.strength_weakness.reasoning_effort},
             ),
         ),
         book_root="./data/tuvitanbien_chunking_compact/part_2",

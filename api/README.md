@@ -40,18 +40,35 @@ uv run uvicorn api.main:app --reload --port 8000
 
 The strength/weakness workflow uses `openrouter:deepseek/deepseek-v4.1-flash`
 by default and calls OpenRouter with `OPENROUTER_API_KEY`.
-Its requests restrict the upstream inference provider to Together using Pydantic
-AI's `OpenRouterModelSettings`:
+It prefers Together first, then lets OpenRouter try other eligible providers
+ordered by lowest latency. The routing request is:
 
 ```json
-{"provider": {"only": ["together"], "allow_fallbacks": false}}
+{"provider": {"order": ["together"], "allow_fallbacks": true, "sort": "latency"}}
 ```
 
-Provider routing and thinking effort are configured together near the top of
-`api/main.py`: `STRENGTH_WEAKNESS_PROVIDER`, `STRENGTH_WEAKNESS_ALLOW_FALLBACKS`,
-and `STRENGTH_WEAKNESS_REASONING_EFFORT`. Effort is currently `low`; use `high`
-for more reasoning or `none` to request no reasoning. Restart the API after
-editing these constants. The agent factory receives these settings explicitly.
+Model, provider routing, and thinking effort are configured together in
+`StrengthWeaknessSettings` in `api/settings.py`, accessed as
+`settings.strength_weakness.model`, `.provider`, `.allow_fallbacks`,
+`.provider_sort`, and `.reasoning_effort`.
+You can override them in the environment or `.env` using `__` between the
+config name and field (replace the previous flat `STRENGTH_WEAKNESS_*` names):
+
+```dotenv
+STRENGTH_WEAKNESS__MODEL=openrouter:deepseek/deepseek-v4.1-flash
+STRENGTH_WEAKNESS__PROVIDER=together
+STRENGTH_WEAKNESS__ALLOW_FALLBACKS=true
+STRENGTH_WEAKNESS__PROVIDER_SORT=latency
+STRENGTH_WEAKNESS__REASONING_EFFORT=low
+```
+
+Use `high` for more reasoning or `none` to request no reasoning. Setting
+`STRENGTH_WEAKNESS__ALLOW_FALLBACKS=false` restricts requests to the preferred
+provider. Restart the API after editing settings or environment values.
+
+`sort=latency` uses OpenRouter's provider performance data; it is a routing
+preference, not a guarantee of the fastest end-to-end completion for every
+request. Together remains first even when another provider has lower latency.
 
 This applies to both `POST /api/v1/laso/strength-weakness` and the workflow called
 from chat. The chat and personality agents keep their normal OpenRouter routing.
@@ -59,23 +76,19 @@ A separate `TOGETHER_API_KEY` is not required.
 
 Export `OPENROUTER_API_KEY` in the shell running the server. Putting the key only
 in `.env` does not populate the environment read by Pydantic AI's provider.
-Set `STRENGTH_WEAKNESS_MODEL` in the environment or `.env` to an
+Set `STRENGTH_WEAKNESS__MODEL` in the environment or `.env` to an
 `openrouter:<model-id>` value, then restart the server. For example:
 
 ```bash
-export STRENGTH_WEAKNESS_MODEL="openrouter:deepseek/deepseek-v4.1-flash"
+export STRENGTH_WEAKNESS__MODEL="openrouter:deepseek/deepseek-v4.1-flash"
 ```
 
-The selected model must have a Together endpoint in OpenRouter's catalog.
-As checked on 2026-10-27, `deepseek/deepseek-v4.1-flash` lists Together;
-`qwen/qwen3.7-max` currently lists only Alibaba. Restricting a model without a
-Together endpoint returns an OpenRouter error. Requests never fall back to
-another provider.
+If the selected model has no Together endpoint, OpenRouter can use another
+provider while fallbacks are enabled. Account restrictions and endpoint
+availability still determine which providers are eligible.
 
-References: [OpenRouter provider routing](https://openrouter.ai/docs/guides/routing/provider-selection),
-[Pydantic AI OpenRouter settings](https://pydantic.dev/docs/ai/models/openrouter/),
-[DeepSeek V4.1 Flash endpoints](https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints),
-and [Qwen3.7 Max endpoints](https://openrouter.ai/api/v1/models/qwen/qwen3.7-max/endpoints).
+References: [OpenRouter provider routing](https://openrouter.ai/docs/guides/routing/provider-selection)
+and [Pydantic AI OpenRouter settings](https://pydantic.dev/docs/ai/models/openrouter/).
 
 ## Health check
 
