@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import asyncio
 import datetime as dt
+import json
 import logging
-from contextlib import asynccontextmanager
+from contextlib import aclosing, asynccontextmanager, suppress
 from dataclasses import dataclass
 from datetime import datetime
 from typing import cast
@@ -10,7 +12,7 @@ from typing import cast
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic_ai.models.openrouter import OpenRouterModelSettings
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -50,6 +52,7 @@ from src.agent.workflow.strength_weakness.agent import (
 from src.agent.workflow.strength_weakness.output import (
     CapabilityProfile,
 )
+from src.agent.workflow.strength_weakness.stream import stream_strength_weakness
 from src.refactored.cau_phu import (
     CauPhuNotFoundError,
     get_cau_phu,
@@ -289,6 +292,58 @@ async def analyze_strength_weakness(
             "trong cách tôi sử dụng năng lực của mình."
         ),
     )
+
+
+@app.post("/api/v1/laso/strength-weakness/stream", response_class=StreamingResponse)
+async def analyze_strength_weakness_stream(payload: BuildLasoRequest, request: Request):
+    """SSE: started, overview, finding, reset, done or error; draft findings are provisional."""
+    la_so = _la_so_from_build_request(payload)
+    base = get_api_state(request).agent_deps
+    agent = base.require_strength_weakness_agent()
+    deps = TuviAgentDeps(
+        la_so=la_so, book=base.book, book_root=base.book_root,
+        strength_weakness_agent=agent,
+    )
+
+    async def events():
+        source = stream_strength_weakness(
+            agent=agent, deps=deps,
+            request="Hãy khám phá những điểm mạnh, điểm yếu và mặt trái nổi bật nhất trong cách tôi sử dụng năng lực của mình.",
+        )
+        queue: asyncio.Queue[dict | None] = asyncio.Queue(maxsize=1)
+
+        async def produce():
+            # Keep the SDK async context in one task across all chunks.
+            try:
+                async with aclosing(source):
+                    async for event in source:
+                        await queue.put(event)
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                logger.exception("Strength/weakness stream failed")
+                await queue.put({"type": "error", "message": "Phân tích bị gián đoạn. Bạn có thể thử lại."})
+            await queue.put(None)
+
+        producer = asyncio.create_task(produce())
+        try:
+            while True:
+                try:
+                    event = await asyncio.wait_for(queue.get(), timeout=10)
+                except TimeoutError:
+                    yield ": keep-alive\n\n"
+                    continue
+                if event is None:
+                    break
+                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+        finally:
+            producer.cancel()
+            with suppress(asyncio.CancelledError):
+                await producer
+
+    return StreamingResponse(events(), media_type="text/event-stream", headers={
+        "Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no",
+    })
 
 
 def _la_so_from_build_request(payload: BuildLasoRequest) -> LaSo:

@@ -74,6 +74,38 @@ This applies to both `POST /api/v1/laso/strength-weakness` and the workflow call
 from chat. The chat and personality agents keep their normal OpenRouter routing.
 A separate `TOGETHER_API_KEY` is not required.
 
+### Progressive strength/weakness report
+
+The capability frontend uses `POST /api/v1/laso/strength-weakness/stream` with
+the same birth-chart body as the existing JSON endpoint. It returns SSE
+(`text/event-stream`) with one JSON object per `data:` frame:
+
+| `type` | Payload and meaning |
+| --- | --- |
+| `started` | `attempt: 0`; analysis begins. |
+| `overview` | `attempt`, `text`; complete overview text. |
+| `finding` | `attempt`, `kind` (`strength`/`weakness`), `id`, zero-based `index`, `finding`; one complete, validated finding. |
+| `reset` | New `attempt`; discard all findings from the previous attempt. |
+| `done` | `attempt`, `profile`; replace the draft with the fully validated report. |
+| `error` | Safe `message`; keep the draft visible and offer retry. |
+
+Findings are provisional until `done`. Only completed profiles are persisted
+in the frontend cache. Validation failures may restart generation twice;
+transport failures end the stream. Disconnecting cancels the model stream.
+Comment heartbeats keep idle connections active; reasoning tokens are not sent
+to the frontend. Disable response buffering on any reverse proxy serving this
+route (the response also sets `X-Accel-Buffering: no`).
+
+```bash
+curl -N http://localhost:8000/api/v1/laso/strength-weakness/stream \
+  -H 'Content-Type: application/json' \
+  -d '{"calendar":"solar","day":4,"month":4,"year":1998,"hour":8,"gender":"M"}'
+```
+
+The original `/api/v1/laso/strength-weakness` JSON endpoint and chat workflow
+remain available. Local SDK simulation instructions are in
+[`postman/context.md`](../postman/context.md).
+
 Export `OPENROUTER_API_KEY` in the shell running the server. Putting the key only
 in `.env` does not populate the environment read by Pydantic AI's provider.
 Set `STRENGTH_WEAKNESS__MODEL` in the environment or `.env` to an
