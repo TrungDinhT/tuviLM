@@ -23,6 +23,7 @@ export function CapabilityConnections({
     const targets = Array.from(container.querySelectorAll<HTMLElement>("[data-capability-anchor]"));
     let frame = 0;
     let disposed = false;
+    const movingUntil = performance.now() + 500;
     const measure = () => {
       const bounds = container.getBoundingClientRect();
       const source = center.getBoundingClientRect();
@@ -64,6 +65,8 @@ export function CapabilityConnections({
         ];
       });
       setDrawing({ width: bounds.width, height: bounds.height, connections });
+      // ResizeObserver does not see transform-only FLIP movement.
+      if (!disposed && performance.now() < movingUntil) frame = requestAnimationFrame(measure);
     };
     const schedule = () => {
       if (disposed) return;

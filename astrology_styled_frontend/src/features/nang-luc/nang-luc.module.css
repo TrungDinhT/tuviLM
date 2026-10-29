@@ -207,10 +207,41 @@
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(var(--finding-rows, 1), minmax(80px, auto));
   column-gap: 44%;
   row-gap: 20px;
   pointer-events: none;
   padding: 0 0 16px;
+}
+
+.constellation[data-strength-count="1"] .strengthGrid,
+.constellation[data-strength-count="2"] .strengthGrid {
+  align-content: center;
+}
+.constellation[data-strength-count="5"],
+.constellation[data-strength-count="6"] {
+  min-height: max(40svh, 360px);
+}
+.report[data-waiting="true"] .constellation {
+  min-height: min(420px, 86cqw);
+}
+.report[data-waiting="true"] .centralOrb {
+  width: min(100%, 420px);
+}
+.report[data-waiting="true"] .strengthGrid {
+  display: none;
+}
+.streamStatus {
+  text-align: center;
+  color: #c4b8d7;
+  line-height: 1.8;
+  padding: 20px 12px 36px;
+}
+.streamStatus p {
+  margin-bottom: 16px;
+}
+.overviewButton:disabled {
+  cursor: default;
 }
 .strengthCard {
   color: var(--mint);

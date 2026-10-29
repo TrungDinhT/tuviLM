@@ -1,32 +1,21 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { skipToken, useQuery, useQueryClient } from "@tanstack/react-query";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { z } from "zod";
-import { request } from "@/lib/api/client";
 import type { BirthInfo } from "@/lib/api/schemas";
 import { safeStorage } from "@/lib/safe-storage";
 
-const description = { mo_ta: z.string().min(1), giai_thich: z.string().min(1) };
-export const capabilitySchema = z.object({
-  tong_quan: z.string().min(1),
-  diem_manh: z
-    .array(
-      z.object({ nang_luc_id: z.string().min(1), nang_luc: z.string().min(1), ...description }),
-    )
-    .max(6),
-  diem_yeu: z
-    .array(
-      z.object({
-        ten: z.string().min(1),
-        loai: z.enum(["han_che_truc_tiep", "qua_da", "xung_dot"]),
-        ...description,
-      }),
-    )
-    .max(6),
-});
-export type CapabilityProfile = z.infer<typeof capabilitySchema>;
+import { capabilitySchema, emptyProfile, type CapabilityProfile } from "./schema";
+import { streamCapabilityReport } from "./stream";
+export { capabilitySchema, type CapabilityProfile } from "./schema";
+export interface CapabilityDraft {
+  generation: number;
+  attempt: number;
+  profile: CapabilityProfile;
+}
+
 export function capabilityKey(birth: BirthInfo | null) {
   return birth
     ? `v1:${birth.calendar}:${birth.year}:${birth.month}:${birth.day}:${birth.hour}:${birth.gender}`
@@ -77,8 +66,16 @@ export const useCapabilityStore = create<CapabilityState>()(
 
 export function useCapabilityReport(birth: BirthInfo | null, unlocked: boolean) {
   const key = capabilityKey(birth);
+  const client = useQueryClient();
+  const draftKey = ["capability", key, "draft"];
+  const draft = useQuery<CapabilityDraft>({
+    queryKey: draftKey,
+    queryFn: skipToken,
+    enabled: false,
+    staleTime: Infinity,
+  });
   const saved = useCapabilityStore((state) => state.entries[key]?.report);
-  return useQuery({
+  const analysis = useQuery({
     queryKey: ["capability", key],
     enabled: birth !== null && unlocked,
     initialData: saved,
@@ -91,11 +88,54 @@ export function useCapabilityReport(birth: BirthInfo | null, unlocked: boolean) 
     queryFn: async ({ signal }) => {
       const restored = useCapabilityStore.getState().entries[key]?.report;
       if (restored) return restored;
-      const report = await request("/api/v1/laso/strength-weakness", {
-        method: "POST",
-        body: birth,
-        schema: capabilitySchema,
-        signal,
+      if (!birth) throw new Error("Thiếu thông tin lá số.");
+      const generation = (client.getQueryData<CapabilityDraft>(draftKey)?.generation ?? 0) + 1;
+      client.setQueryData<CapabilityDraft>(draftKey, {
+        generation,
+        attempt: 0,
+        profile: emptyProfile(),
+      });
+      const report = await streamCapabilityReport(birth, signal, async (event) => {
+        signal.throwIfAborted();
+        client.setQueryData<CapabilityDraft>(draftKey, (current) => {
+          if (event.type === "started" || event.type === "reset")
+            return { generation, attempt: event.attempt, profile: emptyProfile() };
+          if (!current || event.type === "error" || current.attempt !== event.attempt)
+            return current;
+          if (event.type === "done") return { ...current, profile: event.profile };
+          if (event.type === "overview")
+            return { ...current, profile: { ...current.profile, tong_quan: event.text } };
+          if (event.type !== "finding") return current;
+          const profile = { ...current.profile };
+          if (event.kind === "strength") {
+            const items = [...profile.diem_manh];
+            if (event.index > items.length) throw new Error("Thứ tự điểm mạnh không hợp lệ.");
+            items[event.index] = event.finding;
+            profile.diem_manh = items;
+          } else {
+            const items = [...profile.diem_yeu];
+            if (event.index > items.length) throw new Error("Thứ tự điểm yếu không hợp lệ.");
+            items[event.index] = event.finding;
+            profile.diem_yeu = items;
+          }
+          return { ...current, profile };
+        });
+        // A proxy can deliver several findings in one packet. Give each card
+        // a short entrance without delaying readers in a background tab.
+        if (event.type === "finding" && !document.hidden) {
+          await new Promise<void>((resolve, reject) => {
+            const finish = () => {
+              signal.removeEventListener("abort", abort);
+              resolve();
+            };
+            const timer = setTimeout(finish, 160);
+            const abort = () => {
+              clearTimeout(timer);
+              reject(signal.reason);
+            };
+            signal.addEventListener("abort", abort, { once: true });
+          });
+        }
       });
       // A reset may have unlocked the same chart again while this request ran.
       signal.throwIfAborted();
@@ -103,4 +143,5 @@ export function useCapabilityReport(birth: BirthInfo | null, unlocked: boolean) 
       return report;
     },
   });
+  return { ...analysis, draft: draft.data };
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import {
   Drawer,
   DrawerBody,
@@ -16,6 +16,8 @@ import { useChartStore } from "@/store/chart-store";
 import { showToast } from "@/lib/toast";
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
 import { describe, isApiError } from "@/lib/http/errors";
+import { emptyProfile } from "./schema";
+import { useFindingLayout } from "./use-finding-layout";
 import { CapabilityConnections } from "./capability-connections";
 import { CapabilityLoadingArt } from "./capability-loading-art";
 import { CapabilityIcon, CelestialOrb } from "./celestial-art";
@@ -98,31 +100,20 @@ export function NangLucScreen() {
         <CapabilityLauncher />
       </div>
     );
-  if (analysis.data) return <CapabilityReport key={key} report={analysis.data} />;
   return (
-    <main className={styles.report}>
-      <ReportHeader />
-      <div className={styles.status} aria-busy={!analysis.isError}>
-        <div className={styles.loadingVisual}>
-          {analysis.isError ? <CelestialOrb decorativeTrails={false} /> : <CapabilityLoadingArt />}
-        </div>
-        <h1>
-          {analysis.isError ? "Chưa thể đọc năng lực của bạn" : "Đang khám phá cấu trúc Mệnh"}
-        </h1>
-        <p role={analysis.isError ? "alert" : "status"}>
-          {analysis.isError
-            ? isApiError(analysis.error)
-              ? describe(analysis.error.error)
-              : "Kết nối bị gián đoạn. Bạn có thể thử lại."
-            : "Đang tổng hợp lá số và luận giải những năng lực nổi bật của bạn. Quá trình này có thể mất một chút thời gian."}
-        </p>
-        {analysis.isError && (
-          <button className={styles.unlockButton} onClick={() => void analysis.refetch()}>
-            Thử lại
-          </button>
-        )}
-      </div>
-    </main>
+    <CapabilityReport
+      key={`${key}:${analysis.draft?.generation ?? 0}:${analysis.draft?.attempt ?? 0}`}
+      report={analysis.data ?? analysis.draft?.profile ?? emptyProfile()}
+      pending={analysis.isPending && !analysis.isError}
+      error={
+        analysis.isError
+          ? isApiError(analysis.error)
+            ? describe(analysis.error.error)
+            : "Phân tích bị gián đoạn. Bạn có thể thử lại."
+          : undefined
+      }
+      onRetry={() => void analysis.refetch()}
+    />
   );
 }
 
@@ -168,16 +159,54 @@ const strengthIcons: Record<string, string> = {
 };
 const weaknessIcons = { han_che_truc_tiep: "person", qua_da: "work", xung_dot: "chat" };
 
-export function CapabilityReport({ report }: { report: CapabilityProfile }) {
+export function CapabilityReport({
+  report,
+  pending = false,
+  error,
+  onRetry,
+}: {
+  report: CapabilityProfile;
+  pending?: boolean;
+  error?: string;
+  onRetry?: () => void;
+}) {
+  const reportRef = useRef<HTMLElement>(null);
+  const count = report.diem_manh.length;
+  const waiting = count === 0 && !report.diem_yeu.length && (pending || Boolean(error));
+  const layoutKey = `${waiting}:${report.diem_manh.map((item) => item.nang_luc_id).join("|")}:${report.diem_yeu.length}`;
+  useFindingLayout(reportRef, layoutKey);
   const constellationRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLButtonElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selected, setSelected] = useState<{
+  const [selection, setSelected] = useState<{
     id: string;
     title: string;
     description: string;
     explanation?: string;
   } | null>(null);
+  const selected = (() => {
+    if (!selection) return null;
+    if (selection.id === "overview")
+      return report.tong_quan ? { ...selection, description: report.tong_quan } : null;
+    if (selection.id.startsWith("strength:")) {
+      const item = report.diem_manh.find(
+        (finding) => `strength:${finding.nang_luc_id}` === selection.id,
+      );
+      return item
+        ? {
+            ...selection,
+            title: item.nang_luc,
+            description: item.mo_ta,
+            explanation: item.giai_thich,
+          }
+        : null;
+    }
+    const item = report.diem_yeu[Number(selection.id.split(":")[1])];
+    return item
+      ? { ...selection, title: item.ten, description: item.mo_ta, explanation: item.giai_thich }
+      : null;
+  })();
+  const detailOpen = drawerOpen && selected !== null;
   function openFinding(element: HTMLButtonElement, finding: NonNullable<typeof selected>) {
     returnFocusRef.current = element;
     setSelected(finding);
@@ -204,24 +233,38 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
     }
   }
   return (
-    <main className={styles.report} data-detail-open={drawerOpen}>
-      <ReportHeader onShare={() => void share()} />
+    <main
+      ref={reportRef}
+      className={styles.report}
+      data-detail-open={detailOpen}
+      data-waiting={waiting}
+      aria-busy={pending}
+    >
+      <ReportHeader onShare={!pending && !error ? () => void share() : undefined} />
       <h1 className="sr-only">Khám phá năng lực</h1>
       <section className={styles.strengthSection} aria-label="Điểm mạnh">
-        <div className={styles.constellation} ref={constellationRef}>
-          <CapabilityConnections
-            containerRef={constellationRef}
-            findingsKey={report.diem_manh.map((item) => item.nang_luc_id).join("|")}
-          />
+        <div
+          className={styles.constellation}
+          ref={constellationRef}
+          data-strength-count={count}
+          style={{ "--finding-rows": Math.max(1, Math.ceil(count / 2)) } as CSSProperties}
+        >
+          <CapabilityConnections containerRef={constellationRef} findingsKey={layoutKey} />
           <div
             className={styles.centralOrb}
-            data-dimmed={drawerOpen && selected?.id !== "overview"}
+            data-layout-id="person"
+            data-dimmed={detailOpen && selected?.id !== "overview"}
           >
-            <CelestialOrb decorativeTrails={false} />
+            {waiting && pending ? (
+              <CapabilityLoadingArt />
+            ) : (
+              <CelestialOrb decorativeTrails={false} />
+            )}
             <button
               type="button"
               className={styles.overviewButton}
               data-capability-center
+              disabled={!report.tong_quan}
               aria-label="Thấu hiểu cấu trúc Mệnh"
               onClick={(event) =>
                 openFinding(event.currentTarget, {
@@ -239,8 +282,9 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
                 type="button"
                 key={item.nang_luc_id}
                 className={styles.strengthCard}
-                data-dimmed={drawerOpen && selected?.id !== `strength:${item.nang_luc_id}`}
-                data-selected={drawerOpen && selected?.id === `strength:${item.nang_luc_id}`}
+                data-layout-id={`strength:${item.nang_luc_id}`}
+                data-dimmed={detailOpen && selected?.id !== `strength:${item.nang_luc_id}`}
+                data-selected={detailOpen && selected?.id === `strength:${item.nang_luc_id}`}
                 onClick={(event) =>
                   openFinding(event.currentTarget, {
                     id: `strength:${item.nang_luc_id}`,
@@ -260,54 +304,76 @@ export function CapabilityReport({ report }: { report: CapabilityProfile }) {
             ))}
           </div>
         </div>
-        {!report.diem_manh.length && (
+        {!pending && !error && !report.diem_manh.length && (
           <p className={styles.empty}>
             Chưa có đủ cơ sở để xác định điểm mạnh nổi bật trong lần phân tích này.
           </p>
         )}
       </section>
-      <section className={styles.weaknessSection} aria-labelledby="weaknesses-title">
-        <div className={styles.warningDivider}>
-          <span aria-hidden="true">△</span>
-        </div>
-        <h2 id="weaknesses-title">ĐIỂM CẦN LƯU Ý</h2>
-        <div className={styles.weaknessGrid}>
-          {report.diem_yeu.map((item, index) => (
-            <button
-              type="button"
-              key={`${item.ten}-${index}`}
-              className={styles.weaknessCard}
-              data-dimmed={drawerOpen && selected?.id !== `weakness:${index}`}
-              data-selected={drawerOpen && selected?.id === `weakness:${index}`}
-              onClick={(event) =>
-                openFinding(event.currentTarget, {
-                  id: `weakness:${index}`,
-                  title: item.ten,
-                  description: item.mo_ta,
-                  explanation: item.giai_thich,
-                })
-              }
-              aria-label={`Xem luận giải: ${item.ten}`}
-              aria-haspopup="dialog"
-            >
-              <span className={styles.iconHalo}>
-                <CapabilityIcon kind={weaknessIcons[item.loai]} />
-              </span>
-              <span className={styles.findingTitle}>{item.ten}</span>
-            </button>
-          ))}
-        </div>
-        {!report.diem_yeu.length && (
-          <p className={styles.empty}>
-            Chưa có đủ cơ sở để xác định điểm cần lưu ý trong lần phân tích này.
+      {((!pending && !error) || report.diem_yeu.length > 0) && (
+        <section
+          className={styles.weaknessSection}
+          aria-labelledby="weaknesses-title"
+          data-layout-id="weaknesses"
+        >
+          <div className={styles.warningDivider}>
+            <span aria-hidden="true">△</span>
+          </div>
+          <h2 id="weaknesses-title">ĐIỂM CẦN LƯU Ý</h2>
+          <div className={styles.weaknessGrid}>
+            {report.diem_yeu.map((item, index) => (
+              <button
+                type="button"
+                key={`weakness:${index}`}
+                className={styles.weaknessCard}
+                data-layout-id={`weakness:${index}`}
+                data-dimmed={detailOpen && selected?.id !== `weakness:${index}`}
+                data-selected={detailOpen && selected?.id === `weakness:${index}`}
+                onClick={(event) =>
+                  openFinding(event.currentTarget, {
+                    id: `weakness:${index}`,
+                    title: item.ten,
+                    description: item.mo_ta,
+                    explanation: item.giai_thich,
+                  })
+                }
+                aria-label={`Xem luận giải: ${item.ten}`}
+                aria-haspopup="dialog"
+              >
+                <span className={styles.iconHalo}>
+                  <CapabilityIcon kind={weaknessIcons[item.loai]} />
+                </span>
+                <span className={styles.findingTitle}>{item.ten}</span>
+              </button>
+            ))}
+          </div>
+          {!report.diem_yeu.length && (
+            <p className={styles.empty}>
+              Chưa có đủ cơ sở để xác định điểm cần lưu ý trong lần phân tích này.
+            </p>
+          )}
+        </section>
+      )}
+      {(pending || error) && (
+        <div className={styles.streamStatus}>
+          <p role={error ? "alert" : "status"} aria-live="polite">
+            {error ??
+              (waiting
+                ? "Đang tổng hợp lá số và khám phá năng lực của bạn…"
+                : `Đã khám phá ${count} điểm mạnh và ${report.diem_yeu.length} điểm cần lưu ý. Đang tiếp tục luận giải…`)}
           </p>
-        )}
-      </section>
+          {error && (
+            <button className={styles.unlockButton} onClick={onRetry}>
+              Thử lại
+            </button>
+          )}
+        </div>
+      )}
       <div className={styles.endingStar} aria-hidden="true">
         ✦
       </div>
       <Drawer
-        open={drawerOpen}
+        open={detailOpen}
         onOpenChange={setDrawerOpen}
         onOpenChangeComplete={(open) => {
           if (!open) setSelected(null);

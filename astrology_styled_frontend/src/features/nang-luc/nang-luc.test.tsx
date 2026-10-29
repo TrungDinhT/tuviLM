@@ -58,6 +58,12 @@ afterEach(() => {
 function wrapper({ children }: { children: React.ReactNode }) {
   return <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>;
 }
+function completedResponse(profile: CapabilityProfile) {
+  return new Response(
+    `data: ${JSON.stringify({ type: "started", attempt: 0 })}\n\ndata: ${JSON.stringify({ type: "done", attempt: 0, profile })}\n\n`,
+    { headers: { "Content-Type": "text/event-stream" } },
+  );
+}
 describe("capability report", () => {
   it("shows the loading animation until a report arrives", async () => {
     let complete!: (response: Response) => void;
@@ -80,7 +86,7 @@ describe("capability report", () => {
         ?.getAttribute("aria-busy"),
     ).toBe("true");
     expect(screen.getByRole("status").textContent).toContain("Đang tổng hợp lá số");
-    await act(async () => complete(new Response(JSON.stringify(report))));
+    await act(async () => complete(completedResponse(report)));
     await waitFor(() => expect(screen.queryByTestId("capability-loading-art")).toBeNull());
     expect(screen.getByRole("button", { name: "Thấu hiểu cấu trúc Mệnh" })).toBeTruthy();
   });
@@ -160,7 +166,7 @@ describe("capability report", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
   it("requests only the selected birth tuple and persists the result", async () => {
-    const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify(report)));
+    const fetch = vi.fn().mockResolvedValue(completedResponse(report));
     vi.stubGlobal("fetch", fetch);
     const key = capabilityKey(birth);
     useCapabilityStore.getState().unlock(key);
@@ -191,7 +197,7 @@ describe("capability report", () => {
     const fetch = vi
       .fn<typeof globalThis.fetch>()
       .mockReturnValueOnce(oldResponse)
-      .mockResolvedValueOnce(new Response(JSON.stringify(newReport)));
+      .mockResolvedValueOnce(completedResponse(newReport));
     vi.stubGlobal("fetch", fetch);
     const client = new QueryClient();
     const unbind = bindChartResetClearing(client);
@@ -214,12 +220,12 @@ describe("capability report", () => {
       const newHook = renderHook(() => useCapabilityReport(birth, true), { wrapper });
       await waitFor(() => expect(newHook.result.current.data).toEqual(newReport));
 
-      const staleResponse = new Response(JSON.stringify(report));
+      const staleResponse = completedResponse(report);
       const readStaleResponse = vi.spyOn(staleResponse, "text");
       await act(async () => {
         completeOld(staleResponse);
       });
-      expect(readStaleResponse).toHaveBeenCalledOnce();
+      expect(readStaleResponse).not.toHaveBeenCalled();
       expect(useCapabilityStore.getState().entries[key]?.report).toEqual(newReport);
       expect(client.getQueryData(["capability", key])).toEqual(newReport);
       expect(oldSignal?.aborted).toBe(true);
