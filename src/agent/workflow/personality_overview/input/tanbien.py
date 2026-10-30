@@ -24,7 +24,6 @@ from src.refactored.model.elementary import DiaChi
 from src.refactored.model.layer import NATAL_LAYER_ID
 
 _logger = logging.getLogger(__name__)
-_BASE_ROLES = (Role.MENH, Role.TAI_BACH, Role.QUAN_LOC, Role.THIEN_DI)
 
 # Application contexts from the user's framework, not inferred accomplishments.
 THAN_CU_CONTEXTS = {
@@ -63,15 +62,8 @@ class PalaceEvidence(BaseModel):
 class ThanCuEvidence(BaseModel):
     palace_role: Role
     application_context: str
+    palace: PalaceEvidence
     source: str = "Khung Thể–Dụng giản lược do người dùng cung cấp"
-
-
-class PersonalityOverviewEvidence(BaseModel):
-    menh: PalaceEvidence
-    tam_hop: list[PalaceEvidence] = Field(min_length=2, max_length=2)
-    xung_chieu: PalaceEvidence
-    thai_tue: ThaiTueEvidence
-    than_cu: ThanCuEvidence
 
 
 class MeaningPassage(BaseModel):
@@ -80,6 +72,7 @@ class MeaningPassage(BaseModel):
     scope: str
     breadcrumb: str
     content: str
+    additional_context: str
 
 
 class OverviewMeaning(BaseModel):
@@ -87,6 +80,15 @@ class OverviewMeaning(BaseModel):
     palace_role: Role
     passages: list[MeaningPassage] = Field(default_factory=list)
     missing: list[str] = Field(default_factory=list)
+
+
+class PersonalityOverviewEvidence(BaseModel):
+    menh: PalaceEvidence
+    tam_hop: list[PalaceEvidence] = Field(min_length=2, max_length=2)
+    xung_chieu: PalaceEvidence
+    thai_tue: ThaiTueEvidence
+    than_cu: ThanCuEvidence
+    meanings: list[OverviewMeaning] = Field(default_factory=list)
 
 
 class TatAchEvidence(BaseModel):
@@ -101,7 +103,9 @@ class TatAchEvidence(BaseModel):
     )
 
 
-def _build_palace(la_so: LaSo, role: Role) -> PalaceEvidence:
+def _build_palace(
+    la_so: LaSo, role: Role, *, include_tuan_triet: bool = True,
+) -> PalaceEvidence:
     position = la_so.position_of(role.value, NATAL_LAYER_ID)
     if position is None:
         raise ModelRetry(f"Không tìm thấy cung {role.value}; không thể coi dữ liệu thiếu là Vô Chính Diệu.")
@@ -119,50 +123,91 @@ def _build_palace(la_so: LaSo, role: Role) -> PalaceEvidence:
                 name=component.name,
                 status=status.value if status else None,
             ))
-        elif isinstance(component, TuanTriet):
+        elif include_tuan_triet and isinstance(component, TuanTriet):
             modifiers.append(TuanTrietEvidence(component_id=component_id, name=component.name))
     return PalaceEvidence(role=role, position=position, chinh_tinh=stars, tuan_triet=modifiers)
 
 
-def get_personality_overview_evidence(
-    ctx: RunContext[TuviAgentDeps],
-) -> PersonalityOverviewEvidence:
-    """Lấy input nền: bốn cung chiếu Mệnh, Thái Tuế mới và vị trí Thân cư.
-
-    Không lấy cung Tật Ách hoặc đọc sách ở bước này.
-    """
-    la_so = ctx.deps.require_la_so()
-    menh = _build_palace(la_so, Role.MENH)
+def _build_than_cu(la_so: LaSo) -> ThanCuEvidence:
     than_position = la_so.position_of(Role.CUNG_THAN.value, NATAL_LAYER_ID)
     if than_position is None:
         raise ModelRetry("Không tìm thấy vị trí Thân cư.")
     than_role = la_so.cung_at(than_position).natal_role
     if than_role not in THAN_CU_CONTEXTS:
         raise ModelRetry("Thân cư không thuộc sáu cung được hỗ trợ.")
+    return ThanCuEvidence(
+        palace_role=than_role, application_context=THAN_CU_CONTEXTS[than_role],
+        palace=_build_palace(la_so, than_role),
+    )
+
+
+def get_personality_overview_evidence(
+    ctx: RunContext[TuviAgentDeps],
+) -> PersonalityOverviewEvidence:
+    """Lấy chính tinh/trạng thái ở Mệnh và hội chiếu, Thái Tuế tại Mệnh, dữ kiện Thân.
+
+    Tuần/Triệt chỉ lấy tại Mệnh và Thân. Không lấy tam phương/Thái Tuế của
+    Thân hoặc cung Tật Ách. Đọc sách cho chính tinh Mệnh/Thân; chỉ đọc
+    chính tinh hội chiếu khi Mệnh Vô Chính Diệu.
+    """
+    la_so = ctx.deps.require_la_so()
+    menh = _build_palace(la_so, Role.MENH)
     result = PersonalityOverviewEvidence(
         menh=menh,
-        tam_hop=[_build_palace(la_so, role) for role in (Role.TAI_BACH, Role.QUAN_LOC)],
-        xung_chieu=_build_palace(la_so, Role.THIEN_DI),
+        tam_hop=[_build_palace(la_so, role, include_tuan_triet=False)
+                 for role in (Role.TAI_BACH, Role.QUAN_LOC)],
+        xung_chieu=_build_palace(la_so, Role.THIEN_DI, include_tuan_triet=False),
         thai_tue=build_overview_thai_tue(la_so),
-        than_cu=ThanCuEvidence(
-            palace_role=than_role, application_context=THAN_CU_CONTEXTS[than_role],
-        ),
+        than_cu=_build_than_cu(la_so),
     )
-    _logger.info("Personality overview evidence: vo_chinh_dieu=%s than_cu=%s", menh.vo_chinh_dieu, than_role)
+
+    if menh.vo_chinh_dieu:
+        readings = [
+            (palace, "Tam hợp với mệnh vô chính diệu") for palace in result.tam_hop
+        ]
+        readings.append((result.xung_chieu, "Xung chiếu với mệnh vô chính diệu"))
+    else:
+        readings = [(menh, "Tọa tại mệnh")]
+    readings.append((result.than_cu.palace, "Tọa tại cung thân"))
+
+    # One natal palace can serve multiple roles; retain all contexts without
+    # reading or returning the same star's passages again for each role.
+    palaces: dict[Role, PalaceEvidence] = {}
+    contexts: dict[Role, list[str]] = {}
+    for palace, context in readings:
+        palaces[palace.role] = palace
+        contexts.setdefault(palace.role, []).append(context)
+    result.meanings = [
+        _read_meaning(
+            ctx, star, role,
+            at_than=role == result.than_cu.palace_role,
+            additional_context="; ".join(contexts[role]),
+        )
+        for role, palace in palaces.items()
+        for star in palace.chinh_tinh
+    ]
+
+    _logger.info("Personality overview evidence: vo_chinh_dieu=%s than_cu=%s",
+                 menh.vo_chinh_dieu, result.than_cu.palace_role)
     return result
 
 
 def _read_meaning(
     ctx: RunContext[TuviAgentDeps],
-    star: StarEvidence | TuanTrietEvidence,
+    star: StarEvidence,
     role: Role,
+    *,
+    at_than: bool = False,
+    additional_context: str = "",
 ) -> OverviewMeaning:
     result = OverviewMeaning(component_id=star.component_id, palace_role=role)
     references = [(get_sao_section_id(star.name), "generic")]
-    # A star shining toward Mệnh is never treated as occupying Mệnh. Do not
-    # retrieve career/wealth/illness outcome chapters for a personality overview.
+    # The shared Mệnh/Thân chapter applies only to an actual occupant of either.
+    # Never retrieve career/wealth/illness outcome chapters for this overview.
     if role == Role.MENH:
         references.append((get_menh_than_section_id(star.name), "menh"))
+    elif at_than:
+        references.append((get_menh_than_section_id(star.name), "than"))
     available = [(section_id, scope) for section_id, scope in references if section_id]
     if not available:
         result.missing.append(f"Chưa có mục sách được ánh xạ cho {star.name} trong phạm vi này.")
@@ -185,26 +230,9 @@ def _read_meaning(
         result.passages.append(MeaningPassage(
             section_id=record.id, scope=scope,
             breadcrumb=book.breadcrumb(record.id), content=record.content,
+            additional_context=additional_context,
         ))
     return result
-
-
-def get_personality_overview_meaning(
-    ctx: RunContext[TuviAgentDeps], component_id: str, palace_role: Role,
-) -> OverviewMeaning:
-    """Tra nghĩa chính tinh/Tuần/Triệt thực sự có trong bốn cung nền.
-
-    Chỉ tra nghĩa chung và nghĩa tại Mệnh khi sao thực sự ở Mệnh. Không tra
-    nghĩa phụ tinh, Thái Tuế truyền thống, cung Thân hoặc chương bệnh tật.
-    """
-    if palace_role not in _BASE_ROLES:
-        raise ModelRetry("Chỉ tra nghĩa trong Mệnh, Tài Bạch, Quan Lộc và Thiên Di.")
-    palace = _build_palace(ctx.deps.require_la_so(), palace_role)
-    star = next((item for item in [*palace.chinh_tinh, *palace.tuan_triet]
-                 if item.component_id == component_id), None)
-    if star is None:
-        raise ModelRetry("Yếu tố không có trong evidence chính tinh/Tuần/Triệt của cung được chọn.")
-    return _read_meaning(ctx, star, palace_role)
 
 
 def get_personality_overview_tat_ach_evidence(

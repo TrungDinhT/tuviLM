@@ -20,6 +20,7 @@ from src.agent.workflow.personality_overview import (
     PERSONALITY_OVERVIEW_OUTPUT,
     PersonalityOverview,
     build_personality_overview_agent,
+    build_personality_overview_agent_instruction,
     get_personality_overview_evidence,
     render_personality_overview,
     run_personality_overview_agent,
@@ -27,7 +28,6 @@ from src.agent.workflow.personality_overview import (
 )
 from src.agent.workflow.personality_overview.input.tanbien import (
     THAN_CU_CONTEXTS,
-    get_personality_overview_meaning,
     get_personality_overview_tat_ach_evidence,
 )
 from src.agent.workflow.personality_overview.input.thai_tue import (
@@ -35,6 +35,7 @@ from src.agent.workflow.personality_overview.input.thai_tue import (
     THAI_TUE_STAR_MEANINGS,
 )
 from src.refactored.components.definitions.cung_role import Role
+from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
 from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet
 from src.refactored.la_so import LaSo
 from src.refactored.model.elementary import DiaChi
@@ -61,6 +62,8 @@ def _profile():
 
 def test_natal_projection_covers_vcd_pairs_modifiers_and_all_than_cu():
     seen_counts, seen_than, seen_modifiers, seen_ring = set(), set(), set(), set()
+    seen_than_counts, seen_than_modifiers = set(), set()
+    seen_mixed_pair = False
     for hour in DiaChi:
         ctx = _ctx(LaSoPrior(hour=hour, date=1, month=1, year=1984, gender=Gender.MALE))
         la_so = ctx.deps.la_so
@@ -74,22 +77,47 @@ def test_natal_projection_covers_vcd_pairs_modifiers_and_all_than_cu():
             evidence.menh.position + 4, evidence.menh.position + 8,
         }
         assert evidence.xung_chieu.position == evidence.menh.position + 6
-        for palace in [evidence.menh, *evidence.tam_hop, evidence.xung_chieu]:
+        than = evidence.than_cu.palace
+        assert than.role == evidence.than_cu.palace_role
+        assert than.position == la_so.position_of(Role.CUNG_THAN.value, NATAL_LAYER_ID)
+        seen_than_counts.add(len(than.chinh_tinh))
+        seen_than_modifiers.update(s.name for s in than.tuan_triet)
+        seen_mixed_pair |= len({s.status for s in evidence.menh.chinh_tinh}) == 2
+        for palace in [evidence.menh, *evidence.tam_hop, evidence.xung_chieu, than]:
             components = [la_so.component(cid) for cid in
                           la_so.cung_at(palace.position).components_in_layer(NATAL_LAYER_ID)]
             assert {s.component_id for s in palace.chinh_tinh} == {
                 c.id for c in components if isinstance(c, ChinhPhuTinh) and c.is_chinh_tinh
             }
-            assert {s.component_id for s in palace.tuan_triet} == {
-                c.id for c in components if isinstance(c, TuanTriet)
-            }
+            for star in palace.chinh_tinh:
+                status = MAP_SAO_STATUS.get(star.component_id, {}).get(palace.position)
+                assert star.status == (status.value if status else None)
+            if palace is evidence.menh or palace is than:
+                assert {s.component_id for s in palace.tuan_triet} == {
+                    c.id for c in components if isinstance(c, TuanTriet)
+                }
+            else:
+                assert not palace.tuan_triet
             assert palace.role != Role.TAT_ACH
             assert "phu_tinh" not in palace.model_dump()
-        assert set(evidence.than_cu.model_dump()) == {"palace_role", "application_context", "source"}
+        assert set(evidence.than_cu.model_dump()) == {
+            "palace_role", "application_context", "palace", "source",
+        }
+        assert set(than.model_dump()) == {
+            "role", "position", "chinh_tinh", "tuan_triet", "vo_chinh_dieu",
+        }
+        for base in [evidence.menh, *evidence.tam_hop, evidence.xung_chieu]:
+            if base.position == than.position:
+                assert base.chinh_tinh == than.chinh_tinh
+                if base.role == Role.MENH:
+                    assert base == than
         assert "tat_ach" not in evidence.model_dump()
         assert "technical_support" not in evidence.thai_tue.model_dump()
         assert evidence.thai_tue.star_meaning.group_id == evidence.thai_tue.group_meaning.id
     assert seen_counts == {0, 1, 2}
+    assert seen_than_counts == {0, 1, 2}
+    assert seen_than_modifiers == {"Tuần", "Triệt"}
+    assert seen_mixed_pair
     assert seen_than == set(THAN_CU_CONTEXTS)
     assert seen_modifiers == {"Tuần", "Triệt"}
     assert seen_ring == set(THAI_TUE_RING_STAR_IDS)
@@ -111,34 +139,133 @@ def test_missing_menh_is_not_vcd(monkeypatch):
         get_personality_overview_evidence(ctx)
 
 
-def test_scoped_meaning_reads_exact_book_sections_and_reports_missing(tmp_path):
-    # Synthetic source content tests retrieval, not the astrological interpretation.
+def test_enriched_evidence_reads_exact_sections_and_reports_missing(tmp_path):
     (tmp_path / "3_chung.md").write_text("3. Chung\nPARENT_OUT_OF_SCOPE", encoding="utf-8")
     (tmp_path / "3_14_pha-quan.md").write_text("3.14. Phá Quân\nGENERIC_TEST", encoding="utf-8")
     (tmp_path / "4_2_14_pha-quan.md").write_text("4.2.14. Phá Quân\nMENH_TEST", encoding="utf-8")
-    (tmp_path / "3_2_liem-trinh.md").write_text("3.2. Liêm Trinh\nGENERIC_CHIEU_TEST", encoding="utf-8")
-    ctx = _ctx(book=BookIndex(tmp_path))
-    meaning = get_personality_overview_meaning(ctx, "pha_quan", Role.MENH)
+    evidence = get_personality_overview_evidence(_ctx(book=BookIndex(tmp_path)))
+    meaning = next(m for m in evidence.meanings if m.component_id == "pha_quan")
     assert [(p.section_id, p.scope, p.content) for p in meaning.passages] == [
         ("3.14", "generic", "GENERIC_TEST"), ("4.2.14", "menh", "MENH_TEST"),
     ]
-    chieu = get_personality_overview_meaning(ctx, "liem_trinh", Role.THIEN_DI)
-    assert [(p.section_id, p.scope) for p in chieu.passages] == [("3.2", "generic")]
-    missing_section = get_personality_overview_meaning(ctx, "that_sat", Role.TAI_BACH)
-    assert not missing_section.passages and missing_section.missing
-    missing_book = get_personality_overview_meaning(
-        _ctx(book_root=tmp_path / "absent"), "pha_quan", Role.MENH,
+    assert "PARENT_OUT_OF_SCOPE" not in evidence.model_dump_json()
+    assert any(not m.passages and m.missing for m in evidence.meanings)
+    missing_book = get_personality_overview_evidence(_ctx(book_root=tmp_path / "absent"))
+    assert missing_book.meanings
+    assert all(not m.passages and m.missing for m in missing_book.meanings)
+
+
+@pytest.mark.parametrize("hour", list(DiaChi))
+def test_enriched_reading_scope_and_overlap(hour, tmp_path, monkeypatch):
+    from src.agent.tool.tu_vi_tan_bien.constant import (
+        get_menh_than_section_id, get_sao_section_id,
     )
-    assert not missing_book.passages and missing_book.missing
-    modifier = get_personality_overview_meaning(ctx, "triet_1", Role.THIEN_DI)
-    assert not modifier.passages and modifier.missing
-    for component_id, role in [
-        ("tue_pha", Role.MENH), ("thien_ma", Role.MENH),
-        ("liem_trinh", Role.MENH), ("pha_quan", Role.TAT_ACH),
-        ("pha_quan", Role.CUNG_THAN),
+
+    ctx = _ctx(LaSoPrior(hour=hour, date=1, month=1, year=1984, gender=Gender.MALE))
+    evidence = get_personality_overview_evidence(ctx)
+    than = evidence.than_cu.palace
+    # Supply every base/Thân star's sources so excluded reads cannot hide behind
+    # missing mappings. Domain chapters must never enter the payload either.
+    for palace in [evidence.menh, *evidence.tam_hop, evidence.xung_chieu, than]:
+        for star in palace.chinh_tinh:
+            for section_id, content in [
+                (get_sao_section_id(star.name), "GENERIC_TEST"),
+                (get_menh_than_section_id(star.name), "MENH_THAN_TEST"),
+            ]:
+                (tmp_path / f"{section_id.replace('.', '_')}_test.md").write_text(
+                    f"{section_id}. Test\n{content}", encoding="utf-8",
+                )
+    for section_id in ["6.7", "8.7", "12.7", "14.7"]:
+        (tmp_path / f"{section_id.replace('.', '_')}_test.md").write_text(
+            f"{section_id}. Test\nDOMAIN_OUT_OF_SCOPE", encoding="utf-8",
+        )
+    ctx.deps.book = BookIndex(tmp_path)
+    reads = []
+    original = BookIndex.get_record
+
+    def tracked_read(self, section_id):
+        reads.append(section_id)
+        return original(self, section_id)
+
+    monkeypatch.setattr(BookIndex, "get_record", tracked_read)
+    enriched = get_personality_overview_evidence(ctx)
+    expected_palaces = [evidence.menh, than]
+    if evidence.menh.vo_chinh_dieu:
+        expected_palaces += [*evidence.tam_hop, evidence.xung_chieu]
+    expected = {(p.role, star.component_id) for p in expected_palaces for star in p.chinh_tinh}
+    assert {(m.palace_role, m.component_id) for m in enriched.meanings} == expected
+    assert len(enriched.meanings) == len(expected)
+    for meaning in enriched.meanings:
+        scopes = ["generic"]
+        if meaning.palace_role == Role.MENH:
+            scopes.append("menh")
+        elif meaning.palace_role == than.role:
+            scopes.append("than")
+        assert [p.scope for p in meaning.passages] == scopes
+        contexts = []
+        if meaning.palace_role == Role.MENH:
+            contexts.append("Tọa tại mệnh")
+        elif evidence.menh.vo_chinh_dieu:
+            if meaning.palace_role in (Role.TAI_BACH, Role.QUAN_LOC):
+                contexts.append("Tam hợp với mệnh vô chính diệu")
+            elif meaning.palace_role == Role.THIEN_DI:
+                contexts.append("Xung chiếu với mệnh vô chính diệu")
+        if meaning.palace_role == than.role:
+            contexts.append("Tọa tại cung thân")
+        assert all(p.additional_context == "; ".join(contexts) for p in meaning.passages)
+        assert not meaning.missing
+    section_ids = [p.section_id for m in enriched.meanings for p in m.passages]
+    assert len(section_ids) == len(set(section_ids))
+    # BookIndex also looks up records while constructing breadcrumbs.
+    assert set(reads) == set(section_ids)
+    assert "DOMAIN_OUT_OF_SCOPE" not in enriched.model_dump_json()
+
+
+def test_missing_star_status_is_not_inferred(monkeypatch):
+    monkeypatch.delitem(MAP_SAO_STATUS, "pha_quan")
+    evidence = get_personality_overview_evidence(_ctx())
+    assert next(s for s in evidence.menh.chinh_tinh if s.component_id == "pha_quan").status is None
+
+
+def test_missing_than_is_not_silently_omitted(monkeypatch):
+    ctx = _ctx()
+    original = type(ctx.deps.la_so).position_of
+
+    def missing_than(self, component_id, *args, **kwargs):
+        return None if component_id == Role.CUNG_THAN.value else original(self, component_id, *args, **kwargs)
+
+    monkeypatch.setattr(type(ctx.deps.la_so), "position_of", missing_than)
+    with pytest.raises(ModelRetry, match="Không tìm thấy vị trí Thân cư"):
+        get_personality_overview_evidence(ctx)
+
+
+def test_synthesis_instructions_preserve_decisions_and_output_contract():
+    instruction = " ".join(build_personality_overview_agent_instruction().split())
+    for requirement in [
+        "Temperament Condition", "không hiểu đắc là tăng, hãm là giảm",
+        "trạng thái TỪNG sao", "cấu trúc tinh hệ", "double-counting",
+        "Mệnh Vô Chính Diệu là nhánh riêng", "không lấn át Mệnh hoặc tạo personality trait độc lập",
+        "không biến thành chân dung tính cách thứ hai",
+        "Không xét thêm tam phương tứ chính, phụ tinh hoặc vòng Thái Tuế tại Thân",
+        "Tôi có quyền và trách nhiệm phải làm.",
+        "Tôi nên làm gì và chịu trách nhiệm thế nào?",
+        "Thực tại này có gì đó không ổn.",
+        "Điều gì trong hiện trạng cần thay đổi?",
+        "Tôi có thể nhìn ra một cách đi khác.",
+        "Tôi nhìn thấy khả năng nào và sẽ làm gì với nó?",
+        "Tôi thích nghi hơn là áp đặt.",
+        "Tôi điều chỉnh mình và giữ cân bằng thế nào?",
+        "không phải kết luận bắt buộc, nhãn tính cách",
+        "chủ động chọn MỘT hướng", "khoảng 20–40 từ", "Không ghép nhiều hướng",
+        "không yêu cầu người dùng trả lời", "không thêm nhận định tâm lý thiếu căn cứ",
+        "Không gọi Tật Ách mặc định", "không chẩn đoán hoặc khẳng định động cơ vô thức",
     ]:
-        with pytest.raises(ModelRetry):
-            get_personality_overview_meaning(ctx, component_id, role)
+        assert requirement in instruction
+    assert set(PersonalityOverview.model_fields) == {
+        "net_chu_dao", "bieu_hien_thuong_thay", "mat_con_lai", "mot_dieu_dang_de_y",
+    }
+    assert all(set(type(group).model_fields) == {"id", "name", "overview", "tension"}
+               for group in THAI_TUE_GROUP_MEANINGS.values())
 
 
 def test_tat_ach_requires_reason_and_only_reads_generic_meanings(tmp_path):
@@ -174,6 +301,12 @@ def test_tat_ach_requires_reason_and_only_reads_generic_meanings(tmp_path):
 @pytest.mark.parametrize("use_tat_ach", [False, True])
 def test_real_agent_tool_roundtrip_json_retry_and_optional_tat_ach(use_tat_ach, tmp_path):
     calls, returned_tools = [], set()
+    ctx = _ctx(
+        LaSoPrior(hour=DiaChi.SUU, date=1, month=1, year=1984, gender=Gender.MALE),
+        book_root=tmp_path,
+    )
+    (tmp_path / "3_7_thien-phu.md").write_text("3.7. Thiên Phủ\nGENERIC_TEST", encoding="utf-8")
+    (tmp_path / "4_2_7_thien-phu.md").write_text("4.2.7. Thiên Phủ\nTHAN_TEST", encoding="utf-8")
 
     def model(messages, info):
         calls.append(messages)
@@ -198,10 +331,17 @@ def test_real_agent_tool_roundtrip_json_retry_and_optional_tat_ach(use_tat_ach, 
         *(tool.__name__ for tool in PERSONALITY_OVERVIEW_INPUT.supporting_tools),
     }
     profile = asyncio.run(run_personality_overview_agent(
-        agent=agent, deps=_ctx(book_root=tmp_path / "absent").deps, request="Luận nét chủ đạo.",
+        agent=agent, deps=ctx.deps, request="Luận nét chủ đạo.",
     ))
     assert profile == _profile()
     assert len(calls) == 3 + int(use_tat_ach)
+    assert set(agent.toolsets[0].tools) == {
+        "get_personality_overview_evidence", "get_personality_overview_tat_ach_evidence",
+    }
+    evidence = next(p.content for m in calls[-1] for p in m.parts
+                    if isinstance(p, ToolReturnPart) and p.tool_name == "get_personality_overview_evidence")
+    meaning = next(m for m in evidence.meanings if m.component_id == "thien_phu")
+    assert [p.scope for p in meaning.passages] == ["generic", "than"]
     assert ("get_personality_overview_tat_ach_evidence" in returned_tools) == use_tat_ach
 
 

@@ -24,18 +24,34 @@ cần suy xét trước khi phản ứng.” Hai phía thuộc cùng một cơ c
 | Yếu tố | Vai trò | Giới hạn |
 |---|---|---|
 | Chính tinh/bộ chính tinh tại Mệnh | Khí chất, cách vận hành tự nhiên | Tổng hợp cả bộ, không cộng đặc tính |
+| Miếu/Vượng/Đắc/Bình/Hãm của từng chính tinh | Temperament Condition: điều chỉnh cách khí chất vận hành | Đọc theo từng sao và nguồn sách, không quy thành tăng/giảm cường độ hoặc điểm số |
 | Vòng Thái Tuế tại Mệnh | Tư thế sống trước hoàn cảnh và cách biểu hiện | Bổ sung cho chính tinh, không thành một chân dung độc lập |
-| Tuần/Triệt | Điều chỉnh cách xu hướng được biểu hiện | Không coi là một kiểu tính cách riêng |
-| Chính tinh xung chiếu/tam hợp Mệnh | Bối cảnh hỗ trợ; đặc biệt cần khi Vô Chính Diệu | Không đổi sao chiếu thành sao tọa Mệnh |
-| Thân cư | Lĩnh vực hướng khí chất vào | Chỉ vị trí Thân cư, không phân tích thêm sao tại Thân |
+| Tuần/Triệt tại Mệnh/Thân | Điều chỉnh cách khí chất biểu hiện/vận dụng | Không coi là một kiểu tính cách riêng, không lấy từ cung hội chiếu để luận Mệnh |
+| Chính tinh xung chiếu/tam hợp Mệnh | Hiểu và điều chỉnh khí chất Mệnh; quan trọng hơn khi Vô Chính Diệu | Chỉ chính tinh, không thêm trait độc lập hoặc đổi sao chiếu thành sao tọa Mệnh |
+| Thân cư cùng chính tinh, trạng thái, Tuần/Triệt tại Thân | Hướng và phương thức vận dụng khí chất (Dụng) | Không tạo chân dung thứ hai; không xét tam phương hoặc Thái Tuế tại Thân |
 | Tật Ách | Góc khám phá nội tâm thử nghiệm, có điều kiện | Không lấy mặc định, không luận bệnh/tai ách/tiềm thức chắc chắn |
 
 Tuần thường kìm, làm chậm hoặc tiết chế. Triệt thường ngăn, cắt, tạo gián đoạn
 hoặc khiến xu hướng khó biểu hiện trực tiếp. Cả hai có thể giảm biểu hiện quá
 cực đoan. Đây là quy tắc giản lược do người dùng cung cấp.
 
-**Mệnh Vô Chính Diệu:** ưu tiên vòng Thái Tuế, đối chiếu chính tinh xung chiếu/
-tam hợp và Tuần/Triệt. Không mượn một chính tinh thay thế Mệnh; không kết luận
+**Temperament Condition:** đắc không có nghĩa tăng cường độ, hãm không có nghĩa
+giảm cường độ; hãm có thể làm đặc tính thiếu cân bằng hoặc biểu hiện theo chiều
+hướng khác. Đọc điều kiện riêng từng sao qua các đoạn sách trong evidence, không hardcode
+thêm bảng ý nghĩa hay công thức chung. Với hai chính tinh đồng cung, xét trạng
+thái từng sao trước khi tổng hợp, không dùng trạng thái chung hoặc trung bình.
+Áp dụng cho chính tinh tại Mệnh, hội chiếu và Thân. Thiếu trạng thái/nguồn phù
+hợp thì giữ giới hạn, không tự gán trạng thái hoặc bù ý nghĩa.
+
+**Cấu trúc tinh hệ:** Mệnh là trọng tâm; đọc bộ đồng cung và các quan hệ hội
+chiếu như một cấu trúc liên kết. Không cộng dồn đặc tính, không xem các quan hệ
+an sao vốn đi cùng nhau là nhiều bằng chứng độc lập. Một sao nằm trong nhiều
+bộ/quan hệ vẫn là cùng dữ kiện; tên bộ không tự xác nhận cách cục hoặc ý nghĩa.
+Nguyên tắc này nằm trong instruction, không sử dụng `input/tinh_he.py`.
+
+**Mệnh Vô Chính Diệu:** nhánh riêng, trong đó cấu trúc chính tinh xung chiếu/
+tam hợp và trạng thái từng sao có vai trò quan trọng hơn, kết hợp vòng Thái Tuế
+và Tuần/Triệt tại Mệnh. Không mượn một chính tinh thay thế Mệnh; không kết luận
 tuyệt đối bằng công thức như “đắc Tam Không”. Thiếu dữ liệu Mệnh phải báo lỗi,
 không được xem là Vô Chính Diệu.
 
@@ -78,12 +94,28 @@ Lý do giản lược:
 - Nhóm giữ phần chung; sao thừa hưởng và chỉ nói phần riêng. `tension` nhóm
   không gom mọi mặt trái riêng của ba sao rồi gán cho cả nhóm.
 - Tinh thần cốt lõi được giữ trong `overview`. Không thêm `archetype` hoặc
-  `core_question`: dễ lặp ý hoặc ép diễn giải vào một nhãn/câu hỏi cố định.
+  `core_question`; tinh thần và câu hỏi nền được làm rõ trong instruction để
+  định hướng suy luận, không ép kết luận theo một nhãn/câu hỏi cố định.
 - Bỏ `reading_lens` nhóm: các quy tắc chung nằm trong instruction; góc riêng
   đã được mô tả trong `overview`.
 - Bỏ `keywords` để tránh cộng tính từ. Không tách `shadow` sao vì dễ lặp
   `tension`; mặt quá đà riêng nằm cạnh cơ chế sinh ra nó trong `expression`.
 - `expression` thay tên `at_menh` vì toàn bộ bộ dữ liệu này luôn xét tại Mệnh.
+
+Instruction bổ sung bốn hướng đọc nội bộ, giữ nguyên schema nhóm/sao:
+
+- **Tuế Hổ Phù:** “Tôi có quyền và trách nhiệm phải làm.” → Tôi nên làm gì và
+  chịu trách nhiệm thế nào?
+- **Tang Tuế Khách:** “Thực tại này có gì đó không ổn.” → Điều gì trong hiện
+  trạng cần thay đổi?
+- **Dương Tử Phúc:** “Tôi có thể nhìn ra một cách đi khác.” → Tôi nhìn thấy
+  khả năng nào và sẽ làm gì với nó?
+- **Âm Long Trực:** “Tôi thích nghi hơn là áp đặt.” → Tôi điều chỉnh mình và
+  giữ cân bằng thế nào?
+
+Đây không phải kết luận bắt buộc, nhãn tính cách hay câu hỏi gửi người dùng.
+Chỉ đọc nhóm thực sự có tại Mệnh, kết hợp `expression`/`reading_hint` và khí
+chất nền; không dùng câu hỏi nền làm Reflection Lens mặc định.
 
 Không biến khuynh hướng thành năng lực: dùng lời xử lý bất đồng không có nghĩa
 nói giỏi; theo việc không bảo đảm thành công; cân nhắc giá trị không chứng minh
@@ -97,7 +129,8 @@ trên nghiên cứu người dùng. Nội dung chi tiết còn cần thảo lu�
 
 ### Thân cư: luôn xem xét, chỉ sử dụng khi hữu ích
 
-Mệnh là Thể, Thân là Dụng theo cách giản lược. Chỉ lấy cung mà Thân cư:
+**Mệnh (Thể)** là khí chất và khuynh hướng tự nhiên. **Thân (Dụng)** là hướng
+và phương thức vận dụng khí chất. Vị trí Thân cư cho biết lĩnh vực:
 
 | Thân cư | Hướng vận dụng |
 |---|---|
@@ -108,10 +141,22 @@ Mệnh là Thể, Thân là Dụng theo cách giản lược. Chỉ lấy cung m
 | Phu Thê | Gắn bó, đồng hành, cam kết |
 | Phúc Đức | Đời sống tinh thần, giá trị cá nhân, bình ổn nội tâm |
 
+`than_cu.palace` bổ sung chính tinh/bộ chính tinh, trạng thái từng sao và
+Tuần/Triệt tại cung Thân, dùng lại `PalaceEvidence`. Evidence tự đọc nghĩa
+chung và mục Mệnh/Thân của chính tinh tại Thân vào `meanings`, liên kết bằng
+`component_id` và cung thực tế trong `palace_role`;
+chỉ chọn phần phù hợp với hướng/phương thức vận dụng, không lấy chương lĩnh
+vực như nghề nghiệp, tài chính, hôn nhân để suy tính cách.
+
 Tên lĩnh vực không phải kết luận về tham vọng, năng lực hoặc thành công.
-Không đọc thêm chính tinh, phụ tinh, Thái Tuế hay tam phương của Thân. Khi Thân
-cư trùng cung nền, không tính evidence hai lần. Chỉ đưa ảnh hưởng vào bài nếu
-làm pattern cụ thể hoặc có ý nghĩa hơn; không tạo section riêng.
+Không xét thêm phụ tinh, Thái Tuế hay tam phương tứ chính của Thân. Thân không
+có chính tinh thì chỉ dùng vị trí cư và Tuần/Triệt, không mượn sao hội chiếu.
+Không tạo chân dung tính cách thứ hai hoặc section riêng.
+
+Đối chiếu `position`/`component_id` để tránh double-counting: Thân trùng Mệnh
+là cùng dữ kiện qua Thể–Dụng; Thân nằm trong tam phương tứ chính đã xét chỉ bổ
+sung vai trò vận dụng, không cộng lại đặc tính hay tăng độ chắc chắn. Chỉ đưa
+ảnh hưởng vào bài nếu làm pattern cụ thể hoặc có ý nghĩa hơn.
 
 ### Tật Ách: bổ sung có điều kiện
 
@@ -138,7 +183,7 @@ personality_overview/
 ├── agent.py                 instruction, build agent, run structured/rendered
 ├── input/
 │   ├── __init__.py          PERSONALITY_OVERVIEW_INPUT
-│   ├── tanbien.py           evidence, Thân cư, tool tra nghĩa và Tật Ách
+│   ├── tanbien.py           evidence kèm nghĩa sách, tool Tật Ách có điều kiện
 │   └── thai_tue.py          bộ diễn giải Thái Tuế riêng
 ├── output/
 │   └── overview.py          schema, output instruction, renderer
@@ -155,22 +200,48 @@ hoặc thêm dependency.
 ```text
 get_personality_overview_evidence
   → Mệnh + Tài Bạch/Quan Lộc tam hợp + Thiên Di xung chiếu
-    + Thái Tuế mới + vị trí Thân cư
-  → get_personality_overview_meaning cho chính tinh làm căn cứ
-  → tổng hợp pattern, cân nhắc bối cảnh Thân cư
+    (hội chiếu chỉ chính tinh/trạng thái)
+    + Thái Tuế tại Mệnh + Thân cư/chính tinh/trạng thái/Tuần–Triệt
+  → tự nạp meanings cho chính tinh Mệnh/Thân; hội chiếu chỉ khi Mệnh VCD
+  → nhánh có chính tinh hoặc Vô Chính Diệu; tổng hợp cấu trúc và đắc/hãm
+  → cân nhắc Thể–Dụng, không đếm lại dữ kiện
   → tùy nhu cầu: get_personality_overview_tat_ach_evidence(reason)
+  → chọn một Reflection Lens, viết một câu khoảng 20–40 từ
   → PersonalityOverview → renderer → bốn phần Markdown
 ```
 
-Input ban đầu không đọc sách, không lấy Tật Ách. Tool tra nghĩa kiểm tra yếu tố
-thực sự thuộc chính tinh/Tuần–Triệt của cung nền được chọn. Chỉ đọc nghĩa chung
-và nghĩa Mệnh nếu sao thực sự ở Mệnh; không lấy nghĩa cung nghề nghiệp/tài chính
-rồi chuyển thành tính cách. Dùng `BookIndex.get_record()` đọc đúng mục và giữ
-section ID/breadcrumb, không đưa toàn bộ nội dung mục cha vào context.
+Input ban đầu gồm dữ kiện lá số và `meanings: list[OverviewMeaning]`, không
+lấy Tật Ách. Không còn tool `get_personality_overview_meaning` để agent tự
+điều phối từng lượt đọc. Phạm vi tra sách được quyết định từ evidence đã dựng:
 
-Thiếu nguồn/mục/nội dung được trả trong `missing`, không tự bù kiến thức. Mapping
-hiện chưa có mục chung/Mệnh cho Tuần/Triệt; quy tắc giản lược của chúng nằm trong
-instruction và không được trình bày như trích sách.
+- Mệnh có chính tinh: đọc nghĩa chung và mục Mệnh/Thân của các chính tinh đó.
+- Mệnh Vô Chính Diệu: đọc nghĩa chung của chính tinh tại cả hai cung tam hợp
+  và cung xung chiếu. Không coi sao chiếu là sao tọa Mệnh.
+- Thân có chính tinh: đọc nghĩa chung và mục Mệnh/Thân của chúng.
+- Thân Vô Chính Diệu: không đọc thêm hoặc mượn sao hội chiếu cho Thân.
+
+Danh sách cung cần đọc được loại trùng theo cung thực tế trước khi tra sách;
+chính tinh thuộc một cung natal nên mỗi sao/cung chỉ có một `OverviewMeaning`.
+Thân trùng Mệnh hoặc cung hội chiếu không tạo bản sao nghĩa sách. Mỗi meaning
+liên kết với dữ kiện bằng `component_id`/`palace_role`; passages giữ section ID,
+breadcrumb, content, scope và `additional_context`. Ngữ cảnh cho biết tọa
+Mệnh, tam hợp/xung chiếu với Mệnh VCD hoặc tọa Thân; khi trùng cung thì gộp
+các ngữ cảnh trong cùng passage, không nhân đôi nguồn. Mục Mệnh/Thân dùng scope `menh` nếu ở Mệnh,
+`than` nếu ở Thân khác Mệnh; nghĩa chung dùng `generic`. Agent đối chiếu vai trò
+với evidence, không coi cùng nguồn là các bằng chứng độc lập.
+
+Dữ kiện chính tinh/trạng thái hội chiếu vẫn được giữ khi Mệnh có chính tinh,
+nhưng không đọc thêm sách cho chúng (trừ cung cũng là Thân). Chúng cung cấp
+bối cảnh cấu trúc; không tự bù ý nghĩa sao từ kiến thức model khi thiếu nguồn.
+Cung hội chiếu giữ `tuan_triet=[]`; nếu cũng là Thân thì Tuần/Triệt nằm trong
+`than_cu.palace` với vai trò Dụng.
+
+Dùng `BookIndex.get_record()` đọc đúng mục đã ánh xạ, không đưa nội dung mục
+cha hoặc chương nghề nghiệp/tài chính/hôn nhân vào context. Không tính lại vị
+trí Thân hay dựng lại cung để tra từng sao. Thiếu nguồn/mục/nội dung được trả
+trong `missing`, không tự bù kiến thức. Không tra sách cho phụ tinh hay
+Tuần/Triệt; quy tắc giản lược Tuần/Triệt nằm trong instruction và không được
+trình bày như trích sách. Tật Ách vẫn có tool riêng và chỉ đọc nghĩa sao chung.
 
 `build_personality_overview_agent(model)` dùng `TuviAgentDeps` hiện có và
 `PromptedOutput(PersonalityOverview)`, cùng cơ chế JSON qua prompt như
@@ -186,25 +257,38 @@ render từ model đó. Cả hai nhận `agent`, `deps`, `request`, tùy chọn 
 | `net_chu_dao` | Nét chủ đạo | Một đoạn ngắn, một pattern |
 | `bieu_hien_thuong_thay` | Biểu hiện thường thấy | 2–3 biểu hiện cụ thể của pattern |
 | `mat_con_lai` | Mặt còn lại | Tension/cái giá của cùng đặc điểm |
-| `mot_dieu_dang_de_y` | Một điều đáng để ý | Một câu mở góc quan sát mới, không kiểm tra đúng/sai hoặc yêu cầu trả lời |
+| `mot_dieu_dang_de_y` | Một điều đáng để ý | Một câu khoảng 20–40 từ, chỉ chọn một góc quan sát mới, không yêu cầu trả lời |
 
 Viết tiếng Việt phổ thông, gọi người dùng là “bạn”, chỉ dùng thuật ngữ Tử Vi khi
 cần để hiểu nhận định. Không thêm section, không lộ evidence ID/suy luận nội bộ.
 
-**Code bảo đảm:** dữ kiện được lọc theo loại/cung/lớp natal, lý do Tật Ách không
-rỗng, output đúng bốn field không rỗng, danh sách có 2–3 mục, renderer cố định.
+**Reflection Lens:** agent chủ động chọn một hướng phù hợp nhất: điều kiện
+xuất hiện; ngoại lệ/mặt đối lập; khoảng cách suy nghĩ–hành động; động cơ dưới
+hành vi nếu có căn cứ; khác biệt giữa các lĩnh vực; hoặc ảnh hưởng tới quan hệ.
+Không ghép nhiều hướng, lặp kết luận hoặc thêm nhận định tâm lý thiếu căn cứ.
+Không kiểm tra đúng/sai, không khẳng định động cơ vô thức, không yêu cầu trả lời.
+Giữ nguyên bốn field, renderer và độ ngắn của free layer; 20–40 từ là hướng
+dẫn viết, không thêm bộ đếm từ/câu cứng vào validator.
 
-**Instruction yêu cầu, cần đánh giá bằng model thật:** gọi input trước, tra nghĩa
-khi cần kết luận, chỉ gọi Tật Ách khi hữu ích và tối đa một lần, một pattern nhất
-quán, tension liên quan, câu cuối đúng một câu và có góc nhìn mới. Hiện chưa có
+**Code bảo đảm:** dữ kiện được lọc theo loại/cung/lớp natal, lý do Tật Ách không
+rỗng, phạm vi sách được nạp theo nhánh Mệnh/Thân và loại trùng cung,
+output đúng bốn field không rỗng, danh sách có 2–3 mục, renderer cố định.
+
+**Instruction yêu cầu, cần đánh giá bằng model thật:** gọi input trước, chọn
+đoạn sách phù hợp trong meanings, chỉ gọi Tật Ách khi hữu ích và tối đa một lần, một pattern nhất
+quán, đắc/hãm theo từng sao, không đếm trùng tinh hệ/Thân, tension liên quan,
+câu cuối một hướng, đúng một câu khoảng 20–40 từ và có góc nhìn mới. Hiện chưa có
 state machine hoặc validator ngữ nghĩa cưỡng chế các yêu cầu này.
 
 ## 7. Trạng thái, kiểm tra và việc tiếp theo
 
 - Đã triển khai standalone. Chưa nối main agent, CLI, API hoặc frontend. Các
   workflow cũ giữ nguyên; không tự thay thế workflow `personality` hiện có.
-- Lần kiểm tra triển khai gần nhất: **26 test qua**, gồm bộ mới và regression
-  của personality/Thái Tuế. Chưa đánh giá chất lượng bằng model thật.
+- Kiểm tra ngày 2026-10-17: **41 test qua**. Gồm projection/trạng thái từng sao,
+  sáu vị trí Thân cư và dữ kiện
+  trùng Mệnh/hội chiếu, nạp sách theo nhánh Mệnh/Thân/VCD, loại trùng nguồn,
+  instruction và regression của
+  personality/Thái Tuế. Chưa đánh giá chất lượng bằng model thật.
 - Khi triển khai, checkout thiếu `data/tuvitanbien_chunking`; cần kiểm tra lại
   môi trường hoặc truyền `book_root` có dữ liệu trước khi đánh giá có nguồn sách.
 

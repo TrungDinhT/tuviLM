@@ -19,7 +19,7 @@ class PersonalityOverview(BaseModel):
     )
     mat_con_lai: NonEmptyText = Field(description="Tension hoặc cái giá của chính pattern đó.")
     mot_dieu_dang_de_y: NonEmptyText = Field(
-        description="Một câu gợi mở thêm góc tự quan sát, không yêu cầu người dùng trả lời.",
+        description="Một câu ngắn khoảng 20–40 từ, chọn một góc tự quan sát mới, không yêu cầu trả lời.",
     )
 
 
@@ -33,9 +33,14 @@ Trả đúng schema PersonalityOverview, nội dung tiếng Việt, gọi ngư�
   kiện đã xảy ra. Các ví dụ là khả năng biểu hiện, không phải tiểu sử.
 - mat_con_lai: tension hoặc cái giá của cùng pattern, không thêm khuyết điểm
   độc lập, không bắt buộc đưa mọi tension của nhóm/sao vào bài.
-- mot_dieu_dang_de_y: đúng một câu gợi mở một góc nhìn mới, không lặp kết luận,
-  không kiểm tra luận đoán đúng sai, không yêu cầu trả lời. Có thể gợi quan sát
-  điều kiện, ngoại lệ, khoảng cách suy nghĩ–hành động hoặc tác động lên người khác.
+- mot_dieu_dang_de_y (Reflection Lens): chủ động chọn MỘT hướng phù hợp nhất
+  với profile và viết đúng một câu ngắn, khoảng 20–40 từ. Các hướng có thể chọn:
+  điều kiện khiến đặc điểm xuất hiện; ngoại lệ hoặc mặt đối lập; khoảng cách
+  suy nghĩ–hành động; động cơ dưới hành vi nếu có căn cứ; khác biệt giữa các
+  lĩnh vực đời sống; ảnh hưởng đến các mối quan hệ. Không ghép nhiều hướng.
+  Câu phải bổ sung một chiều quan sát mới, không lặp kết luận, không thêm nhận
+  định tâm lý thiếu căn cứ, không khẳng định động cơ vô thức, không kiểm tra
+  luận đoán đúng sai và không yêu cầu người dùng trả lời.
 Viết ngắn gọn cho người không biết Tử Vi, không thêm tiêu đề trong các field,
 không thêm section Thân/Tật Ách, không xuất evidence ID, suy luận nội bộ hay
 trích sách dài. Chỉ gọi tên sao/cung khi thật sự cần để hiểu nhận định.

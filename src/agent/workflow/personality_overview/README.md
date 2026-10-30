@@ -29,19 +29,27 @@ gọi model viết lại. Usage và message history có thể truyền qua hai h
 
 ## Input và nguồn
 
-- `input/tanbien.py`: chính tinh/trạng thái và Tuần/Triệt của Mệnh, Tài Bạch,
-  Quan Lộc, Thiên Di; vị trí Thân cư và sáu hướng vận dụng từ framework người dùng.
+- `input/tanbien.py`: chính tinh/trạng thái tại Mệnh và tam hợp/xung chiếu;
+  Tuần/Triệt tại Mệnh. Thân cư gồm lĩnh vực vận dụng, chính tinh/trạng thái và
+  Tuần/Triệt tại Thân; không mở rộng tam phương hoặc vòng Thái Tuế của Thân.
+- Instruction đọc đắc/hãm theo từng sao, tổng hợp theo cấu trúc tinh hệ và
+  Thể–Dụng, không cộng đặc tính hoặc đếm trùng dữ kiện. Không dùng `tinh_he.py`.
 - `input/thai_tue.py`: bốn nhóm (`overview`, `tension`) và mười hai sao
   (`expression`, `reading_hint`). Nội dung bản đầu dựa trên nghiên cứu người dùng,
   còn cần rà và chỉnh cùng người dùng; không phải trích dẫn Tân Biên/Thiên Lương.
   Builder cũ chỉ cung cấp định danh sao. Diễn giải cũ, keywords và technical
   support không được đưa vào input mới; `vong_thai_tue.py` không thay đổi.
-- Tool tra nghĩa chỉ đọc các mục sao đã ánh xạ, có section ID và breadcrumb:
-  nghĩa chung và nghĩa Mệnh khi sao thật sự tại Mệnh. Đọc đúng nội dung mục,
-  không đưa toàn bộ phần cha vào context. Không mở rộng các tổ hợp phụ tinh
-  chỉ vì sách có nhắc chúng. Thiếu sách/mục/nội dung được trả rõ trong `missing`.
+- `get_personality_overview_evidence` tự nạp sách vào `meanings`: nghĩa chung
+  và mục Mệnh/Thân của chính tinh tại Mệnh/Thân; chỉ đọc chính tinh tam hợp và
+  xung chiếu khi Mệnh Vô Chính Diệu. Thân Vô Chính Diệu không đọc thêm.
+  Cung trùng nhau chỉ đọc một lần, liên kết qua `component_id`/`palace_role`.
+  Không còn tool tra nghĩa riêng. Giữ section ID, breadcrumb và nội dung đúng
+  mục; không đưa phần cha hoặc chương lĩnh vực vào context. Thiếu sách/mục/
+  nội dung trả rõ trong `missing`; không tự bù nghĩa cho sao chưa có nguồn.
 - Các quy tắc Tuần/Triệt giản lược ở instruction là framework người dùng;
   mapping sách hiện chưa có mục chung/Mệnh cho Tuần/Triệt. Không bịa section ID.
+- Giữ bốn phần output. “Một điều đáng để ý” chọn một hướng quan sát mới,
+  đúng một câu khoảng 20–40 từ, không lặp kết luận hoặc yêu cầu trả lời.
 
 ## Tật Ách thử nghiệm
 
