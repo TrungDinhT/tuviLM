@@ -17,7 +17,7 @@ import { showToast } from "@/lib/toast";
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
 import { describe, isApiError } from "@/lib/http/errors";
 import { CapabilityConnections } from "./capability-connections";
-import { CapabilityLoadingArt } from "./capability-loading-art";
+import { CapabilityLoading } from "./capability-loading";
 import { CapabilityIcon, CelestialOrb } from "./celestial-art";
 import {
   capabilityKey,
@@ -104,7 +104,11 @@ export function NangLucScreen() {
       <ReportHeader />
       <div className={styles.status} aria-busy={!analysis.isError}>
         <div className={styles.loadingVisual}>
-          {analysis.isError ? <CelestialOrb decorativeTrails={false} /> : <CapabilityLoadingArt />}
+          {analysis.isError ? (
+            <CelestialOrb decorativeTrails={false} />
+          ) : (
+            <CapabilityLoading key={key} />
+          )}
         </div>
         <h1>
           {analysis.isError ? "Chưa thể đọc năng lực của bạn" : "Đang khám phá cấu trúc Mệnh"}

@@ -80,8 +80,10 @@ describe("capability report", () => {
         ?.getAttribute("aria-busy"),
     ).toBe("true");
     expect(screen.getByRole("status").textContent).toContain("Đang tổng hợp lá số");
+    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("0");
     await act(async () => complete(new Response(JSON.stringify(report))));
     await waitFor(() => expect(screen.queryByTestId("capability-loading-art")).toBeNull());
+    expect(screen.queryByRole("progressbar")).toBeNull();
     expect(screen.getByRole("button", { name: "Thấu hiểu cấu trúc Mệnh" })).toBeTruthy();
   });
 
@@ -97,8 +99,10 @@ describe("capability report", () => {
 
     await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
     expect(screen.queryByTestId("capability-loading-art")).toBeNull();
+    expect(screen.queryByRole("progressbar")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Thử lại" }));
     await waitFor(() => expect(screen.getByTestId("capability-loading-art")).toBeTruthy());
+    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("0");
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
