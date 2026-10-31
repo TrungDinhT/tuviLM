@@ -47,6 +47,8 @@ export function reconcileChartState(queryClient: QueryClient): void {
 export function bindChartResetClearing(queryClient: QueryClient): () => void {
   return useChartStore.subscribe((state, previous) => {
     if (previous.hasChart && !state.hasChart) {
+      void queryClient.cancelQueries({ queryKey: ["capability"] });
+      queryClient.removeQueries({ queryKey: ["capability"] });
       queryClient.removeQueries({
         predicate: (query) => isPersistedQueryKey(query.queryKey),
       });

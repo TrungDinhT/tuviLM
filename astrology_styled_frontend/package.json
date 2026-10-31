@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@base-ui/react": "^1.8.0",
     "@better-auth/mongo-adapter": "1.6.0",
     "@radix-ui/react-dialog": "^1.1.23",
     "@t3-oss/env-nextjs": "^0.13.11",

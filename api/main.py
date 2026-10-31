@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic_ai.models.openrouter import OpenRouterModelSettings
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from api._parse import to_cung_payload_map
@@ -30,27 +31,33 @@ from api.schemas import (
     BuildLasoResponse,
     BuildSaoLuuRequest,
     BuildSaoLuuResponse,
+    CauPhuResponse,
     DiaChiKey,
     MenhCucRelationKey,
     NguHanhKey,
     PreviewLasoRequest,
     PreviewLasoResponse,
-    CauPhuResponse,
 )
 from api.settings import get_settings
 from src.agent.deps import TuviAgentDeps
 from src.agent.main import build_tuvi_agent
 from src.agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
 from src.agent.workflow.personality.agent import build_personality_agent
-from src.refactored.components.definitions.sao import ChinhPhuTinh
+from src.agent.workflow.strength_weakness.agent import (
+    build_strength_weakness_agent,
+    run_strength_weakness_agent,
+)
+from src.agent.workflow.strength_weakness.output import (
+    CapabilityProfile,
+)
 from src.refactored.cau_phu import (
     CauPhuNotFoundError,
     get_cau_phu,
 )
+from src.refactored.components.definitions.sao import ChinhPhuTinh
 from src.refactored.la_so import LaSo
 from src.refactored.model.prior import Gender, LaSoPrior
 from src.refactored.view.builder import build_laso_view
-
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +101,17 @@ async def lifespan(app: FastAPI):
     agent_deps = TuviAgentDeps(
         agent=build_tuvi_agent(model=model),
         personality_agent=build_personality_agent(model=model),
+        strength_weakness_agent=build_strength_weakness_agent(
+            model=settings.strength_weakness.model,
+            model_settings=OpenRouterModelSettings(
+                openrouter_provider={
+                    "order": [settings.strength_weakness.provider],
+                    "allow_fallbacks": settings.strength_weakness.allow_fallbacks,
+                    "sort": settings.strength_weakness.provider_sort,
+                },
+                openrouter_reasoning={"effort": settings.strength_weakness.reasoning_effort},
+            ),
+        ),
         book_root="./data/tuvitanbien_chunking_compact/part_2",
     )
     app.state.api_state = ApiState(
@@ -208,23 +226,10 @@ def preview_laso(payload: PreviewLasoRequest) -> PreviewLasoResponse:
 
 @app.post("/api/v1/laso/build", response_model=BuildLasoResponse)
 def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse:
-    try:
-        solar_dt = dt.datetime(
-            year=payload.year,
-            month=payload.month,
-            day=payload.day,
-            hour=payload.hour,
-        )
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-    prior = LaSoPrior.from_solar_day(
-        solar_dt, Gender.MALE if payload.gender == "M" else Gender.FEMALE
-    )
+    la_so = _la_so_from_build_request(payload)
 
     # TODO : This is inefficient as we are building the LaSo and LaSoView again in the agent deps.
     # We should refactor to build it only once and reuse.
-    la_so = LaSo.from_prior(prior)
     la_so_view = build_laso_view(la_so, study_year=datetime.now().year)
     get_api_state(request).set_la_so(la_so)
 
@@ -258,6 +263,51 @@ def build_laso(payload: BuildLasoRequest, request: Request) -> BuildLasoResponse
     )
 
 
+@app.post(
+    "/api/v1/laso/strength-weakness",
+    response_model=CapabilityProfile,
+)
+async def analyze_strength_weakness(
+    payload: BuildLasoRequest,
+    request: Request,
+) -> CapabilityProfile:
+    """Return a structured capability profile for one explicit birth chart."""
+    la_so = _la_so_from_build_request(payload)
+    base_deps = get_api_state(request).agent_deps
+    workflow_agent = base_deps.require_strength_weakness_agent()
+    deps = TuviAgentDeps(
+        strength_weakness_agent=workflow_agent,
+        la_so=la_so,
+        book=base_deps.book,
+        book_root=base_deps.book_root,
+    )
+    return await run_strength_weakness_agent(
+        agent=workflow_agent,
+        deps=deps,
+        request=(
+            "Hãy khám phá những điểm mạnh, điểm yếu và mặt trái nổi bật nhất "
+            "trong cách tôi sử dụng năng lực của mình."
+        ),
+    )
+
+
+def _la_so_from_build_request(payload: BuildLasoRequest) -> LaSo:
+    try:
+        solar_dt = dt.datetime(
+            year=payload.year,
+            month=payload.month,
+            day=payload.day,
+            hour=payload.hour,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    prior = LaSoPrior.from_solar_day(
+        solar_dt, Gender.MALE if payload.gender == "M" else Gender.FEMALE
+    )
+    return LaSo.from_prior(prior)
+  
+  
 @app.get("/api/v1/laso/cau-phu", response_model=CauPhuResponse)
 def read_cau_phu(request: Request) -> CauPhuResponse:
     api_state = get_api_state(request)
