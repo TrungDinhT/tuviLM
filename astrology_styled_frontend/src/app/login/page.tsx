@@ -7,6 +7,12 @@ export const metadata: Metadata = {
   description: "Đăng nhập để tiếp tục hành trình luận giải lá số của bạn.",
 };
 
-export default function Page() {
-  return <AuthScreen mode="login" />;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { error } = await searchParams;
+
+  return <AuthScreen mode="login" callbackError={typeof error === "string" ? error : undefined} />;
 }

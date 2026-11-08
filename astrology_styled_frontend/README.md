@@ -53,6 +53,32 @@ the Google credentials with `NEXT_PUBLIC_`.
 
 See the [Better Auth Google guide](https://better-auth.com/docs/authentication/google).
 
+## Email verification and password reset
+
+Email/password accounts must confirm their email before they can sign in.
+Sign-up sends a confirmation link; signing in with an unconfirmed email sends a
+fresh one. The link signs the user in and returns to `/login`, which routes on
+as usual. Google accounts arrive already verified.
+
+`/forgot-password` emails a reset link that opens `/reset-password`. Saving a new
+password signs out every existing session of that account. Both links expire
+after one hour.
+
+Mail is sent through the [Resend](https://resend.com) HTTP API. Set both values
+in `.env.local`:
+
+```dotenv
+RESEND_API_KEY=re_...
+EMAIL_FROM="Thiên Hạc <no-reply@your-domain.com>"
+```
+
+The `EMAIL_FROM` domain must be verified in Resend. Without these values,
+`pnpm dev` prints each email, link included, to its console instead of sending
+it; a production server logs an error and sends nothing.
+
+Accounts that were already signed in before verification became mandatory keep
+their session until it ends; they must verify at their next sign-in.
+
 ## Commands
 
 | Command | What it does |

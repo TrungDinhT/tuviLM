@@ -17,6 +17,53 @@ describe("server-managed account fields", () => {
   });
 });
 
+describe("email verification and password reset", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it("requires a verified email and signs the user in once it is", () => {
+    expect(auth.options.emailAndPassword).toMatchObject({
+      requireEmailVerification: true,
+      revokeSessionsOnPasswordReset: true,
+    });
+    expect(auth.options.emailVerification?.autoSignInAfterVerification).toBe(true);
+  });
+
+  it.each([
+    {
+      name: "verification",
+      send: () => auth.options.emailVerification?.sendVerificationEmail,
+      subject: "Xác nhận email · Thiên Hạc",
+    },
+    {
+      name: "password reset",
+      send: () => auth.options.emailAndPassword?.sendResetPassword,
+      subject: "Đặt lại mật khẩu · Thiên Hạc",
+    },
+  ])("mails the $name link to the account's address", async ({ send, subject }) => {
+    vi.stubEnv("RESEND_API_KEY", "re_test");
+    vi.stubEnv("EMAIL_FROM", "no-reply@example.com");
+    const fetchMock = vi.fn().mockResolvedValue(new Response("{}", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = {
+      id: "user-a",
+      name: "Lan",
+      email: "lan@example.com",
+      emailVerified: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    await send()?.({ user, url: "http://localhost:3000/link?token=t", token: "t" });
+
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as Record<string, unknown>;
+    expect(body).toMatchObject({ to: ["lan@example.com"], subject });
+    expect(body.text).toContain("http://localhost:3000/link?token=t");
+  });
+});
+
 describe("Google OAuth configuration", () => {
   afterEach(() => {
     vi.unstubAllEnvs();

@@ -14,7 +14,20 @@ import { cn } from "@/lib/utils";
 
 type AuthMode = "login" | "register";
 
-const INPUT_CLASS =
+/** Where a verification link lands; signed in by then, it routes onward. */
+const VERIFY_EMAIL_CALLBACK = "/login";
+const EXPIRED_LINK_ERRORS = new Set(["INVALID_TOKEN", "TOKEN_EXPIRED"]);
+
+export const AUTH_CARD_CLASS =
+  "min-w-0 rounded-card border border-glass-line bg-[color-mix(in_oklch,var(--color-bg-1)_92%,transparent)] p-6 shadow-[0_28px_80px_color-mix(in_oklch,var(--color-bg-0)_74%,transparent)] backdrop-blur-[18px] sm:p-8";
+
+export const PRIMARY_BUTTON_CLASS =
+  "inline-flex min-h-[50px] w-full cursor-pointer items-center justify-center rounded-[14px] border border-accent bg-accent px-5 font-bold text-bg-0 transition-[transform,background,border-color] hover:bg-[color-mix(in_oklch,var(--accent)_86%,var(--color-ink))] active:translate-y-px disabled:cursor-wait disabled:opacity-70";
+
+export const SECONDARY_BUTTON_CLASS =
+  "inline-flex min-h-[50px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-[14px] border border-glass-line bg-transparent px-5 font-bold text-ink transition-[transform,background,border-color] hover:border-ink hover:bg-white/[0.07] active:translate-y-px disabled:cursor-wait disabled:opacity-50";
+
+export const INPUT_CLASS =
   "min-h-[50px] w-full rounded-[14px] border border-glass-line bg-white/[0.07] px-3.5 py-3 text-[15px] text-ink outline-none caret-accent transition-[border-color,box-shadow,background] placeholder:text-muted/70 hover:border-[color-mix(in_oklch,var(--color-glass-line)_60%,var(--color-ink))] focus:border-accent focus:bg-[color-mix(in_oklch,var(--color-bg-1)_78%,rgba(255,255,255,.07))] focus:shadow-[0_0_0_4px_color-mix(in_oklch,var(--accent)_14%,transparent)]";
 
 const registerFormSchema = z
@@ -37,13 +50,14 @@ const registerFormSchema = z
     path: ["confirmPassword"],
   });
 
-export function AuthScreen({ mode }: { mode: AuthMode }) {
+export function AuthScreen({ callbackError, mode }: { callbackError?: string; mode: AuthMode }) {
   const isLogin = mode === "login";
   const { data: session } = authClient.useSession();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordValue, setPasswordValue] = useState("");
   const [pendingAction, setPendingAction] = useState<"email" | "google" | null>(null);
+  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -78,12 +92,26 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
             name: displayName,
             email,
             password,
+            callbackURL: VERIFY_EMAIL_CALLBACK,
+            // Sign-up opens no session before the email is verified. Refreshing
+            // it anyway makes QueryProvider unmount the app while a guest's
+            // session reloads, which would drop the check-inbox state below.
+            fetchOptions: { disableSignal: true },
           });
 
       if (result.error) {
+        // Better Auth reports this only after the password matched.
+        if (isLogin && result.error.code === "EMAIL_NOT_VERIFIED") {
+          setVerificationEmail(email);
+          await requestVerificationEmail(email);
+          return;
+        }
         showToast(authErrorMessage(result.error.message, isLogin));
         return;
       }
+
+      // Sign-up never signs in before the email is confirmed.
+      if (!isLogin) setVerificationEmail(email);
     } catch {
       showToast("Không thể kết nối máy chủ xác thực. Vui lòng thử lại sau.");
     } finally {
@@ -109,6 +137,14 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
     }
   };
 
+  // A verification link that failed lands here with ?error=; it is announced
+  // the way every other notice in the app is, through the shared toast.
+  useEffect(() => {
+    if (isLogin && callbackError && EXPIRED_LINK_ERRORS.has(callbackError)) {
+      showToast("Link xác nhận đã hết hạn. Hãy đăng nhập để nhận link mới.");
+    }
+  }, [callbackError, isLogin]);
+
   if (session) return <SignedInRedirect />;
 
   return (
@@ -124,19 +160,27 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
             )}
           >
             <AuthIntro mode={mode} />
-            <AuthCard
-              mode={mode}
-              passwordLevel={getPasswordStrength(passwordValue)}
-              pendingAction={pendingAction}
-              showConfirmPassword={showConfirmPassword}
-              showPassword={showPassword}
-              onConfirmPasswordToggle={() => setShowConfirmPassword((visible) => !visible)}
-              onGoogleSignIn={() => void signInWithGoogle()}
-              onPasswordChange={setPasswordValue}
-              onPasswordToggle={() => setShowPassword((visible) => !visible)}
-              onSubmit={(event) => void handleSubmit(event)}
-              onUnavailableLink={() => showToast("Nội dung này sẽ sớm được mở ✦")}
-            />
+            {verificationEmail ? (
+              <VerifyEmailCard
+                email={verificationEmail}
+                mode={mode}
+                onBack={() => setVerificationEmail(null)}
+              />
+            ) : (
+              <AuthCard
+                mode={mode}
+                passwordLevel={getPasswordStrength(passwordValue)}
+                pendingAction={pendingAction}
+                showConfirmPassword={showConfirmPassword}
+                showPassword={showPassword}
+                onConfirmPasswordToggle={() => setShowConfirmPassword((visible) => !visible)}
+                onGoogleSignIn={() => void signInWithGoogle()}
+                onPasswordChange={setPasswordValue}
+                onPasswordToggle={() => setShowPassword((visible) => !visible)}
+                onSubmit={(event) => void handleSubmit(event)}
+                onUnavailableLink={() => showToast("Nội dung này sẽ sớm được mở ✦")}
+              />
+            )}
           </div>
         </section>
       </main>
@@ -202,7 +246,8 @@ function AuthCard({
   return (
     <div
       className={cn(
-        "min-w-0 justify-self-end rounded-card border border-glass-line bg-[color-mix(in_oklch,var(--color-bg-1)_92%,transparent)] p-6 shadow-[0_28px_80px_color-mix(in_oklch,var(--color-bg-0)_74%,transparent)] backdrop-blur-[18px] sm:p-8",
+        AUTH_CARD_CLASS,
+        "justify-self-end",
         isLogin ? "w-full max-w-[520px]" : "w-full max-w-[610px]",
       )}
     >
@@ -304,13 +349,12 @@ function AuthCard({
               label="Mật khẩu"
               htmlFor="password"
               action={
-                <button
-                  type="button"
-                  className="cursor-pointer border-0 text-[13px] text-muted underline decoration-glass-line underline-offset-4 transition-colors hover:text-ink"
-                  onClick={onUnavailableLink}
+                <Link
+                  href="/forgot-password"
+                  className="text-[13px] text-muted underline decoration-glass-line underline-offset-4 transition-colors hover:text-ink"
                 >
                   Quên mật khẩu?
-                </button>
+                </Link>
               }
             >
               <PasswordInput
@@ -363,7 +407,7 @@ function AuthCard({
           <button
             type="submit"
             disabled={pendingAction !== null}
-            className="mt-1 inline-flex min-h-[50px] w-full cursor-pointer items-center justify-center rounded-[14px] border border-accent bg-accent px-5 font-bold text-bg-0 transition-[transform,background,border-color] hover:bg-[color-mix(in_oklch,var(--accent)_86%,var(--color-ink))] active:translate-y-px disabled:cursor-wait disabled:opacity-70"
+            className={cn(PRIMARY_BUTTON_CLASS, "mt-1")}
           >
             {pendingAction === "email"
               ? isLogin
@@ -386,7 +430,7 @@ function AuthCard({
           <button
             type="button"
             disabled={pendingAction !== null}
-            className="inline-flex min-h-[50px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-[14px] border border-glass-line bg-transparent px-5 font-bold text-ink transition-[transform,background,border-color] hover:border-ink hover:bg-white/[0.07] active:translate-y-px disabled:cursor-wait disabled:opacity-50"
+            className={SECONDARY_BUTTON_CLASS}
             onClick={onGoogleSignIn}
           >
             <GoogleIcon />
@@ -415,6 +459,76 @@ function AuthCard({
       </form>
     </div>
   );
+}
+
+function VerifyEmailCard({
+  email,
+  mode,
+  onBack,
+}: {
+  email: string;
+  mode: AuthMode;
+  onBack: () => void;
+}) {
+  const [sending, setSending] = useState(false);
+
+  const resend = async () => {
+    setSending(true);
+    if (await requestVerificationEmail(email)) showToast("Đã gửi lại email xác nhận.");
+    setSending(false);
+  };
+
+  return (
+    <div className={cn(AUTH_CARD_CLASS, "w-full max-w-[520px] justify-self-end")}>
+      <h2 className="font-display text-[clamp(30px,5vw,40px)] leading-[1.1] font-semibold">
+        Kiểm tra hộp thư
+      </h2>
+      <p role="status" className="mt-3 text-[15px] leading-relaxed text-muted">
+        {mode === "login" ? "Email này chưa được xác nhận. " : "Tài khoản đã được tạo. "}
+        Chúng tôi đã gửi link xác nhận tới <strong className="break-all text-ink">{email}</strong>.
+        Mở link trong vòng 1 giờ để kích hoạt tài khoản.
+      </p>
+      <p className="mt-3 text-sm text-muted">Không thấy email? Hãy xem cả mục Spam.</p>
+
+      <div className="mt-7 grid gap-3">
+        <button
+          type="button"
+          disabled={sending}
+          className={PRIMARY_BUTTON_CLASS}
+          onClick={() => void resend()}
+        >
+          {sending ? "Đang gửi…" : "Gửi lại email xác nhận"}
+        </button>
+        {mode === "login" ? (
+          <button type="button" className={SECONDARY_BUTTON_CLASS} onClick={onBack}>
+            Quay lại đăng nhập
+          </button>
+        ) : (
+          <Link href="/login" className={SECONDARY_BUTTON_CLASS}>
+            Đến trang đăng nhập
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
+async function requestVerificationEmail(email: string): Promise<boolean> {
+  try {
+    const result = await authClient.sendVerificationEmail({
+      email,
+      callbackURL: VERIFY_EMAIL_CALLBACK,
+    });
+    if (!result.error) return true;
+    showToast(
+      result.error.status === 429
+        ? "Bạn thao tác hơi nhanh. Vui lòng đợi một chút rồi thử lại."
+        : "Không gửi được email xác nhận. Vui lòng thử lại sau.",
+    );
+  } catch {
+    showToast("Không thể kết nối máy chủ xác thực. Vui lòng thử lại sau.");
+  }
+  return false;
 }
 
 function AuthIntro({ mode }: { mode: AuthMode }) {
@@ -459,7 +573,7 @@ function AuthIntro({ mode }: { mode: AuthMode }) {
   );
 }
 
-function AuthField({
+export function AuthField({
   action,
   children,
   htmlFor,
@@ -483,7 +597,7 @@ function AuthField({
   );
 }
 
-function PasswordInput({
+export function PasswordInput({
   autoComplete,
   id,
   name,
