@@ -10,6 +10,7 @@ import {
 } from "../_lib/session-store";
 import { EntryFormSchema } from "../_lib/schemas";
 import { useBuildLaso } from "@/services/api/v1/laso/build";
+import { getCauPhu } from "@/services/api/v1/laso/cau-phu";
 import {
   createAnonymousOwner,
   createChartProfile,
@@ -56,6 +57,7 @@ export function MobileEntryForm() {
       }
 
       const laso = await buildLaso.mutateAsync(apiPayload);
+      const cauPhu = await getCauPhu().catch(() => undefined);
       const chartProfileId = await createChartProfile({
         ownerId,
         idempotencyKey: clientOperationId(),
@@ -71,6 +73,7 @@ export function MobileEntryForm() {
       const profile: UserProfile = { name, gender, calendar, day, month, year, hour, minute };
       saveStash({
         laso,
+        cauPhu,
         profile,
         ownerId,
         chartProfileId,

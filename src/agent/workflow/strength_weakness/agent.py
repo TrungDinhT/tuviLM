@@ -8,9 +8,8 @@ from typing import Any
 
 from pydantic_ai import Agent, PromptedOutput, RunContext
 from pydantic_ai.messages import ModelMessage
-from pydantic_ai.models.openrouter import (
-    OpenRouterModelSettings,
-)
+from pydantic_ai.models import Model
+from pydantic_ai.settings import ModelSettings
 
 from src.agent.deps import TuviAgentDeps
 from src.agent.workflow.strength_weakness.input import (
@@ -58,9 +57,14 @@ def build_strength_weakness_agent_instruction() -> str:
 STRENGTH_WEAKNESS_AGENT_INSTRUCTION = build_strength_weakness_agent_instruction()
 
 
-def build_strength_weakness_agent(model: str) -> Agent:
+def build_strength_weakness_agent(
+    model: str | Model,
+    *,
+    model_settings: ModelSettings | None = None,
+) -> Agent:
     return Agent(
         model=model,
+        model_settings=model_settings,
         name="diem_manh_diem_yeu_agent",
         deps_type=TuviAgentDeps,
         # Qwen thinking models reject the `tool_choice=required` request that
@@ -91,12 +95,6 @@ async def run_strength_weakness_agent(
         deps=deps,
         usage=usage,
         message_history=message_history,
-        model_settings=OpenRouterModelSettings(
-            openrouter_provider={
-                "only": ["together"],
-                "allow_fallbacks": False,
-            }
-        ),
     )
     return result.output
 

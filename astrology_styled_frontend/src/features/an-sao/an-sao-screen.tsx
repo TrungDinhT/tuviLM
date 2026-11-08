@@ -66,6 +66,11 @@ export function AnSaoScreen() {
   const [gender, setGender] = useState<"M" | "F" | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [clockPulse, setClockPulse] = useState(0);
+  const [rewardPreview, setRewardPreview] = useState<{
+    key: string;
+    stars: string[];
+    names: string[];
+  } | null>(null);
 
   const time = useMemo<BirthTimeInput | null>(
     () => (hour12 === null ? null : { hour12, meridiem }),
@@ -88,6 +93,19 @@ export function AnSaoScreen() {
     return mapped.ok ? ({ calendar: "solar", ...mapped.value } as const) : null;
   }, [debouncedInput]);
   const preview = useLasoPreview(previewBirth);
+
+  useEffect(() => {
+    if (preview.data === undefined || preview.isPlaceholderData || debouncedInput === null) return;
+    const names = preview.data.chinh_tinh;
+    // This is intentionally a snapshot, not derived state: placeholder data
+    // must keep the last settled reward mounted until the new query resolves.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setRewardPreview({
+      key: `${debouncedInput.date.year}-${debouncedInput.date.month}-${debouncedInput.date.day}-${debouncedInput.time.hour12}-${debouncedInput.time.meridiem}`,
+      stars: names.map(starKeyFromName),
+      names,
+    });
+  }, [debouncedInput, preview.data, preview.isPlaceholderData]);
 
   useEffect(() => {
     if (preview.data === undefined) return;
@@ -278,8 +296,9 @@ export function AnSaoScreen() {
       {/* Hidden on phone; from md up it sits under the story column. */}
       <div className="hidden md:col-start-1 md:row-start-2 md:mt-6 md:block md:self-start">
         <ConstellationReward
-          stars={preview.data?.chinh_tinh.map(starKeyFromName) ?? null}
-          names={preview.data?.chinh_tinh ?? []}
+          key={rewardPreview?.key ?? "sleeping"}
+          stars={rewardPreview?.stars ?? null}
+          names={rewardPreview?.names ?? []}
         />
       </div>
 
