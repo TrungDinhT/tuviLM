@@ -4,6 +4,9 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { betterAuth } from "better-auth";
 import { jwt } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
+import { after } from "next/server";
+
+import { resetPasswordEmail, sendEmail, verificationEmail } from "@/lib/email";
 
 const mongoUri = process.env.MONGODB_URI ?? "mongodb://localhost:27017";
 const mongoDatabase = process.env.MONGODB_DATABASE ?? "tuvilm";
@@ -31,6 +34,20 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: ({ user, url }) =>
+      sendEmail({ to: user.email, ...resetPasswordEmail({ name: user.name, url }) }),
+  },
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: ({ user, url }) =>
+      sendEmail({ to: user.email, ...verificationEmail({ name: user.name, url }) }),
+  },
+  advanced: {
+    // Mail goes out after the response, so a reset or sign-up request takes the
+    // same time whether or not the email already has an account.
+    backgroundTasks: { handler: (task) => after(task) },
   },
   user: {
     additionalFields: {

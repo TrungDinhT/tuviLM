@@ -11,8 +11,8 @@ does not create password hashes or change the account's plan, balance or email
 verification status.
 
 1. Register an account at `/register` using an email you control and a strong,
-   unique password. Confirm that the account belongs to you; email verification
-   is not currently enforced by the app.
+   unique password, then open the confirmation link sent to that email. The app
+   does not let an unverified email/password account sign in.
 2. On a trusted machine with private MongoDB access, run the script from the
    repository root. First check that `.env` values `AUTH__MONGO_URI` and
    `AUTH__DATABASE_NAME` point to the same database as the frontend's
