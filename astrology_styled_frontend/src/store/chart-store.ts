@@ -1,3 +1,4 @@
+import { useCapabilityStore } from "@/features/nang-luc/data";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -87,6 +88,7 @@ export const useChartStore = create<ChartState>()(
        * clear when it goes false — including closing any open overlay.
        */
       reset: () => {
+        useCapabilityStore.getState().clear();
         dismissToast();
         set({ ...EMPTY });
       },

@@ -6,13 +6,7 @@
  * destination means adding a row, not touching two components.
  */
 
-export const NAV_ICONS = [
-  "banMenh",
-  "vanHan",
-  "hoiAi",
-  "nangCao",
-  "hoSo",
-] as const;
+export const NAV_ICONS = ["banMenh", "vanHan", "hoiAi", "nangCao", "hoSo"] as const;
 
 export type NavIcon = (typeof NAV_ICONS)[number];
 
@@ -76,6 +70,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
     group: GROUP_DEEP,
     title: "Thiên Bàn",
     requiresChart: true,
+    // Capability reports are launched from Thiên Bàn and share its tab.
+    alsoMatches: ["/nang-luc"],
   },
   {
     href: "/ho-so",
@@ -89,6 +85,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
 
 /** Screens that have no tab of their own but still title the top bar. */
 const EXTRA_SCREENS: Record<string, ScreenMeta> = {
+  "/nang-luc": {
+    href: "/nang-luc",
+    group: GROUP_DEEP,
+    title: "Khám phá năng lực",
+    requiresChart: true,
+  },
   "/": { href: "/", group: GROUP_CHART, title: "An sao", requiresChart: false },
   "/la-so": {
     href: "/la-so",

@@ -161,6 +161,11 @@ MENH_THAN_SECTION_ID_MAP = MappingProxyType(
         "Địa Không": "4.2.22",
         "Địa Kiếp": "4.2.22",
         "Tứ Hóa": "4.2.23",
+        # The four transformations share the Mệnh/Thân chapter entry.
+        "Hóa Lộc": "4.2.23",
+        "Hóa Quyền": "4.2.23",
+        "Hóa Khoa": "4.2.23",
+        "Hóa Kỵ": "4.2.23",
         "Lục Bại": "4.2.24",
     }
 )
