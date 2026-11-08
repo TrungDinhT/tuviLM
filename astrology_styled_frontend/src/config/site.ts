@@ -50,6 +50,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
     group: GROUP_CHART,
     title: "Bản mệnh",
     requiresChart: true,
+    // The full chart is a detail view opened from Bản mệnh.
+    alsoMatches: ["/la-so"],
   },
   {
     href: "/van-han",
@@ -74,8 +76,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
     group: GROUP_DEEP,
     title: "Thiên Bàn",
     requiresChart: true,
-    // The full 12-cung chart is reached from Thiên Bàn and shares its tab.
-    alsoMatches: ["/la-so"],
   },
   {
     href: "/ho-so",
@@ -92,7 +92,7 @@ const EXTRA_SCREENS: Record<string, ScreenMeta> = {
   "/": { href: "/", group: GROUP_CHART, title: "An sao", requiresChart: false },
   "/la-so": {
     href: "/la-so",
-    group: GROUP_DEEP,
+    group: GROUP_CHART,
     title: "Lá số gốc · 12 cung",
     requiresChart: true,
   },
