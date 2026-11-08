@@ -77,6 +77,15 @@ describe("AuthScreen", () => {
     expect(authMocks.signUpEmail).not.toHaveBeenCalled();
   });
 
+  it("links the register form to the privacy policy in a new tab", () => {
+    renderAuth("register");
+
+    const link = screen.getByRole("link", { name: "Chính sách riêng tư" });
+
+    expect(link.getAttribute("href")).toBe("/privacy");
+    expect(link.getAttribute("target")).toBe("_blank");
+  });
+
   it.each([
     { profiles: [{ id: "profile-a" }], route: "/ho-so" },
     { profiles: [], route: "/" },
