@@ -16,6 +16,7 @@ from typing import Any
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic_ai.models.openrouter import OpenRouterModelSettings
 from pydantic_ai.usage import RunUsage
 
 from src.agent.deps import TuviAgentDeps
@@ -131,6 +132,18 @@ async def _run_personality(agent: Any, deps: TuviAgentDeps, usage: RunUsage) -> 
     )
 
 
+def _build_strength_weakness_agent(model: str) -> Any:
+    return build_strength_weakness_agent(
+        model,
+        model_settings=OpenRouterModelSettings(
+            openrouter_provider={
+                "only": ["together"],
+                "allow_fallbacks": False,
+            }
+        ),
+    )
+
+
 async def _run_strength_weakness(
     agent: Any,
     deps: TuviAgentDeps,
@@ -154,7 +167,7 @@ WORKFLOWS: dict[str, WorkflowDefinition] = {
     "strength_weakness": WorkflowDefinition(
         name="strength_weakness",
         description="Khám phá điểm mạnh, điểm yếu và mặt trái năng lực",
-        build_agent=build_strength_weakness_agent,
+        build_agent=_build_strength_weakness_agent,
         run=_run_strength_weakness,
     ),
 }
