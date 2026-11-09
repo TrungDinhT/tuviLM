@@ -391,13 +391,14 @@ function AuthCard({
                 Điều khoản sử dụng
               </button>{" "}
               và{" "}
-              <button
-                type="button"
-                className="cursor-pointer border-0 font-medium text-ink underline decoration-glass-line underline-offset-4"
-                onClick={onUnavailableLink}
+              <Link
+                href="/privacy"
+                className="font-medium text-ink underline decoration-glass-line underline-offset-4"
+                rel="noopener"
+                target="_blank"
               >
                 Chính sách riêng tư
-              </button>
+              </Link>
               .
             </span>
           </div>
