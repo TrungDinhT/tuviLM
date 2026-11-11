@@ -4,6 +4,8 @@ import logging
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from tuvi_agent.deps import TuviAgentDeps
 from tuvi_agent.skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
 from tuvi_agent.tool.ban_menh.laso_foundation import get_laso_foundation
@@ -28,12 +30,16 @@ from tuvi_engine.la_so import LaSo
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 
+BOOK_ROOT = Path("data/tuvitanbien_chunking_compact/part_2")
+
+
+@pytest.mark.skipif(not BOOK_ROOT.is_dir(), reason=f"book files are missing: {BOOK_ROOT}")
 def test_agent_tools_log_start_and_compact_completion_metadata(caplog):
     caplog.set_level(logging.INFO, logger="tuvi_agent")
     la_so = LaSo.from_prior(FIXTURE_PRIOR_A)
     deps = TuviAgentDeps(
         la_so=la_so,
-        book_root=Path("data/tuvitanbien_chunking_compact/part_2"),
+        book_root=BOOK_ROOT,
     )
     ctx = SimpleNamespace(deps=deps)
     menh_position = la_so.tinh_ban.menh_position

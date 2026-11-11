@@ -155,9 +155,14 @@ def test_missing_book_section_fails_before_model_request():
     agent.run.assert_not_called()
 
 
+BOOK_ROOT = Path(__file__).resolve().parents[1] / "data/tuvitanbien_chunking_compact/part_2"
+
+
 @pytest.fixture(scope="module")
 def capability_book():
-    return BookIndex(Path(__file__).resolve().parents[1] / "data/tuvitanbien_chunking_compact/part_2")
+    if not BOOK_ROOT.is_dir():
+        pytest.skip(f"book files are missing: {BOOK_ROOT}")
+    return BookIndex(BOOK_ROOT)
 
 
 @pytest.mark.parametrize("hour", list(DiaChi))
