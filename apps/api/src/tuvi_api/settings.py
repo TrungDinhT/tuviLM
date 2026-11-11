@@ -7,6 +7,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from tuvi_api.auth.settings import AuthSettings
 from tuvi_api.chat.storage.settings import MongoConversationHistorySettings
 
 
@@ -18,16 +19,6 @@ class StrengthWeaknessSettings(BaseModel):
     reasoning_effort: Literal[
         "none", "minimal", "low", "medium", "high", "xhigh"
     ] = "low"
-
-
-class AuthSettings(BaseModel):
-    base_url: str = "http://localhost:3000"
-    mongo_uri: str = "mongodb://localhost:27017"
-    database_name: str = "tuvilm"
-
-    @property
-    def jwks_url(self) -> str:
-        return f"{self.base_url.rstrip('/')}/api/auth/jwks"
 
 
 class ApiSettings(BaseSettings):
