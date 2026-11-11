@@ -1,4 +1,4 @@
-# Mirrors ../frontend/: neither native build is needed here.
+# Neither native build is needed here.
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
