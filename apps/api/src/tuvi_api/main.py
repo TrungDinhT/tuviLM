@@ -11,7 +11,6 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from jwt import PyJWKClient
 from pydantic_ai.models.openrouter import OpenRouterModelSettings
 from pymongo import AsyncMongoClient
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -31,6 +30,9 @@ from tuvi_api.accounts.redeem_codes import (
     router as redeem_codes_router,
 )
 from tuvi_api.auth.dependencies import Principal, ReconciledUser
+from tuvi_api.auth.rate_limit import RateLimiter
+from tuvi_api.auth.routes import router as auth_router
+from tuvi_api.auth.store import MongoAuthStore
 from tuvi_api.chat.contracts import (
     ConversationHistoryError,
     ConversationHistoryStore,
@@ -102,6 +104,11 @@ class ApiState:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
+    if settings.auth.cookie_secure and not settings.auth.email_enabled:
+        raise RuntimeError(
+            "Set AUTH__RESEND_API_KEY and AUTH__EMAIL_FROM: on https the API must send "
+            "verification and password reset emails."
+        )
     conversation_history_store = await MongoConversationHistoryStore.connect(
         settings.conversation_history_store,
     )
@@ -128,8 +135,8 @@ async def lifespan(app: FastAPI):
     )
     auth_mongo = AsyncMongoClient(settings.auth.mongo_uri, serverSelectionTimeoutMS=5000)
     app.state.auth_database = auth_mongo[settings.auth.database_name]
-    app.state.auth_jwks = PyJWKClient(settings.auth.jwks_url, timeout=5)
     try:
+        await MongoAuthStore(app.state.auth_database).ensure_indexes()
         await ensure_redeem_code_indexes(app.state.auth_database)
         await ensure_capability_report_indexes(app.state.auth_database)
         yield
@@ -139,6 +146,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="TuviLM API", version="0.1.0", lifespan=lifespan)
+app.state.auth_rate_limiter = RateLimiter()
+app.include_router(auth_router)
 app.include_router(chat_router)
 app.include_router(accounts_router)
 app.include_router(redeem_codes_router)

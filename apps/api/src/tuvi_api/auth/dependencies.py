@@ -1,20 +1,26 @@
+"""Who is calling: the account behind the session cookie."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from typing import Annotated, Literal
 
-import jwt
 from bson import ObjectId
-from fastapi import Depends, HTTPException, Request
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jwt import InvalidTokenError, PyJWKClientConnectionError, PyJWKClientError
+from fastapi import Depends, HTTPException, Request, Response
 from pydantic import ValidationError
 from pymongo.errors import PyMongoError
 
 from tuvi_api.accounts.billing import reconcile_chat_coins
 from tuvi_api.accounts.models import AccountAccess, Balance, Plan
+from tuvi_api.auth.passwords import hash_token
+from tuvi_api.auth.rate_limit import RateLimiter
+from tuvi_api.auth.settings import AuthSettings
+from tuvi_api.auth.store import MongoAuthStore
 from tuvi_api.settings import get_settings
+
+SESSION_COOKIE = "tuvi_session"
+OAUTH_STATE_COOKIE = "tuvi_oauth_state"
 
 
 @dataclass(frozen=True)
@@ -25,65 +31,45 @@ class Principal:
     balance: Balance = 0
 
 
+def get_auth_settings() -> AuthSettings:
+    return get_settings().auth
+
+
+def get_auth_store(request: Request) -> MongoAuthStore:
+    return MongoAuthStore(request.app.state.auth_database)
+
+
+def get_rate_limiter(request: Request) -> RateLimiter:
+    return request.app.state.auth_rate_limiter
+
+
 def _unauthorized() -> HTTPException:
-    return HTTPException(
-        status_code=401,
-        detail="Authentication required or session expired.",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    return HTTPException(status_code=401, detail="Authentication required or session expired.")
 
 
-def _verify_token(
-    request: Request,
-    credentials: Annotated[
-        HTTPAuthorizationCredentials | None, Depends(HTTPBearer(auto_error=False))
-    ],
-) -> dict[str, str]:
-    if credentials is None:
-        raise _unauthorized()
-
+async def current_user_id(request: Request) -> str | None:
+    """The account id behind the session cookie, or None for a guest."""
+    token = request.cookies.get(SESSION_COOKIE)
+    if not token:
+        return None
     try:
-        key = request.app.state.auth_jwks.get_signing_key_from_jwt(credentials.credentials)
-        claims = jwt.decode(
-            credentials.credentials,
-            key.key,
-            algorithms=["EdDSA"],
-            issuer=get_settings().auth.base_url.rstrip("/"),
-            audience="tuvilm-api",
-            options={"require": ["sub", "sid", "exp", "iss", "aud", "iat"]},
+        return await get_auth_store(request).session_user_id(
+            hash_token(token), now=datetime.now(UTC)
         )
-    except PyJWKClientConnectionError as exc:
+    except PyMongoError as exc:
         raise HTTPException(503, "Authentication service unavailable.") from exc
-    except (InvalidTokenError, PyJWKClientError) as exc:
-        raise _unauthorized() from exc
-
-    user_id, session_id = claims["sub"], claims["sid"]
-    if not all(
-        isinstance(value, str) and ObjectId.is_valid(value)
-        for value in (user_id, session_id)
-    ):
-        raise _unauthorized()
-    return {"sub": user_id, "sid": session_id}
 
 
 async def require_user(
     request: Request,
-    claims: Annotated[dict[str, str], Depends(_verify_token)],
+    user_id: Annotated[str | None, Depends(current_user_id)],
 ) -> Principal:
+    if user_id is None:
+        raise _unauthorized()
     database = request.app.state.auth_database
     try:
-        session = await database["session"].find_one(
-            {
-                "_id": ObjectId(claims["sid"]),
-                "userId": ObjectId(claims["sub"]),
-                "expiresAt": {"$gt": datetime.now(UTC)},
-            },
-            {"_id": 1},
-        )
-        if session is None:
-            raise _unauthorized()
         user = await database["user"].find_one(
-            {"_id": ObjectId(claims["sub"])}, {"role": 1, "plan": 1, "balance": 1}
+            {"_id": ObjectId(user_id)}, {"role": 1, "plan": 1, "balance": 1}
         )
         if user is None:
             raise _unauthorized()
@@ -93,7 +79,7 @@ async def require_user(
     except ValidationError as exc:
         raise HTTPException(503, "Account data unavailable.") from exc
     return Principal(
-        user_id=claims["sub"],
+        user_id=user_id,
         role="admin" if user.get("role") == "admin" else "user",
         plan=access.plan,
         balance=access.balance,
@@ -140,3 +126,25 @@ def require_admin(user: CurrentUser) -> Principal:
     if user.role != "admin":
         raise HTTPException(403, "Administrator access required.")
     return user
+
+
+def set_session_cookie(response: Response, token: str, settings: AuthSettings) -> None:
+    response.set_cookie(
+        SESSION_COOKIE,
+        token,
+        max_age=settings.session_days * 24 * 3600,
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite="lax",
+        path="/",
+    )
+
+
+def clear_session_cookie(response: Response, settings: AuthSettings) -> None:
+    response.delete_cookie(
+        SESSION_COOKIE,
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite="lax",
+        path="/",
+    )

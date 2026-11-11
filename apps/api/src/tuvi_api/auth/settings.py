@@ -39,7 +39,3 @@ class AuthSettings(BaseModel):
     @property
     def email_enabled(self) -> bool:
         return bool(self.resend_api_key and self.email_from)
-
-    @property
-    def jwks_url(self) -> str:
-        return f"{self.public_url}/api/auth/jwks"

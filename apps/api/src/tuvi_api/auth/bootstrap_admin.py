@@ -7,12 +7,13 @@ from bson import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
+from tuvi_api.auth.store import SESSIONS
 from tuvi_api.settings import get_settings
 
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
-        description="Grant administrator access to an existing Better Auth account."
+        description="Grant administrator access to an existing account."
     )
     parser.add_argument("--email", required=True, help="The email registered to the account.")
     args = parser.parse_args(argv)
@@ -54,7 +55,7 @@ def main(argv: list[str] | None = None) -> None:
             if confirmation != email:
                 raise SystemExit("Confirmation did not match. Nothing changed.")
 
-            revoked = database["session"].delete_many({"userId": user_id})
+            revoked = database[SESSIONS].delete_many({"user_id": user_id})
             expected_role = user["role"] if "role" in user else {"$exists": False}
             updated = database["user"].update_one(
                 {"_id": user_id, "email": email, "role": expected_role},

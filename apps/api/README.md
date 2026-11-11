@@ -3,6 +3,12 @@
 FastAPI backend for TuviLM UI.
 
 ## Current status
+- Login routes are mounted from `apps/api/src/tuvi_api/auth/routes.py`:
+  - `GET /api/v1/auth/session`
+  - `POST /api/v1/auth/register`, `/login`, `/logout`
+  - `POST /api/v1/auth/verification-email`, `GET /api/v1/auth/verify-email`
+  - `POST /api/v1/auth/forgot-password`, `/reset-password`
+  - `GET /api/v1/auth/google/start`, `/google/callback`
 - Real route: `POST /api/v1/laso/build`
 - Real route: `POST /api/v1/laso/cau-phu`
 - Real route: `POST /api/v1/laso/build_sao_luu`
@@ -98,16 +104,35 @@ curl http://localhost:8000/api/v1/health
 
 ## Authentication
 
-Better Auth runs in `astrology_styled_frontend`. Configure the backend's `.env`
-using `.env.example`; `AUTH__BASE_URL`, `AUTH__MONGO_URI` and
-`AUTH__DATABASE_NAME` must match the frontend's `BETTER_AUTH_URL`, `MONGODB_URI`
-and `MONGODB_DATABASE`.
+The API owns login. Configure it in `.env` (see `.env.example`):
+`AUTH__BASE_URL` is the web app URL as the browser sees it. The web app forwards
+`/api/*` to the API, so the API runs on the same origin, and email links and the
+Google redirect use this URL.
 
-Saved chart profiles, sessions and chat require a signed-in account. The web
-client retrieves a JWT from `/api/auth/token` and sends it as
-`Authorization: Bearer <token>`. The backend verifies its signature, issuer,
-audience and expiration using `/api/auth/jwks`, then checks the associated
-Better Auth session and reads the user's current role from MongoDB.
+- **Email and password.** `register` creates the account and emails a
+  verification link (valid 1 hour). `login` answers `403` until the email is
+  verified. The link signs the user in and opens `/login`. Passwords use Argon2.
+- **Sessions.** An httpOnly `SameSite=Lax` cookie (`tuvi_session`). MongoDB keeps
+  only a SHA-256 hash of the token, in `auth_sessions`, with a TTL index.
+- **Password reset.** `forgot-password` emails a link to `/reset-password`
+  (valid 1 hour, one use). `reset-password` sets the new password, marks the
+  email verified and ends every session of the account.
+- **Google.** Off unless `AUTH__GOOGLE_CLIENT_ID` and
+  `AUTH__GOOGLE_CLIENT_SECRET` are set. Redirect URI:
+  `<AUTH__BASE_URL>/api/v1/auth/google/callback`. Only a verified Google email
+  is accepted. It links to an account with the same email; if that email was
+  never verified, its password is removed.
+- **Email.** Sent through Resend with `AUTH__RESEND_API_KEY` and
+  `AUTH__EMAIL_FROM`. Without them, the API logs each email and its link. On an
+  https `AUTH__BASE_URL`, the API does not start without them.
+- **Rate limit.** Login, registration and the email routes are limited per email
+  address, in memory, per API process.
+- **Accounts from Better Auth.** Users stay in the `user` collection with the
+  same fields, so role, plan and coins are kept. On the first login, the old
+  Better Auth password (in `account`) is checked once and replaced by an Argon2
+  hash. Earlier Better Auth sessions end; users log in again.
+
+Saved chart profiles, sessions and chat require a signed-in account.
 
 `GET /api/v1/me` returns the authenticated `user_id`, `role`, `plan` and `balance`.
 Missing, invalid or revoked credentials return `401`; an authenticated user lacking
@@ -115,7 +140,7 @@ an administrator role receives `403` from `require_admin`. Authentication
 service outages return `503` rather than granting access.
 
 To bootstrap an administrator, register a normal account and run the private
-`api.auth.bootstrap_admin` script. Follow the [administrator setup guide](../README.md#bootstrap-an-administrator)
+`tuvi_api.auth.bootstrap_admin` script. Follow the [administrator setup guide](../README.md#bootstrap-an-administrator)
 for configuration, confirmation and session revocation. No public endpoint grants
 administrator roles.
 
@@ -125,8 +150,7 @@ reassigned to accounts automatically.
 
 The web client resets chart and chat state when the active account changes.
 Its persisted chart is restored only for the matching account. Requests from
-the previous account are cancelled; private requests also check that their
-fresh token belongs to the account that started them.
+the previous account are cancelled.
 
 Saved chart names can be changed with
 `PATCH /api/v1/chart-profiles/{chart_profile_id}` and
@@ -153,9 +177,9 @@ or `full_unlock`. New accounts start with `normal` and a balance of `0`.
 Existing accounts without these fields receive the same defaults when read by
 the API, without a migration or default-field backfill.
 
-Both fields are stored on the existing Better Auth `user` document and cannot
-be supplied through signup or user profile updates. The API reads their current
-values from MongoDB on every authenticated request, not from JWT claims.
+Both fields are stored on the `user` document and cannot be supplied through
+signup. The API reads their current values from MongoDB on every authenticated
+request.
 
 Administrators can manually update either field or both:
 

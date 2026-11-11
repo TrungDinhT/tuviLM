@@ -38,7 +38,7 @@ Có thể xuất bảng metric và độ đa dạng thành CSV. Viewer chỉ đ�
 ## Bootstrap an administrator
 
 Administrator access is granted by a private server-side script, not a public
-signup option or API. The script promotes an existing Better Auth account; it
+signup option or API. The script promotes an existing account; it
 does not create password hashes or change the account's plan, balance or email
 verification status.
 
@@ -46,13 +46,12 @@ verification status.
    unique password, then open the confirmation link sent to that email. The app
    does not let an unverified email/password account sign in.
 2. On a trusted machine with private MongoDB access, run the script from the
-   repository root. First check that `.env` values `AUTH__MONGO_URI` and
-   `AUTH__DATABASE_NAME` point to the same database as the frontend's
-   `MONGODB_URI` and `MONGODB_DATABASE`.
+   repository root. First check that the `.env` values `AUTH__MONGO_URI` and
+   `AUTH__DATABASE_NAME` point to the database the API uses.
 
    ```bash
    uv sync
-   uv run python -m api.auth.bootstrap_admin --email admin@example.com
+   uv run python -m tuvi_api.auth.bootstrap_admin --email admin@example.com
    ```
 
 3. The script finds the account by email; you do not need to look up a user ID.
@@ -74,4 +73,4 @@ Keep MongoDB private and authenticated in production. Never expose this script
 through an HTTP route, run it during startup, or store database credentials in Git.
 
 Coin redemption itself requires a MongoDB replica set; see the
-[redemption requirements](api/README.md#coin-redemption-codes).
+[redemption requirements](apps/api/README.md#coin-redemption-codes).

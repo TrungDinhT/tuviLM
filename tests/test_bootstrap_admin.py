@@ -24,7 +24,7 @@ def bootstrap_context(monkeypatch):
     users.update_one.return_value = SimpleNamespace(matched_count=1)
     sessions.delete_many.return_value = SimpleNamespace(deleted_count=2)
     client = MagicMock()
-    client.__enter__.return_value = {"auth_test": {"user": users, "session": sessions}}
+    client.__enter__.return_value = {"auth_test": {"user": users, "auth_sessions": sessions}}
     factory = Mock(return_value=client)
     confirmation = Mock(return_value="  ADMIN@EXAMPLE.TEST  ")
     settings = SimpleNamespace(auth=SimpleNamespace(mongo_uri=URI, database_name="auth_test"))
@@ -51,7 +51,7 @@ def test_normalized_email_confirmation_revokes_sessions_before_role_only_update(
     )
     context.users.find.return_value.limit.assert_called_once_with(2)
     assert context.writes.mock_calls == [
-        call.revoke({"userId": USER_ID}),
+        call.revoke({"user_id": USER_ID}),
         call.promote(
             {"_id": USER_ID, "email": EMAIL, "role": "user"},
             {"$set": {"role": "admin", "updatedAt": ANY}},
@@ -95,7 +95,7 @@ def test_revocation_failure_never_promotes_and_hides_database_details(bootstrap_
     with pytest.raises(SystemExit) as error:
         bootstrap_admin.main(ARGS)
 
-    context.sessions.delete_many.assert_called_once_with({"userId": USER_ID})
+    context.sessions.delete_many.assert_called_once_with({"user_id": USER_ID})
     context.users.update_one.assert_not_called()
     assert str(error.value) == (
         "Database operation failed. Check the account role before retrying."
