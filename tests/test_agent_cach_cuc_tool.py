@@ -13,11 +13,11 @@ from pydantic_ai.messages import (
 )
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.tool.cach_cuc.tool import get_list_cach_cuc
-from src.agent.tool.json_compatible import JsonCompatible
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.la_so import LaSo
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.tool.cach_cuc.tool import get_list_cach_cuc
+from tuvi_agent.tool.json_compatible import JsonCompatible
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.la_so import LaSo
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 

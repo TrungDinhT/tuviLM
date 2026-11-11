@@ -3,8 +3,8 @@ from pathlib import Path
 
 from pydantic import TypeAdapter
 
-from src.refactored.components.definitions.elementary import ComponentBase
-from src.refactored.model.elementary import NguHanh
+from tuvi_engine.components.definitions.elementary import ComponentBase
+from tuvi_engine.model.elementary import NguHanh
 
 
 class Cuc(ComponentBase):

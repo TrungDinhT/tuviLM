@@ -12,14 +12,14 @@ from pymongo.asynchronous.database import AsyncDatabase
 from pymongo.errors import PyMongoError
 from pymongo.write_concern import WriteConcern
 
-from api.accounts.models import (
+from tuvi_api.accounts.models import (
     AccountAccess,
     RedeemCode,
     RedeemCodeCreate,
     RedeemCodeInput,
     RedeemCodeResult,
 )
-from api.auth.dependencies import ReconciledUser, require_admin
+from tuvi_api.auth.dependencies import ReconciledUser, require_admin
 
 
 router = APIRouter(prefix="/api/v1")

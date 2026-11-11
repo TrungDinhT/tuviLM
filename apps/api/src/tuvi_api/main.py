@@ -16,8 +16,8 @@ from pydantic_ai.models.openrouter import OpenRouterModelSettings
 from pymongo import AsyncMongoClient
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from api._parse import to_cung_payload_map
-from api.accounts.capability import (
+from tuvi_api._parse import to_cung_payload_map
+from tuvi_api.accounts.capability import (
     capability_chart_key,
     ensure_capability_report_indexes,
     find_capability_report,
@@ -25,13 +25,13 @@ from api.accounts.capability import (
     save_capability_report,
     settle_capability_coins,
 )
-from api.accounts.routes import router as accounts_router
-from api.accounts.redeem_codes import (
+from tuvi_api.accounts.routes import router as accounts_router
+from tuvi_api.accounts.redeem_codes import (
     ensure_redeem_code_indexes,
     router as redeem_codes_router,
 )
-from api.auth.dependencies import Principal, ReconciledUser
-from api.chat.contracts import (
+from tuvi_api.auth.dependencies import Principal, ReconciledUser
+from tuvi_api.chat.contracts import (
     ConversationHistoryError,
     ConversationHistoryStore,
     DuplicateStreamInProgressError,
@@ -40,10 +40,10 @@ from api.chat.contracts import (
     MissingOwnerIdError,
     NotFoundError,
 )
-from api.chat.models import BirthInfo
-from api.chat.routes import router as chat_router
-from api.chat.storage.store import MongoConversationHistoryStore
-from api.schemas import (
+from tuvi_api.chat.models import BirthInfo
+from tuvi_api.chat.routes import router as chat_router
+from tuvi_api.chat.storage.store import MongoConversationHistoryStore
+from tuvi_api.schemas import (
     AmDuongRelationKey,
     BuildLasoRequest,
     BuildLasoResponse,
@@ -56,26 +56,26 @@ from api.schemas import (
     PreviewLasoRequest,
     PreviewLasoResponse,
 )
-from api.settings import get_settings
-from src.agent.deps import TuviAgentDeps
-from src.agent.main import build_tuvi_agent
-from src.agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
-from src.agent.workflow.personality.agent import build_personality_agent
-from src.agent.workflow.strength_weakness.agent import (
+from tuvi_api.settings import get_settings
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.main import build_tuvi_agent
+from tuvi_agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
+from tuvi_agent.workflow.personality.agent import build_personality_agent
+from tuvi_agent.workflow.strength_weakness.agent import (
     build_strength_weakness_agent,
     run_strength_weakness_agent,
 )
-from src.agent.workflow.strength_weakness.output import (
+from tuvi_agent.workflow.strength_weakness.output import (
     CapabilityProfile,
 )
-from src.refactored.cau_phu import (
+from tuvi_engine.cau_phu import (
     CauPhuNotFoundError,
     get_cau_phu,
 )
-from src.refactored.components.definitions.sao import ChinhPhuTinh
-from src.refactored.la_so import LaSo
-from src.refactored.model.prior import Gender, LaSoPrior
-from src.refactored.view.builder import build_laso_view
+from tuvi_engine.components.definitions.sao import ChinhPhuTinh
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.prior import Gender, LaSoPrior
+from tuvi_engine.view.builder import build_laso_view
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ async def lifespan(app: FastAPI):
     conversation_history_store = await MongoConversationHistoryStore.connect(
         settings.conversation_history_store,
     )
-    model = "openrouter:qwen/qwen3.7-max"
+    model = settings.agent_model
     agent_deps = TuviAgentDeps(
         agent=build_tuvi_agent(model=model),
         personality_agent=build_personality_agent(model=model),
@@ -120,7 +120,7 @@ async def lifespan(app: FastAPI):
                 openrouter_reasoning={"effort": settings.strength_weakness.reasoning_effort},
             ),
         ),
-        book_root="./data/tuvitanbien_chunking_compact/part_2",
+        book_root=settings.book_root,
     )
     app.state.api_state = ApiState(
         agent_deps=agent_deps,

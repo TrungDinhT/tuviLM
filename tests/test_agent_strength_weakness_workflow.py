@@ -17,9 +17,9 @@ from pydantic_ai.messages import (
 from pydantic_ai.models.function import FunctionModel
 from pydantic_ai.usage import RunUsage
 
-from src.agent.book_index import BookIndex, SectionContent
-from src.agent.deps import TuviAgentDeps
-from src.agent.workflow.strength_weakness import (
+from tuvi_agent.book_index import BookIndex, SectionContent
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.workflow.strength_weakness import (
     CapabilityEvidence,
     CapabilityProfile,
     StrengthFinding,
@@ -28,16 +28,16 @@ from src.agent.workflow.strength_weakness import (
     run_strength_weakness_agent,
     run_strength_weakness_workflow,
 )
-from src.agent.workflow.strength_weakness import agent as workflow_module
-from src.agent.workflow.strength_weakness.input import (
+from tuvi_agent.workflow.strength_weakness import agent as workflow_module
+from tuvi_agent.workflow.strength_weakness.input import (
     CapabilityInput,
     build_strength_weakness_evidence,
     prepare_capability_input,
 )
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.la_so import LaSo
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.layer import NATAL_LAYER_ID
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.layer import NATAL_LAYER_ID
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 

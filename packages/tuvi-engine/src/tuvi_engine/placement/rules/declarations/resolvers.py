@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import Callable, TypeAlias
 
-from src.refactored.context.protocol import PlacementContext
-from src.refactored.model.elementary import CircleDirection, DiaChi
-from src.refactored.placement.registry import AbsolutePositionResolver, PositionTransform
-from src.refactored.placement.rules.positions import absolute, relative
-from src.refactored.placement.transforms import (
+from tuvi_engine.context.protocol import PlacementContext
+from tuvi_engine.model.elementary import CircleDirection, DiaChi
+from tuvi_engine.placement.registry import AbsolutePositionResolver, PositionTransform
+from tuvi_engine.placement.rules.positions import absolute, relative
+from tuvi_engine.placement.transforms import (
     get_luc_hai,
     get_nhi_hop,
     get_tam_hop,

@@ -5,9 +5,9 @@ from typing import Mapping
 
 from pydantic import BaseModel, ConfigDict
 
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.layer import LayerKind
-from src.refactored.view.models import CungView, LaSoView
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.layer import LayerKind
+from tuvi_engine.view.models import CungView, LaSoView
 
 
 class StreamlitComponentLine(BaseModel):

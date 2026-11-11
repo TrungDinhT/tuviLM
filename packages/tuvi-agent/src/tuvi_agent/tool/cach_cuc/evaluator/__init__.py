@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from src.agent.tool.cach_cuc.evaluator.context import CachCucMatchContext, STAR_ALIASES
-from src.agent.tool.cach_cuc.evaluator.core import match_condition
-from src.agent.tool.cach_cuc.evaluator.match_types import (
+from tuvi_agent.tool.cach_cuc.evaluator.context import CachCucMatchContext, STAR_ALIASES
+from tuvi_agent.tool.cach_cuc.evaluator.core import match_condition
+from tuvi_agent.tool.cach_cuc.evaluator.match_types import (
     MatchOutcome,
     merge_related_roles,
 )

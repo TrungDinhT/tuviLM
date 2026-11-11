@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.refactored.model.elementary import DiaChi, ThienCan
+from tuvi_engine.model.elementary import DiaChi, ThienCan
 
 
 @dataclass(frozen=True)

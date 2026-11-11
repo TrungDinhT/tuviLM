@@ -10,9 +10,9 @@ from pydantic import ValidationError
 from pymongo.asynchronous.database import AsyncDatabase
 from pymongo.errors import DuplicateKeyError, PyMongoError
 
-from api.accounts.models import AccountAccess
-from api.chat.models import BirthInfo
-from src.agent.workflow.strength_weakness.output import CapabilityProfile
+from tuvi_api.accounts.models import AccountAccess
+from tuvi_api.chat.models import BirthInfo
+from tuvi_agent.workflow.strength_weakness.output import CapabilityProfile
 
 
 CAPABILITY_REPORT_COST = 10

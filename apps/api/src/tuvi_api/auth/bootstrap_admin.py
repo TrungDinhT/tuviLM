@@ -7,7 +7,7 @@ from bson import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from api.settings import get_settings
+from tuvi_api.settings import get_settings
 
 
 def main(argv: list[str] | None = None) -> None:

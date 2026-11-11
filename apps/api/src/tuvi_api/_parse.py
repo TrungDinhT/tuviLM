@@ -1,12 +1,12 @@
-from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
-from src.refactored.components.definitions.sao import (
+from tuvi_engine.components.definitions.map_sao_status import MAP_SAO_STATUS
+from tuvi_engine.components.definitions.sao import (
     ChinhPhuTinh,
     TuHoa,
     TuanTriet,
     VongTrangSinh,
 )
-from src.refactored.model.elementary import DiaChi
-from src.refactored.view.models import CungView, LaSoView
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.view.models import CungView, LaSoView
 
 from .schemas import (
     CungPayload,

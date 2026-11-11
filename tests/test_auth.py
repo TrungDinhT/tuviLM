@@ -13,10 +13,10 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
-from api.auth import dependencies
-from api.auth.dependencies import Principal, require_admin, require_user
-from api.chat.routes import router as chat_router
-from api.main import me
+from tuvi_api.auth import dependencies
+from tuvi_api.auth.dependencies import Principal, require_admin, require_user
+from tuvi_api.chat.routes import router as chat_router
+from tuvi_api.main import me
 
 
 ISSUER = "http://localhost:3000"

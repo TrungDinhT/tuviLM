@@ -4,32 +4,32 @@ import logging
 from pathlib import Path
 from types import SimpleNamespace
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
-from src.agent.tool.ban_menh.laso_foundation import get_laso_foundation
-from src.agent.tool.book import read_catalog, read_section
-from src.agent.tool.cach_cuc.tool import get_list_cach_cuc
-from src.agent.tool.chart import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.skills import get_cung_analyze_skill, read_book_tuvi_tan_bien
+from tuvi_agent.tool.ban_menh.laso_foundation import get_laso_foundation
+from tuvi_agent.tool.book import read_catalog, read_section
+from tuvi_agent.tool.cach_cuc.tool import get_list_cach_cuc
+from tuvi_agent.tool.chart import (
     get_cung_by_position,
     get_cung_by_role,
     get_tam_hop,
     get_xung_chieu,
 )
-from src.agent.tool.guidance import get_role_instruction
-from src.agent.tool.personality import get_tinh_cach_b3_b4_context
-from src.agent.tool.phu_tinh.tool import (
+from tuvi_agent.tool.guidance import get_role_instruction
+from tuvi_agent.tool.personality import get_tinh_cach_b3_b4_context
+from tuvi_agent.tool.phu_tinh.tool import (
     get_phu_tinh_tam_phuong_tu_chinh,
     get_trang_sinh,
 )
-from src.agent.tool.thai_tue.vong_thai_tue import get_vong_thai_tue
-from src.agent.workflow.personality.input.tanbien import get_personality_evidence
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.la_so import LaSo
+from tuvi_agent.tool.thai_tue.vong_thai_tue import get_vong_thai_tue
+from tuvi_agent.workflow.personality.input.tanbien import get_personality_evidence
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.la_so import LaSo
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 
 def test_agent_tools_log_start_and_compact_completion_metadata(caplog):
-    caplog.set_level(logging.INFO, logger="src.agent")
+    caplog.set_level(logging.INFO, logger="tuvi_agent")
     la_so = LaSo.from_prior(FIXTURE_PRIOR_A)
     deps = TuviAgentDeps(
         la_so=la_so,

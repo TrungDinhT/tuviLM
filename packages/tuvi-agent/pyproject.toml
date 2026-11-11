@@ -1,0 +1,18 @@
+[project]
+name = "tuvi-agent"
+version = "0.1.0"
+description = "pydantic-ai agent, tools and book index that read a Tử Vi chart."
+requires-python = ">=3.12"
+dependencies = [
+    "tuvi-engine",
+    "pydantic>=2.9.2,<3",
+    "pyyaml>=6.0.0,<7",
+    "pydantic-ai>=1.96.0",
+]
+
+[tool.uv.sources]
+tuvi-engine = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.9,<0.14"]
+build-backend = "uv_build"

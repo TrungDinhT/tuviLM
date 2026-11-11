@@ -2,14 +2,14 @@ import datetime as dt
 
 import pytest
 
-from src.refactored.context.natal import NatalContext
-from src.refactored.model.elementary import (
+from tuvi_engine.context.natal import NatalContext
+from tuvi_engine.model.elementary import (
     CircleDirection,
     DiaChi,
     NguHanh,
     ThienCan,
 )
-from src.refactored.model.prior import Gender, LaSoPrior, LunarYear
+from tuvi_engine.model.prior import Gender, LaSoPrior, LunarYear
 
 
 def test_circle_direction_supports_multiplier_semantics():

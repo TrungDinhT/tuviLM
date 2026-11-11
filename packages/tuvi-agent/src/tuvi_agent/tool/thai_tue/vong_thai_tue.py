@@ -5,11 +5,11 @@ from dataclasses import dataclass
 
 from pydantic_ai import RunContext
 
-from src.agent.deps import TuviAgentDeps
-from src.refactored.la_so import LaSo
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.layer import NATAL_LAYER_ID
-from src.refactored.placement.registry import ComponentId
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.layer import NATAL_LAYER_ID
+from tuvi_engine.placement.registry import ComponentId
 
 
 _logger = logging.getLogger(__name__)

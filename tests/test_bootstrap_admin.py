@@ -6,7 +6,7 @@ import pytest
 from bson import ObjectId
 from pymongo.errors import PyMongoError
 
-from api.auth import bootstrap_admin
+from tuvi_api.auth import bootstrap_admin
 
 
 USER_ID = ObjectId("64b000000000000000000001")

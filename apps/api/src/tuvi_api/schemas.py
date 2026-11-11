@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from api.chat.models import BirthInfo, ChatSession, ChatSessionSummary
+from tuvi_api.chat.models import BirthInfo, ChatSession, ChatSessionSummary
 
 
 class BuildLasoRequest(BirthInfo):

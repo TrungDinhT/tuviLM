@@ -5,15 +5,15 @@ from enum import StrEnum
 from functools import cached_property
 from typing import Mapping
 
-from src.refactored.model.elementary import DiaChi, ThienCan
-from src.refactored.context.natal import NatalContext
-from src.refactored.model.period_focus import (
+from tuvi_engine.model.elementary import DiaChi, ThienCan
+from tuvi_engine.context.natal import NatalContext
+from tuvi_engine.model.period_focus import (
     PeriodFocusMaps,
     TenYearRange,
     luu_nien_dai_han_focus_position,
 )
-from src.refactored.model.prior import LunarYear
-from src.refactored.model.cung import CungId
+from tuvi_engine.model.prior import LunarYear
+from tuvi_engine.model.cung import CungId
 
 
 class PeriodKind(StrEnum):

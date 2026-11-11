@@ -4,18 +4,18 @@ from dataclasses import dataclass
 
 import pytest
 
-from src.agent.tool.cach_cuc.loader import load_cach_cuc_source
-from src.agent.tool.cach_cuc.matcher import find_matching_cach_cuc
-from src.agent.tool.cach_cuc.models import (
+from tuvi_agent.tool.cach_cuc.loader import load_cach_cuc_source
+from tuvi_agent.tool.cach_cuc.matcher import find_matching_cach_cuc
+from tuvi_agent.tool.cach_cuc.models import (
     CachCucData,
     CachCucToolResult,
     Role,
     SourceKind,
 )
-from src.refactored.model.cung import Cung
-from src.refactored.model.elementary import DiaChi, ThienCan
-from src.refactored.model.layer import NATAL_LAYER_ID
-from src.refactored.model.prior import Gender
+from tuvi_engine.model.cung import Cung
+from tuvi_engine.model.elementary import DiaChi, ThienCan
+from tuvi_engine.model.layer import NATAL_LAYER_ID
+from tuvi_engine.model.prior import Gender
 
 
 @dataclass(frozen=True)

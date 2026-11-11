@@ -4,22 +4,22 @@ from dataclasses import dataclass, field
 from functools import cached_property
 from typing import Callable, Iterable
 
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.period_focus import (
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.period_focus import (
     DaiHanFocusMap,
     PeriodFocusMaps,
     TieuHanFocusMap
 )
-from src.refactored.model.cung import Cung, CungId, LayeredComponent
-from src.refactored.model.layer import (
+from tuvi_engine.model.cung import Cung, CungId, LayeredComponent
+from tuvi_engine.model.layer import (
     LayerId,
     NATAL_LAYER_ID,
     PeriodLayerId,
     PlacementLayer,
 )
-from src.refactored.model.period_layer_store import PeriodLayerStore
-from src.refactored.placement.registry import ComponentId
+from tuvi_engine.model.period_layer_store import PeriodLayerStore
+from tuvi_engine.placement.registry import ComponentId
 
 
 @dataclass

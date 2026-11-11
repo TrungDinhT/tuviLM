@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from src.agent.tool.cach_cuc.loader import load_cach_cuc_source
-from src.agent.tool.cach_cuc.models import SourceKind
+from tuvi_agent.tool.cach_cuc.loader import load_cach_cuc_source
+from tuvi_agent.tool.cach_cuc.models import SourceKind
 
 # (group id in the cach_cuc groups data, Vietnamese label). Ordered so
 # higher-signal groups surface first in tool output.

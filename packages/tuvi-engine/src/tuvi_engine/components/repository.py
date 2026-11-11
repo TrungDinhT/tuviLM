@@ -5,13 +5,13 @@ from pathlib import Path
 
 from pydantic import TypeAdapter
 
-from src.refactored.components.definitions import Component
-from src.refactored.components.definitions.ban_menh import BanMenh
-from src.refactored.components.definitions.cuc import LIST_CUC
-from src.refactored.components.definitions.cung_role import CungRole
-from src.refactored.components.definitions.elementary import DiaChiEntity, ThienCanEntity
-from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet, TuHoa, VongTrangSinh
-from src.refactored.model.elementary import DiaChi, ThienCan
+from tuvi_engine.components.definitions import Component
+from tuvi_engine.components.definitions.ban_menh import BanMenh
+from tuvi_engine.components.definitions.cuc import LIST_CUC
+from tuvi_engine.components.definitions.cung_role import CungRole
+from tuvi_engine.components.definitions.elementary import DiaChiEntity, ThienCanEntity
+from tuvi_engine.components.definitions.sao import ChinhPhuTinh, TuanTriet, TuHoa, VongTrangSinh
+from tuvi_engine.model.elementary import DiaChi, ThienCan
 
 
 class ComponentRepository:

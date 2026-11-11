@@ -4,9 +4,9 @@ from types import SimpleNamespace
 
 import pytest
 from pydantic_ai.messages import ModelRequest, UserPromptPart
-from src.agent.deps import TuviAgentDeps
-from src.agent.main import build_tuvi_agent
-from src.agent.workflow.personality import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.main import build_tuvi_agent
+from tuvi_agent.workflow.personality import (
     DEFAULT_PERSONALITY_CONFIG,
     PERSONALITY_AGENT_INSTRUCTION,
     PERSONALITY_INPUT_REGISTRY,
@@ -19,14 +19,14 @@ from src.agent.workflow.personality import (
     run_personality_workflow,
     run_tinh_cach_workflow,
 )
-from src.agent.workflow.personality.input.tanbien import (
+from tuvi_agent.workflow.personality.input.tanbien import (
     BanMenhEvidence,
     PersonalityEvidence,
 )
-from src.agent.workflow.personality.output import (
+from tuvi_agent.workflow.personality.output import (
     OPTIONAL_AVOID_EVIDENCE_INSTRUCTION,
 )
-from src.refactored.la_so import LaSo
+from tuvi_engine.la_so import LaSo
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 

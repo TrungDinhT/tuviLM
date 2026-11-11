@@ -19,24 +19,22 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 from pydantic_ai.models.openrouter import OpenRouterModelSettings
 from pydantic_ai.usage import RunUsage
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.workflow.personality import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.workflow.personality import (
     build_personality_agent,
     run_personality_workflow,
 )
-from src.agent.workflow.strength_weakness import (
+from tuvi_agent.workflow.strength_weakness import (
     build_strength_weakness_agent,
     run_strength_weakness_agent,
 )
-from src.refactored.la_so import LaSo
-from src.refactored.model.prior import Gender, LaSoPrior
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.prior import Gender, LaSoPrior
 
 DEFAULT_MODEL = "openrouter:qwen/qwen3.7-max"
+# The book files are not in git. Resolved from the repo root (tools are installed editable).
 DEFAULT_BOOK_ROOT = (
-    Path(__file__).resolve().parents[2]
-    / "data"
-    / "tuvitanbien_chunking_compact"
-    / "part_2"
+    Path(__file__).resolve().parents[4] / "data" / "tuvitanbien_chunking_compact" / "part_2"
 )
 
 

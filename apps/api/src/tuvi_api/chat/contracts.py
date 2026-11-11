@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from api.chat.models import (
+from tuvi_api.chat.models import (
     ChartProfile,
     ChatMessage,
     ChatMessageStatus,

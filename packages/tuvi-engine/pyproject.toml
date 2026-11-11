@@ -1,0 +1,13 @@
+[project]
+name = "tuvi-engine"
+version = "0.1.0"
+description = "Builds the Tử Vi chart. No network, database or AI calls."
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.9.2,<3",
+    "pyyaml>=6.0.0,<7",
+]
+
+[build-system]
+requires = ["uv_build>=0.9,<0.14"]
+build-backend = "uv_build"

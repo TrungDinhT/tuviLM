@@ -1,18 +1,18 @@
 from dataclasses import dataclass
 
-from src.refactored.assembly.natal import build_natal_tinh_ban
-from src.refactored.assembly.tu_hoa_phai import build_tu_hoa_phai_layer
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.model.elementary import DiaChi
-from src.refactored.context.natal import NatalContext
-from src.refactored.model.prior import Gender, LaSoPrior
-from src.refactored.context.tu_hoa_phai import TuHoaPhaiContext
-from src.refactored.components.definitions.ban_menh import BanMenh, compute_ban_menh_id
-from src.refactored.la_so import LaSo
-from src.refactored.model.elementary import NguHanh
+from tuvi_engine.assembly.natal import build_natal_tinh_ban
+from tuvi_engine.assembly.tu_hoa_phai import build_tu_hoa_phai_layer
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.context.natal import NatalContext
+from tuvi_engine.model.prior import Gender, LaSoPrior
+from tuvi_engine.context.tu_hoa_phai import TuHoaPhaiContext
+from tuvi_engine.components.definitions.ban_menh import BanMenh, compute_ban_menh_id
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.elementary import NguHanh
 import pytest
 
-from src.refactored.model.layer import PlacementLayer, TieuHanLayerId, TuHoaPhaiLayerId
+from tuvi_engine.model.layer import PlacementLayer, TieuHanLayerId, TuHoaPhaiLayerId
 
 
 def _prior() -> LaSoPrior:

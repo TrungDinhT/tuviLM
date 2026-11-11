@@ -6,10 +6,10 @@ import pytest
 from streamlit.testing.v1 import AppTest
 import yaml
 
-from src.cli.strength_weakness_report import (
+from tuvi_tools.workflow_cli.strength_weakness_report import (
     common_profiles, complete_total, diversity, read_report, reviewed_weaknesses,
 )
-from src.cli.view import build_streamlit_command, parse_report_yaml
+from tuvi_tools.workflow_cli.view import build_streamlit_command, parse_report_yaml
 
 
 IDS = ['lap_luan_logic', 'nghien_cuu_chuyen_sau']
@@ -35,7 +35,7 @@ def report(doc=None):
 
 def _run_app(directory, annotation):
     from pathlib import Path
-    from src.cli.view import streamlit_main
+    from tuvi_tools.workflow_cli.view import streamlit_main
     streamlit_main((), report_dir=Path(directory), annotation_path=Path(annotation))
 
 
@@ -58,7 +58,7 @@ def test_streamlit_command_forwards_server_options_and_report_path(tmp_path):
     path = tmp_path / 'report.yaml'
     assert build_streamlit_command(path, port=8765, address='127.0.0.1', headless=True, executable='python-test') == [
         'python-test', '-m', 'streamlit', 'run', '--server.port', '8765', '--server.address', '127.0.0.1',
-        '--server.headless', 'true', str(Path('src/cli/view.py').resolve()), '--', str(path.resolve())]
+        '--server.headless', 'true', str(Path('tools/src/tuvi_tools/workflow_cli/view.py').resolve()), '--', str(path.resolve())]
 
 
 def test_profile_identity_cohort_and_missing_usage():
@@ -161,7 +161,7 @@ def test_app_handles_checkpoint_without_results(tmp_path):
 
 def _run_path_app(path):
     from pathlib import Path
-    from src.cli.view import streamlit_main
+    from tuvi_tools.workflow_cli.view import streamlit_main
     streamlit_main((path,), report_dir=Path(path).parent)
 
 

@@ -4,16 +4,16 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from src.agent.tool.cach_cuc.evaluator.context import CachCucMatchContext
-from src.agent.tool.cach_cuc.evaluator.match_types import MatchOutcome
-from src.agent.tool.cach_cuc.models import Mode, StarAtChiCondition
-from src.agent.tool.cach_cuc.evaluator.star_utils import (
+from tuvi_agent.tool.cach_cuc.evaluator.context import CachCucMatchContext
+from tuvi_agent.tool.cach_cuc.evaluator.match_types import MatchOutcome
+from tuvi_agent.tool.cach_cuc.models import Mode, StarAtChiCondition
+from tuvi_agent.tool.cach_cuc.evaluator.star_utils import (
     _match_count,
     _resolve_group_stars,
     _roles_for_positions,
     _star_positions_at_any_chi,
 )
-from src.refactored.model.elementary import DiaChi
+from tuvi_engine.model.elementary import DiaChi
 
 
 def _match_star_at_chi(

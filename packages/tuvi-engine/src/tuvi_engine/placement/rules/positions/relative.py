@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import Callable, Mapping
 
-from src.refactored.context.protocol import PlacementContext
-from src.refactored.model.elementary import (
+from tuvi_engine.context.protocol import PlacementContext
+from tuvi_engine.model.elementary import (
     CircleDirection,
     DiaChi,
     IndexedEnumMixin,
 )
-from src.refactored.placement.registry import AbsolutePositionResolver, PositionTransform
+from tuvi_engine.placement.registry import AbsolutePositionResolver, PositionTransform
 
 ContextStepSelector = Callable[[PlacementContext], int]
 DiaChiGroup = tuple[DiaChi, ...]

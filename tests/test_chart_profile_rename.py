@@ -12,13 +12,13 @@ from bson import ObjectId
 from fastapi import FastAPI, HTTPException, Request
 from pymongo import AsyncMongoClient
 
-from api.auth.dependencies import Principal, require_user
-from api.chat.contracts import ConversationHistoryError
-from api.chat.models import CreateSessionInput
-from api.chat.routes import router
-from api.chat.storage import store as store_module
-from api.chat.storage.store import MongoConversationHistoryStore
-from api.main import conversation_history_exception_handler
+from tuvi_api.auth.dependencies import Principal, require_user
+from tuvi_api.chat.contracts import ConversationHistoryError
+from tuvi_api.chat.models import CreateSessionInput
+from tuvi_api.chat.routes import router
+from tuvi_api.chat.storage import store as store_module
+from tuvi_api.chat.storage.store import MongoConversationHistoryStore
+from tuvi_api.main import conversation_history_exception_handler
 
 
 pytestmark = pytest.mark.anyio

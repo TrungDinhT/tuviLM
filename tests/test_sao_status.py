@@ -1,6 +1,6 @@
 import pytest
 
-from src.refactored.components.definitions.sao import Status
+from tuvi_engine.components.definitions.sao import Status
 
 
 def test_status_values_and_lookup():

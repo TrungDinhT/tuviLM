@@ -1,4 +1,4 @@
-from src.agent.workflow.personality import (
+from tuvi_agent.workflow.personality import (
     DEFAULT_PERSONALITY_CONFIG,
     PERSONALITY_INPUT_REGISTRY,
     PERSONALITY_OUTPUT_INSTRUCTION_REGISTRY,
@@ -8,7 +8,7 @@ from src.agent.workflow.personality import (
     get_personality_evidence,
     run_personality_workflow,
 )
-from src.agent.workflow.strength_weakness import (
+from tuvi_agent.workflow.strength_weakness import (
     CapabilityEvidence,
     CapabilityProfile,
     build_strength_weakness_agent,

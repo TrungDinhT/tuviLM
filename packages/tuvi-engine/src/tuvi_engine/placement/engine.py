@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from src.refactored.model.elementary import DiaChi
-from src.refactored.placement.compiler import (
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.placement.compiler import (
     SpecializedAbsoluteSpec,
     SpecializedPlacementRules,
     SpecializedRelativeSpec,
 )
-from src.refactored.placement.registry import ComponentId
+from tuvi_engine.placement.registry import ComponentId
 
 
 class PlacementEngine:

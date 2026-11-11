@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from src.refactored.placement.component_groups import TU_HOA_IDS
-from src.refactored.placement.registry import ComponentId
-from src.refactored.placement.rules.declarations.models import (
+from tuvi_engine.placement.component_groups import TU_HOA_IDS
+from tuvi_engine.placement.registry import ComponentId
+from tuvi_engine.placement.rules.declarations.models import (
     CircleDeclaration,
     OffsetGroupDeclaration,
     PlacementRuleDeclaration,

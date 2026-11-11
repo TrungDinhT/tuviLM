@@ -11,16 +11,16 @@ from pydantic_ai.messages import ModelMessage
 from pydantic_ai.models import Model
 from pydantic_ai.settings import ModelSettings
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.workflow.strength_weakness.input import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.workflow.strength_weakness.input import (
     STRENGTH_WEAKNESS_REASONING_INSTRUCTION,
     build_strength_weakness_evidence,
     prepare_capability_input,
 )
-from src.agent.workflow.strength_weakness.ontology import (
+from tuvi_agent.workflow.strength_weakness.ontology import (
     build_capability_ontology_instruction,
 )
-from src.agent.workflow.strength_weakness.output import (
+from tuvi_agent.workflow.strength_weakness.output import (
     CAPABILITY_PROFILE_OUTPUT_INSTRUCTION,
     CapabilityProfile,
     render_capability_profile,

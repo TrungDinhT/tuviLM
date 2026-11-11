@@ -4,10 +4,10 @@ import datetime as dt
 
 import streamlit as st
 
-from src.refactored.la_so import LaSo
-from src.refactored.model.prior import Gender, LaSoPrior
-from src.refactored.view.builder import build_laso_view
-from src.refactored.view.streamlit_adapter import render_laso_view_html
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.prior import Gender, LaSoPrior
+from tuvi_engine.view.builder import build_laso_view
+from tuvi_engine.view.streamlit_adapter import render_laso_view_html
 
 
 st.sidebar.header("Ngày sinh theo lịch dương")

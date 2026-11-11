@@ -10,28 +10,28 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic_ai import ModelRetry
 
-from src.agent.book_index import BookIndex, SectionContent
-from src.agent.tool.cach_cuc.loader import load_cach_cuc_source
-from src.agent.tool.cach_cuc.matcher import find_matching_cach_cuc
-from src.agent.tool.cach_cuc.models import CachCuc, CachCucData, SourceKind
-from src.agent.tool.tu_vi_tan_bien.constant import (
+from tuvi_agent.book_index import BookIndex, SectionContent
+from tuvi_agent.tool.cach_cuc.loader import load_cach_cuc_source
+from tuvi_agent.tool.cach_cuc.matcher import find_matching_cach_cuc
+from tuvi_agent.tool.cach_cuc.models import CachCuc, CachCucData, SourceKind
+from tuvi_agent.tool.tu_vi_tan_bien.constant import (
     MAP_ROLE_SECTION_ID_FUNC,
     get_sao_section_id,
 )
-from src.agent.workflow.strength_weakness.ontology import (
+from tuvi_agent.workflow.strength_weakness.ontology import (
     CAPABILITY_ONTOLOGY_VERSION,
 )
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
-from src.refactored.components.definitions.sao import (
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.components.definitions.map_sao_status import MAP_SAO_STATUS
+from tuvi_engine.components.definitions.sao import (
     ChinhPhuTinh,
     TuanTriet,
     TuHoa,
 )
-from src.refactored.la_so import LaSo
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.layer import NATAL_LAYER_ID
-from src.refactored.placement.rules.loader import load_tu_hoa_target_mapping
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.layer import NATAL_LAYER_ID
+from tuvi_engine.placement.rules.loader import load_tu_hoa_target_mapping
 
 _logger = logging.getLogger(__name__)
 _BOOK_NAME = "Tử Vi Đẩu Số Tân Biên"

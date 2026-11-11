@@ -6,7 +6,7 @@ from beanie import DocumentWithSoftDelete
 from pydantic import BaseModel, Field
 from pymongo import ASCENDING, IndexModel
 
-from api.chat.models import BirthInfo, ChatMessage, MessageOperationStatus
+from tuvi_api.chat.models import BirthInfo, ChatMessage, MessageOperationStatus
 
 
 def utc_now() -> datetime:

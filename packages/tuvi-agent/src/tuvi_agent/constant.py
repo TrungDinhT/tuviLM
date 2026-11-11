@@ -1,5 +1,5 @@
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.model.elementary import DiaChi
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.model.elementary import DiaChi
 
 # TODO: This map is temporary and should be replaced by a more robust solution,
 # such as loading from a config file or defining in the model layer.

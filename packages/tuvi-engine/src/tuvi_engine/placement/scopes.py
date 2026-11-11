@@ -1,11 +1,11 @@
 """Component scopes materialized by each non-natal placement layer kind."""
 
-from src.refactored.placement.component_groups import (
+from tuvi_engine.placement.component_groups import (
     PERIOD_ROLE_IDS,
     SAO_LUU_IDS,
     TU_HOA_IDS,
 )
-from src.refactored.placement.registry import ComponentId
+from tuvi_engine.placement.registry import ComponentId
 
 
 TIEU_HAN_SCOPE: frozenset[ComponentId] = SAO_LUU_IDS | TU_HOA_IDS

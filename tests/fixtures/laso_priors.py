@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import datetime as dt
 
-from src.refactored.model.elementary import CircleDirection, DiaChi, NguHanh, ThienCan
-from src.refactored.model.prior import Gender, LaSoPrior
+from tuvi_engine.model.elementary import CircleDirection, DiaChi, NguHanh, ThienCan
+from tuvi_engine.model.prior import Gender, LaSoPrior
 
 # Canonical happy-path birth (Nam, same instant as placement regression tests).
 _SOLAR_A = dt.datetime(1990, 5, 15, 10, 30)

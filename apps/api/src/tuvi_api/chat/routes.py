@@ -22,10 +22,10 @@ from pydantic_ai import (
 from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, UserPromptPart
 from starlette.types import Receive, Scope, Send
 
-from api.accounts.billing import CHAT_MESSAGE_COST, reserve_chat_coins, settle_chat_coins
-from api.auth.dependencies import CurrentUser, ReconciledUser
-from api.chat.contracts import ConversationHistoryStore, NotFoundError
-from api.chat.models import (
+from tuvi_api.accounts.billing import CHAT_MESSAGE_COST, reserve_chat_coins, settle_chat_coins
+from tuvi_api.auth.dependencies import CurrentUser, ReconciledUser
+from tuvi_api.chat.contracts import ConversationHistoryStore, NotFoundError
+from tuvi_api.chat.models import (
     BirthInfo,
     ChartProfile,
     ChatMessage,
@@ -37,7 +37,7 @@ from api.chat.models import (
     ReservedMessagePair,
     SessionContext,
 )
-from api.schemas import (
+from tuvi_api.schemas import (
     ChartProfilePayload,
     CreateAnonymousResponse,
     CreateChartProfileRequest,
@@ -50,9 +50,9 @@ from api.schemas import (
     SessionChatStreamRequest,
     UpdateChartProfileRequest,
 )
-from src.agent.deps import TuviAgentDeps
-from src.refactored.la_so import LaSo
-from src.refactored.model.prior import Gender, LaSoPrior
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.prior import Gender, LaSoPrior
 
 
 logger = logging.getLogger(__name__)

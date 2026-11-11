@@ -1,8 +1,8 @@
-from src.refactored.components.repository import get_default_repository
-from src.refactored.components.definitions.ban_menh import BanMenh
-from src.refactored.components.definitions.cung_role import CungRole, Role
-from src.refactored.model.elementary import DiaChi, NguHanh, ThienCan
-from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet, TuHoa
+from tuvi_engine.components.repository import get_default_repository
+from tuvi_engine.components.definitions.ban_menh import BanMenh
+from tuvi_engine.components.definitions.cung_role import CungRole, Role
+from tuvi_engine.model.elementary import DiaChi, NguHanh, ThienCan
+from tuvi_engine.components.definitions.sao import ChinhPhuTinh, TuanTriet, TuHoa
 
 
 def test_default_catalog_loads_cung_and_sao_components():

@@ -10,9 +10,9 @@ from typing import Any
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.messages import ModelMessage
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.skills import read_book_tuvi_tan_bien
-from src.agent.tool import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.skills import read_book_tuvi_tan_bien
+from tuvi_agent.tool import (
     get_cung_by_position,
     get_cung_by_role,
     get_laso_foundation,
@@ -24,20 +24,20 @@ from src.agent.tool import (
     get_vong_thai_tue,
     get_xung_chieu,
 )
-from src.agent.tool.tu_vi_tan_bien.tool import (
+from tuvi_agent.tool.tu_vi_tan_bien.tool import (
     get_star_description,
     get_star_role_interaction,
 )
-from src.agent.workflow.contracts import (
+from tuvi_agent.workflow.contracts import (
     WorkflowInputDefinition,
     WorkflowOutputInstruction,
 )
-from src.agent.workflow.personality.input.tanbien import (
+from tuvi_agent.workflow.personality.input.tanbien import (
     PersonalityEvidence,
     get_personality_evidence,
     luan_tinh_cach_skill,
 )
-from src.agent.workflow.personality.output import (
+from tuvi_agent.workflow.personality.output import (
     SEVEN_FOUNDATION_QUESTIONS_INSTRUCTION,
 )
 

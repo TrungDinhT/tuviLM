@@ -1,10 +1,10 @@
-from src.agent.tool.thai_tue import (
+from tuvi_agent.tool.thai_tue import (
     THAI_TUE_RING_STAR_IDS,
     build_vong_thai_tue_payload,
 )
-from src.refactored.la_so import LaSo
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.prior import Gender, LaSoPrior
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.prior import Gender, LaSoPrior
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from src.agent.tool.cach_cuc.evaluator.context import CachCucMatchContext
-from src.agent.tool.cach_cuc.evaluator.match_types import (
+from tuvi_agent.tool.cach_cuc.evaluator.context import CachCucMatchContext
+from tuvi_agent.tool.cach_cuc.evaluator.match_types import (
     MatchOutcome,
     merge_related_roles,
 )
-from src.agent.tool.cach_cuc.models import (
+from tuvi_agent.tool.cach_cuc.models import (
     AllCondition,
     AnyCondition,
     CanExcludeCondition,
@@ -24,8 +24,8 @@ from src.agent.tool.cach_cuc.models import (
     StarWithPalaceCondition,
     StarsMeetingCondition,
 )
-from src.agent.tool.cach_cuc.evaluator.scopes import positions_for_scope
-from src.agent.tool.cach_cuc.evaluator.star_conditions import (
+from tuvi_agent.tool.cach_cuc.evaluator.scopes import positions_for_scope
+from tuvi_agent.tool.cach_cuc.evaluator.star_conditions import (
     _match_only_chinh_tinh,
     _match_star_at_chi,
     _match_star_brightness,
@@ -33,7 +33,7 @@ from src.agent.tool.cach_cuc.evaluator.star_conditions import (
     _match_supported_stars,
     _star_at_any_chi,
 )
-from src.refactored.model.prior import Gender as PriorGender
+from tuvi_engine.model.prior import Gender as PriorGender
 
 
 def match_condition(

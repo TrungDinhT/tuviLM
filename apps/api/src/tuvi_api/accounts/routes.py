@@ -6,8 +6,8 @@ from pydantic import ValidationError
 from pymongo import ReturnDocument
 from pymongo.errors import PyMongoError
 
-from api.accounts.models import AccountAccess, AccountAccessUpdate
-from api.auth.dependencies import require_admin
+from tuvi_api.accounts.models import AccountAccess, AccountAccessUpdate
+from tuvi_api.auth.dependencies import require_admin
 
 
 router = APIRouter(prefix="/api/v1/admin/users", dependencies=[Depends(require_admin)])

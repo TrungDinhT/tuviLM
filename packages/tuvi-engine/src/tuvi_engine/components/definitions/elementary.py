@@ -1,6 +1,6 @@
 from pydantic import BaseModel, model_validator
 
-from src.refactored.model.elementary import DiaChi, NguHanh, ThienCan
+from tuvi_engine.model.elementary import DiaChi, NguHanh, ThienCan
 
 
 class ComponentBase(BaseModel):

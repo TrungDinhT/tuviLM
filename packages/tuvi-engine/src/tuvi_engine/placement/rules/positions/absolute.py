@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Mapping
 
-from src.refactored.context.protocol import PlacementContext
-from src.refactored.model.elementary import DiaChi, NguHanh, ThienCan
-from src.refactored.placement.registry import AbsolutePositionResolver
+from tuvi_engine.context.protocol import PlacementContext
+from tuvi_engine.model.elementary import DiaChi, NguHanh, ThienCan
+from tuvi_engine.placement.registry import AbsolutePositionResolver
 
 ThienCanPositionMap = Mapping[ThienCan, DiaChi]
 

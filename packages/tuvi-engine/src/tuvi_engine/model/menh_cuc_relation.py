@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import StrEnum
 
 from pydantic import BaseModel
-from src.refactored.model.elementary import NguHanh
+from tuvi_engine.model.elementary import NguHanh
 
 
 class MenhCucRelationType(StrEnum):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from src.refactored.model.menh_cuc_relation import MenhCucRelationType
+from tuvi_engine.model.menh_cuc_relation import MenhCucRelationType
 
 
 @dataclass(frozen=True)

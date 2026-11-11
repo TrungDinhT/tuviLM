@@ -13,7 +13,7 @@ from pydantic import (
     model_validator,
 )
 
-from src.agent.workflow.strength_weakness.ontology import (
+from tuvi_agent.workflow.strength_weakness.ontology import (
     get_capability_definition,
 )
 

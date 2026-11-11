@@ -19,14 +19,14 @@ from pydantic import BaseModel
 from pymongo import AsyncMongoClient
 from pymongo.errors import DuplicateKeyError
 
-from api.chat.contracts import (
+from tuvi_api.chat.contracts import (
     DuplicateStreamInProgressError,
     IdempotencyConflictError,
     InsufficientChatCoinsError,
     MissingOwnerIdError,
     NotFoundError,
 )
-from api.chat.models import (
+from tuvi_api.chat.models import (
     ChartProfile,
     ChatMessage,
     ChatMessageStatus,
@@ -39,19 +39,19 @@ from api.chat.models import (
     ReservedMessagePair,
     SessionContext,
 )
-from api.chat.storage.documents import (
+from tuvi_api.chat.storage.documents import (
     ChartProfileDocument,
     ChatSessionDocument,
     MessageOperationDocument,
     utc_now,
 )
-from api.chat.storage.mappers import (
+from tuvi_api.chat.storage.mappers import (
     chart_profile_from_document,
     chat_message_from_document,
     chat_session_from_document,
     chat_session_summary_from_document,
 )
-from api.chat.storage.settings import MongoConversationHistorySettings
+from tuvi_api.chat.storage.settings import MongoConversationHistorySettings
 
 
 class MongoConversationHistoryStore:

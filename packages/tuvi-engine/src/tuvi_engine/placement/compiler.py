@@ -3,9 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Iterable, Mapping, Protocol, Set
 
-from src.refactored.model.elementary import DiaChi
-from src.refactored.context.protocol import PlacementContext
-from src.refactored.placement.registry import (
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.context.protocol import PlacementContext
+from tuvi_engine.placement.registry import (
     AbsolutePositionSpec,
     ComponentId,
     PlacementRegistry,

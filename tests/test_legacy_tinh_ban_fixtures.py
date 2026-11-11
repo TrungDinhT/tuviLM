@@ -9,10 +9,10 @@ from typing import Any
 
 import pytest
 
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.prior import Gender, LaSoPrior
-from src.refactored.la_so import LaSo
-from src.refactored.view.builder import build_laso_view
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.prior import Gender, LaSoPrior
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.view.builder import build_laso_view
 
 
 RESOURCE_DIR = Path(__file__).parent / "resources"

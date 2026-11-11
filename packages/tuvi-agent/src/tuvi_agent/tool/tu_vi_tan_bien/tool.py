@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from pydantic_ai import RunContext
 
-from src.refactored.components.definitions.cung_role import Role
+from tuvi_engine.components.definitions.cung_role import Role
 
 from .constant import get_sao_section_id
-from src.agent.book_index import SectionContent
-from src.agent.deps import TuviAgentDeps
-from src.agent.tool.tu_vi_tan_bien.constant import MAP_ROLE_SECTION_ID_FUNC
+from tuvi_agent.book_index import SectionContent
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.tool.tu_vi_tan_bien.constant import MAP_ROLE_SECTION_ID_FUNC
 
 
 def get_star_description(

@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict
 
-from src.refactored.components.definitions import Component
-from src.refactored.components.definitions.cung_role import CungRole
-from src.refactored.components.definitions.elementary import (
+from tuvi_engine.components.definitions import Component
+from tuvi_engine.components.definitions.cung_role import CungRole
+from tuvi_engine.components.definitions.elementary import (
     DiaChiEntity,
     ThienCanEntity,
 )
-from src.refactored.model.elementary import (
+from tuvi_engine.model.elementary import (
     DiaChi,
     ThienCan,
 )
-from src.refactored.model.prior import Gender
-from src.refactored.model.layer import LayerKind
+from tuvi_engine.model.prior import Gender
+from tuvi_engine.model.layer import LayerKind
 
 
 class LayeredComponentView(BaseModel):

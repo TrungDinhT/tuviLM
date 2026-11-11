@@ -2,10 +2,10 @@
 
 from dataclasses import dataclass
 
-from src.refactored.components.definitions.cung_role import CungRole, Role
-from src.refactored.model.elementary import DiaChi, ThienCan
-from src.refactored.model.layer import LayerId
-from src.refactored.placement.registry import ComponentId
+from tuvi_engine.components.definitions.cung_role import CungRole, Role
+from tuvi_engine.model.elementary import DiaChi, ThienCan
+from tuvi_engine.model.layer import LayerId
+from tuvi_engine.placement.registry import ComponentId
 
 
 # Ngũ Hổ Độn anchor table: maps the natal year Thiên Can to the Thiên Can

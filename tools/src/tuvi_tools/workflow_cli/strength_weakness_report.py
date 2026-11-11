@@ -11,8 +11,8 @@ from typing import Any
 
 import yaml
 
-from src.agent.workflow.strength_weakness.ontology import get_capability_definition
-from src.agent.workflow.strength_weakness.output.capability_profile import CapabilityProfile
+from tuvi_agent.workflow.strength_weakness.ontology import get_capability_definition
+from tuvi_agent.workflow.strength_weakness.output.capability_profile import CapabilityProfile
 
 ProfileKey = tuple[str, str, str, str]
 

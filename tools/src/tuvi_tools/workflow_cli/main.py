@@ -10,13 +10,13 @@ CommandRunner = Callable[[Sequence[str]], int]
 
 
 def _run_workflow(argv: Sequence[str]) -> int:
-    from src.cli.workflow import main as workflow_main
+    from tuvi_tools.workflow_cli.workflow import main as workflow_main
 
     return workflow_main(argv, prog="tuvilm run")
 
 
 def _view_report(argv: Sequence[str]) -> int:
-    from src.cli.view import cli_main as view_main
+    from tuvi_tools.workflow_cli.view import cli_main as view_main
 
     return view_main(argv, prog="tuvilm view")
 

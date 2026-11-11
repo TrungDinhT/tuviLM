@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from typing import Callable, Sequence, TypeAlias
 
-from src.refactored.context.protocol import PlacementContext
-from src.refactored.model.elementary import DiaChi, ThienCan
-from src.refactored.placement.component_groups import TU_HOA_IDS
-from src.refactored.placement.registry import (
+from tuvi_engine.context.protocol import PlacementContext
+from tuvi_engine.model.elementary import DiaChi, ThienCan
+from tuvi_engine.placement.component_groups import TU_HOA_IDS
+from tuvi_engine.placement.registry import (
     AbsolutePositionResolver,
     AbsolutePositionSpec,
     ComponentId,
     PlacementRegistry,
     RelativePositionSpec,
 )
-from src.refactored.placement.rules.declarations import resolvers
-from src.refactored.placement.rules.declarations.models import (
+from tuvi_engine.placement.rules.declarations import resolvers
+from tuvi_engine.placement.rules.declarations.models import (
     AbsoluteByDiaChiGroupsDeclaration,
     AbsoluteByThienCanDeclaration,
     AbsoluteFormulaDeclaration,
@@ -29,7 +29,7 @@ from src.refactored.placement.rules.declarations.models import (
     TuanTrietPairDeclaration,
     TuHoaDeclaration,
 )
-from src.refactored.placement.rules.positions import relative
+from tuvi_engine.placement.rules.positions import relative
 
 DeclarationRegistrar: TypeAlias = Callable[
     [PlacementRegistry, PlacementRuleDeclaration], None

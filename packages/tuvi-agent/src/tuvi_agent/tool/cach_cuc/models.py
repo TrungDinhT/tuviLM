@@ -14,8 +14,8 @@ from pydantic import (
     model_validator,
 )
 
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.model.elementary import DiaChi, ThienCan
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.model.elementary import DiaChi, ThienCan
 
 
 _BLANK_LINE_RE = re.compile(r"\n\s*\n+")

@@ -10,8 +10,8 @@ import pytest
 from pydantic import BaseModel, ValidationError
 from pydantic_ai.usage import RunUsage
 
-from src.agent.deps import TuviAgentDeps
-from src.cli.workflow import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_tools.workflow_cli.workflow import (
     ProfileGender,
     WorkflowDefinition,
     build_parser,
@@ -179,7 +179,7 @@ def test_batch_preserves_structured_workflow_output_and_checkpoints_failures(
 
 
 def test_unreported_thinking_tokens_are_unknown():
-    from src.cli.workflow import _usage_metrics
+    from tuvi_tools.workflow_cli.workflow import _usage_metrics
 
     assert _usage_metrics(RunUsage(), 0)["thinking_tokens"] is None
     assert _usage_metrics(RunUsage(details={"reasoning_tokens": 0}), 0)["thinking_tokens"] == 0
@@ -193,7 +193,7 @@ def test_unreported_thinking_tokens_are_unknown():
     ],
 )
 def test_workflow_passes_usage_to_agent(monkeypatch, workflow_name, runner_name):
-    from src.cli import workflow
+    from tuvi_tools.workflow_cli import workflow
 
     usage = RunUsage()
     agent = object()

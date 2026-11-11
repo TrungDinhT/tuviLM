@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from src.refactored.components.definitions.elementary import ComponentBase
-from src.refactored.model.elementary import NguHanh
+from tuvi_engine.components.definitions.elementary import ComponentBase
+from tuvi_engine.model.elementary import NguHanh
 
 # Ordered list of 30 ban_menh ids covering a 60-year cycle.
 # Each entry spans 2 consecutive years.

@@ -3,23 +3,23 @@ from __future__ import annotations
 import pytest
 from pydantic_ai import Agent, ModelRetry
 
-from src.agent.tool.book import read_catalog
-from src.agent.tool.cach_cuc.models import SourceKind
-from src.agent.tool.cach_cuc.tool import get_list_cach_cuc
-from src.agent.tool.chart import (
+from tuvi_agent.tool.book import read_catalog
+from tuvi_agent.tool.cach_cuc.models import SourceKind
+from tuvi_agent.tool.cach_cuc.tool import get_list_cach_cuc
+from tuvi_agent.tool.chart import (
     get_cung_by_position,
     get_cung_by_role,
     get_tam_hop,
     get_xung_chieu,
 )
-from src.agent.tool.guidance import get_role_instruction
-from src.agent.tool.phu_tinh.tool import (
+from tuvi_agent.tool.guidance import get_role_instruction
+from tuvi_agent.tool.phu_tinh.tool import (
     get_phu_tinh_tam_phuong_tu_chinh,
     get_trang_sinh,
 )
-from src.agent.tool.tu_vi_tan_bien.tool import get_star_role_interaction
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.model.elementary import DiaChi
+from tuvi_agent.tool.tu_vi_tan_bien.tool import get_star_role_interaction
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.model.elementary import DiaChi
 
 
 def _validate_tool_arguments(tool, arguments: dict[str, object]) -> dict[str, object]:

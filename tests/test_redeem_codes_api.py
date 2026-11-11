@@ -15,9 +15,9 @@ from pymongo import AsyncMongoClient
 from pymongo.asynchronous.collection import AsyncCollection
 from pymongo.errors import PyMongoError
 
-from api.accounts.redeem_codes import ensure_redeem_code_indexes, router
-from api.auth.dependencies import Principal, require_user
-from api.chat.models import ChatMessageStatus
+from tuvi_api.accounts.redeem_codes import ensure_redeem_code_indexes, router
+from tuvi_api.auth.dependencies import Principal, require_user
+from tuvi_api.chat.models import ChatMessageStatus
 
 
 pytestmark = pytest.mark.anyio

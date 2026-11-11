@@ -12,9 +12,9 @@ from jwt import InvalidTokenError, PyJWKClientConnectionError, PyJWKClientError
 from pydantic import ValidationError
 from pymongo.errors import PyMongoError
 
-from api.accounts.billing import reconcile_chat_coins
-from api.accounts.models import AccountAccess, Balance, Plan
-from api.settings import get_settings
+from tuvi_api.accounts.billing import reconcile_chat_coins
+from tuvi_api.accounts.models import AccountAccess, Balance, Plan
+from tuvi_api.settings import get_settings
 
 
 @dataclass(frozen=True)

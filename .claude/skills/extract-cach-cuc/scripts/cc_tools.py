@@ -23,22 +23,13 @@ from collections import Counter, defaultdict
 from typing import Any, Literal, Union, get_args, get_origin
 
 
-def find_repo_root(start: str) -> str:
-    p = os.path.abspath(start)
-    while p != os.path.dirname(p):
-        if os.path.isdir(os.path.join(p, "support_tool")) and os.path.isdir(os.path.join(p, "src")):
-            return p
-        p = os.path.dirname(p)
-    raise SystemExit("cc_tools: could not locate repo root (no support_tool/ + src/ ancestor)")
+import tuvi_engine  # noqa: E402  (installed by `uv sync` from the workspace)
 
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(tuvi_engine.__file__)), "components", "data")
 
-ROOT = find_repo_root(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-DATA_DIR = os.path.join(ROOT, "src", "refactored", "components", "data")
-
-import yaml  # noqa: E402  (after sys.path setup)
-from support_tool.cach_cuc.condition_models import CachCucData  # noqa: E402
-from support_tool.cach_cuc import condition_models as cm  # noqa: E402
+import yaml  # noqa: E402
+from tuvi_tools.cach_cuc.condition_models import CachCucData  # noqa: E402
+from tuvi_tools.cach_cuc import condition_models as cm  # noqa: E402
 
 
 # ----------------------------------------------------------------------------- helpers

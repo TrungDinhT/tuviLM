@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from src.cli import main as cli
-from src.cli.view import build_cli_parser
-from src.cli.workflow import build_parser as build_workflow_parser
+from tuvi_tools.workflow_cli import main as cli
+from tuvi_tools.workflow_cli.view import build_cli_parser
+from tuvi_tools.workflow_cli.workflow import build_parser as build_workflow_parser
 
 
 @pytest.mark.parametrize("command", ["run", "view"])

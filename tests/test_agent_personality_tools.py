@@ -1,14 +1,14 @@
 from types import SimpleNamespace
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.tool.personality import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.tool.personality import (
     _sao_ban_menh_relation,
     get_tinh_cach_b3_b4_context,
 )
-from src.agent.workflow.personality.input.tanbien import luan_tinh_cach_skill
-from src.refactored.la_so import LaSo
-from src.refactored.model.elementary import DiaChi, NguHanh
-from src.refactored.model.prior import Gender, LaSoPrior
+from tuvi_agent.workflow.personality.input.tanbien import luan_tinh_cach_skill
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.elementary import DiaChi, NguHanh
+from tuvi_engine.model.prior import Gender, LaSoPrior
 
 
 def test_luan_tinh_cach_skill_only_keeps_non_redundant_reasoning_rules():

@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Mapping, TypeAlias
 
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.model.elementary import DiaChi
-from src.refactored.placement.registry import ComponentId
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.placement.registry import ComponentId
 
 
 class LayerKind(StrEnum):

@@ -13,17 +13,17 @@ from fastapi import HTTPException, Request
 from pymongo import AsyncMongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 
-from api import main as routes
-from api.accounts.capability import (
+from tuvi_api import main as routes
+from tuvi_api.accounts.capability import (
     CAPABILITY_REPORT_COST,
     STALE_HOLD_AFTER,
     capability_chart_key,
     ensure_capability_report_indexes,
 )
-from api.auth.dependencies import Principal, require_user
-from api.chat.models import BirthInfo
-from src.agent.deps import TuviAgentDeps
-from src.agent.workflow.strength_weakness import CapabilityProfile, StrengthFinding
+from tuvi_api.auth.dependencies import Principal, require_user
+from tuvi_api.chat.models import BirthInfo
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.workflow.strength_weakness import CapabilityProfile, StrengthFinding
 
 
 pytestmark = pytest.mark.anyio

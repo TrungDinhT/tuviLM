@@ -1,14 +1,13 @@
 """Streamlit editor for cach_cuc entries.
 
 Run with:
-    streamlit run support_tool/cach_cuc/cach_cuc_editor.py
+    uv run streamlit run tools/src/tuvi_tools/cach_cuc/cach_cuc_editor.py
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
-import sys
 import uuid
 from copy import deepcopy
 from pathlib import Path
@@ -18,7 +17,7 @@ import streamlit as st
 import yaml
 from pydantic import ValidationError
 
-from support_tool.cach_cuc.condition_models import (
+from tuvi_tools.cach_cuc.condition_models import (
     Brightness,
     CachCuc,
     DiaChi,
@@ -29,12 +28,9 @@ from support_tool.cach_cuc.condition_models import (
     ThienCan,
 )
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+import tuvi_engine
 
-
-STARS_PATH = ROOT / "src/refactored/components/data/sao.json"
+STARS_PATH = Path(tuvi_engine.__file__).resolve().parent / "components/data/sao.json"
 DEFAULT_EXPORT_FILENAME = "cach_cuc_reviewed.yaml"
 SELECTED_ENTRY_WIDGET_KEY = "selected_entry_select"
 ORIGINAL_ENTRY_PLACEHOLDER = ""

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from src.refactored.model.elementary import DiaChi
+from tuvi_engine.model.elementary import DiaChi
 
 
 NHI_HOP_PAIRS: dict[DiaChi, DiaChi] = {

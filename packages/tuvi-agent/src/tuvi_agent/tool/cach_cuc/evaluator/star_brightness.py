@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from src.agent.tool.cach_cuc.evaluator.context import CachCucMatchContext
-from src.agent.tool.cach_cuc.models import StarBrightnessCondition
-from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
-from src.refactored.components.definitions.sao import Status
+from tuvi_agent.tool.cach_cuc.evaluator.context import CachCucMatchContext
+from tuvi_agent.tool.cach_cuc.models import StarBrightnessCondition
+from tuvi_engine.components.definitions.map_sao_status import MAP_SAO_STATUS
+from tuvi_engine.components.definitions.sao import Status
 
 
 STATUS_TO_BRIGHTNESS: dict[Status, str] = {

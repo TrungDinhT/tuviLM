@@ -7,19 +7,19 @@ import logging
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic_ai import RunContext
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
-from src.agent.tool.cach_cuc.matcher import get_cach_cuc_tool_results
-from src.agent.tool.cach_cuc.models import CachCucToolResult
-from src.agent.tool.personality import build_tinh_cach_b3_b4_context
-from src.agent.tool.phu_tinh.tool import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
+from tuvi_agent.tool.cach_cuc.matcher import get_cach_cuc_tool_results
+from tuvi_agent.tool.cach_cuc.models import CachCucToolResult
+from tuvi_agent.tool.personality import build_tinh_cach_b3_b4_context
+from tuvi_agent.tool.phu_tinh.tool import (
     PhuTinhGroupedResult,
     TrangSinhResult,
     build_phu_tinh_tam_phuong_tu_chinh,
     build_trang_sinh,
 )
-from src.agent.tool.thai_tue.vong_thai_tue import build_vong_thai_tue_payload
-from src.refactored.components.definitions.cung_role import Role
+from tuvi_agent.tool.thai_tue.vong_thai_tue import build_vong_thai_tue_payload
+from tuvi_engine.components.definitions.cung_role import Role
 
 _logger = logging.getLogger(__name__)
 

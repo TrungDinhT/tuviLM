@@ -5,23 +5,23 @@ import logging
 from pydantic import BaseModel, Field
 from pydantic_ai import ModelRetry, RunContext
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.tool.cach_cuc.evaluator.scopes import positions_for_scope
-from src.agent.tool.phu_tinh.groups import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.tool.cach_cuc.evaluator.scopes import positions_for_scope
+from tuvi_agent.tool.phu_tinh.groups import (
     PHU_TINH_GROUP_LABELS,
     build_group_of_star,
     load_phu_tinh_groups,
 )
-from src.refactored.la_so import LaSo
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
-from src.refactored.components.definitions.sao import (
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.components.definitions.map_sao_status import MAP_SAO_STATUS
+from tuvi_engine.components.definitions.sao import (
     ChinhPhuTinh,
     TuHoa,
     VongTrangSinh,
 )
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.layer import NATAL_LAYER_ID
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.layer import NATAL_LAYER_ID
 
 _logger = logging.getLogger(__name__)
 

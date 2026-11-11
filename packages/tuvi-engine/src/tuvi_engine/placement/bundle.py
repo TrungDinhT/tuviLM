@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from src.refactored.placement.compiler import PlacementRuleCompiler
-from src.refactored.placement.rules.loader import register_declaration_group
+from tuvi_engine.placement.compiler import PlacementRuleCompiler
+from tuvi_engine.placement.rules.loader import register_declaration_group
 
 
 def get_default_placement_rule_compiler() -> PlacementRuleCompiler:

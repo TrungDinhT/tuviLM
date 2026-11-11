@@ -1,4 +1,4 @@
-from src.refactored.calendar.lunar import (
+from tuvi_engine.calendar.lunar import (
     LunarDate,
     solar_to_lunar_date,
 )

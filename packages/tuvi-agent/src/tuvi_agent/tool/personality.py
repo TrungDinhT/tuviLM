@@ -4,14 +4,14 @@ import logging
 
 from pydantic_ai import ModelRetry, RunContext
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.tool.chart import _format_cung_at
-from src.refactored.la_so import LaSo
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.components.definitions.sao import ChinhPhuTinh, TuanTriet
-from src.refactored.model.elementary import CircleDirection, DiaChi, NguHanh
-from src.refactored.model.layer import NATAL_LAYER_ID
-from src.refactored.placement.transforms import (
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.tool.chart import _format_cung_at
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.components.definitions.sao import ChinhPhuTinh, TuanTriet
+from tuvi_engine.model.elementary import CircleDirection, DiaChi, NguHanh
+from tuvi_engine.model.layer import NATAL_LAYER_ID
+from tuvi_engine.placement.transforms import (
     get_tam_hop as transform_tam_hop,
     get_xung_chieu as transform_xung_chieu,
 )
@@ -72,7 +72,7 @@ def _tuan_triet_line(la_so: LaSo, label: str, position: DiaChi) -> str:
 
 
 def _format_star_status(sao_id: str, position: DiaChi) -> str:
-    from src.refactored.components.definitions.map_sao_status import MAP_SAO_STATUS
+    from tuvi_engine.components.definitions.map_sao_status import MAP_SAO_STATUS
 
     return MAP_SAO_STATUS.get(sao_id, {}).get(position, "không rõ")
 

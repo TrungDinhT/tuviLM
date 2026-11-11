@@ -1,28 +1,28 @@
 from __future__ import annotations
 
-from src.refactored.context.period import (
+from tuvi_engine.context.period import (
     DaiHanContext,
     LuuNienDaiHanContext,
     PeriodKind,
     TieuHanContext,
 )
-from src.refactored.placement.bundle import get_default_placement_rule_compiler
-from src.refactored.placement.compiler import PlacementRuleCompiler
-from src.refactored.placement.engine import PlacementEngine
-from src.refactored.model.layer import (
+from tuvi_engine.placement.bundle import get_default_placement_rule_compiler
+from tuvi_engine.placement.compiler import PlacementRuleCompiler
+from tuvi_engine.placement.engine import PlacementEngine
+from tuvi_engine.model.layer import (
     DaiHanLayerId,
     LuuNienDaiHanLayerId,
     PeriodLayerId,
     PlacementLayer,
     TieuHanLayerId,
 )
-from src.refactored.placement.scopes import (
+from tuvi_engine.placement.scopes import (
     DAI_HAN_SCOPE,
     LUU_NIEN_DAI_HAN_SCOPE,
     TIEU_HAN_SCOPE,
 )
-from src.refactored.placement.registry import ComponentId
-from src.refactored.model.tinh_ban import TinhBan
+from tuvi_engine.placement.registry import ComponentId
+from tuvi_engine.model.tinh_ban import TinhBan
 
 
 PERIOD_SCOPE_BY_KIND: dict[PeriodKind, frozenset[ComponentId]] = {

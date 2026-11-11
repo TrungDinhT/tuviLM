@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from src.agent.tool.ban_menh import get_laso_foundation
-from src.agent.tool.cach_cuc import get_list_cach_cuc
-from src.agent.tool.personality import get_tinh_cach_b3_b4_context
-from src.agent.tool.phu_tinh import get_phu_tinh_tam_phuong_tu_chinh, get_trang_sinh
-from src.agent.tool.thai_tue import get_vong_thai_tue
+from tuvi_agent.tool.ban_menh import get_laso_foundation
+from tuvi_agent.tool.cach_cuc import get_list_cach_cuc
+from tuvi_agent.tool.personality import get_tinh_cach_b3_b4_context
+from tuvi_agent.tool.phu_tinh import get_phu_tinh_tam_phuong_tu_chinh, get_trang_sinh
+from tuvi_agent.tool.thai_tue import get_vong_thai_tue
 
 from .book import read_catalog, read_section
 from .chart import (

@@ -9,16 +9,14 @@ from statistics import median
 import subprocess
 import sys
 
-# Streamlit executes this file by path, including outside the repository cwd.
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+# Repo root, so reports/ and data/ are found from any working directory.
+ROOT = Path(__file__).resolve().parents[4]
 
 import pandas as pd
 import streamlit as st
 
-from src.agent.workflow.strength_weakness.ontology import GROUP_LABELS, get_capability_definition
-from src.cli.strength_weakness_report import (
+from tuvi_agent.workflow.strength_weakness.ontology import GROUP_LABELS, get_capability_definition
+from tuvi_tools.workflow_cli.strength_weakness_report import (
     Report, common_profiles, complete_total, diversity, number, overlap,
     parse_report_yaml, profile_label, read_report, reviewed_weaknesses, strength_labels,
 )

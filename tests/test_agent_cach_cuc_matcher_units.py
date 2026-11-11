@@ -6,38 +6,38 @@ import pytest
 from pydantic import ValidationError
 from pydantic_ai import ModelRetry
 
-from src.agent.tool.cach_cuc import matcher as matcher_module
-from src.agent.tool.cach_cuc.evaluator import (
+from tuvi_agent.tool.cach_cuc import matcher as matcher_module
+from tuvi_agent.tool.cach_cuc.evaluator import (
     CachCucMatchContext,
     MatchOutcome,
     match_condition,
 )
-from src.agent.tool.cach_cuc.evaluator.palace_content import _match_only_chinh_tinh
-from src.agent.tool.cach_cuc.evaluator.scopes import positions_for_scope
-from src.agent.tool.cach_cuc.evaluator.star_brightness import _match_star_brightness
-from src.agent.tool.cach_cuc.evaluator.star_utils import (
+from tuvi_agent.tool.cach_cuc.evaluator.palace_content import _match_only_chinh_tinh
+from tuvi_agent.tool.cach_cuc.evaluator.scopes import positions_for_scope
+from tuvi_agent.tool.cach_cuc.evaluator.star_brightness import _match_star_brightness
+from tuvi_agent.tool.cach_cuc.evaluator.star_utils import (
     _match_count,
     _match_supported_stars,
     _resolve_condition_stars,
     _star_at_any_chi,
 )
-from src.agent.tool.cach_cuc.evaluator.stars_meeting import _match_stars_meeting
-from src.agent.tool.cach_cuc.matcher import (
+from tuvi_agent.tool.cach_cuc.evaluator.stars_meeting import _match_stars_meeting
+from tuvi_agent.tool.cach_cuc.matcher import (
     find_matching_cach_cuc,
     get_cach_cuc_tool_results,
 )
-from src.agent.tool.cach_cuc.models import (
+from tuvi_agent.tool.cach_cuc.models import (
     CachCucData,
     Role,
     StarBrightnessCondition,
     StarWithPalaceCondition,
     StarsMeetingCondition,
 )
-from src.refactored.components.definitions.sao import ChinhPhuTinh
-from src.refactored.model.cung import Cung, LayeredComponent
-from src.refactored.model.elementary import DiaChi, NguHanh, ThienCan
-from src.refactored.model.layer import NATAL_LAYER_ID
-from src.refactored.model.prior import Gender
+from tuvi_engine.components.definitions.sao import ChinhPhuTinh
+from tuvi_engine.model.cung import Cung, LayeredComponent
+from tuvi_engine.model.elementary import DiaChi, NguHanh, ThienCan
+from tuvi_engine.model.layer import NATAL_LAYER_ID
+from tuvi_engine.model.prior import Gender
 
 
 @dataclass(frozen=True)

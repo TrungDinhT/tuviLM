@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from api.settings import ApiSettings
+from tuvi_api.settings import ApiSettings
 
 
 def test_strength_weakness_defaults_to_deepseek_on_openrouter(monkeypatch) -> None:
@@ -72,7 +72,7 @@ def test_strength_weakness_routing_can_be_overridden_in_env_or_dotenv(monkeypatc
 def test_api_uses_strength_weakness_routing_settings(
     monkeypatch, model_name, provider, effort, allow_fallbacks, sort,
 ) -> None:
-    from api import main
+    from tuvi_api import main
 
     monkeypatch.delenv("TOGETHER_API_KEY", raising=False)
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-openrouter-key")

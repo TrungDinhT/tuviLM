@@ -4,10 +4,10 @@ import logging
 
 from pydantic_ai import RunContext
 
-from src.agent.deps import TuviAgentDeps
-from src.agent.tool.cach_cuc.matcher import get_cach_cuc_tool_results
-from src.agent.tool.cach_cuc.models import CachCucToolResult, Role, SourceKind
-from src.agent.tool.json_compatible import JsonCompatible
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.tool.cach_cuc.matcher import get_cach_cuc_tool_results
+from tuvi_agent.tool.cach_cuc.models import CachCucToolResult, Role, SourceKind
+from tuvi_agent.tool.json_compatible import JsonCompatible
 
 _logger = logging.getLogger(__name__)
 

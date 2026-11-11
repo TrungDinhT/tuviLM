@@ -8,9 +8,9 @@ from pydantic import ValidationError
 from pymongo.asynchronous.database import AsyncDatabase
 from pymongo.errors import PyMongoError
 
-from api.accounts.models import AccountAccess
-from api.chat.contracts import ConversationHistoryStore, NotFoundError
-from api.chat.models import ChatMessageStatus
+from tuvi_api.accounts.models import AccountAccess
+from tuvi_api.chat.contracts import ConversationHistoryStore, NotFoundError
+from tuvi_api.chat.models import ChatMessageStatus
 
 
 CHAT_MESSAGE_COST = 3

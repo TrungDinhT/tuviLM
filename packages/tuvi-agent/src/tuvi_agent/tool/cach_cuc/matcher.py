@@ -21,20 +21,20 @@ from __future__ import annotations
 
 import logging
 
-from src.agent.tool.cach_cuc.evaluator import (
+from tuvi_agent.tool.cach_cuc.evaluator import (
     CachCucMatchContext,
     MatchOutcome,
     match_condition,
 )
-from src.agent.tool.cach_cuc.loader import load_cach_cuc_source
-from src.agent.tool.cach_cuc.models import (
+from tuvi_agent.tool.cach_cuc.loader import load_cach_cuc_source
+from tuvi_agent.tool.cach_cuc.models import (
     CachCuc,
     CachCucData,
     CachCucToolResult,
     Role,
     SourceKind,
 )
-from src.refactored.la_so import LaSo
+from tuvi_engine.la_so import LaSo
 
 
 _logger = logging.getLogger(__name__)

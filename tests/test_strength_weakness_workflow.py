@@ -10,10 +10,10 @@ from pydantic import ValidationError
 from pydantic_ai import ModelRetry
 from pydantic_ai.models.test import TestModel
 
-from src.agent.book_index import SectionContent
-from src.agent.deps import TuviAgentDeps
-from src.agent.main import build_tuvi_agent
-from src.agent.workflow.strength_weakness import (
+from tuvi_agent.book_index import SectionContent
+from tuvi_agent.deps import TuviAgentDeps
+from tuvi_agent.main import build_tuvi_agent
+from tuvi_agent.workflow.strength_weakness import (
     CapabilityProfile,
     StrengthFinding,
     build_strength_weakness_agent,
@@ -21,11 +21,11 @@ from src.agent.workflow.strength_weakness import (
     render_capability_profile,
     run_strength_weakness_agent,
 )
-from src.agent.workflow.strength_weakness.agent import run_strength_weakness_workflow
-from src.agent.workflow.strength_weakness.input.tanbien import prepare_capability_input
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.la_so import LaSo
-from src.refactored.model.prior import Gender, LaSoPrior
+from tuvi_agent.workflow.strength_weakness.agent import run_strength_weakness_workflow
+from tuvi_agent.workflow.strength_weakness.input.tanbien import prepare_capability_input
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.prior import Gender, LaSoPrior
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 

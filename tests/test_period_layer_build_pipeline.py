@@ -1,28 +1,28 @@
-from src.refactored.assembly.natal import build_natal_tinh_ban
-from src.refactored.assembly.period import build_period_layer, build_period_layer_id
-from src.refactored.model.elementary import CircleDirection, DiaChi
-from src.refactored.context.natal import NatalContext
-from src.refactored.context.period import (
+from tuvi_engine.assembly.natal import build_natal_tinh_ban
+from tuvi_engine.assembly.period import build_period_layer, build_period_layer_id
+from tuvi_engine.model.elementary import CircleDirection, DiaChi
+from tuvi_engine.context.natal import NatalContext
+from tuvi_engine.context.period import (
     DaiHanContext,
     LuuNienDaiHanContext,
     PeriodKind,
     TieuHanContext,
     build_period_context,
 )
-from src.refactored.model.period_focus import (
+from tuvi_engine.model.period_focus import (
     TenYearRange,
     build_dai_han_focus_map,
     build_tieu_han_focus_map,
     luu_nien_dai_han_focus_position,
 )
-from src.refactored.model.prior import Gender, LaSoPrior
-from src.refactored.la_so import LaSo
-from src.refactored.model.layer import (
+from tuvi_engine.model.prior import Gender, LaSoPrior
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.layer import (
     DaiHanLayerId,
     LuuNienDaiHanLayerId,
     TieuHanLayerId,
 )
-from src.refactored.placement.transforms import get_xung_chieu
+from tuvi_engine.placement.transforms import get_xung_chieu
 
 
 def _prior() -> LaSoPrior:

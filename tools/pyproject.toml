@@ -1,0 +1,25 @@
+[project]
+name = "tuvi-tools"
+version = "0.1.0"
+description = "Internal tools: cách cục rule editor, chart viewer and workflow report CLI."
+requires-python = ">=3.12"
+dependencies = [
+    "tuvi-engine",
+    "tuvi-agent",
+    "pandas>=2",
+    "pydantic-ai>=1.96.0",
+    "pydantic>=2.9.2,<3",
+    "pyyaml>=6.0.0,<7",
+    "streamlit>=1.40.0,<2",
+]
+
+[project.scripts]
+tuvilm = "tuvi_tools.workflow_cli.main:main"
+
+[tool.uv.sources]
+tuvi-engine = { workspace = true }
+tuvi-agent = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.9,<0.14"]
+build-backend = "uv_build"

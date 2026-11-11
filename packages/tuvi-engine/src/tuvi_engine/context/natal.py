@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from src.refactored.components.definitions.cuc import Cuc, LIST_CUC
-from src.refactored.model.elementary import CircleDirection, DiaChi, LuongNghi, ThienCan
-from src.refactored.model.prior import Gender, LaSoPrior
+from tuvi_engine.components.definitions.cuc import Cuc, LIST_CUC
+from tuvi_engine.model.elementary import CircleDirection, DiaChi, LuongNghi, ThienCan
+from tuvi_engine.model.prior import Gender, LaSoPrior
 
 
 def _get_menh_position(prior: LaSoPrior) -> DiaChi:

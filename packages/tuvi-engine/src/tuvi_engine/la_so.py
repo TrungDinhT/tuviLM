@@ -3,24 +3,24 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Iterable
 
-from src.refactored.assembly.natal import build_natal_tinh_ban
-from src.refactored.assembly.period import build_period_layer, build_period_layer_id
-from src.refactored.components.definitions import Component
-from src.refactored.components.definitions.ban_menh import BanMenh, compute_ban_menh_id
-from src.refactored.components.repository import (
+from tuvi_engine.assembly.natal import build_natal_tinh_ban
+from tuvi_engine.assembly.period import build_period_layer, build_period_layer_id
+from tuvi_engine.components.definitions import Component
+from tuvi_engine.components.definitions.ban_menh import BanMenh, compute_ban_menh_id
+from tuvi_engine.components.repository import (
     ComponentRepository,
     get_default_repository,
 )
-from src.refactored.context.natal import NatalContext
-from src.refactored.context.period import PeriodKind, build_period_context
-from src.refactored.model.cung import Cung
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.layer import LayerId, NATAL_LAYER_ID, PlacementLayer
-from src.refactored.model.menh_cuc_relation import MenhCucRelation
-from src.refactored.model.period_focus import DaiHanFocusMap
-from src.refactored.model.prior import LaSoPrior
-from src.refactored.model.tinh_ban import TinhBan
-from src.refactored.placement.registry import ComponentId
+from tuvi_engine.context.natal import NatalContext
+from tuvi_engine.context.period import PeriodKind, build_period_context
+from tuvi_engine.model.cung import Cung
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.layer import LayerId, NATAL_LAYER_ID, PlacementLayer
+from tuvi_engine.model.menh_cuc_relation import MenhCucRelation
+from tuvi_engine.model.period_focus import DaiHanFocusMap
+from tuvi_engine.model.prior import LaSoPrior
+from tuvi_engine.model.tinh_ban import TinhBan
+from tuvi_engine.placement.registry import ComponentId
 
 
 @dataclass

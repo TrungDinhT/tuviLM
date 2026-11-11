@@ -1,7 +1,7 @@
 import pytest
 
-from src.refactored.model.elementary import CircleDirection, DiaChi
-from src.refactored.placement.transforms import (
+from tuvi_engine.model.elementary import CircleDirection, DiaChi
+from tuvi_engine.placement.transforms import (
     get_luc_hai,
     get_nhi_hop,
     get_tam_hop,

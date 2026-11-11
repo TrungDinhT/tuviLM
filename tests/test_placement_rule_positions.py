@@ -1,18 +1,18 @@
 
 import pytest
 
-from src.refactored.model.elementary import CircleDirection, DiaChi, ThienCan
-from src.refactored.model.prior import Gender, LaSoPrior
-from src.refactored.context.natal import NatalContext
-from src.refactored.model.cung import NGU_HO_DON_THIEN_CAN, derive_cung_thien_can
-from src.refactored.placement.rules.positions.relative import (
+from tuvi_engine.model.elementary import CircleDirection, DiaChi, ThienCan
+from tuvi_engine.model.prior import Gender, LaSoPrior
+from tuvi_engine.context.natal import NatalContext
+from tuvi_engine.model.cung import NGU_HO_DON_THIEN_CAN, derive_cung_thien_can
+from tuvi_engine.placement.rules.positions.relative import (
     move_by_attr,
     move_by_birth_month,
     move_by_van_direction,
     move_with,
     position_by_dia_chi_groups,
 )
-from src.refactored.placement.rules.positions.absolute import (
+from tuvi_engine.placement.rules.positions.absolute import (
     position_by_thien_can,
 )
 @pytest.mark.parametrize(

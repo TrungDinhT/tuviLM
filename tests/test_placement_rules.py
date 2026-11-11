@@ -2,41 +2,41 @@ import datetime as dt
 
 import pytest
 
-from src.refactored.assembly.natal import resolve_natal_placement
-from src.refactored.placement.bundle import get_default_placement_rule_compiler
-from src.refactored.placement.compiler import (
+from tuvi_engine.assembly.natal import resolve_natal_placement
+from tuvi_engine.placement.bundle import get_default_placement_rule_compiler
+from tuvi_engine.placement.compiler import (
     PlacementRuleCompiler,
     SpecializedAbsoluteSpec,
     SpecializedPlacementRules,
     SpecializedRelativeSpec,
 )
-from src.refactored.placement.engine import PlacementEngine
-from src.refactored.placement.rules.registration import (
+from tuvi_engine.placement.engine import PlacementEngine
+from tuvi_engine.placement.rules.registration import (
     build_tu_hoa_target_mapping,
 )
-from src.refactored.placement.rules.loader import (
+from tuvi_engine.placement.rules.loader import (
     DeclarationRule,
     load_rule_group,
     load_tu_hoa_target_mapping,
 )
-from src.refactored.placement.rules.declarations.models import (
+from tuvi_engine.placement.rules.declarations.models import (
     CircleDeclaration,
     FixedAnchorDeclaration,
     SamePositionMemberDeclaration,
     TuHoaDeclaration,
 )
-from src.refactored.placement.rules.positions.absolute import (
+from tuvi_engine.placement.rules.positions.absolute import (
     triet_positions_fn,
     tuan_positions_fn,
 )
-from src.refactored.placement.registry import (
+from tuvi_engine.placement.registry import (
     AbsolutePositionSpec,
     RelativePositionSpec,
 )
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.prior import Gender, LaSoPrior
-from src.refactored.context.natal import NatalContext
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.prior import Gender, LaSoPrior
+from tuvi_engine.context.natal import NatalContext
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 ROLE_RULES = list(load_rule_group("cung_roles"))

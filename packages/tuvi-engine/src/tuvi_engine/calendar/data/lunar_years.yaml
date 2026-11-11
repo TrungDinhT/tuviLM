@@ -1,4 +1,4 @@
-# Vietnamese lunar year reference data used by src.refactored.calendar.lunar.
+# Vietnamese lunar year reference data used by tuvi_engine.calendar.lunar.
 # Each year stores the decoded structure that was previously packed in Ho Ngoc Duc-style year codes.
 # regular_month_lengths is ordered from lunar month 1 through lunar month 12.
 supported_years:

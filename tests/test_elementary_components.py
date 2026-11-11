@@ -1,10 +1,10 @@
 import pytest
 
-from src.refactored.components.definitions.elementary import (
+from tuvi_engine.components.definitions.elementary import (
     DiaChiEntity,
     ThienCanEntity,
 )
-from src.refactored.model.elementary import (
+from tuvi_engine.model.elementary import (
     DiaChi,
     NguHanh,
     ThienCan,

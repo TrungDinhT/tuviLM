@@ -1,5 +1,5 @@
-from src.refactored.model.elementary import DiaChi
-from src.refactored.components.definitions.sao import Status
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.components.definitions.sao import Status
 
 
 # Source : https://hocvienlyso.org/14-chinh-tinh.html

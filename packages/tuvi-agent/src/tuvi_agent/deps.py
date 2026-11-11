@@ -6,13 +6,13 @@ from pathlib import Path
 from pydantic_ai import Agent, ModelRetry
 from pydantic_ai.messages import ModelMessage
 
-from src.agent.book_index import BookIndex
-from src.refactored.la_so import LaSo
+from tuvi_agent.book_index import BookIndex
+from tuvi_engine.la_so import LaSo
 
 
-DEFAULT_BOOK_ROOT = (
-    Path(__file__).resolve().parents[2] / "data" / "tuvitanbien_chunking"
-)
+# The book files are not in git. The path is relative to the working directory
+# (the repo root in development, /app in the container).
+DEFAULT_BOOK_ROOT = Path("data") / "tuvitanbien_chunking"
 
 
 @dataclass(slots=True)

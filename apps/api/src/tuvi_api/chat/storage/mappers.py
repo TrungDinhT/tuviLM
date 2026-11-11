@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from api.chat.models import (
+from tuvi_api.chat.models import (
     ChartProfile,
     ChatMessage,
     ChatSession,
     ChatSessionSummary,
 )
-from api.chat.storage.documents import (
+from tuvi_api.chat.storage.documents import (
     ChartProfileDocument,
     ChatSessionDocument,
 )

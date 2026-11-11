@@ -1,0 +1,23 @@
+[project]
+name = "tuvi-api"
+version = "0.1.0"
+description = "FastAPI server: chart routes, chat stream, login and storage."
+requires-python = ">=3.12"
+dependencies = [
+    "tuvi-engine",
+    "tuvi-agent",
+    "pydantic-settings>=2.14.1",
+    "pydantic-ai>=1.96.0",
+    "fastapi>=0.136.1",
+    "beanie>=2.0.1",
+    "pyjwt[crypto]>=2.13,<3",
+    "uvicorn[standard]>=0.30.0",
+]
+
+[tool.uv.sources]
+tuvi-engine = { workspace = true }
+tuvi-agent = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.9,<0.14"]
+build-backend = "uv_build"

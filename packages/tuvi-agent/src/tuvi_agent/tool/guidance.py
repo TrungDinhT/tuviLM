@@ -4,7 +4,7 @@ import logging
 
 from pydantic_ai import ModelRetry
 
-from src.agent.prompt.skill_analyze_cung import (
+from tuvi_agent.prompt.skill_analyze_cung import (
     CUNG_DIEN_TRACH_INSTRUCTION,
     CUNG_HUYNH_DE_INSTRUCTION,
     CUNG_MENH_INSTRUCTION,
@@ -18,7 +18,7 @@ from src.agent.prompt.skill_analyze_cung import (
     CUNG_THIEN_DI_INSTRUCTION,
     CUNG_TU_TUC_INSTRUCTION,
 )
-from src.refactored.components.definitions.cung_role import Role
+from tuvi_engine.components.definitions.cung_role import Role
 
 
 _logger = logging.getLogger(__name__)

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping, TypeAlias
 
-from src.refactored.model.elementary import CircleDirection, DiaChi
+from tuvi_engine.model.elementary import CircleDirection, DiaChi
 
 
 @dataclass(frozen=True, order=True)

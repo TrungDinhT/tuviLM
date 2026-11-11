@@ -6,9 +6,9 @@ from datetime import datetime
 import pytest
 from fastapi import HTTPException
 
-from api.main import read_cau_phu
-from api.schemas import BuildLasoRequest
-from src.refactored.cau_phu import (
+from tuvi_api.main import read_cau_phu
+from tuvi_api.schemas import BuildLasoRequest
+from tuvi_engine.cau_phu import (
     DEFAULT_CAU_PHU_PATH,
     CauPhuLookupKey,
     extract_cau_phu_lookup_key,
@@ -16,8 +16,8 @@ from src.refactored.cau_phu import (
     get_cau_phu,
     load_cau_phu_catalog,
 )
-from src.refactored.la_so import LaSo
-from src.refactored.model.prior import Gender, LaSoPrior
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.prior import Gender, LaSoPrior
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
 
 

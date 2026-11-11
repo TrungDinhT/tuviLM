@@ -1,7 +1,7 @@
-from src.agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
-from src.refactored.la_so import LaSo
-from src.refactored.model.elementary import DiaChi
-from src.refactored.model.prior import Gender, LaSoPrior
+from tuvi_agent.tool.ban_menh.laso_foundation import build_laso_foundation_payload
+from tuvi_engine.la_so import LaSo
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.model.prior import Gender, LaSoPrior
 
 
 def test_laso_foundation_projects_root_chart_factors():

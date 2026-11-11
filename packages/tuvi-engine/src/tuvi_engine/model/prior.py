@@ -4,8 +4,8 @@ from functools import cached_property
 
 import pydantic
 
-from src.refactored.calendar import solar_to_lunar_date
-from src.refactored.model.elementary import DiaChi, ThienCan
+from tuvi_engine.calendar import solar_to_lunar_date
+from tuvi_engine.model.elementary import DiaChi, ThienCan
 
 
 class LunarYear(pydantic.BaseModel):

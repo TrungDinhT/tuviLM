@@ -3,25 +3,25 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping
 
-from src.refactored.components.definitions.cung_role import Role
-from src.refactored.model.elementary import DiaChi
-from src.refactored.context.natal import NatalContext
-from src.refactored.model.period_focus import (
+from tuvi_engine.components.definitions.cung_role import Role
+from tuvi_engine.model.elementary import DiaChi
+from tuvi_engine.context.natal import NatalContext
+from tuvi_engine.model.period_focus import (
     PeriodFocusMaps,
     build_dai_han_focus_map,
     build_tieu_han_focus_map,
 )
-from src.refactored.model.cung import CungId, derive_cung_thien_can
-from src.refactored.placement.bundle import get_default_placement_rule_compiler
-from src.refactored.placement.compiler import PlacementRuleCompiler
-from src.refactored.placement.engine import PlacementEngine
-from src.refactored.model.layer import (
+from tuvi_engine.model.cung import CungId, derive_cung_thien_can
+from tuvi_engine.placement.bundle import get_default_placement_rule_compiler
+from tuvi_engine.placement.compiler import PlacementRuleCompiler
+from tuvi_engine.placement.engine import PlacementEngine
+from tuvi_engine.model.layer import (
     NATAL_LAYER_ID,
     STRUCTURAL_COMPONENT_IDS,
     PlacementLayer,
 )
-from src.refactored.placement.registry import ComponentId
-from src.refactored.model.tinh_ban import TinhBan
+from tuvi_engine.placement.registry import ComponentId
+from tuvi_engine.model.tinh_ban import TinhBan
 
 
 _ROLE_BY_ID = {role.value: role for role in Role}
