@@ -266,6 +266,21 @@ but the refund succeeds, the message can remain pending until stale cleanup.
 Other feature access is unchanged. No admin role exemption or free-chat quota is
 added: chat pricing depends only on plan and coins.
 
+## Capability analysis pricing
+
+`POST /api/v1/laso/strength-weakness` requires a signed-in account. On the
+`normal` plan, the first analysis of a chart costs **10 coins**; `full_unlock`
+gets it without spending coins. The report is saved per account and chart in the
+`capability_reports` collection, so asking again for the same chart returns the
+saved report without running the model or charging again, on any device.
+
+The server reserves the 10 coins before the model runs, as `capability_holds` on
+the user document, and returns them if the analysis fails. An account with fewer
+than 10 available coins receives `402` and the model does not run. A second
+request for the same chart while the first is still running receives `409`. If
+the server stops mid-analysis, the reservation stays; a retry after 10 minutes
+takes it over without charging again.
+
 ## Build lá số example
 
 ```bash

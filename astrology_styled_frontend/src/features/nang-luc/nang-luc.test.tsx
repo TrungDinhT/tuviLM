@@ -9,7 +9,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { CapabilityReport, NangLucScreen } from "./nang-luc-screen";
+import { CapabilityLauncher, CapabilityReport, NangLucScreen } from "./nang-luc-screen";
 import {
   capabilityKey,
   capabilitySchema,
@@ -18,7 +18,9 @@ import {
   type CapabilityProfile,
 } from "./data";
 import { useChartStore } from "@/store/chart-store";
+import { AccountRequestContext } from "@/lib/api/account-request";
 import { bindChartResetClearing } from "@/lib/api/chart-persistence";
+const USER = "user-1";
 const birth = {
   calendar: "solar" as const,
   year: 1996,
@@ -40,6 +42,15 @@ const report: CapabilityProfile = {
   diem_yeu: [],
 };
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    // Payload {"sub":"user-1"}.
+    token: vi.fn().mockResolvedValue({
+      data: { token: "header.eyJzdWIiOiJ1c2VyLTEifQ.signature" },
+      error: null,
+    }),
+  },
+}));
 beforeEach(() => {
   // jsdom does not provide layout observers; geometry is checked in a browser.
   vi.stubGlobal(
@@ -55,9 +66,18 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
 });
-function wrapper({ children }: { children: React.ReactNode }) {
-  return <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>;
+function withAccount(userId: string | null, client?: QueryClient) {
+  return function Wrapper({ children }: { children: React.ReactNode }) {
+    return (
+      <QueryClientProvider client={client ?? new QueryClient()}>
+        <AccountRequestContext.Provider value={{ getSignal: () => undefined, userId }}>
+          {children}
+        </AccountRequestContext.Provider>
+      </QueryClientProvider>
+    );
+  };
 }
+const wrapper = withAccount(USER);
 describe("capability report", () => {
   it("shows the loading animation until a report arrives", async () => {
     let complete!: (response: Response) => void;
@@ -70,7 +90,7 @@ describe("capability report", () => {
       ),
     );
     useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
-    useCapabilityStore.getState().unlock(capabilityKey(birth));
+    useCapabilityStore.getState().unlock(capabilityKey(birth, USER));
     render(<NangLucScreen />, { wrapper });
 
     expect(
@@ -94,7 +114,7 @@ describe("capability report", () => {
       .mockReturnValue(new Promise<Response>(() => {}));
     vi.stubGlobal("fetch", fetch);
     useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
-    useCapabilityStore.getState().unlock(capabilityKey(birth));
+    useCapabilityStore.getState().unlock(capabilityKey(birth, USER));
     render(<NangLucScreen />, { wrapper });
 
     await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
@@ -147,6 +167,36 @@ describe("capability report", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(strength.getAttribute("data-dimmed")).toBe("false");
   });
+  it("asks a signed-out visitor to sign in before paying", () => {
+    useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
+    render(<CapabilityLauncher />, { wrapper: withAccount(null) });
+    expect(screen.getByRole("link", { name: /Đăng nhập để khám phá/ }).getAttribute("href")).toBe(
+      "/login",
+    );
+    expect(screen.queryByRole("button", { name: /xu/ })).toBeNull();
+  });
+  it("shows the coin price to a signed-in account", () => {
+    useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
+    render(<CapabilityLauncher />, { wrapper });
+    expect(screen.getByRole("button", { name: /Mở với 10 xu/ })).toBeTruthy();
+  });
+  it("explains a missing balance", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("{}", { status: 402 })));
+    useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
+    useCapabilityStore.getState().unlock(capabilityKey(birth, USER));
+    render(<NangLucScreen />, { wrapper });
+    await waitFor(() =>
+      expect(screen.getByRole("alert").textContent).toBe(
+        "Bạn không đủ xu. Mở phân tích năng lực cần 10 xu.",
+      ),
+    );
+  });
+  it("does not request without a signed-in account", () => {
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    renderHook(() => useCapabilityReport(birth, true), { wrapper: withAccount(null) });
+    expect(fetch).not.toHaveBeenCalled();
+  });
   it("does not request a locked report", () => {
     const fetch = vi.fn();
     vi.stubGlobal("fetch", fetch);
@@ -156,7 +206,7 @@ describe("capability report", () => {
   it("uses a restored report without calling the backend", async () => {
     const fetch = vi.fn();
     vi.stubGlobal("fetch", fetch);
-    const key = capabilityKey(birth);
+    const key = capabilityKey(birth, USER);
     useCapabilityStore.getState().unlock(key);
     useCapabilityStore.getState().save(key, report);
     const { result } = renderHook(() => useCapabilityReport(birth, true), { wrapper });
@@ -166,26 +216,29 @@ describe("capability report", () => {
   it("requests only the selected birth tuple and persists the result", async () => {
     const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify(report)));
     vi.stubGlobal("fetch", fetch);
-    const key = capabilityKey(birth);
+    const key = capabilityKey(birth, USER);
     useCapabilityStore.getState().unlock(key);
     const { result } = renderHook(() => useCapabilityReport(birth, true), { wrapper });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(JSON.parse(fetch.mock.calls[0]?.[1].body)).toEqual(birth);
+    expect(fetch.mock.calls[0]?.[1].headers.Authorization).toBe(
+      "Bearer header.eyJzdWIiOiJ1c2VyLTEifQ.signature",
+    );
     expect(useCapabilityStore.getState().entries[key]?.report).toEqual(report);
     expect(
-      useCapabilityStore.getState().entries[capabilityKey({ ...birth, hour: 11 })],
+      useCapabilityStore.getState().entries[capabilityKey({ ...birth, hour: 11 }, USER)],
     ).toBeUndefined();
   });
   it("clears unlocks on chart reset and ignores a late report", () => {
-    const key = capabilityKey(birth);
+    const key = capabilityKey(birth, USER);
     useCapabilityStore.getState().unlock(key);
     useChartStore.getState().reset();
     useCapabilityStore.getState().save(key, report);
     expect(useCapabilityStore.getState().entries).toEqual({});
   });
   it("cancels a reset request and prevents its late response overwriting a new report", async () => {
-    const key = capabilityKey(birth);
+    const key = capabilityKey(birth, USER);
     const newReport = { ...report, tong_quan: "Phân tích mới sau khi lập lại lá số." };
     let completeOld!: (response: Response) => void;
     const oldResponse = new Promise<Response>((resolve) => {
@@ -199,9 +252,7 @@ describe("capability report", () => {
     vi.stubGlobal("fetch", fetch);
     const client = new QueryClient();
     const unbind = bindChartResetClearing(client);
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <QueryClientProvider client={client}>{children}</QueryClientProvider>
-    );
+    const wrapper = withAccount(USER, client);
     try {
       useChartStore.getState().castChart({ stars: ["tuvi"] }, "chart", birth);
       useCapabilityStore.getState().unlock(key);

@@ -15,11 +15,13 @@ import {
 import { useChartStore } from "@/store/chart-store";
 import { showToast } from "@/lib/toast";
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
+import { useAccountRequestScope } from "@/lib/api/account-request";
 import { describe, isApiError } from "@/lib/http/errors";
 import { CapabilityConnections } from "./capability-connections";
 import { CapabilityLoading } from "./capability-loading";
 import { CapabilityIcon, CelestialOrb } from "./celestial-art";
 import {
+  CAPABILITY_REPORT_COST,
   capabilityKey,
   useCapabilityReport,
   useCapabilityStore,
@@ -30,7 +32,8 @@ import styles from "./nang-luc.module.css";
 export function CapabilityLauncher() {
   const birth = useChartStore((state) => state.birthInfo);
   const hasChart = useChartStore((state) => state.hasChart);
-  const key = capabilityKey(birth);
+  const { userId } = useAccountRequestScope();
+  const key = capabilityKey(birth, userId);
   const unlocked = useCapabilityStore((state) => state.entries[key]?.unlocked);
   const router = useRouter();
   const hydrated = useIsHydrated();
@@ -52,7 +55,7 @@ export function CapabilityLauncher() {
           Thấu hiểu điểm mạnh và những điều cần lưu ý<br />
           ẩn trong cấu trúc Mệnh của bạn.
         </p>
-        {available ? (
+        {available && userId ? (
           <button
             className={styles.unlockButton}
             onClick={() => {
@@ -60,9 +63,13 @@ export function CapabilityLauncher() {
               router.push("/nang-luc");
             }}
           >
-            {unlocked ? "Xem phân tích" : "Trả phí để mở"}
+            {unlocked ? "Xem phân tích" : `Mở với ${CAPABILITY_REPORT_COST} xu`}
             <span aria-hidden="true"> ↗</span>
           </button>
+        ) : available ? (
+          <Link className={styles.unlockButton} href="/login">
+            Đăng nhập để khám phá ↗
+          </Link>
         ) : (
           <Link className={styles.unlockButton} href="/">
             Lập lá số để khám phá ↗
@@ -80,7 +87,8 @@ export function NangLucScreen() {
   const birth = useChartStore((state) => state.birthInfo);
   const hasChart = useChartStore((state) => state.hasChart);
   const hydrated = useIsHydrated();
-  const key = capabilityKey(birth);
+  const { userId } = useAccountRequestScope();
+  const key = capabilityKey(birth, userId);
   const unlocked = useCapabilityStore((state) => state.entries[key]?.unlocked) === true;
   const analysis = useCapabilityReport(birth, hydrated && hasChart && unlocked);
   if (!hydrated)
@@ -115,9 +123,7 @@ export function NangLucScreen() {
         </h1>
         <p role={analysis.isError ? "alert" : "status"}>
           {analysis.isError
-            ? isApiError(analysis.error)
-              ? describe(analysis.error.error)
-              : "Kết nối bị gián đoạn. Bạn có thể thử lại."
+            ? failureMessage(analysis.error)
             : "Đang tổng hợp lá số và luận giải những năng lực nổi bật của bạn. Quá trình này có thể mất một chút thời gian."}
         </p>
         {analysis.isError && (
@@ -128,6 +134,18 @@ export function NangLucScreen() {
       </div>
     </main>
   );
+}
+
+function failureMessage(error: unknown): string {
+  if (!isApiError(error)) return "Kết nối bị gián đoạn. Bạn có thể thử lại.";
+  const failure = error.error;
+  if (failure.kind === "http" && failure.status === 402) {
+    return `Bạn không đủ xu. Mở phân tích năng lực cần ${CAPABILITY_REPORT_COST} xu.`;
+  }
+  if (failure.kind === "http" && failure.status === 409) {
+    return "Lá số này đang được phân tích. Bạn thử lại sau ít phút nhé.";
+  }
+  return describe(failure);
 }
 
 function ReportHeader({ onShare }: { onShare?: () => void }) {

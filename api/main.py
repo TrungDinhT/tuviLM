@@ -17,6 +17,14 @@ from pymongo import AsyncMongoClient
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from api._parse import to_cung_payload_map
+from api.accounts.capability import (
+    capability_chart_key,
+    ensure_capability_report_indexes,
+    find_capability_report,
+    reserve_capability_coins,
+    save_capability_report,
+    settle_capability_coins,
+)
 from api.accounts.routes import router as accounts_router
 from api.accounts.redeem_codes import (
     ensure_redeem_code_indexes,
@@ -123,6 +131,7 @@ async def lifespan(app: FastAPI):
     app.state.auth_jwks = PyJWKClient(settings.auth.jwks_url, timeout=5)
     try:
         await ensure_redeem_code_indexes(app.state.auth_database)
+        await ensure_capability_report_indexes(app.state.auth_database)
         yield
     finally:
         await auth_mongo.close()
@@ -284,25 +293,46 @@ def build_laso(payload: BuildLasoRequest) -> BuildLasoResponse:
 async def analyze_strength_weakness(
     payload: BuildLasoRequest,
     request: Request,
+    user: ReconciledUser,
 ) -> CapabilityProfile:
-    """Return a structured capability profile for one explicit birth chart."""
+    """Return the account's capability profile for one chart, paid once per chart."""
     la_so = _build_la_so(payload)
-    base_deps = request.app.state.api_state.agent_deps
-    workflow_agent = base_deps.require_strength_weakness_agent()
-    deps = TuviAgentDeps(
-        strength_weakness_agent=workflow_agent,
-        la_so=la_so,
-        book=base_deps.book,
-        book_root=base_deps.book_root,
-    )
-    return await run_strength_weakness_agent(
-        agent=workflow_agent,
-        deps=deps,
-        request=(
-            "Hãy khám phá những điểm mạnh, điểm yếu và mặt trái nổi bật nhất "
-            "trong cách tôi sử dụng năng lực của mình."
-        ),
-    )
+    database = request.app.state.auth_database
+    chart_key = capability_chart_key(payload)
+    saved = await find_capability_report(database, user.user_id, chart_key)
+    if saved is not None:
+        return saved
+
+    attempt = await reserve_capability_coins(database, user.user_id, chart_key)
+    try:
+        base_deps = request.app.state.api_state.agent_deps
+        workflow_agent = base_deps.require_strength_weakness_agent()
+        deps = TuviAgentDeps(
+            strength_weakness_agent=workflow_agent,
+            la_so=la_so,
+            book=base_deps.book,
+            book_root=base_deps.book_root,
+        )
+        report = await run_strength_weakness_agent(
+            agent=workflow_agent,
+            deps=deps,
+            request=(
+                "Hãy khám phá những điểm mạnh, điểm yếu và mặt trái nổi bật nhất "
+                "trong cách tôi sử dụng năng lực của mình."
+            ),
+        )
+        await save_capability_report(database, user.user_id, chart_key, report)
+    except BaseException:
+        if attempt is not None:
+            await settle_capability_coins(
+                database, user.user_id, chart_key, attempt, confirmed=False
+            )
+        raise
+    if attempt is not None:
+        await settle_capability_coins(
+            database, user.user_id, chart_key, attempt, confirmed=True
+        )
+    return report
 
 
 @app.post("/api/v1/laso/cau-phu", response_model=CauPhuResponse)

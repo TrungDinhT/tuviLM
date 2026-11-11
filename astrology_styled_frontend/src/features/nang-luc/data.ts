@@ -1,12 +1,17 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { z } from "zod";
+import { useAccountRequestScope } from "@/lib/api/account-request";
 import { request } from "@/lib/api/client";
+import { queryKeys } from "@/lib/api/queryKeys";
 import type { BirthInfo } from "@/lib/api/schemas";
 import { safeStorage } from "@/lib/safe-storage";
+
+/** Coins on the normal plan; the backend charges each account once per chart. */
+export const CAPABILITY_REPORT_COST = 10;
 
 const description = { mo_ta: z.string().min(1), giai_thich: z.string().min(1) };
 export const capabilitySchema = z.object({
@@ -27,9 +32,9 @@ export const capabilitySchema = z.object({
     .max(6),
 });
 export type CapabilityProfile = z.infer<typeof capabilitySchema>;
-export function capabilityKey(birth: BirthInfo | null) {
-  return birth
-    ? `v1:${birth.calendar}:${birth.year}:${birth.month}:${birth.day}:${birth.hour}:${birth.gender}`
+export function capabilityKey(birth: BirthInfo | null, userId: string | null | undefined) {
+  return birth && userId
+    ? `v1:${userId}:${birth.calendar}:${birth.year}:${birth.month}:${birth.day}:${birth.hour}:${birth.gender}`
     : "idle";
 }
 interface CapabilityState {
@@ -76,11 +81,13 @@ export const useCapabilityStore = create<CapabilityState>()(
 );
 
 export function useCapabilityReport(birth: BirthInfo | null, unlocked: boolean) {
-  const key = capabilityKey(birth);
+  const { userId } = useAccountRequestScope();
+  const queryClient = useQueryClient();
+  const key = capabilityKey(birth, userId);
   const saved = useCapabilityStore((state) => state.entries[key]?.report);
   return useQuery({
     queryKey: ["capability", key],
-    enabled: birth !== null && unlocked,
+    enabled: key !== "idle" && unlocked,
     initialData: saved,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -95,11 +102,15 @@ export function useCapabilityReport(birth: BirthInfo | null, unlocked: boolean) 
         method: "POST",
         body: birth,
         schema: capabilitySchema,
+        withAuth: true,
+        expectedUserId: userId,
         signal,
       });
       // A reset may have unlocked the same chart again while this request ran.
       signal.throwIfAborted();
       useCapabilityStore.getState().save(key, report);
+      // The first report for a chart spends coins.
+      void queryClient.invalidateQueries({ queryKey: queryKeys.accountAccess(userId ?? null) });
       return report;
     },
   });
