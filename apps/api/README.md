@@ -7,7 +7,6 @@ FastAPI backend for TuviLM UI.
 - Real route: `POST /api/v1/laso/cau-phu`
 - Real route: `POST /api/v1/laso/build_sao_luu`
 - Conversation history routes are mounted from `apps/api/src/tuvi_api/chat/routes.py`:
-  - `POST /api/v1/anonymous`
   - `POST /api/v1/chart-profiles`
   - `GET /api/v1/chart-profiles`
   - `PATCH /api/v1/chart-profiles/{chart_profile_id}`
@@ -120,10 +119,9 @@ To bootstrap an administrator, register a normal account and run the private
 for configuration, confirmation and session revocation. No public endpoint grants
 administrator roles.
 
-Health, chart preview and chart casting remain public. The legacy anonymous
-ID endpoint remains available, but `X-Anonymous-Owner-Id` no longer grants
-access to saved profiles or chat. Existing anonymous data is not reassigned
-to accounts automatically.
+Health, chart preview and chart casting remain public. Saved profiles and chat
+need an account. Data saved earlier under an anonymous owner id is not
+reassigned to accounts automatically.
 
 The web client resets chart and chat state when the active account changes.
 Its persisted chart is restored only for the matching account. Requests from

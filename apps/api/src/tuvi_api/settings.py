@@ -48,6 +48,9 @@ class ApiSettings(BaseSettings):
     agent_model: str = "openrouter:qwen/qwen3.7-max"
     # The book files are not in git. Relative paths resolve from the working directory.
     book_root: Path = Path("data/tuvitanbien_chunking_compact/part_2")
+    # Browser origins allowed to call the API directly. Not needed when the web
+    # app proxies /api to this server (the default setup).
+    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
 
 
 @lru_cache

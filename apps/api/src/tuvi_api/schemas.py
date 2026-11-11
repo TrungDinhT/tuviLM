@@ -41,10 +41,6 @@ class CauPhuResponse(BaseModel):
     cac_cau: list[str]
 
 
-class CreateAnonymousResponse(BaseModel):
-    owner_id: str
-
-
 class CreateChartProfileRequest(BaseModel):
     display_name: str
     birth_info: BirthInfo

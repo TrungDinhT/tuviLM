@@ -172,13 +172,6 @@ async def test_build_laso_accepts_birth_info_day_field(api_client) -> None:
     assert response.json()["summary"] == "Sinh dương lịch: 15/04/1996 10:00"
 
 
-async def test_create_anonymous_owner_returns_owner_id(api_client) -> None:
-    response = await api_client.post("/api/v1/anonymous")
-
-    assert response.status_code == 200
-    assert response.json()["owner_id"].startswith("anon_")
-
-
 async def test_chart_profile_endpoints_use_store(api_client, fake_store) -> None:
     await fake_store.create_chart_profile(
         "other_owner",

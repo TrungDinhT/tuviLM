@@ -20,7 +20,7 @@ class ConversationHistoryError(Exception):
 
 
 class MissingOwnerIdError(ConversationHistoryError):
-    """Raised when an operation requires an anonymous owner id."""
+    """Raised when an operation has no owner id."""
 
 
 class IdempotencyConflictError(ConversationHistoryError):

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import secrets
 from datetime import datetime
 from typing import Any, AsyncIterator, Awaitable, Callable
 
@@ -39,7 +38,6 @@ from tuvi_api.chat.models import (
 )
 from tuvi_api.schemas import (
     ChartProfilePayload,
-    CreateAnonymousResponse,
     CreateChartProfileRequest,
     CreateChartProfileResponse,
     CreateSessionRequest,
@@ -58,11 +56,6 @@ from tuvi_engine.model.prior import Gender, LaSoPrior
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1")
-
-
-@router.post("/anonymous", response_model=CreateAnonymousResponse)
-def create_anonymous() -> CreateAnonymousResponse:
-    return CreateAnonymousResponse(owner_id=f"anon_{secrets.token_urlsafe(24)}")
 
 
 @router.post("/chart-profiles", response_model=CreateChartProfileResponse)
