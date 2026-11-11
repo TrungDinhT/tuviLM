@@ -231,6 +231,7 @@ def build_personality_agent(
     output_instruction = get_personality_output_instruction(resolved.output_instruction)
     return Agent(
         model=model,
+        defer_model_check=True,  # see build_tuvi_agent
         name="tinh_cach_agent",
         deps_type=TuviAgentDeps,
         output_type=output_instruction.output_type,

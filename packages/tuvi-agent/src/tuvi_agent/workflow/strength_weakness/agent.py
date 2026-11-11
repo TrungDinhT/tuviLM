@@ -74,6 +74,7 @@ def build_strength_weakness_agent(
         output_type=PromptedOutput(CapabilityProfile),
         instructions=STRENGTH_WEAKNESS_AGENT_INSTRUCTION,
         output_retries=2,
+        defer_model_check=True,
     )
 
 

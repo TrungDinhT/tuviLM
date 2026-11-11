@@ -98,6 +98,9 @@ Bạn là một trợ lý luận giải lá số Tử Vi. Nhiệm vụ của b�
 def build_tuvi_agent(model: str = DEFAULT_MODEL) -> Agent:
     return Agent(
         model=model,
+        # Resolve the provider (and its API key) on the first run, not here, so the
+        # API starts and serves charts without an LLM key.
+        defer_model_check=True,
         deps_type=TuviAgentDeps,
         output_type=str,
         system_prompt=TUVI_AGENT_INSTRUCTION,
