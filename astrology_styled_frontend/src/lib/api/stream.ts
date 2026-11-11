@@ -1,7 +1,8 @@
 import { ApiErrorException } from "@/lib/http/errors";
 
-import { apiUrl, mintOwnerId, safeBody } from "./client";
-import { getOwnerId } from "./owner";
+import { clearAuthToken, getAuthHeaders } from "./auth-headers";
+import { apiUrl, safeBody } from "./client";
+import { apiEndpoints } from "./endpoints";
 import { sseChatEventSchema, type SseChatEvent } from "./schemas";
 
 /**
@@ -28,25 +29,34 @@ import { sseChatEventSchema, type SseChatEvent } from "./schemas";
 export async function* streamChat(
   sessionId: string,
   content: string,
-  opts: { idempotencyKey: string; signal?: AbortSignal },
+  opts: { idempotencyKey: string; signal?: AbortSignal; expectedUserId?: string | null },
 ): AsyncGenerator<SseChatEvent> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    "X-Anonymous-Owner-Id": await getOwnerId(mintOwnerId),
-    "Idempotency-Key": opts.idempotencyKey,
+  const send = async (): Promise<Response> => {
+    opts.signal?.throwIfAborted();
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(await getAuthHeaders(opts.expectedUserId)),
+      "Idempotency-Key": opts.idempotencyKey,
+    };
+    opts.signal?.throwIfAborted();
+    try {
+      return await fetch(apiUrl(apiEndpoints.chatStream(sessionId)), {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ content }),
+        signal: opts.signal,
+      });
+    } catch (cause) {
+      if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
+      throw new ApiErrorException({ kind: "network" });
+    }
   };
 
-  let response: Response;
-  try {
-    response = await fetch(apiUrl(`/api/v1/sessions/${sessionId}/chat/stream`), {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ content }),
-      signal: opts.signal,
-    });
-  } catch (cause) {
-    if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
-    throw new ApiErrorException({ kind: "network" });
+  let response = await send();
+  if (response.status === 401) {
+    // A cached token can outlive its session; retry once with a new one.
+    clearAuthToken();
+    response = await send();
   }
 
   if (!response.ok) {

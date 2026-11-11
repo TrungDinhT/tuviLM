@@ -2,9 +2,10 @@
 
 import { usePathname } from "next/navigation";
 
-import { screenFor } from "@/config/site";
+import { AN_SAO_ROUTE, screenFor } from "@/config/site";
 
 import { AuthLinks } from "./auth-links";
+import { BrandLink } from "./brand-link";
 
 /**
  * Desktop-only top bar.
@@ -19,7 +20,7 @@ import { AuthLinks } from "./auth-links";
  * font metrics push it a couple of pixels taller, and those pixels show up as
  * the sticky header jumping the moment it pins.
  */
-export function TopBar() {
+export function TopBar({ showBrand = false }: { showBrand?: boolean }) {
   const pathname = usePathname();
   const screen = screenFor(pathname);
   if (screen === null) return null;
@@ -27,12 +28,15 @@ export function TopBar() {
   return (
     <header className="bg-[linear-gradient(180deg,rgba(28,17,54,0.78)_62%,rgba(28,17,54,0.58)_88%,rgba(28,17,54,0))] sticky top-0 z-30 hidden h-[var(--topbar-h)] border-b border-glass-line backdrop-blur-[22px] backdrop-saturate-[130%] lg:block">
       <div className="mx-auto flex h-full w-full max-w-[var(--shell)] items-center gap-[18px] px-10">
-        <div>
-          <div className="text-[10px] font-bold tracking-[0.24em] text-muted uppercase">
-            {screen.group}
+        {showBrand ? <BrandLink className="max-w-48" /> : null}
+        {pathname !== AN_SAO_ROUTE ? (
+          <div>
+            <div className="text-[10px] font-bold tracking-[0.24em] text-muted uppercase">
+              {screen.group}
+            </div>
+            <h1 className="mt-[3px] text-[22px] leading-tight font-semibold">{screen.title}</h1>
           </div>
-          <h1 className="mt-[3px] text-[22px] leading-tight font-semibold">{screen.title}</h1>
-        </div>
+        ) : null}
         <AuthLinks className="ml-auto" />
       </div>
     </header>

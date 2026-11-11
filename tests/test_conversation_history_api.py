@@ -4,15 +4,18 @@ import asyncio
 import logging
 import os
 from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock
 from uuid import uuid4
 
 import httpx
 import pytest
 from beanie import PydanticObjectId
+from fastapi import HTTPException, Request
 from pymongo import AsyncMongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from pydantic_ai import PartStartEvent, TextPart
 
+from api.auth.dependencies import Principal, require_reconciled_user, require_user
 from api.chat.contracts import (
     ConversationHistoryStore,
     DuplicateStreamInProgressError,
@@ -62,13 +65,33 @@ def anyio_backend() -> str:
 
 
 @pytest.fixture()
-async def api_client():
+async def api_client(monkeypatch):
+    async def test_user(request: Request) -> Principal:
+        authorization = request.headers.get("Authorization", "")
+        if not authorization.startswith("Bearer ") or not authorization[7:].strip():
+            raise HTTPException(status_code=401, detail="Authentication required.")
+        return Principal(user_id=authorization[7:], plan="full_unlock")
+
+    app.dependency_overrides[require_user] = test_user
+    app.dependency_overrides[require_reconciled_user] = test_user
+    monkeypatch.setattr("api.chat.routes.reserve_chat_coins", AsyncMock())
+    monkeypatch.setattr("api.chat.routes.settle_chat_coins", AsyncMock())
+    previous_auth_database = getattr(app.state, "auth_database", None)
+    app.state.auth_database = {}
     transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(
-        transport=transport,
-        base_url="http://testserver",
-    ) as client:
-        yield client
+    try:
+        async with httpx.AsyncClient(
+            transport=transport,
+            base_url="http://testserver",
+        ) as client:
+            yield client
+    finally:
+        app.dependency_overrides.pop(require_user, None)
+        app.dependency_overrides.pop(require_reconciled_user, None)
+        if previous_auth_database is None:
+            del app.state.auth_database
+        else:
+            app.state.auth_database = previous_auth_database
 
 
 @pytest.fixture()
@@ -169,7 +192,7 @@ async def test_chart_profile_endpoints_use_store(api_client, fake_store) -> None
     create_response = await api_client.post(
         "/api/v1/chart-profiles",
         headers={
-            "X-Anonymous-Owner-Id": "anon_owner",
+            "Authorization": "Bearer anon_owner",
             "Idempotency-Key": "create-profile-1",
         },
         json={
@@ -186,7 +209,7 @@ async def test_chart_profile_endpoints_use_store(api_client, fake_store) -> None
     )
     list_response = await api_client.get(
         "/api/v1/chart-profiles",
-        headers={"X-Anonymous-Owner-Id": "anon_owner"},
+        headers={"Authorization": "Bearer anon_owner"},
     )
 
     assert create_response.status_code == 200
@@ -196,14 +219,13 @@ async def test_chart_profile_endpoints_use_store(api_client, fake_store) -> None
     ]
 
 
-async def test_create_chart_profile_rejects_blank_owner_id(
+async def test_create_chart_profile_requires_authentication(
     api_client,
     fake_store,
 ) -> None:
     response = await api_client.post(
         "/api/v1/chart-profiles",
         headers={
-            "X-Anonymous-Owner-Id": "",
             "Idempotency-Key": "create-profile-1",
         },
         json={
@@ -219,8 +241,7 @@ async def test_create_chart_profile_rejects_blank_owner_id(
         },
     )
 
-    assert response.status_code == 400
-    assert response.json()["detail"] == "Owner id is required."
+    assert response.status_code == 401
 
 
 async def test_mutating_routes_reject_blank_idempotency_key(
@@ -230,7 +251,7 @@ async def test_mutating_routes_reject_blank_idempotency_key(
     profile = await _create_profile(fake_store)
     session = await _create_session(fake_store, profile.id)
     headers = {
-        "X-Anonymous-Owner-Id": "anon_owner",
+        "Authorization": "Bearer anon_owner",
         "Idempotency-Key": "",
     }
 
@@ -271,7 +292,7 @@ async def test_session_endpoints_use_store(api_client, fake_store) -> None:
     create_response = await api_client.post(
         f"/api/v1/chart-profiles/{profile.id}/sessions",
         headers={
-            "X-Anonymous-Owner-Id": "anon_owner",
+            "Authorization": "Bearer anon_owner",
             "Idempotency-Key": "create-session-1",
         },
         json={"title": "Career"},
@@ -279,11 +300,11 @@ async def test_session_endpoints_use_store(api_client, fake_store) -> None:
     session = create_response.json()["session"]
     list_response = await api_client.get(
         f"/api/v1/chart-profiles/{profile.id}/sessions",
-        headers={"X-Anonymous-Owner-Id": "anon_owner"},
+        headers={"Authorization": "Bearer anon_owner"},
     )
     get_response = await api_client.get(
         f"/api/v1/sessions/{session['id']}",
-        headers={"X-Anonymous-Owner-Id": "anon_owner"},
+        headers={"Authorization": "Bearer anon_owner"},
     )
 
     assert create_response.status_code == 200
@@ -302,7 +323,7 @@ async def test_delete_session_route_returns_no_content(
 
     delete_response = await api_client.delete(
         f"/api/v1/sessions/{session.id}",
-        headers={"X-Anonymous-Owner-Id": "anon_owner"},
+        headers={"Authorization": "Bearer anon_owner"},
     )
 
     assert delete_response.status_code == 204
@@ -317,11 +338,55 @@ async def test_delete_chart_profile_route_returns_no_content(
 
     delete_response = await api_client.delete(
         f"/api/v1/chart-profiles/{profile.id}",
-        headers={"X-Anonymous-Owner-Id": "anon_owner"},
+        headers={"Authorization": "Bearer anon_owner"},
     )
 
     assert delete_response.status_code == 204
     assert fake_store.deleted_chart_profile_ids == [profile.id]
+
+
+async def test_authenticated_user_cannot_access_another_users_data(
+    api_client, fake_store
+) -> None:
+    profile = await _create_profile(fake_store)
+    session = await _create_session(fake_store, profile.id)
+    headers = {
+        "Authorization": "Bearer other_owner",
+        "X-Anonymous-Owner-Id": "anon_owner",
+        "Idempotency-Key": "other-user-message",
+    }
+
+    session_response = await api_client.get(
+        f"/api/v1/sessions/{session.id}", headers=headers
+    )
+    chat_response = await api_client.post(
+        f"/api/v1/sessions/{session.id}/chat/stream",
+        headers=headers,
+        json={"content": "Tell me about career."},
+    )
+
+    assert session_response.status_code == 404
+    assert chat_response.status_code == 404
+    context = await fake_store.load_session_context("anon_owner", session.id)
+    assert context.session.messages == []
+
+
+async def test_mongo_store_rejects_cross_owner_access(mongo_store) -> None:
+    profile = await _create_profile(mongo_store)
+    session = await _create_session(mongo_store, profile.id)
+
+    with pytest.raises(NotFoundError):
+        await mongo_store.load_session_context("other_owner", session.id)
+    with pytest.raises(NotFoundError):
+        await mongo_store.reserve_message_pair(
+            "other_owner",
+            session.id,
+            user_content="Tell me about career.",
+            idempotency_key="other-user-message",
+        )
+
+    context = await mongo_store.load_session_context("anon_owner", session.id)
+    assert context.session.messages == []
 
 
 async def test_create_chart_profile_requires_owner_id(mongo_store) -> None:
@@ -632,7 +697,7 @@ async def test_session_chat_stream_persists_confirmed_assistant_message(
     response = await api_client.post(
         f"/api/v1/sessions/{session.id}/chat/stream",
         headers={
-            "X-Anonymous-Owner-Id": "anon_owner",
+            "Authorization": "Bearer anon_owner",
             "Idempotency-Key": "message-1",
         },
         json={"content": "Tell me about career."},
@@ -663,7 +728,7 @@ async def test_session_chat_stream_logs_generation_failure(
     response = await api_client.post(
         f"/api/v1/sessions/{session.id}/chat/stream",
         headers={
-            "X-Anonymous-Owner-Id": "anon_owner",
+            "Authorization": "Bearer anon_owner",
             "Idempotency-Key": "message-1",
         },
         json={"content": "Tell me about career."},
@@ -693,7 +758,7 @@ async def test_session_chat_stream_cancellation_marks_assistant_cancelled(
         await api_client.post(
             f"/api/v1/sessions/{session.id}/chat/stream",
             headers={
-                "X-Anonymous-Owner-Id": "anon_owner",
+                "Authorization": "Bearer anon_owner",
                 "Idempotency-Key": "message-1",
             },
             json={"content": "Tell me about career."},
@@ -753,7 +818,7 @@ async def test_session_chat_stream_default_runner_reconstructs_agent_context(
     response = await api_client.post(
         f"/api/v1/sessions/{session.id}/chat/stream",
         headers={
-            "X-Anonymous-Owner-Id": "anon_owner",
+            "Authorization": "Bearer anon_owner",
             "Idempotency-Key": "message-1",
         },
         json={"content": "New question."},
@@ -788,7 +853,7 @@ async def test_session_chat_stream_duplicate_pending_request_does_not_start_gene
     response = await api_client.post(
         f"/api/v1/sessions/{session.id}/chat/stream",
         headers={
-            "X-Anonymous-Owner-Id": "anon_owner",
+            "Authorization": "Bearer anon_owner",
             "Idempotency-Key": "message-1",
         },
         json={"content": "Tell me about career."},
@@ -823,7 +888,7 @@ async def test_session_chat_stream_completed_replay_does_not_start_generation(
     response = await api_client.post(
         f"/api/v1/sessions/{session.id}/chat/stream",
         headers={
-            "X-Anonymous-Owner-Id": "anon_owner",
+            "Authorization": "Bearer anon_owner",
             "Idempotency-Key": "message-1",
         },
         json={"content": "Tell me about career."},
@@ -843,7 +908,7 @@ async def test_create_chart_profile_endpoint_returns_conflict_for_idempotency_mi
     caplog.set_level(logging.WARNING, logger="api.main")
     fake_store.create_chart_profile_errors = [None, IdempotencyConflictError()]
     headers = {
-        "X-Anonymous-Owner-Id": "anon_owner",
+        "Authorization": "Bearer anon_owner",
         "Idempotency-Key": "create-profile-1",
     }
 
@@ -1036,6 +1101,7 @@ class FakeConversationHistoryStore:
         *,
         user_content: str,
         idempotency_key: str,
+        allow_new: bool = True,
     ) -> ReservedMessagePair:
         if self.reserve_result is not None:
             return self.reserve_result

@@ -29,7 +29,7 @@ export function SettingsList() {
   const rows: SettingRow[] = [
     {
       title: "Giao diện",
-      subtitle: "Luminous Twilight · theo hành mệnh",
+      subtitle: "Hoàng hôn rực rỡ · theo hành mệnh",
       action: () => showToast(COMING_SOON),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className={ICON_CLASS}>
@@ -51,7 +51,7 @@ export function SettingsList() {
     },
     {
       title: "Ảnh chia sẻ",
-      subtitle: "Xuất lá bài dạng story 9:16",
+      subtitle: "Xuất lá bài khổ 9:16",
       action: () => showToast(COMING_SOON),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className={ICON_CLASS}>

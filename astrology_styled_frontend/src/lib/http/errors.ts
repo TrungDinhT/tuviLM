@@ -34,6 +34,9 @@ export function describe(error: ApiError): string {
     case "network":
       return "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại nhé.";
     case "http":
+      if (error.status === 402) {
+        return "Bạn không đủ xu. Trò chuyện với AI cần 3 xu cho mỗi tin nhắn.";
+      }
       return error.status >= 500
         ? "Máy chủ đang trục trặc. Bạn thử lại sau ít phút nhé."
         : "Yêu cầu không hợp lệ. Kiểm tra lại thông tin đã nhập nhé.";

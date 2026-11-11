@@ -34,6 +34,7 @@ const GROUP_DEEP = "Tra cứu chuyên sâu";
 
 /** Casting lives at the root. Reaching it again means casting again. */
 export const AN_SAO_ROUTE = "/";
+export const ADMIN_REDEEM_CODES_ROUTE = "/admin/redeem-codes";
 
 /** The five destinations in the tab bar / rail, in order. */
 export const NAV_ITEMS: readonly NavItem[] = [
@@ -92,6 +93,13 @@ const EXTRA_SCREENS: Record<string, ScreenMeta> = {
     requiresChart: true,
   },
   "/": { href: "/", group: GROUP_CHART, title: "An sao", requiresChart: false },
+  "/goi": { href: "/goi", group: "Tài khoản", title: "Gói sử dụng", requiresChart: false },
+  [ADMIN_REDEEM_CODES_ROUTE]: {
+    href: ADMIN_REDEEM_CODES_ROUTE,
+    group: "Quản trị",
+    title: "Tạo mã nhận xu",
+    requiresChart: false,
+  },
   "/la-so": {
     href: "/la-so",
     group: GROUP_CHART,

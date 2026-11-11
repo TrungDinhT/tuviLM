@@ -2,7 +2,11 @@ import "server-only";
 
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { betterAuth } from "better-auth";
+import { jwt } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
+import { after } from "next/server";
+
+import { resetPasswordEmail, sendEmail, verificationEmail } from "@/lib/email";
 
 const mongoUri = process.env.MONGODB_URI ?? "mongodb://localhost:27017";
 const mongoDatabase = process.env.MONGODB_DATABASE ?? "tuvilm";
@@ -17,10 +21,11 @@ if (process.env.NODE_ENV !== "production") globalMongo.tuviAuthMongoClient = mon
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 const googleConfigured = Boolean(googleClientId && googleClientSecret);
+const authBaseUrl = (process.env.BETTER_AUTH_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 
 export const auth = betterAuth({
   appName: "Thiên Hạc",
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: authBaseUrl,
   secret: process.env.BETTER_AUTH_SECRET,
   database: mongodbAdapter(mongoClient.db(mongoDatabase), {
     client: mongoClient,
@@ -29,7 +34,50 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: ({ user, url }) =>
+      sendEmail({ to: user.email, ...resetPasswordEmail({ name: user.name, url }) }),
   },
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: ({ user, url }) =>
+      sendEmail({ to: user.email, ...verificationEmail({ name: user.name, url }) }),
+  },
+  advanced: {
+    // Mail goes out after the response, so a reset or sign-up request takes the
+    // same time whether or not the email already has an account.
+    backgroundTasks: { handler: (task) => after(task) },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: ["user", "admin"],
+        defaultValue: "user",
+        input: false,
+      },
+      plan: {
+        type: ["normal", "full_unlock"],
+        defaultValue: "normal",
+        input: false,
+      },
+      balance: {
+        type: "number",
+        defaultValue: 0,
+        input: false,
+      },
+    },
+  },
+  plugins: [
+    jwt({
+      jwt: {
+        issuer: authBaseUrl,
+        audience: "tuvilm-api",
+        expirationTime: "15m",
+        definePayload: ({ session }) => ({ sid: session.id }),
+      },
+    }),
+  ],
   socialProviders: googleConfigured
     ? {
         google: {

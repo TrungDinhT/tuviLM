@@ -20,6 +20,7 @@ class ChartProfileDocument(DocumentWithSoftDelete):
     creation_request_fingerprint: str
 
     display_name: str
+    name_key: str | None = None
     birth_info: BirthInfo
     created_at: datetime = Field(default_factory=utc_now)
     updated_at: datetime = Field(default_factory=utc_now)
@@ -28,6 +29,11 @@ class ChartProfileDocument(DocumentWithSoftDelete):
         name = "chart_profiles"
         indexes = [
             IndexModel([("owner_id", ASCENDING)]),
+            IndexModel(
+                [("owner_id", ASCENDING), ("name_key", ASCENDING)],
+                unique=True,
+                partialFilterExpression={"name_key": {"$type": "string"}},
+            ),
             IndexModel(
                 [
                     ("owner_id", ASCENDING),

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import json
-from types import SimpleNamespace
+from datetime import datetime
 
 import pytest
 from fastapi import HTTPException
 
 from api.main import read_cau_phu
+from api.schemas import BuildLasoRequest
 from src.refactored.cau_phu import (
     DEFAULT_CAU_PHU_PATH,
     CauPhuLookupKey,
@@ -16,13 +17,8 @@ from src.refactored.cau_phu import (
     load_cau_phu_catalog,
 )
 from src.refactored.la_so import LaSo
+from src.refactored.model.prior import Gender, LaSoPrior
 from tests.fixtures.laso_priors import FIXTURE_PRIOR_A
-
-
-def _request_for(api_state: object) -> SimpleNamespace:
-    return SimpleNamespace(
-        app=SimpleNamespace(state=SimpleNamespace(api_state=api_state))
-    )
 
 
 def test_catalog_indexes_every_case_without_changing_phu_text() -> None:
@@ -58,11 +54,13 @@ def test_completed_chart_matches_its_exact_catalog_entry() -> None:
     assert entry.cau_phu == "\n".join(entry.cac_cau)
 
 
-def test_api_returns_original_phu_for_current_chart() -> None:
-    la_so = LaSo.from_prior(FIXTURE_PRIOR_A)
-    api_state = SimpleNamespace(has_la_so=True, require_la_so=lambda: la_so)
+def test_api_returns_original_phu_for_requested_birth() -> None:
+    payload = BuildLasoRequest(year=1990, month=5, day=15, hour=10, gender="M")
+    la_so = LaSo.from_prior(
+        LaSoPrior.from_solar_day(datetime(1990, 5, 15, 10), Gender.MALE)
+    )
 
-    response = read_cau_phu(_request_for(api_state))
+    response = read_cau_phu(payload)
     expected = get_cau_phu(la_so)
 
     assert response.cau_phu == expected.cau_phu
@@ -70,11 +68,10 @@ def test_api_returns_original_phu_for_current_chart() -> None:
     assert response.tieu_de == expected.tieu_de
 
 
-def test_api_requires_a_built_chart() -> None:
-    api_state = SimpleNamespace(has_la_so=False)
+def test_api_rejects_invalid_birth_date() -> None:
+    payload = BuildLasoRequest(year=2000, month=2, day=31, hour=10, gender="M")
 
     with pytest.raises(HTTPException) as exc_info:
-        read_cau_phu(_request_for(api_state))
+        read_cau_phu(payload)
 
-    assert exc_info.value.status_code == 409
-    assert "POST /api/v1/laso/build" in exc_info.value.detail
+    assert exc_info.value.status_code == 422

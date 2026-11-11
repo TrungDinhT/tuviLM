@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Pill } from "@/components/primitives/pill";
 import { AuthLinks } from "@/components/shell/auth-links";
+import { BrandLink } from "@/components/shell/brand-link";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {
   profileDisplayName,
@@ -13,6 +13,7 @@ import {
   useCreateChartProfile,
   useLasoPreview,
 } from "@/lib/api/hooks";
+import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
 import { starKeyFromName } from "@/lib/theme";
 import { showToast } from "@/lib/toast";
@@ -57,13 +58,21 @@ function pad2(value: number): string {
  */
 export function AnSaoScreen() {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const savedBirth = useChartStore((state) => state.birthInfo);
   const [phase, setPhase] = useState<"form" | "loading">("form");
-  const [date, setDate] = useState<BirthDateInput>(DEFAULT_DATE);
-  // AM/PM is picked above the face, so it stands on its own and defaults to
-  // AM; the hour stays unpicked until touched, which is what the guard reads.
-  const [meridiem, setMeridiem] = useState<Meridiem>(MERIDIEM.AM);
-  const [hour12, setHour12] = useState<number | null>(null);
-  const [gender, setGender] = useState<"M" | "F" | null>(null);
+  const [date, setDate] = useState<BirthDateInput>(() =>
+    savedBirth
+      ? { year: savedBirth.year, month: savedBirth.month, day: savedBirth.day }
+      : DEFAULT_DATE,
+  );
+  const [meridiem, setMeridiem] = useState<Meridiem>(() =>
+    savedBirth && savedBirth.hour >= 12 ? MERIDIEM.PM : MERIDIEM.AM,
+  );
+  const [hour12, setHour12] = useState<number | null>(() =>
+    savedBirth ? savedBirth.hour % 12 || 12 : null,
+  );
+  const [gender, setGender] = useState<"M" | "F" | null>(() => savedBirth?.gender ?? null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [clockPulse, setClockPulse] = useState(0);
   const [rewardPreview, setRewardPreview] = useState<{
@@ -79,6 +88,13 @@ export function AnSaoScreen() {
 
   const clockRef = useRef<HTMLDivElement>(null);
   const genderRef = useRef<HTMLDivElement>(null);
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const setPreviewOutcome = useChartStore((state) => state.setPreviewOutcome);
   const castChart = useChartStore((state) => state.castChart);
@@ -154,18 +170,23 @@ export function AnSaoScreen() {
     const minimumLoading = new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS));
     try {
       const chart = await buildLaso.mutateAsync(birth);
+      if (!isMounted.current) return;
       const [, profileId] = await Promise.all([
         minimumLoading,
         // Auto-save starts only after a valid build. It must never fail the
         // cast, so it resolves to the profile id or null.
-        createProfile
-          .mutateAsync({ display_name: profileDisplayName(birth), birth_info: birth })
-          .then((res) => res.chart_profile.id)
-          .catch(() => null),
+        session
+          ? createProfile
+              .mutateAsync({ display_name: profileDisplayName(birth), birth_info: birth })
+              .then((res) => res.chart_profile.id)
+              .catch(() => null)
+          : Promise.resolve(null),
       ]);
+      if (!isMounted.current) return;
       castChart(outcomeFromChart(chart), chart.id, birth, profileId);
       router.push("/ban-menh");
     } catch (error) {
+      if (!isMounted.current) return;
       setPhase("form");
       showToast(
         isApiError(error) ? describe(error.error) : "Có lỗi xảy ra khi an sao. Bạn thử lại nhé.",
@@ -188,19 +209,8 @@ export function AnSaoScreen() {
   return (
     <div className="relative flex flex-col pt-[76px] md:grid md:min-h-[calc(100dvh-140px-var(--safe-t)-var(--safe-b))] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:content-center md:gap-x-10 md:gap-y-0 lg:min-h-[calc(100dvh-152px-var(--safe-t))] lg:pt-0">
       <div className="absolute top-0 right-0 left-0 flex h-14 items-center justify-between gap-3 lg:hidden">
-        <div className="flex min-w-0 shrink-0 items-center gap-2 max-[349px]:gap-1.5">
-          <Image
-            src="/assets/icons/favicon-48x48.png"
-            alt=""
-            width={48}
-            height={48}
-            className="size-10 shrink-0 drop-shadow-[0_0_10px_rgba(255,222,143,0.26)] max-[349px]:size-8"
-          />
-          <span className="truncate font-display text-lg font-semibold text-ink max-[349px]:text-sm">
-            Thiên Hạc
-          </span>
-        </div>
-        <AuthLinks className="min-w-0 shrink-0 justify-end [&_a]:px-3 max-[349px]:gap-1 max-[349px]:[&_a]:px-2 max-[349px]:[&_a]:text-[11px]" />
+        <BrandLink />
+        <AuthLinks className="min-w-0 justify-end [&_a]:px-3 max-[349px]:gap-1 max-[349px]:[&_a]:px-2 max-[349px]:[&_a]:text-[11px]" />
       </div>
       {/* Head — story column on the left from md up. */}
       <div className="text-center md:col-start-1 md:row-start-1 md:text-left">

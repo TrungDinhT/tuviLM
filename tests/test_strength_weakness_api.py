@@ -39,7 +39,7 @@ def test_analysis_uses_explicit_birth_chart_and_serializes_profile(monkeypatch, 
     assert response.json() == output.model_dump(mode='json')
     assert response.json()['diem_manh'][0]['nang_luc']
     args = run.call_args.kwargs
-    expected = routes._la_so_from_build_request(routes.BuildLasoRequest.model_validate(birth))
+    expected = routes._build_la_so(routes.BuildLasoRequest.model_validate(birth))
     assert args['agent'] is workflow_agent
     assert args['deps'] is not base_deps
     assert args['deps'].la_so.prior == expected.prior

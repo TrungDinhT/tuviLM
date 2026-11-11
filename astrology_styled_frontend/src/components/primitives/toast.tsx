@@ -13,6 +13,7 @@ export function Toast() {
   return (
     <Toaster
       className={styles.toaster}
+      containerAriaLabel="Thông báo"
       position="bottom-center"
       duration={TOAST_DURATION_MS}
       gap={8}

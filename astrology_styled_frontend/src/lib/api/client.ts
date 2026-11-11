@@ -3,7 +3,8 @@ import type { z } from "zod";
 import { env } from "@/config/env";
 import { ApiErrorException } from "@/lib/http/errors";
 
-import { getOwnerId } from "./owner";
+import { clearAuthToken, getAuthHeaders } from "./auth-headers";
+import { apiEndpoints } from "./endpoints";
 import { createAnonymousResponseSchema } from "./schemas";
 
 /**
@@ -11,7 +12,7 @@ import { createAnonymousResponseSchema } from "./schemas";
  *
  * Three things happen here and nowhere else:
  * - the base URL is applied
- * - identity (`X-Anonymous-Owner-Id`) and idempotency headers are attached
+ * - identity (`Authorization`) and idempotency headers are attached
  * - every response is parsed by a Zod schema and every failure is normalized
  *   to the `ApiError` union
  *
@@ -20,14 +21,15 @@ import { createAnonymousResponseSchema } from "./schemas";
  */
 
 export interface RequestOptions<T> {
-  method?: "GET" | "POST" | "DELETE";
+  method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
   schema: z.ZodType<T>;
   /**
-   * Whether the request carries the owner identity. Everything except
-   * `/health` and `/anonymous` does.
+   * Whether the request requires a signed-in account. Public chart building,
+   * preview, health, and anonymous identity acquisition do not.
    */
-  withOwner?: boolean;
+  withAuth?: boolean;
+  expectedUserId?: string | null;
   /**
    * Pass a stable key for anything that creates a resource or opens a stream.
    * Retrying the same logical operation must reuse the same key, or the
@@ -89,7 +91,7 @@ export function newIdempotencyKey(): string {
 }
 
 export async function mintOwnerId(): Promise<string> {
-  const response = await fetch(apiUrl("/api/v1/anonymous"), { method: "POST" });
+  const response = await fetch(apiUrl(apiEndpoints.anonymous), { method: "POST" });
   if (!response.ok) {
     throw new ApiErrorException({
       kind: "http",
@@ -115,28 +117,44 @@ export async function safeBody(response: Response): Promise<unknown> {
 }
 
 export async function request<T>(path: string, options: RequestOptions<T>): Promise<T> {
-  const { method = "GET", body, schema, withOwner = false, idempotencyKey, signal } = options;
+  const {
+    method = "GET",
+    body,
+    schema,
+    withAuth = false,
+    expectedUserId,
+    idempotencyKey,
+    signal,
+  } = options;
 
-  const headers: Record<string, string> = {};
-  if (body !== undefined) headers["Content-Type"] = "application/json";
-  if (withOwner) headers["X-Anonymous-Owner-Id"] = await getOwnerId(mintOwnerId);
-  if (idempotencyKey !== undefined) headers["Idempotency-Key"] = idempotencyKey;
+  const send = async (headers: Record<string, string>): Promise<Response> => {
+    signal?.throwIfAborted();
+    if (body !== undefined) headers["Content-Type"] = "application/json";
+    if (idempotencyKey !== undefined) headers["Idempotency-Key"] = idempotencyKey;
+    try {
+      return await fetch(apiUrl(path), {
+        method,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal,
+      });
+    } catch (cause) {
+      // An aborted request is the caller's own doing, not a network failure.
+      if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
+      throw new ApiErrorException({ kind: "network" });
+    }
+  };
 
-  let response: Response;
-  try {
-    response = await fetch(apiUrl(path), {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-      signal,
-    });
-  } catch (cause) {
-    // An aborted request is the caller's own doing, not a network failure.
-    if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
-    throw new ApiErrorException({ kind: "network" });
+  signal?.throwIfAborted();
+  let response = await send(withAuth ? await getAuthHeaders(expectedUserId) : {});
+  if (withAuth && response.status === 401) {
+    // A cached token can outlive its session; retry once with a new one.
+    clearAuthToken();
+    response = await send(await getAuthHeaders(expectedUserId));
   }
 
   const payload = await safeBody(response);
+  signal?.throwIfAborted();
 
   if (!response.ok) {
     throw new ApiErrorException({ kind: "http", status: response.status, body: payload });
