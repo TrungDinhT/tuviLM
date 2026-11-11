@@ -380,7 +380,7 @@ class _ChatStreamingResponse(StreamingResponse):
         super().__init__(
             stream,
             media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+            headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
         )
         self._stream = stream
         self._cleanup = cleanup
@@ -402,7 +402,7 @@ def _streaming_response(stream: AsyncIterator[str]) -> StreamingResponse:
     return StreamingResponse(
         stream,
         media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
     )
 
 

@@ -4,15 +4,21 @@ import { z } from "zod";
 /**
  * Validated environment.
  *
- * A malformed or missing base URL fails here, at startup, naming the variable
- * — rather than surfacing later as an unexplained fetch failure in a screen.
+ * A malformed backend URL fails here, at startup or build, naming the
+ * variable, rather than surfacing later as an unexplained 404 on `/api`.
  */
 export const env = createEnv({
-  client: {
-    NEXT_PUBLIC_API_BASE_URL: z.url().default("http://localhost:8000"),
+  server: {
+    /**
+     * Where the FastAPI backend runs. The browser never calls it directly:
+     * `next.config.ts` forwards every `/api/*` request to it, so cookies stay
+     * on this site's domain. On Vercel, set it to the API service URL.
+     */
+    API_ORIGIN: z.url().default("http://localhost:8000"),
   },
+  client: {},
   runtimeEnv: {
-    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    API_ORIGIN: process.env.API_ORIGIN,
   },
   emptyStringAsUndefined: true,
 });

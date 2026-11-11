@@ -1,7 +1,7 @@
 import { ApiErrorException } from "@/lib/http/errors";
 
 import { clearAuthToken, getAuthHeaders } from "./auth-headers";
-import { apiUrl, safeBody } from "./client";
+import { safeBody } from "./client";
 import { apiEndpoints } from "./endpoints";
 import { sseChatEventSchema, type SseChatEvent } from "./schemas";
 
@@ -10,7 +10,7 @@ import { sseChatEventSchema, type SseChatEvent } from "./schemas";
  *
  * Streams are not TanStack Query queries, so they do not go through `request`
  * (which reads the whole body). They do, however, share the client's rules:
- * the same base-URL/host resolution (`apiUrl`), the same identity and
+ * same-origin `/api` paths, the same identity and
  * idempotency headers, and the same normalized `ApiError` failures.
  *
  * The backend sends one `data: {…}\n\n` frame per event. A frame is split
@@ -40,7 +40,7 @@ export async function* streamChat(
     };
     opts.signal?.throwIfAborted();
     try {
-      return await fetch(apiUrl(apiEndpoints.chatStream(sessionId)), {
+      return await fetch(apiEndpoints.chatStream(sessionId), {
         method: "POST",
         headers,
         body: JSON.stringify({ content }),

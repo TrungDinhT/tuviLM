@@ -1,17 +1,14 @@
 import type { z } from "zod";
 
-import { env } from "@/config/env";
 import { ApiErrorException } from "@/lib/http/errors";
 
 import { clearAuthToken, getAuthHeaders } from "./auth-headers";
-import { apiEndpoints } from "./endpoints";
-import { createAnonymousResponseSchema } from "./schemas";
 
 /**
  * The only place in the application that talks to the FastAPI backend.
  *
  * Three things happen here and nowhere else:
- * - the base URL is applied
+ * - requests go to same-origin `/api` paths, which Next forwards to FastAPI
  * - identity (`Authorization`) and idempotency headers are attached
  * - every response is parsed by a Zod schema and every failure is normalized
  *   to the `ApiError` union
@@ -26,7 +23,7 @@ export interface RequestOptions<T> {
   schema: z.ZodType<T>;
   /**
    * Whether the request requires a signed-in account. Public chart building,
-   * preview, health, and anonymous identity acquisition do not.
+   * preview and health do not.
    */
   withAuth?: boolean;
   expectedUserId?: string | null;
@@ -39,45 +36,6 @@ export interface RequestOptions<T> {
   signal?: AbortSignal;
 }
 
-/**
- * The base URL to call, given the configured one and the host the page is
- * being served from (null on the server).
- *
- * Dev on a phone: the default base URL is `localhost:8000`, and on the phone
- * `localhost` is the phone. The backend runs on the same machine as `next
- * dev`, so when the page arrives from a LAN address the API is at that address
- * too — borrow the host rather than making everyone hardcode an IP that DHCP
- * will change. Only a localhost base is ever rewritten, so a configured
- * backend (any deployment) is left exactly as given.
- *
- * The backend must be listening on that interface for this to help:
- * `uv run uvicorn api.main:app --reload --host 0.0.0.0`.
- */
-export function resolveBaseUrl(configured: string, pageHostname: string | null): string {
-  const base = configured.replace(/\/$/, "");
-  if (pageHostname === null) return base;
-
-  const parsed = new URL(base);
-  const isLocal = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
-  if (!isLocal || pageHostname === parsed.hostname) return base;
-
-  parsed.hostname = pageHostname;
-  return parsed.toString().replace(/\/$/, "");
-}
-
-/**
- * The absolute URL for a backend path. Exported so the SSE reader can reuse
- * the same base-URL/host-resolution logic without reaching past the client's
- * single URL rule.
- */
-export function apiUrl(path: string): string {
-  const pageHostname =
-    process.env.NODE_ENV === "development" && typeof window !== "undefined"
-      ? window.location.hostname
-      : null;
-  return `${resolveBaseUrl(env.NEXT_PUBLIC_API_BASE_URL, pageHostname)}${path}`;
-}
-
 /** A fresh key for one logical operation. Reuse it across retries. */
 export function newIdempotencyKey(): string {
   // `crypto.randomUUID` is secure-context-only: it is absent over plain HTTP
@@ -88,22 +46,6 @@ export function newIdempotencyKey(): string {
     return crypto.randomUUID();
   }
   return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
-}
-
-export async function mintOwnerId(): Promise<string> {
-  const response = await fetch(apiUrl(apiEndpoints.anonymous), { method: "POST" });
-  if (!response.ok) {
-    throw new ApiErrorException({
-      kind: "http",
-      status: response.status,
-      body: await safeBody(response),
-    });
-  }
-  const parsed = createAnonymousResponseSchema.safeParse(await safeBody(response));
-  if (!parsed.success) {
-    throw new ApiErrorException({ kind: "parse", issues: parsed.error.issues });
-  }
-  return parsed.data.owner_id;
 }
 
 export async function safeBody(response: Response): Promise<unknown> {
@@ -132,7 +74,7 @@ export async function request<T>(path: string, options: RequestOptions<T>): Prom
     if (body !== undefined) headers["Content-Type"] = "application/json";
     if (idempotencyKey !== undefined) headers["Idempotency-Key"] = idempotencyKey;
     try {
-      return await fetch(apiUrl(path), {
+      return await fetch(path, {
         method,
         headers,
         body: body === undefined ? undefined : JSON.stringify(body),

@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
+import { env } from "./src/config/env";
+
 const nextConfig: NextConfig = {
   devIndicators: false,
+
+  /**
+   * The `/api` rewrite below gives up after 30 s by default and answers 500,
+   * while FastAPI finishes the request and spends the coins. The capability
+   * report can take longer than that. Applies to `next dev` and `next start`.
+   */
+  experimental: { proxyTimeout: 120_000 },
 
   /**
    * Dev only. Next blocks cross-origin requests to dev assets, and the dev
@@ -14,6 +23,21 @@ const nextConfig: NextConfig = {
    * off the local network. Has no effect on a production build.
    */
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.16.*.*", "*.local"],
+
+  /**
+   * The browser calls `/api/*` on this site; Next forwards it to FastAPI.
+   * Same origin means cookies are first-party, with no CORS. Works the same in
+   * `next dev` and on Vercel. Route handlers under `src/app/api` (Better Auth)
+   * run before rewrites, so they still answer their own paths.
+   */
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${env.API_ORIGIN.replace(/\/$/, "")}/api/:path*`,
+      },
+    ];
+  },
 
   /**
    * `public/` is served with `max-age=0`, so the loading crane the An sao

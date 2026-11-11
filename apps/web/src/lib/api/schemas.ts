@@ -262,10 +262,6 @@ export const previewLasoResponseSchema = z.object({
 
 export type PreviewLasoResponse = z.infer<typeof previewLasoResponseSchema>;
 
-export const createAnonymousResponseSchema = z.object({
-  owner_id: z.string(),
-});
-
 export const chartProfileSchema = z.object({
   id: z.string(),
   display_name: z.string(),
