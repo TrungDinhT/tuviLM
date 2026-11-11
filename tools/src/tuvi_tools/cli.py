@@ -169,6 +169,8 @@ class Service:
     command: list[str]
     cwd: Path
     env: dict[str, str]
+    # Port the service listens on, to report when it is ready or never comes up.
+    ready_port: int | None = None
     process: subprocess.Popen[str] | None = field(default=None, repr=False)
 
     def start(self) -> None:
@@ -206,6 +208,26 @@ def _interrupt(signum: int, frame: object) -> None:
     raise KeyboardInterrupt
 
 
+READY_TIMEOUT = 60.0
+
+
+def _report_ready(service: Service) -> None:
+    """Say when the service opens its port, or warn when it does not.
+
+    uvicorn --reload keeps running after a failed startup and retries when a file
+    changes, so a dead API does not end the process: this message is the signal.
+    """
+    assert service.ready_port is not None
+    if wait_for_port(service.ready_port, timeout=READY_TIMEOUT):
+        say(f"{service.name} is ready on :{service.ready_port}")
+    elif service.process is not None and service.process.poll() is None:
+        say(
+            f"{service.name} did not open :{service.ready_port} within "
+            f"{READY_TIMEOUT:.0f} s. Look for the error above. With --reload it "
+            "starts again when you save a file."
+        )
+
+
 def run_services(services: list[Service]) -> int:
     """Run until Ctrl+C, SIGTERM or one service exits; then stop the others.
 
@@ -217,6 +239,8 @@ def run_services(services: list[Service]) -> int:
     for service in services:
         say(f"starting {service.name}: {' '.join(service.command)}")
         service.start()
+        if service.ready_port is not None:
+            threading.Thread(target=_report_ready, args=(service,), daemon=True).start()
     exit_code = 0
     try:
         while True:
@@ -309,6 +333,7 @@ def cmd_up(args: argparse.Namespace) -> int:
                 ],
                 cwd=root,
                 env=env,
+                ready_port=API_PORT,
             )
         )
     if not args.api_only:
@@ -326,6 +351,7 @@ def cmd_up(args: argparse.Namespace) -> int:
                 ["pnpm", "dev", "--hostname", args.host, "--port", str(WEB_PORT)],
                 cwd=root / "apps" / "web",
                 env=web_env,
+                ready_port=WEB_PORT,
             )
         )
 
