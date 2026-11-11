@@ -13,7 +13,8 @@ pnpm install
 pnpm dev
 ```
 
-The backend runs separately, from the repo root:
+The backend runs separately. The easiest way is to start the whole stack from the
+repo root with `uv run tuvi up`, or only the API with:
 
 ```bash
 uv run uvicorn tuvi_api.main:app --reload
