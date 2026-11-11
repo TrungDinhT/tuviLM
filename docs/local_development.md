@@ -19,11 +19,23 @@ stops too.
 | Command | What it does |
 | --- | --- |
 | `tuvi up --no-db` | Do not start MongoDB with Docker. Use your own on port 27017. |
+| `tuvi up --sudo` / `tuvi down --sudo` | Run the docker command with sudo |
 | `tuvi up --api-only` / `--web-only` | Start one side only |
 | `tuvi up --host 0.0.0.0` | Listen on the LAN, to open the app from a phone |
 | `tuvi check --python-only` / `--web-only` | Run one side of the checks |
 | `tuvi editor` | Streamlit editor for the cách cục rules |
 | `tuvi viewer` | Streamlit chart viewer |
+
+## Docker permission denied
+
+If your user cannot use Docker, `tuvi up` and `tuvi down` print how to fix it.
+In a terminal, they also ask whether to run the docker command with sudo this
+time. To fix it for good, add your user to the `docker` group and open a new
+shell. This group gives root-level access to the machine.
+
+```bash
+sudo usermod -aG docker $USER
+```
 
 ## Environment
 

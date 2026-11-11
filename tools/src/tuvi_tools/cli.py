@@ -109,6 +109,57 @@ def require(tool: str, hint: str) -> bool:
     return True
 
 
+PNPM_HINT = (
+    "Activate it with `mise use -g pnpm@11`, or `corepack enable pnpm`, "
+    "or see https://pnpm.io/installation."
+)
+
+DOCKER_PERMISSION_HELP = """\
+your user cannot use Docker (permission denied on the Docker socket). To fix it:
+       sudo usermod -aG docker $USER   # then open a new shell, or run: newgrp docker
+     The docker group gives root-level access to this machine.
+     Other ways: pass --sudo, or run your own MongoDB on :27017 and pass --no-db."""
+
+
+def ask_yes_no(question: str) -> bool:
+    """Ask in an interactive terminal; anything but yes is no."""
+    if not sys.stdin.isatty():
+        return False
+    try:
+        answer = input(f"{_prefix('tuvi')} {question} [y/N] ")
+    except EOFError:
+        return False
+    return answer.strip().lower() in {"y", "yes"}
+
+
+def docker_command(*, use_sudo: bool) -> list[str] | None:
+    """The command that reaches the Docker daemon: ["docker"] or ["sudo", "docker"].
+
+    Returns None, after printing what to do, when Docker cannot be used.
+    """
+    if not require("docker", "Install Docker, or run your own MongoDB on :27017 and pass --no-db."):
+        return None
+    if use_sudo:
+        return ["sudo", "docker"]
+
+    probe = subprocess.run(["docker", "info"], capture_output=True, text=True)
+    if probe.returncode == 0:
+        return ["docker"]
+
+    error = (probe.stderr or probe.stdout).lower()
+    if "permission denied" in error:
+        say(DOCKER_PERMISSION_HELP)
+        if shutil.which("sudo") and ask_yes_no("Run the docker command with sudo this time?"):
+            return ["sudo", "docker"]
+        return None
+    if "cannot connect" in error or "is the docker daemon running" in error:
+        say("the Docker daemon is not running. Start it (Linux: sudo systemctl start docker),")
+        say("or run your own MongoDB on :27017 and pass --no-db.")
+        return None
+    say(f"docker does not work: {(probe.stderr or probe.stdout).strip()}")
+    return None
+
+
 # ----------------------------------------------------------------------------- processes
 
 
@@ -196,10 +247,10 @@ def run(command: list[str], *, cwd: Path, env: dict[str, str] | None = None) -> 
 
 def cmd_setup(_: argparse.Namespace) -> int:
     root = repo_root()
-    ok = require("pnpm", "Install it with `corepack enable` or https://pnpm.io/installation.")
-    ok &= require("docker", "Install Docker to run MongoDB, or run your own on port 27017.")
-    if not ok:
+    if not require("pnpm", PNPM_HINT):
         return 1
+    if shutil.which("docker") is None:
+        say("note: Docker is not installed. `tuvi up` needs it, or your own MongoDB and --no-db.")
 
     if run(["uv", "sync"], cwd=root) != 0:
         return fail("uv sync failed")
@@ -231,13 +282,15 @@ def cmd_up(args: argparse.Namespace) -> int:
         if port_open(MONGO_PORT):
             say(f"MongoDB already answers on :{MONGO_PORT}; using it")
         else:
-            if not require("docker", "Or start MongoDB yourself and pass --no-db."):
+            docker = docker_command(use_sudo=args.sudo)
+            if docker is None:
                 return 1
-            if run(["docker", "compose", "up", "-d", "mongodb"], cwd=root) != 0:
+            if run([*docker, "compose", "up", "-d", "mongodb"], cwd=root) != 0:
                 return fail("could not start MongoDB with docker compose")
             if not wait_for_port(MONGO_PORT, timeout=60):
                 return fail(f"MongoDB did not open port {MONGO_PORT} within 60 s")
-            say(f"MongoDB is up on :{MONGO_PORT} (stop it with: uv run tuvi down)")
+            down = "uv run tuvi down --sudo" if docker[0] == "sudo" else "uv run tuvi down"
+            say(f"MongoDB is up on :{MONGO_PORT} (stop it with: {down})")
 
     if "OPENROUTER_API_KEY" not in env:
         say("note: OPENROUTER_API_KEY is not set; charts work, the AI chat will fail")
@@ -259,7 +312,7 @@ def cmd_up(args: argparse.Namespace) -> int:
             )
         )
     if not args.api_only:
-        if not require("pnpm", "Run `uv run tuvi setup` first."):
+        if not require("pnpm", PNPM_HINT):
             return 1
         if not (root / "apps" / "web" / "node_modules").is_dir():
             return fail("web deps are missing; run `uv run tuvi setup` first")
@@ -283,11 +336,12 @@ def cmd_up(args: argparse.Namespace) -> int:
     return run_services(services)
 
 
-def cmd_down(_: argparse.Namespace) -> int:
+def cmd_down(args: argparse.Namespace) -> int:
     root = repo_root()
-    if not require("docker", ""):
+    docker = docker_command(use_sudo=args.sudo)
+    if docker is None:
         return 1
-    return run(["docker", "compose", "down"], cwd=root)
+    return run([*docker, "compose", "down"], cwd=root)
 
 
 def cmd_check(args: argparse.Namespace) -> int:
@@ -349,6 +403,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     up = commands.add_parser("up", help="start MongoDB, the API and the web app")
     up.add_argument("--no-db", action="store_true", help="do not start MongoDB with Docker")
+    up.add_argument("--sudo", action="store_true", help="run the docker command with sudo")
     only = up.add_mutually_exclusive_group()
     only.add_argument("--api-only", action="store_true", help="start only the API")
     only.add_argument("--web-only", action="store_true", help="start only the web app")
@@ -359,7 +414,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     up.set_defaults(func=cmd_up)
 
-    commands.add_parser("down", help="stop MongoDB (data is kept)").set_defaults(func=cmd_down)
+    down = commands.add_parser("down", help="stop MongoDB (data is kept)")
+    down.add_argument("--sudo", action="store_true", help="run the docker command with sudo")
+    down.set_defaults(func=cmd_down)
 
     check = commands.add_parser("check", help="run tests, typecheck and lint")
     side = check.add_mutually_exclusive_group()
