@@ -17,15 +17,6 @@ import { queryKeys } from "./queryKeys";
 import { accountAccessSchema, buildLasoResponseSchema, emptyResponseSchema, type ChartProfile } from "./schemas";
 import buildLasoFixture from "./__fixtures__/build-laso.json";
 
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    token: vi.fn().mockResolvedValue({
-      data: { token: "header.eyJzdWIiOiJ1c2VyLTEifQ.signature" },
-      error: null,
-    }),
-  },
-}));
-
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -77,10 +68,8 @@ describe("useAccountAccess", () => {
 
     await waitFor(() => expect(result.current.data).toEqual(access));
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/me"),
-      expect.objectContaining({
-        headers: { Authorization: "Bearer header.eyJzdWIiOiJ1c2VyLTEifQ.signature" },
-      }),
+      "/api/v1/me",
+      expect.objectContaining({ method: "GET", headers: { "X-Expected-User-Id": "user-1" } }),
     );
     expect(client.getQueryData(queryKeys.accountAccess("user-1"))).toEqual(access);
   });

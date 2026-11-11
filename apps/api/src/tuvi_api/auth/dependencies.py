@@ -66,6 +66,11 @@ async def require_user(
 ) -> Principal:
     if user_id is None:
         raise _unauthorized()
+    # The page sends the account it was loaded for. Another tab may have signed
+    # in as someone else since, and this request must not run as them.
+    expected = request.headers.get("X-Expected-User-Id")
+    if expected is not None and expected != user_id:
+        raise HTTPException(status_code=401, detail="Account changed. Reload to continue.")
     database = request.app.state.auth_database
     try:
         user = await database["user"].find_one(

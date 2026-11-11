@@ -1,14 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { isApiError } from "@/lib/http/errors";
-import { authClient } from "@/lib/auth-client";
 
 import fixture from "./__fixtures__/build-laso.json";
-import { clearAuthToken } from "./auth-headers";
 import { newIdempotencyKey, request } from "./client";
 import { buildLasoResponseSchema } from "./schemas";
-
-vi.mock("@/lib/auth-client", () => ({ authClient: { token: vi.fn() } }));
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -16,16 +12,6 @@ function jsonResponse(body: unknown, status = 200) {
     headers: { "Content-Type": "application/json" },
   });
 }
-
-function signedToken(claims: Record<string, unknown>) {
-  const payload = btoa(JSON.stringify(claims))
-    .replace(/=+$/, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-  return `header.${payload}.signature`;
-}
-
-const inAnHour = () => Math.floor(Date.now() / 1000) + 3600;
 
 /** Unwrap the ApiError the client threw, failing the test if it threw anything else. */
 async function errorFrom(promise: Promise<unknown>) {
@@ -40,9 +26,6 @@ async function errorFrom(promise: Promise<unknown>) {
 
 beforeEach(() => {
   localStorage.clear();
-  clearAuthToken();
-  vi.mocked(authClient.token).mockReset();
-  vi.mocked(authClient.token).mockResolvedValue({ data: { token: "signed-token" }, error: null });
 });
 
 afterEach(() => {
@@ -110,51 +93,40 @@ describe("request", () => {
     );
   });
 
-  it("does not send a private request if the account leaves while its token loads", async () => {
-    let resolveToken!: (value: { data: { token: string }; error: null }) => void;
-    vi.mocked(authClient.token).mockReturnValue(
-      new Promise((resolve) => {
-        resolveToken = resolve;
-      }),
-    );
+  it("does not send a private request after its account left", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     const controller = new AbortController();
-    const pending = request("/api/v1/chart-profiles", {
-      method: "POST",
-      schema: buildLasoResponseSchema,
-      withAuth: true,
-      signal: controller.signal,
-    });
-    const rejected = expect(pending).rejects.toMatchObject({ name: "AbortError" });
     controller.abort();
-    resolveToken({ data: { token: "new-account-token" }, error: null });
-    await rejected;
+
+    await expect(
+      request("/api/v1/chart-profiles", {
+        method: "POST",
+        schema: buildLasoResponseSchema,
+        withAuth: true,
+        signal: controller.signal,
+      }),
+    ).rejects.toMatchObject({ name: "AbortError" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 
 describe("headers", () => {
-  it("does not send data for account A using account B's token", async () => {
-    vi.mocked(authClient.token).mockResolvedValue({
-      data: { token: "header.eyJzdWIiOiJhY2NvdW50LWIifQ.signature" },
-      error: null,
-    });
+  it("does not call the backend for an account request while signed out", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     const error = await errorFrom(
       request("/api/v1/chart-profiles", {
-        method: "POST",
-        body: { birth_info: "account-a-input" },
         schema: buildLasoResponseSchema,
         withAuth: true,
-        expectedUserId: "account-a",
+        expectedUserId: null,
       }),
     );
     expect(error).toMatchObject({ kind: "http", status: 401 });
     expect(fetchMock).not.toHaveBeenCalled();
   });
-  it("attaches bearer identity and idempotency", async () => {
+
+  it("sends idempotency and the expected account but no token: the session cookie goes along by itself", async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(fixture));
     vi.stubGlobal("fetch", fetchMock);
 
@@ -164,121 +136,30 @@ describe("headers", () => {
       body: {},
       schema: buildLasoResponseSchema,
       withAuth: true,
+      expectedUserId: "account-a",
       idempotencyKey: key,
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]![0]).toBe("/api/v1/chart-profiles");
     const headers = fetchMock.mock.calls[0]![1].headers;
-    expect(headers["Authorization"]).toBe("Bearer signed-token");
+    expect(headers["Authorization"]).toBeUndefined();
     expect(headers["Idempotency-Key"]).toBe(key);
+    expect(headers["X-Expected-User-Id"]).toBe("account-a");
     expect(headers["Content-Type"]).toBe("application/json");
   });
 
-  it("does not acquire identity for a public request", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(fixture));
-    vi.stubGlobal("fetch", fetchMock);
-
-    await request("/api/v1/laso/build", { schema: buildLasoResponseSchema });
-
-    const headers = fetchMock.mock.calls[0]![1].headers;
-    expect(headers["Authorization"]).toBeUndefined();
-    expect(headers["Idempotency-Key"]).toBeUndefined();
-    expect(authClient.token).not.toHaveBeenCalled();
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("reuses an unexpired token for the same account", async () => {
-    const token = signedToken({ sub: "account-a", exp: inAnHour() });
-    vi.mocked(authClient.token).mockResolvedValue({ data: { token }, error: null });
-    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(fixture)));
-    vi.stubGlobal("fetch", fetchMock);
-    const options = {
-      schema: buildLasoResponseSchema,
-      withAuth: true,
-      expectedUserId: "account-a",
-    };
-
-    await Promise.all([
-      request("/api/v1/chart-profiles", options),
-      request("/api/v1/chart-profiles", options),
-    ]);
-    await request("/api/v1/chart-profiles", options);
-
-    expect(authClient.token).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls.map(([, init]) => init.headers.Authorization)).toEqual(
-      Array(3).fill(`Bearer ${token}`),
-    );
-    expect(localStorage.length).toBe(0);
-  });
-
-  it("does not reuse a token that is about to expire or belongs to another account", async () => {
-    const expiring = signedToken({ sub: "account-a", exp: Math.floor(Date.now() / 1000) + 30 });
-    const accountA = signedToken({ sub: "account-a", exp: inAnHour() });
-    const accountB = signedToken({ sub: "account-b", exp: inAnHour() });
-    vi.mocked(authClient.token)
-      .mockResolvedValueOnce({ data: { token: expiring }, error: null })
-      .mockResolvedValueOnce({ data: { token: accountA }, error: null })
-      .mockResolvedValueOnce({ data: { token: accountB }, error: null });
-    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(fixture)));
-    vi.stubGlobal("fetch", fetchMock);
-
-    for (const expectedUserId of ["account-a", "account-a", "account-b"]) {
-      await request("/api/v1/chart-profiles", {
-        schema: buildLasoResponseSchema,
-        withAuth: true,
-        expectedUserId,
-      });
-    }
-
-    expect(fetchMock.mock.calls.map(([, init]) => init.headers.Authorization)).toEqual([
-      `Bearer ${expiring}`,
-      `Bearer ${accountA}`,
-      `Bearer ${accountB}`,
-    ]);
-  });
-
-  it("retries once with a new token when the API rejects a cached one", async () => {
-    const revoked = signedToken({ sub: "account-a", exp: inAnHour(), sid: "revoked" });
-    const current = signedToken({ sub: "account-a", exp: inAnHour(), sid: "current" });
-    vi.mocked(authClient.token)
-      .mockResolvedValueOnce({ data: { token: revoked }, error: null })
-      .mockResolvedValueOnce({ data: { token: current }, error: null });
+  it("passes a 401 from the API through without retrying", async () => {
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce(jsonResponse(fixture))
-      .mockResolvedValueOnce(jsonResponse({ detail: "Session expired." }, 401))
-      .mockResolvedValueOnce(jsonResponse(fixture));
-    vi.stubGlobal("fetch", fetchMock);
-    const options = {
-      schema: buildLasoResponseSchema,
-      withAuth: true,
-      expectedUserId: "account-a",
-    };
-
-    await request("/api/v1/chart-profiles", options);
-    await request("/api/v1/chart-profiles", options);
-
-    expect(fetchMock.mock.calls.map(([, init]) => init.headers.Authorization)).toEqual([
-      `Bearer ${revoked}`,
-      `Bearer ${revoked}`,
-      `Bearer ${current}`,
-    ]);
-  });
-
-  it("does not call the backend when authentication fails or poison later attempts", async () => {
-    vi.mocked(authClient.token)
-      .mockResolvedValueOnce({ data: { token: "" }, error: null })
-      .mockResolvedValueOnce({ data: { token: "signed-token" }, error: null });
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(fixture));
+      .mockResolvedValue(jsonResponse({ detail: "Authentication required." }, 401));
     vi.stubGlobal("fetch", fetchMock);
 
     const error = await errorFrom(
       request("/api/v1/chart-profiles", { schema: buildLasoResponseSchema, withAuth: true }),
     );
-    expect(error).toMatchObject({ kind: "http", status: 401 });
-    expect(fetchMock).not.toHaveBeenCalled();
 
-    await request("/api/v1/chart-profiles", { schema: buildLasoResponseSchema, withAuth: true });
+    expect(error).toMatchObject({ kind: "http", status: 401 });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

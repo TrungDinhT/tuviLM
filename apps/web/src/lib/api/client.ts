@@ -2,14 +2,13 @@ import type { z } from "zod";
 
 import { ApiErrorException } from "@/lib/http/errors";
 
-import { clearAuthToken, getAuthHeaders } from "./auth-headers";
 
 /**
  * The only place in the application that talks to the FastAPI backend.
  *
  * Three things happen here and nowhere else:
  * - requests go to same-origin `/api` paths, which Next forwards to FastAPI
- * - identity (`Authorization`) and idempotency headers are attached
+ * - idempotency headers are attached (the session cookie goes along by itself)
  * - every response is parsed by a Zod schema and every failure is normalized
  *   to the `ApiError` union
  *
@@ -23,9 +22,13 @@ export interface RequestOptions<T> {
   schema: z.ZodType<T>;
   /**
    * Whether the request requires a signed-in account. Public chart building,
-   * preview and health do not.
+   * preview and health do not. The session cookie decides who the API sees.
    */
   withAuth?: boolean;
+  /**
+   * The account that started the request (from the account scope). `null`
+   * means signed out: an account request then fails here, without a round trip.
+   */
   expectedUserId?: string | null;
   /**
    * Pass a stable key for anything that creates a resource or opens a stream.
@@ -88,12 +91,8 @@ export async function request<T>(path: string, options: RequestOptions<T>): Prom
   };
 
   signal?.throwIfAborted();
-  let response = await send(withAuth ? await getAuthHeaders(expectedUserId) : {});
-  if (withAuth && response.status === 401) {
-    // A cached token can outlive its session; retry once with a new one.
-    clearAuthToken();
-    response = await send(await getAuthHeaders(expectedUserId));
-  }
+  if (withAuth) assertSignedIn(expectedUserId);
+  const response = await send(expectedUserHeader(expectedUserId));
 
   const payload = await safeBody(response);
   signal?.throwIfAborted();
@@ -108,4 +107,23 @@ export async function request<T>(path: string, options: RequestOptions<T>): Prom
   }
 
   return parsed.data;
+}
+
+/**
+ * The account this page was loaded for. The API refuses the request if the
+ * session cookie belongs to someone else, e.g. after a sign-in in another tab.
+ */
+export function expectedUserHeader(expectedUserId: string | null | undefined): Record<string, string> {
+  return expectedUserId ? { "X-Expected-User-Id": expectedUserId } : {};
+}
+
+/** An account request made while signed out fails without a round trip. */
+export function assertSignedIn(expectedUserId: string | null | undefined): void {
+  if (expectedUserId === null) {
+    throw new ApiErrorException({
+      kind: "http",
+      status: 401,
+      body: { detail: "Authentication required" },
+    });
+  }
 }

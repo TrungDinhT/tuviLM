@@ -26,9 +26,8 @@ const nextConfig: NextConfig = {
 
   /**
    * The browser calls `/api/*` on this site; Next forwards it to FastAPI.
-   * Same origin means cookies are first-party, with no CORS. Works the same in
-   * `next dev` and on Vercel. Route handlers under `src/app/api` (Better Auth)
-   * run before rewrites, so they still answer their own paths.
+   * Same origin means the login cookie is first-party, with no CORS. Works the
+   * same in `next dev` and on Vercel.
    */
   async rewrites() {
     return [

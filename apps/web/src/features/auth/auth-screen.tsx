@@ -14,8 +14,6 @@ import { cn } from "@/lib/utils";
 
 type AuthMode = "login" | "register";
 
-/** Where a verification link lands; signed in by then, it routes onward. */
-const VERIFY_EMAIL_CALLBACK = "/login";
 const EXPIRED_LINK_ERRORS = new Set(["INVALID_TOKEN", "TOKEN_EXPIRED"]);
 
 export const AUTH_CARD_CLASS =
@@ -88,19 +86,11 @@ export function AuthScreen({ callbackError, mode }: { callbackError?: string; mo
     try {
       const result = isLogin
         ? await authClient.signIn.email({ email, password })
-        : await authClient.signUp.email({
-            name: displayName,
-            email,
-            password,
-            callbackURL: VERIFY_EMAIL_CALLBACK,
-            // Sign-up opens no session before the email is verified. Refreshing
-            // it anyway makes QueryProvider unmount the app while a guest's
-            // session reloads, which would drop the check-inbox state below.
-            fetchOptions: { disableSignal: true },
-          });
+        : // Sign-up opens no session before the email is verified.
+          await authClient.signUp.email({ name: displayName, email, password });
 
       if (result.error) {
-        // Better Auth reports this only after the password matched.
+        // The API reports this only after the password matched.
         if (isLogin && result.error.code === "EMAIL_NOT_VERIFIED") {
           setVerificationEmail(email);
           await requestVerificationEmail(email);
@@ -122,11 +112,8 @@ export function AuthScreen({ callbackError, mode }: { callbackError?: string; mo
   const signInWithGoogle = async () => {
     setPendingAction("google");
     try {
-      const result = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: "/login",
-        errorCallbackURL: "/login",
-      });
+      // Google sends the browser back to /login, signed in or with ?error=google.
+      const result = await authClient.signIn.social({ provider: "google" });
       if (result.error) {
         showToast(authErrorMessage(result.error.message, true));
         setPendingAction(null);
@@ -137,11 +124,14 @@ export function AuthScreen({ callbackError, mode }: { callbackError?: string; mo
     }
   };
 
-  // A verification link that failed lands here with ?error=; it is announced
-  // the way every other notice in the app is, through the shared toast.
+  // A verification link or Google sign-in that failed lands here with ?error=;
+  // it is announced the way every other notice in the app is, through the toast.
   useEffect(() => {
-    if (isLogin && callbackError && EXPIRED_LINK_ERRORS.has(callbackError)) {
+    if (!isLogin || !callbackError) return;
+    if (EXPIRED_LINK_ERRORS.has(callbackError)) {
       showToast("Link xác nhận đã hết hạn. Hãy đăng nhập để nhận link mới.");
+    } else if (callbackError === "google") {
+      showToast("Đăng nhập Google không thành công. Vui lòng thử lại.");
     }
   }, [callbackError, isLogin]);
 
@@ -516,10 +506,7 @@ function VerifyEmailCard({
 
 async function requestVerificationEmail(email: string): Promise<boolean> {
   try {
-    const result = await authClient.sendVerificationEmail({
-      email,
-      callbackURL: VERIFY_EMAIL_CALLBACK,
-    });
+    const result = await authClient.sendVerificationEmail({ email });
     if (!result.error) return true;
     showToast(
       result.error.status === 429

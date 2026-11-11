@@ -28,10 +28,6 @@ vi.mock("@/lib/toast", () => toastMocks);
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
     useSession: () => accountState,
-    token: vi.fn().mockResolvedValue({
-      data: { token: "header.eyJzdWIiOiJ1c2VyLTEifQ.signature" },
-      error: null,
-    }),
   },
 }));
 

@@ -1,12 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { authClient } from "@/lib/auth-client";
 import { isApiError } from "@/lib/http/errors";
 
 import type { SseChatEvent } from "./schemas";
 import { parseSseStream, streamChat } from "./stream";
-
-vi.mock("@/lib/auth-client", () => ({ authClient: { token: vi.fn() } }));
 
 function sseBody(chunks: (string | Uint8Array)[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -28,8 +25,6 @@ async function collect(body: ReadableStream<Uint8Array>): Promise<SseChatEvent[]
 
 beforeEach(() => {
   localStorage.clear();
-  vi.mocked(authClient.token).mockReset();
-  vi.mocked(authClient.token).mockResolvedValue({ data: { token: "signed-token" }, error: null });
 });
 
 afterEach(() => {
@@ -37,42 +32,28 @@ afterEach(() => {
 });
 
 describe("streamChat", () => {
-  it("does not stream account A's message using account B's token", async () => {
-    vi.mocked(authClient.token).mockResolvedValue({
-      data: { token: "header.eyJzdWIiOiJhY2NvdW50LWIifQ.signature" },
-      error: null,
-    });
+  it("does not open a stream while signed out", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     await expect(
       streamChat("session-a", "Account A message", {
         idempotencyKey: "turn-a",
-        expectedUserId: "account-a",
+        expectedUserId: null,
       }).next(),
     ).rejects.toMatchObject({ error: { kind: "http", status: 401 } });
     expect(fetchMock).not.toHaveBeenCalled();
   });
-  it("does not open a stream if its account leaves while the token loads", async () => {
-    let resolveToken!: (value: { data: { token: string }; error: null }) => void;
-    vi.mocked(authClient.token).mockReturnValue(
-      new Promise((resolve) => {
-        resolveToken = resolve;
-      }),
-    );
+  it("does not open a stream after its account left", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     const controller = new AbortController();
-    const pending = streamChat("s1", "Hello", {
-      idempotencyKey: "turn-1",
-      signal: controller.signal,
-    }).next();
-    const rejected = expect(pending).rejects.toMatchObject({ name: "AbortError" });
     controller.abort();
-    resolveToken({ data: { token: "new-account-token" }, error: null });
-    await rejected;
+    await expect(
+      streamChat("s1", "Hello", { idempotencyKey: "turn-1", signal: controller.signal }).next(),
+    ).rejects.toMatchObject({ name: "AbortError" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
-  it("uses the logical turn's idempotency key and abort signal", async () => {
+  it("uses the logical turn's idempotency key, abort signal and expected account", async () => {
     const controller = new AbortController();
     const fetchMock = vi.fn().mockResolvedValue(
       new Response('data: {"type":"done","status":"confirmed"}\n\n', {
@@ -86,6 +67,7 @@ describe("streamChat", () => {
     for await (const event of streamChat("s1", "xin chào", {
       idempotencyKey: "turn-key-1",
       signal: controller.signal,
+      expectedUserId: "account-a",
     })) {
       events.push(event);
     }
@@ -96,9 +78,9 @@ describe("streamChat", () => {
       expect.objectContaining({
         signal: controller.signal,
         headers: {
-          Authorization: "Bearer signed-token",
           "Content-Type": "application/json",
           "Idempotency-Key": "turn-key-1",
+          "X-Expected-User-Id": "account-a",
         },
       }),
     );

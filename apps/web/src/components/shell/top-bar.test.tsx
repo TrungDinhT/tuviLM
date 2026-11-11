@@ -100,7 +100,7 @@ describe("TopBar balance", () => {
     vi.mocked(authClient.signOut).mockImplementationOnce(
       () =>
         new Promise((resolve) => {
-          finishSignOut = () => resolve({ data: { success: true }, error: null });
+          finishSignOut = () => resolve({ error: null });
         }),
     );
     fireEvent.click(sidebarSignOut);

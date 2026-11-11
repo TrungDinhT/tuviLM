@@ -31,7 +31,6 @@ describe("ForgotPasswordScreen", () => {
     expect((await screen.findByRole("status")).textContent).toContain("lan@example.com");
     expect(authMocks.requestPasswordReset).toHaveBeenCalledWith({
       email: "lan@example.com",
-      redirectTo: "/reset-password",
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Gửi lại link" }));

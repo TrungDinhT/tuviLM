@@ -44,7 +44,6 @@ describe("HoSoScreen", () => {
     expect(screen.getByRole("link", { name: "Đăng nhập" }).getAttribute("href")).toBe("/login");
     expect(screen.queryByRole("button", { name: "Đăng xuất" })).toBeNull();
     expect(screen.queryByLabelText("Mã ưu đãi")).toBeNull();
-    expect(authClient.token).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

@@ -42,15 +42,6 @@ const report: CapabilityProfile = {
   diem_yeu: [],
 };
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    // Payload {"sub":"user-1"}.
-    token: vi.fn().mockResolvedValue({
-      data: { token: "header.eyJzdWIiOiJ1c2VyLTEifQ.signature" },
-      error: null,
-    }),
-  },
-}));
 beforeEach(() => {
   // jsdom does not provide layout observers; geometry is checked in a browser.
   vi.stubGlobal(
@@ -222,9 +213,8 @@ describe("capability report", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(JSON.parse(fetch.mock.calls[0]?.[1].body)).toEqual(birth);
-    expect(fetch.mock.calls[0]?.[1].headers.Authorization).toBe(
-      "Bearer header.eyJzdWIiOiJ1c2VyLTEifQ.signature",
-    );
+    // The session cookie identifies the account; no token header is sent.
+    expect(fetch.mock.calls[0]?.[1].headers.Authorization).toBeUndefined();
     expect(useCapabilityStore.getState().entries[key]?.report).toEqual(report);
     expect(
       useCapabilityStore.getState().entries[capabilityKey({ ...birth, hour: 11 }, USER)],

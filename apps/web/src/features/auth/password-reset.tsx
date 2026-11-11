@@ -17,8 +17,6 @@ import {
   SECONDARY_BUTTON_CLASS,
 } from "./auth-screen";
 
-/** Better Auth sends the reset link through here as `?token=` or `?error=`. */
-const RESET_PASSWORD_ROUTE = "/reset-password";
 const NETWORK_ERROR = "Không thể kết nối máy chủ xác thực. Vui lòng thử lại sau.";
 const RATE_LIMITED = "Bạn thao tác hơi nhanh. Vui lòng đợi một chút rồi thử lại.";
 
@@ -48,10 +46,7 @@ export function ForgotPasswordScreen() {
   const sendResetLink = async (email: string) => {
     setPending(true);
     try {
-      const result = await authClient.requestPasswordReset({
-        email,
-        redirectTo: RESET_PASSWORD_ROUTE,
-      });
+      const result = await authClient.requestPasswordReset({ email });
       if (result.error) {
         showToast(
           result.error.status === 429

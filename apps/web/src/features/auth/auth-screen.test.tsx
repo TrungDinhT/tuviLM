@@ -148,11 +148,7 @@ describe("AuthScreen", () => {
     renderAuth();
     fireEvent.click(screen.getByRole("button", { name: /Google/ }));
     await waitFor(() =>
-      expect(authMocks.signInSocial).toHaveBeenCalledWith({
-        provider: "google",
-        callbackURL: "/login",
-        errorCallbackURL: "/login",
-      }),
+      expect(authMocks.signInSocial).toHaveBeenCalledWith({ provider: "google" }),
     );
   });
 
@@ -172,8 +168,6 @@ describe("AuthScreen", () => {
       name: "Lan",
       email: "lan@example.com",
       password: "password123",
-      callbackURL: "/login",
-      fetchOptions: { disableSignal: true },
     });
     expect(authMocks.sendVerificationEmail).not.toHaveBeenCalled();
     expect(screen.getByRole("link", { name: "Đến trang đăng nhập" }).getAttribute("href")).toBe(
@@ -191,7 +185,6 @@ describe("AuthScreen", () => {
     await waitFor(() =>
       expect(authMocks.sendVerificationEmail).toHaveBeenCalledWith({
         email: "user@example.com",
-        callbackURL: "/login",
       }),
     );
     expect(screen.getByRole("status").textContent).toContain("chưa được xác nhận");

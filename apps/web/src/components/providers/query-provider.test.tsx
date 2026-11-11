@@ -21,12 +21,6 @@ const account = vi.hoisted(() => ({
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
     useSession: () => account,
-    token: vi
-      .fn()
-      .mockResolvedValue({
-        data: { token: "header.eyJzdWIiOiJhY2NvdW50LWEifQ.signature" },
-        error: null,
-      }),
   },
 }));
 

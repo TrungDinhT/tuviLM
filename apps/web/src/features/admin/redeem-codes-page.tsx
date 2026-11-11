@@ -1,17 +1,13 @@
-import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import { ScreenPad } from "@/components/shell/app-shell";
 import { StickyHeader } from "@/components/shell/sticky-header";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/server-session";
 
 import { RedeemCodesScreen } from "./redeem-codes-screen";
 
 export async function RedeemCodesPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-    query: { disableCookieCache: true },
-  });
+  const session = await getServerSession();
   if (!session) redirect("/login");
   if (session.user.role !== "admin") notFound();
 

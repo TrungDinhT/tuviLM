@@ -581,6 +581,17 @@ async def test_unknown_session_token_is_unauthorized(auth) -> None:
     assert (await auth.client.get("/private")).status_code == 401
 
 
+async def test_request_for_another_account_is_refused(auth) -> None:
+    user_id = await _register(auth)
+
+    same = await auth.client.get("/private", headers={"X-Expected-User-Id": user_id})
+    other = await auth.client.get("/private", headers={"X-Expected-User-Id": str(ObjectId())})
+
+    assert same.status_code == 200
+    assert other.status_code == 401
+    assert other.json() == {"detail": "Account changed. Reload to continue."}
+
+
 async def test_admin_guard_uses_the_live_role(auth) -> None:
     user_id = await _register(auth)
     users = auth.database["user"]
