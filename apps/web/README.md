@@ -16,7 +16,7 @@ pnpm dev
 The backend runs separately, from the repo root:
 
 ```bash
-uv run uvicorn api.main:app --reload
+uv run uvicorn tuvi_api.main:app --reload
 ```
 
 ## Google sign-in (OAuth 2.0)

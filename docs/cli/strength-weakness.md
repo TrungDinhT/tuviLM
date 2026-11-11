@@ -14,13 +14,13 @@ Create `profiles.yaml` with a list of solar birth dates and integer hours:
 ```
 
 ```sh
-uv run python -m src.cli.main run --list-workflows
-uv run python -m src.cli.main run profiles.yaml \
+uv run tuvilm run --list-workflows
+uv run tuvilm run profiles.yaml \
   --workflow strength_weakness \
   --model openai:gpt-5.4-mini \
   --book-root data/tuvitanbien_chunking_compact/part_2 \
   --output report.yaml
-uv run python -m src.cli.main view report.yaml
+uv run tuvilm view report.yaml
 ```
 
 The book directory must contain the locally provisioned Tân Biên Markdown

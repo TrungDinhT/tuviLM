@@ -23,31 +23,31 @@ and continuing in a new session.
 
 ```mermaid
 flowchart LR
-    Client[Frontend] -->|HTTP + SSE| Routes[api/chat/routes.py]
-    Routes -->|ConversationHistoryStore| Store[api/chat/storage/store.py]
+    Client[Frontend] -->|HTTP + SSE| Routes[apps/api/src/tuvi_api/chat/routes.py]
+    Routes -->|ConversationHistoryStore| Store[apps/api/src/tuvi_api/chat/storage/store.py]
     Store --> Docs[Beanie documents]
     Docs --> Mongo[(MongoDB)]
 
     Routes --> Agent[Pydantic AI agent]
     Routes --> LaSo[Recomputed LaSo]
 
-    Models[api/chat/models.py] -.DTOs/enums.-> Routes
+    Models[apps/api/src/tuvi_api/chat/models.py] -.DTOs/enums.-> Routes
     Models -.DTOs/enums.-> Store
-    Schemas[api/schemas.py] -.HTTP wrappers.-> Routes
+    Schemas[apps/api/src/tuvi_api/schemas.py] -.HTTP wrappers.-> Routes
 ```
 
 Main boundary:
 
 - routes own HTTP, SSE, and agent orchestration
 - store owns persistence consistency
-- Beanie and MongoDB stay inside `api/chat/storage/`
-- `api/chat/models.py` is the shared conversation-history DTO layer
-- `api/schemas.py` is the HTTP wrapper layer
+- Beanie and MongoDB stay inside `apps/api/src/tuvi_api/chat/storage/`
+- `apps/api/src/tuvi_api/chat/models.py` is the shared conversation-history DTO layer
+- `apps/api/src/tuvi_api/schemas.py` is the HTTP wrapper layer
 
 ## Code Map
 
 ```text
-api/chat/
+apps/api/src/tuvi_api/chat/
   models.py          # DTOs and enums used by routes/store/tests
   contracts.py       # ConversationHistoryStore protocol and exceptions
   routes.py          # FastAPI routes, SSE, agent orchestration
@@ -274,7 +274,7 @@ CONVERSATION_HISTORY_STORE__STALE_PENDING_AFTER_SECONDS=900
 
 ## Core Invariants
 
-- Beanie documents do not escape `api/chat/storage/`.
+- Beanie documents do not escape `apps/api/src/tuvi_api/chat/storage/`.
 - Routes do not perform MongoDB queries directly.
 - Store methods enforce owner access.
 - Mutations that create resources or reserve messages require idempotency keys.

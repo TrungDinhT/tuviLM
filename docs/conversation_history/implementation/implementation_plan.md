@@ -52,10 +52,10 @@ Implementation note: Beanie 2 uses PyMongo's async client interface. Use
 
 ## Module Layout
 
-Create the conversation history implementation under `api/chat/`:
+Create the conversation history implementation under `apps/api/src/tuvi_api/chat/`:
 
 ```text
-api/chat/
+apps/api/src/tuvi_api/chat/
   __init__.py
   models.py
   contracts.py
@@ -71,7 +71,7 @@ Responsibilities:
 
 - `models.py`: storage-agnostic Pydantic DTOs and enums
 - `contracts.py`: `ConversationHistoryStore` protocol and store result types
-- `routes.py`: FastAPI router mounted by `api/main.py`
+- `routes.py`: FastAPI router mounted by `apps/api/src/tuvi_api/main.py`
 - `storage/documents.py`: Beanie `Document` classes
 - `storage/mappers.py`: Beanie document to DTO conversion
 - `storage/settings.py`: Mongo-specific settings for the conversation history store
@@ -79,12 +79,12 @@ Responsibilities:
   implementation of `ConversationHistoryStore`
 
 Beanie document classes and Mongo-specific settings must not escape
-`api/chat/storage/` except through app composition in `api/settings.py` and
-`api/main.py`.
+`apps/api/src/tuvi_api/chat/storage/` except through app composition in `apps/api/src/tuvi_api/settings.py` and
+`apps/api/src/tuvi_api/main.py`.
 
 ## Domain DTOs
 
-Define storage-agnostic DTOs in `api/chat/models.py`:
+Define storage-agnostic DTOs in `apps/api/src/tuvi_api/chat/models.py`:
 
 - `BirthInfo`
   - `calendar: Literal["solar"] = "solar"`
@@ -127,7 +127,7 @@ Define storage-agnostic DTOs in `api/chat/models.py`:
   - operation status: `MessageOperationStatus`
 
 Represent chat roles, chat message statuses, and message operation statuses with
-shared `StrEnum` types in `api/chat/models.py`. HTTP schemas and storage
+shared `StrEnum` types in `apps/api/src/tuvi_api/chat/models.py`. HTTP schemas and storage
 documents should reuse those enums so route, store, and persistence logic do not
 compare scattered raw strings.
 
@@ -151,7 +151,7 @@ persistence adapter.
 
 ## Mongo Documents
 
-Define Beanie documents in `api/chat/storage/documents.py`.
+Define Beanie documents in `apps/api/src/tuvi_api/chat/storage/documents.py`.
 
 Use Beanie `DocumentWithSoftDelete` for top-level resource documents:
 
@@ -214,7 +214,7 @@ Use timezone-aware UTC timestamps for `created_at` and `updated_at`.
 
 ## Store Contract
 
-Define `ConversationHistoryStore` in `api/chat/contracts.py`. It owns owner
+Define `ConversationHistoryStore` in `apps/api/src/tuvi_api/chat/contracts.py`. It owns owner
 access checks, idempotency, message reservation/finalization, session context
 loading, soft-delete behavior, and stale pending cleanup.
 
@@ -232,7 +232,7 @@ The contract should expose operations equivalent to:
 - finalize an assistant message as confirmed, failed, or cancelled
 
 Create/list/load methods should return storage-agnostic DTOs from
-`api/chat/models.py`, never Beanie documents.
+`apps/api/src/tuvi_api/chat/models.py`, never Beanie documents.
 
 The store should raise typed application exceptions for:
 
@@ -247,8 +247,8 @@ Routes translate those exceptions into HTTP/SSE responses.
 
 ## HTTP Schemas And Routes
 
-Define only the HTTP wrapper schemas in `api/schemas.py`. Keep
-`api/chat/models.py` for storage-agnostic conversation history DTOs, and reuse
+Define only the HTTP wrapper schemas in `apps/api/src/tuvi_api/schemas.py`. Keep
+`apps/api/src/tuvi_api/chat/models.py` for storage-agnostic conversation history DTOs, and reuse
 those DTOs directly when the HTTP contract is identical to the domain shape.
 Routes should avoid field-copying mappers for identical request/response models.
 
@@ -323,7 +323,7 @@ class SessionChatStreamRequest(BaseModel):
     content: str = Field(min_length=1)
 ```
 
-Mount a router from `api/chat/routes.py` in `api/main.py`.
+Mount a router from `apps/api/src/tuvi_api/chat/routes.py` in `apps/api/src/tuvi_api/main.py`.
 
 Use headers:
 
@@ -754,7 +754,7 @@ Implemented in the current branch:
 - stale pending assistant cleanup before session load and stream reservation
 - frontend creation flow for anonymous owner, chart profile, and session
 - frontend session-scoped chat streaming without the legacy chat fallback
-- `api/main.py` cleanup so chat-history routes live in `api/chat/routes.py`
+- `apps/api/src/tuvi_api/main.py` cleanup so chat-history routes live in `apps/api/src/tuvi_api/chat/routes.py`
 - Mongo-backed integration tests for the conversation history API
 
 Still deferred:

@@ -39,7 +39,7 @@ const ELEMENT_COLORS: Record<string, string> = {
 };
 
 // Lục sát / lục cát plus the twelve stars in THAI_TUE_RING_STAR_IDS
-// (src/agent/tool/thai_tue/vong_thai_tue.py). Preserve accents to distinguish
+// (packages/tuvi-agent/src/tuvi_agent/tool/thai_tue/vong_thai_tue.py). Preserve accents to distinguish
 // Quan Phù in this cycle from Quan Phủ.
 const PREVIEW_STAR_NAMES = new Set([
   "Kình Dương",
@@ -69,7 +69,7 @@ const PREVIEW_STAR_NAMES = new Set([
 ]);
 
 // The API supplies tứ hóa as names only. Elements follow the backend catalog:
-// src/refactored/components/data/tuhoa.json.
+// packages/tuvi-engine/src/tuvi_engine/components/data/tuhoa.json.
 const TU_HOA_ELEMENTS: Record<string, string> = {
   hoaloc: "Thổ",
   hoaquyen: "Mộc",

@@ -7,9 +7,9 @@ complement: leaf semantics, scopes, group members, priority, special cases, merg
 owns the procedure.)
 
 ## Sources
-- Schema (source of truth): `support_tool/cach_cuc/condition_models.py` — read it only to change the
+- Schema (source of truth): `tools/src/tuvi_tools/cach_cuc/condition_models.py` — read it only to change the
   model; for extraction use `cc_tools.py schema`, which is auto-derived from it and never stale.
-- Language spec (prose + worked examples): `src/refactored/docs/cach_cuc_condition_language.md`
+- Language spec (prose + worked examples): `docs/la_so_design/cach_cuc_condition_language.md`
 - Book pages: `data/tuvitanbien/page_NNN.md`
 - Output: `cach_cuc_reviewed.yaml` (keep the `groups:` block at top)
 

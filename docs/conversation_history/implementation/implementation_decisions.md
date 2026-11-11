@@ -12,7 +12,7 @@ storage-agnostic conversation history contract.
 Module layout:
 
 ```text
-api/chat/
+apps/api/src/tuvi_api/chat/
   models.py          # storage-agnostic Pydantic models / DTOs
   contracts.py       # ConversationHistoryStore Protocol
   storage/
@@ -24,20 +24,20 @@ api/chat/
 
 Rules:
 
-- `api/chat/models.py` contains storage-agnostic Pydantic DTOs used by the
+- `apps/api/src/tuvi_api/chat/models.py` contains storage-agnostic Pydantic DTOs used by the
   conversation history contract and application code.
-- `api/chat/contracts.py` exposes the `ConversationHistoryStore` protocol.
-- `api/chat/storage/documents.py` contains Beanie `Document` classes and other
+- `apps/api/src/tuvi_api/chat/contracts.py` exposes the `ConversationHistoryStore` protocol.
+- `apps/api/src/tuvi_api/chat/storage/documents.py` contains Beanie `Document` classes and other
   Mongo-specific persistence models.
-- `api/chat/storage/settings.py` contains Mongo-specific settings for the
+- `apps/api/src/tuvi_api/chat/storage/settings.py` contains Mongo-specific settings for the
   conversation history store adapter.
-- `api/chat/storage/store.py` implements `ConversationHistoryStore` using Beanie.
-- `api/chat/storage/mappers.py` contains explicit conversions between Beanie
+- `apps/api/src/tuvi_api/chat/storage/store.py` implements `ConversationHistoryStore` using Beanie.
+- `apps/api/src/tuvi_api/chat/storage/mappers.py` contains explicit conversions between Beanie
   documents and storage-agnostic DTOs.
-- Beanie document classes must not escape `api/chat/storage/`.
-- API handlers and agent orchestration should depend on `api/chat/models.py` and
-  `api/chat/contracts.py`, not direct MongoDB or Beanie APIs.
-- Keep `api/schemas.py` for HTTP request/response schemas. Do not pass
+- Beanie document classes must not escape `apps/api/src/tuvi_api/chat/storage/`.
+- API handlers and agent orchestration should depend on `apps/api/src/tuvi_api/chat/models.py` and
+  `apps/api/src/tuvi_api/chat/contracts.py`, not direct MongoDB or Beanie APIs.
+- Keep `apps/api/src/tuvi_api/schemas.py` for HTTP request/response schemas. Do not pass
   `api.schemas` request models directly into the store protocol; map API
   payloads to conversation history DTOs at the route/service boundary.
 
@@ -112,7 +112,7 @@ Rationale:
 
 ## Decision 3: `birth_info` Shape
 
-Use a storage-agnostic `BirthInfo` DTO in `api/chat/models.py`.
+Use a storage-agnostic `BirthInfo` DTO in `apps/api/src/tuvi_api/chat/models.py`.
 
 Conceptual shape:
 
@@ -161,7 +161,7 @@ A stored `ChatMessage` represents a user-visible message:
 - timestamps
 
 Roles, chat message statuses, and message operation statuses are represented as
-shared `StrEnum` types in `api/chat/models.py` and reused by HTTP schemas,
+shared `StrEnum` types in `apps/api/src/tuvi_api/chat/models.py` and reused by HTTP schemas,
 storage documents, and route/store logic.
 
 Do not persist Pydantic AI native message objects, tool calls, tool results, or
@@ -336,7 +336,7 @@ Store responsibilities:
 - assistant message finalization
 - stale cleanup of old pending assistant messages
 
-The concrete protocol is defined in `api/chat/contracts.py`.
+The concrete protocol is defined in `apps/api/src/tuvi_api/chat/contracts.py`.
 
 Rationale:
 
@@ -349,22 +349,22 @@ Rationale:
 ## Decision 8: Route Organization
 
 Add a dedicated FastAPI router for conversation history endpoints rather than
-putting all new endpoints directly in `api/main.py`.
+putting all new endpoints directly in `apps/api/src/tuvi_api/main.py`.
 
 Planned shape:
 
 ```text
-api/chat/routes.py
+apps/api/src/tuvi_api/chat/routes.py
 ```
 
-`api/main.py` should include the router and keep application lifecycle setup.
+`apps/api/src/tuvi_api/main.py` should include the router and keep application lifecycle setup.
 
 Rationale:
 
 - The feature is large enough to deserve its own route module.
 - Keeping routes separate makes the transition from the current mocked/in-memory
   chat flow easier to understand.
-- `api/main.py` should remain the app composition point rather than the home of
+- `apps/api/src/tuvi_api/main.py` should remain the app composition point rather than the home of
   all feature logic.
 
 ## Decision 9: Existing Endpoint Transition
@@ -393,7 +393,7 @@ Use a test pyramid split by responsibility:
 - route/API behavior tests should depend on the `ConversationHistoryStore`
   protocol and use a small fake/mock store when persistence correctness is not
   the subject of the test
-- Mongo adapter integration tests should exercise `api/chat/storage/store.py`
+- Mongo adapter integration tests should exercise `apps/api/src/tuvi_api/chat/storage/store.py`
   against a real MongoDB when validating persistence behavior, Beanie mapping,
   soft delete, indexes, idempotency, and embedded message updates
 
@@ -547,13 +547,13 @@ Rationale:
 
 ## Decision 14: Conversation Route Schemas And Stream Path
 
-Keep HTTP request/response schemas in `api/schemas.py` for now, including the
+Keep HTTP request/response schemas in `apps/api/src/tuvi_api/schemas.py` for now, including the
 new conversation-history endpoints.
 
 Planned chat module shape:
 
 ```text
-api/chat/
+apps/api/src/tuvi_api/chat/
   models.py          # storage-agnostic Pydantic models / DTOs
   contracts.py       # ConversationHistoryStore Protocol
   routes.py          # FastAPI router for conversation endpoints
@@ -577,9 +577,9 @@ POST /api/v1/chat/stream
 
 Rationale:
 
-- Keeping all HTTP schemas in `api/schemas.py` is simpler for the current
+- Keeping all HTTP schemas in `apps/api/src/tuvi_api/schemas.py` is simpler for the current
   codebase.
-- `api/chat/models.py` remains the storage-agnostic DTO boundary; routes map
+- `apps/api/src/tuvi_api/chat/models.py` remains the storage-agnostic DTO boundary; routes map
   `api.schemas` payloads into those DTOs.
 - The new persisted stream path is session-scoped and does not break existing
   frontend calls immediately.

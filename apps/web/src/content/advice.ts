@@ -4,7 +4,7 @@ import type { AmDuongRelation, MenhCucRelation } from "@/lib/api/schemas";
  * Lời Khuyên — ten entries keyed by (Mệnh–Cục relation, âm dương polarity).
  *
  * Adapted from the agent's own reviewed prose, not authored from scratch:
- * `_RELATION_LENS` meanings (`src/agent/tool/ban_menh/ban_menh_meaning.py`)
+ * `_RELATION_LENS` meanings (`packages/tuvi-agent/src/tuvi_agent/tool/ban_menh/ban_menh_meaning.py`)
  * supply the relation's reading, and `_YEAR_MENH_POLARITY_LENS.development_focus`
  * (`laso_foundation.py`) supplies the advice axis — reworded here into card
  * voice so the card and the future Hỏi AI tell the same chart one story.

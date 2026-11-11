@@ -1,7 +1,7 @@
 # Adding an agent workflow
 
 This document defines the repository standard for adding a specialized workflow
-under `src/agent/workflow/`. The personality workflow is the reference example.
+under `packages/tuvi-agent/src/tuvi_agent/workflow/`. The personality workflow is the reference example.
 
 ## What a workflow owns
 
@@ -21,7 +21,7 @@ but it must not hardcode the resource location.
 ## Reference layout
 
 ```text
-src/agent/workflow/<workflow_name>/
+packages/tuvi-agent/src/tuvi_agent/workflow/<workflow_name>/
 |-- __init__.py
 |-- agent.py
 |-- input/
@@ -36,7 +36,7 @@ Use valid Python module names. A stable registry key may start with a number,
 but a file name must use words, for example `seven_foundation_questions.py`
 with registry key `7_foundation_questions`.
 
-Shared definitions live in `src/agent/workflow/contracts.py`:
+Shared definitions live in `packages/tuvi-agent/src/tuvi_agent/workflow/contracts.py`:
 
 - `WorkflowInputDefinition` binds an input model to its builder tool,
   instructions, and supporting tools.

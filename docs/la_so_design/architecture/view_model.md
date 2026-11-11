@@ -12,7 +12,7 @@ external services. They sit outside the placement core:
 - `LaSoView` and `CungView` are frozen, serializable DTOs.
 - View construction enriches placement ids with complete component definitions.
 
-The view layer lives in `src/refactored/view/`.
+The view layer lives in `packages/tuvi-engine/src/tuvi_engine/view/`.
 
 ## Snapshot Scope
 

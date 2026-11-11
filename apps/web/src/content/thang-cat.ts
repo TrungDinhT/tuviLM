@@ -12,7 +12,7 @@ import type { DiaChi } from "@/lib/api/schemas";
  *   Tý Sửu Dần Mão Thìn Tỵ Ngọ Mùi Thân Dậu Tuất Hợi
  *
  * The frontend deliberately does not reimplement the transforms
- * (`src/refactored/placement/transforms.py`); the test in this module
+ * (`packages/tuvi-engine/src/tuvi_engine/placement/transforms.py`); the test in this module
  * re-derives every row from these definitions, so a mis-keyed entry fails
  * loudly instead of rendering a wrong month.
  *

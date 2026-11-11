@@ -6,7 +6,7 @@ FastAPI backend for TuviLM UI.
 - Real route: `POST /api/v1/laso/build`
 - Real route: `POST /api/v1/laso/cau-phu`
 - Real route: `POST /api/v1/laso/build_sao_luu`
-- Conversation history routes are mounted from `api/chat/routes.py`:
+- Conversation history routes are mounted from `apps/api/src/tuvi_api/chat/routes.py`:
   - `POST /api/v1/anonymous`
   - `POST /api/v1/chart-profiles`
   - `GET /api/v1/chart-profiles`
@@ -34,7 +34,7 @@ From repo root:
 
 ```bash
 export OPENROUTER_API_KEY="your-openrouter-api-key"
-uv run uvicorn api.main:app --reload --port 8000
+uv run uvicorn tuvi_api.main:app --reload --port 8000
 ```
 
 ### Strength/weakness provider routing
@@ -49,7 +49,7 @@ ordered by lowest latency. The routing request is:
 ```
 
 Model, provider routing, and thinking effort are configured together in
-`StrengthWeaknessSettings` in `api/settings.py`, accessed as
+`StrengthWeaknessSettings` in `apps/api/src/tuvi_api/settings.py`, accessed as
 `settings.strength_weakness.model`, `.provider`, `.allow_fallbacks`,
 `.provider_sort`, and `.reasoning_effort`.
 You can override them in the environment or `.env` using `__` between the
@@ -300,7 +300,7 @@ curl -X POST http://localhost:8000/api/v1/laso/build \
 Send the birth data directly, using the same body as `POST /api/v1/laso/build`.
 It matches the chart by cung Mệnh position, main stars, Tuần and Triệt, then
 returns the original phú text from
-`data/cung_menh_phu_luc_bat_v3_tieu_de_moi.json`.
+`packages/tuvi-engine/src/tuvi_engine/data/cung_menh_phu_luc_bat_v3_tieu_de_moi.json`.
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/laso/cau-phu \

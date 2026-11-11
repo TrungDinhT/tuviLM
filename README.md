@@ -1,12 +1,12 @@
 # TuviLM
 
-See the [API guide](api/README.md) and [frontend guide](astrology_styled_frontend/README.md)
+See the [API guide](apps/api/README.md) and [frontend guide](apps/web/README.md)
 for application setup.
 
 Chọn model khi chạy workflow bằng `--model` (trước hoặc sau `run`):
 
 ```bash
-uv run python -m src.cli.main --model openrouter:qwen/qwen3.8-flash run data/workflow_profiles.yaml --workflow strength_weakness
+uv run tuvilm --model openrouter:qwen/qwen3.8-flash run data/workflow_profiles.yaml --workflow strength_weakness
 ```
 
 Nếu bỏ qua `--model`, CLI dùng `TUVILM_WORKFLOW_MODEL` hoặc model mặc định.
@@ -14,13 +14,13 @@ Nếu bỏ qua `--model`, CLI dùng `TUVILM_WORKFLOW_MODEL` hoặc model mặc �
 Mở dashboard riêng cho workflow điểm mạnh–điểm yếu:
 
 ```bash
-uv run python -m src.cli.main view
+uv run tuvilm view
 ```
 
 Dashboard tự tìm `reports/strength_weakness*.yaml` / `.yml`. Chọn nhiều lần chạy trong sidebar hoặc upload nhiều report để đối chiếu model. Để mở sẵn một report:
 
 ```bash
-uv run python -m src.cli.main view reports/strength_weakness_qwen3.8-flash.yaml --port 8501
+uv run tuvilm view reports/strength_weakness_qwen3.8-flash.yaml --port 8501
 ```
 
 Ba phần của dashboard:
