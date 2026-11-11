@@ -236,9 +236,9 @@ deadline, so an expired code cannot be used while waiting for cleanup.
 
 Code claims and balance credits use one MongoDB transaction. If either fails,
 neither is saved. **Redemption requires a MongoDB replica set or sharded cluster;
-standalone MongoDB returns `503`.** The current local standalone database must
-be converted before this feature can be used locally. Never remove its data
-volume during conversion. A separate one-node replica set can be used for tests:
+standalone MongoDB returns `503`.** The repo `docker-compose.yaml` (started by
+`uv run tuvi up`) runs a one-node replica set, and keeps the data of an older
+standalone volume. A separate replica set can also be used for tests:
 
 ```bash
 CONVERSATION_HISTORY_STORE__URI='mongodb://localhost:27018/?directConnection=true' \

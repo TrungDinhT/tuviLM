@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import os
-import secrets
 import shutil
 import signal
 import socket
@@ -91,6 +90,22 @@ def port_open(port: int, host: str = "127.0.0.1") -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.settimeout(0.3)
         return sock.connect_ex((host, port)) == 0
+
+
+def mongo_is_replica_set() -> bool | None:
+    """True or False for the MongoDB on MONGO_PORT, or None if it cannot tell."""
+    try:
+        from pymongo import MongoClient
+    except ImportError:
+        return None
+    try:
+        with MongoClient(
+            f"mongodb://localhost:{MONGO_PORT}/?directConnection=true",
+            serverSelectionTimeoutMS=2000,
+        ) as client:
+            return bool(client.admin.command("hello").get("setName"))
+    except Exception:
+        return None
 
 
 def wait_for_port(port: int, timeout: float) -> bool:
@@ -283,11 +298,7 @@ def cmd_setup(_: argparse.Namespace) -> int:
 
     env_file = root / ".env"
     if not env_file.exists():
-        text = (root / ".env.example").read_text()
-        text = text.replace(
-            "# AUTH__SECRET_KEY=", f"AUTH__SECRET_KEY={secrets.token_urlsafe(32)}"
-        )
-        env_file.write_text(text)
+        shutil.copyfile(root / ".env.example", env_file)
         say("created .env from .env.example (add OPENROUTER_API_KEY for the chat)")
     web_env = root / "apps" / "web" / ".env.local"
     if not web_env.exists():
@@ -305,11 +316,18 @@ def cmd_up(args: argparse.Namespace) -> int:
     if not args.no_db:
         if port_open(MONGO_PORT):
             say(f"MongoDB already answers on :{MONGO_PORT}; using it")
+            if mongo_is_replica_set() is False:
+                say(
+                    "note: this MongoDB is not a replica set, so redeeming coin codes "
+                    "fails (503). To restart it with the repo config: uv run tuvi down, "
+                    "then uv run tuvi up"
+                )
         else:
             docker = docker_command(use_sudo=args.sudo)
             if docker is None:
                 return 1
-            if run([*docker, "compose", "up", "-d", "mongodb"], cwd=root) != 0:
+            # --wait returns once the health check passes: the replica set is ready.
+            if run([*docker, "compose", "up", "-d", "--wait", "mongodb"], cwd=root) != 0:
                 return fail("could not start MongoDB with docker compose")
             if not wait_for_port(MONGO_PORT, timeout=60):
                 return fail(f"MongoDB did not open port {MONGO_PORT} within 60 s")

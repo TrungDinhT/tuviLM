@@ -9,6 +9,7 @@ dependencies = [
     "pandas>=2",
     "pydantic-ai>=1.96.0",
     "pydantic>=2.9.2,<3",
+    "pymongo>=4.9",
     "pyyaml>=6.0.0,<7",
     "streamlit>=1.40.0,<2",
 ]

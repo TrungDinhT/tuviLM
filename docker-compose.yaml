@@ -1,10 +1,29 @@
 services:
   mongodb:
     image: mongo:7
+    # A one-node replica set: coin redemption uses MongoDB transactions, which a
+    # standalone server rejects. Existing data in the volume is kept.
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      # Starts the replica set on the first run; later runs only check it.
+      # The member host is localhost:27017, the address the API uses.
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - >-
+          try { rs.status() } catch (e) {
+          rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] }) };
+          quit(db.hello().isWritablePrimary ? 0 : 1)
+      interval: 5s
+      timeout: 10s
+      start_period: 10s
+      retries: 12
 
 volumes:
   mongodb_data:

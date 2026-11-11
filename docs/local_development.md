@@ -37,16 +37,30 @@ shell. This group gives root-level access to the machine.
 sudo usermod -aG docker $USER
 ```
 
+## MongoDB
+
+`docker-compose.yaml` runs MongoDB as a one-node replica set (`rs0`), because
+coin redemption uses transactions. The first start sets up the replica set; the
+data in the volume is kept. If an older standalone MongoDB is still running,
+`tuvi up` uses it and warns you. Restart it with `uv run tuvi down`, then
+`uv run tuvi up`. The redeem code tests need the replica set too.
+
 ## Environment
 
 `tuvi up` reads the repo `.env` and passes it to the API, so you can keep
 `OPENROUTER_API_KEY` there. Without it, charts work but the AI chat fails.
 See `apps/api/README.md` for all API settings.
 
+## Login emails
+
+Without `AUTH__RESEND_API_KEY` and `AUTH__EMAIL_FROM`, the API does not send
+email. It prints each verification and password reset email, with its link,
+in the `api` log. Open the link to verify the account.
+
 The web app forwards `/api/*` to `API_ORIGIN` (default `http://127.0.0.1:8000`).
 
 ## Book files
 
 The agent's book files are not in git. Put them in
-`data/tuvitanbien_chunking_compact/part_2/`, or set `BOOK_ROOT`. The test that
-needs them is skipped when they are missing.
+`data/tuvitanbien_chunking_compact/part_2/`, or set `BOOK_ROOT`. The tests that
+need them are skipped when they are missing.
