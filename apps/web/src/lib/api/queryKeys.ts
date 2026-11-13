@@ -53,6 +53,7 @@ export const queryKeys = {
 export const mutationKeys = {
   castChart: () => ["laso", "cast"] as const,
   openChartProfile: () => ["chartProfiles", "open"] as const,
+  createSession: (profileId: string | null) => ["sessions", "create", profileId] as const,
 } as const;
 
 /**
