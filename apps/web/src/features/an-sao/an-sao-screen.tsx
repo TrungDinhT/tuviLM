@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -54,6 +55,7 @@ function pad2(value: number): string {
 export function AnSaoScreen() {
   const router = useRouter();
   const savedBirth = useChartStore((state) => state.birthInfo);
+  const hasChart = useChartStore((state) => state.hasChart);
   const [date, setDate] = useState<BirthDateInput>(() =>
     savedBirth
       ? { year: savedBirth.year, month: savedBirth.month, day: savedBirth.day }
@@ -189,6 +191,14 @@ export function AnSaoScreen() {
       </div>
       {/* Head — story column on the left from md up. */}
       <div className="text-center md:col-start-1 md:row-start-1 md:text-left">
+        {hasChart ? (
+          <Link
+            href="/ban-menh"
+            className="pill-ghost mb-4 inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-[13px] font-semibold no-underline"
+          >
+            <span aria-hidden="true">←</span> Quay lại lá số đang xem
+          </Link>
+        ) : null}
         <div className="text-[10px] font-bold tracking-[0.28em] text-accent uppercase [text-shadow:0_0_14px_var(--accent-glow)]">
           An sao · lập lá số
         </div>

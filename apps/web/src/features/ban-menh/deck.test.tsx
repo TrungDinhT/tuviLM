@@ -13,6 +13,12 @@ import { AdviceCard } from "./advice-card";
 import { DestinyCard } from "./destiny-card";
 import { LuckCard } from "./luck-card";
 
+// The header mounts the profile switcher, which reads the router.
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/ban-menh",
+  useRouter: () => ({ push: vi.fn() }),
+}));
+
 const chart = fixture as BuildLasoResponse;
 
 function cung(over: Partial<Cung>): Cung {

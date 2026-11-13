@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import { AN_SAO_ROUTE, screenFor } from "@/config/site";
+import { ProfileSwitcher } from "@/features/profile-switcher/profile-switcher";
 
 import { AuthLinks } from "./auth-links";
 import { BrandLink } from "./brand-link";
@@ -37,7 +38,10 @@ export function TopBar({ showBrand = false }: { showBrand?: boolean }) {
             <h1 className="mt-[3px] text-[22px] leading-tight font-semibold">{screen.title}</h1>
           </div>
         ) : null}
-        <AuthLinks className="ml-auto" />
+        <div className="ml-auto flex min-w-0 items-center gap-3">
+          <ProfileSwitcher className="max-w-64" align="end" />
+          <AuthLinks />
+        </div>
       </div>
     </header>
   );

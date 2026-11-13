@@ -10,6 +10,7 @@ import {
   CarouselDots,
   CarouselItem,
 } from "@/components/primitives/carousel";
+import { ProfileSwitcher } from "@/features/profile-switcher/profile-switcher";
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
 import { useLasoChart } from "@/lib/api/hooks";
 import { showToast } from "@/lib/toast";
@@ -47,13 +48,14 @@ export function BanMenhScreen() {
   return (
     <div className="pb-[calc(56px+var(--tabbar-h))] lg:pb-14">
       <div className="px-[22px] pt-[calc(10px+var(--safe-t))] md:px-[30px] lg:px-10 lg:pt-[calc(18px+var(--safe-t))]">
-        <div className="flex items-center justify-between gap-[14px]">
-          <div className="text-[10px] font-bold tracking-[0.26em] text-accent uppercase">
-            {hydrated ? greeting() : "Chào bạn"}
-          </div>
-          <div className="flex flex-none flex-col items-end gap-[9px] lg:hidden">
+        <div className="flex items-center justify-between gap-[14px] lg:hidden">
+          <ProfileSwitcher />
+          <div className="shrink-0">
             <BalanceBadge />
           </div>
+        </div>
+        <div className="mt-4 text-[10px] font-bold tracking-[0.26em] text-accent uppercase lg:mt-0">
+          {hydrated ? greeting() : "Chào bạn"}
         </div>
         <div className="mt-[10px] flex items-center justify-between gap-3">
           <h2 className="font-display text-[26px] leading-[1.06] font-semibold tracking-[-0.01em]">
