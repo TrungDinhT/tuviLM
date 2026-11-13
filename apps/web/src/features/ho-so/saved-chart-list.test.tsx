@@ -2,14 +2,22 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 import type { ChartProfile } from "@/lib/api/schemas";
-import chart from "@/lib/api/__fixtures__/build-laso.json";
 import { useChartStore } from "@/store/chart-store";
 
 import { SavedChartList } from "./saved-chart-list";
 
-const mocks = vi.hoisted(() => ({ mutate: vi.fn(), hook: vi.fn(), push: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  mutate: vi.fn(),
+  hook: vi.fn(),
+  opening: vi.fn(),
+  push: vi.fn(),
+}));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: mocks.push }) }));
-vi.mock("@/lib/api/hooks", () => ({ useOpenChartProfile: mocks.hook }));
+vi.mock("@tanstack/react-query", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@tanstack/react-query")>()),
+  useMutation: mocks.hook,
+  useIsMutating: () => (mocks.opening() ? 1 : 0),
+}));
 vi.mock("@/features/an-sao/casting-loader", () => ({
   CastingLoader: ({ title }: { title: string }) => <p>{title}</p>,
 }));
@@ -40,6 +48,7 @@ const media = window.matchMedia("(min-width: 768px)");
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.hook.mockReturnValue(OPEN_PROFILE);
+  mocks.opening.mockReturnValue(false);
   useChartStore.getState().reset();
   wide = false;
   listeners.clear();
@@ -149,7 +158,7 @@ it("clamps deletion pages and updates active rename searches", () => {
   expect(names()).toEqual([]);
 });
 
-it("activates the selected profile only after loading and redirects to Ban Menh", () => {
+it("shows the loader while the profile opens, then redirects to Ban Menh", () => {
   const content = () => (
     <>
       <h1>Hồ sơ</h1>
@@ -160,7 +169,6 @@ it("activates the selected profile only after loading and redirects to Ban Menh"
   fireEvent.click(screen.getByRole("button", { name: "Chart 2" }));
   const [profile, callbacks] = mocks.mutate.mock.calls[0]!;
   expect(profile).toBe(profiles[1]);
-  expect(useChartStore.getState().hasChart).toBe(false);
   mocks.hook.mockReturnValue({ ...OPEN_PROFILE, isPending: true });
   view.rerender(content());
   const loading = screen.getByRole("dialog", { name: "Đang mở lá số đã lưu" });
@@ -172,13 +180,9 @@ it("activates the selected profile only after loading and redirects to Ban Menh"
   expect(screen.queryAllByRole("article")).toHaveLength(0);
   fireEvent.keyDown(loading, { key: "Escape" });
   expect(screen.getByRole("dialog")).toBe(loading);
-  act(() => callbacks.onSuccess({ chart }));
-  expect(useChartStore.getState()).toMatchObject({
-    hasChart: true,
-    chartId: chart.id,
-    chartProfileId: profile.id,
-    birthInfo: profile.birth_info,
-  });
+  // The mutation activates the chart; the list only navigates.
+  expect(mocks.push).not.toHaveBeenCalled();
+  act(() => callbacks.onSuccess());
   expect(mocks.push).toHaveBeenCalledWith("/ban-menh");
   mocks.hook.mockReturnValue({ ...OPEN_PROFILE, isSuccess: true });
   view.rerender(content());
@@ -204,4 +208,11 @@ it("restores the list and focus for retry without changing the active chart on f
   expect(mocks.mutate).toHaveBeenCalledTimes(2);
   expect(mocks.mutate).toHaveBeenCalledWith(profiles[1], expect.any(Object));
   expect(mocks.push).not.toHaveBeenCalled();
+});
+
+it("does not open a chart while another unit is already opening one", () => {
+  mocks.opening.mockReturnValue(true);
+  render(<SavedChartList profiles={profiles} />);
+  fireEvent.click(screen.getByRole("button", { name: "Chart 2" }));
+  expect(mocks.mutate).not.toHaveBeenCalled();
 });

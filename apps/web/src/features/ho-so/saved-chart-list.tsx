@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useIsMutating, useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useState, useSyncExternalStore } from "react";
 
 import { Dialog } from "@/components/primitives/dialog";
 import { CastingLoader } from "@/features/an-sao/casting-loader";
-import { outcomeFromChart } from "@/features/an-sao/outcome";
-import { useOpenChartProfile } from "@/lib/api/hooks";
+import { useAccountRequestScope } from "@/lib/api/account-request";
+import { openChartProfileMutationOptions } from "@/lib/api/chart-profiles";
+import { mutationKeys } from "@/lib/api/queryKeys";
 import type { ChartProfile } from "@/lib/api/schemas";
 import { describe, isApiError } from "@/lib/http/errors";
-import { useChartStore } from "@/store/chart-store";
 
 import { SavedChartCard } from "./saved-chart-card";
 
@@ -17,21 +18,20 @@ const TABLET_QUERY = "(min-width: 768px)";
 const PAGE_BUTTON_CLASS =
   "pill-ghost min-h-11 cursor-pointer rounded-full px-3 text-[13px] disabled:pointer-events-none disabled:opacity-40";
 
-function subscribeWidth(onChange: () => void) {
+const subscribeWidth = (onChange: () => void) => {
   const media = window.matchMedia(TABLET_QUERY);
   media.addEventListener("change", onChange);
   return () => media.removeEventListener("change", onChange);
-}
+};
 
-function normalizeSearch(value: string): string {
-  return value
+const normalizeSearch = (value: string): string =>
+  value
     .trim()
     .toLowerCase()
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .replace(/đ/g, "d")
     .replace(/\s+/g, " ");
-}
 
 interface SavedChartListProps {
   profiles: ChartProfile[];
@@ -39,7 +39,11 @@ interface SavedChartListProps {
 
 export function SavedChartList({ profiles }: SavedChartListProps) {
   const router = useRouter();
-  const openProfile = useOpenChartProfile();
+  const scope = useAccountRequestScope();
+  const { mutate, isPending, isSuccess, isError, error } = useMutation(
+    openChartProfileMutationOptions(scope),
+  );
+  const isOpening = useIsMutating({ mutationKey: mutationKeys.openChartProfile() }) > 0;
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageDraft, setPageDraft] = useState<string | null>(null);
@@ -68,36 +72,31 @@ export function SavedChartList({ profiles }: SavedChartListProps) {
     targetPage <= pageCount;
   const pageError = pageDraft !== null && !validPage;
 
-  function goToPage(nextPage: number) {
+  const goToPage = (nextPage: number) => {
     setPage(nextPage);
     setPageDraft(null);
-  }
+  };
 
-  function submitPage() {
+  const submitPage = () => {
     if (validPage) goToPage(targetPage);
-  }
+  };
 
-  function changeSearch(value: string) {
+  const changeSearch = (value: string) => {
     setSearch(value);
     goToPage(1);
-  }
+  };
 
-  function openChart(profile: ChartProfile) {
-    if (openProfile.isPending || openProfile.isSuccess) return;
-    openProfile.mutate(profile, {
-      onSuccess: ({ chart }) => {
-        useChartStore
-          .getState()
-          .castChart(outcomeFromChart(chart), chart.id, profile.birth_info, profile.id);
-        router.push("/ban-menh");
-      },
-    });
-  }
+  const openChart = (profile: ChartProfile) => {
+    if (isOpening || isSuccess) return;
+    // The mutation activates the chart; here only the navigation, which has
+    // no meaning once this list is gone.
+    mutate(profile, { onSuccess: () => router.push("/ban-menh") });
+  };
 
   return (
     <>
       <Dialog
-        open={openProfile.isPending || openProfile.isSuccess}
+        open={isPending || isSuccess}
         onOpenChange={() => {}}
         variant="fullscreen"
         title="Đang mở lá số đã lưu"
@@ -108,11 +107,9 @@ export function SavedChartList({ profiles }: SavedChartListProps) {
         </div>
       </Dialog>
       <div>
-        {openProfile.isError && (
+        {isError && (
           <p role="alert" className="mb-4 text-[13px] text-fire">
-            {isApiError(openProfile.error)
-              ? describe(openProfile.error.error)
-              : "Không mở được lá số. Bạn thử lại nhé."}
+            {isApiError(error) ? describe(error.error) : "Không mở được lá số. Bạn thử lại nhé."}
           </p>
         )}
         <label htmlFor="saved-chart-search" className="sr-only">

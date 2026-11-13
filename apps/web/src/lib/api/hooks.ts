@@ -17,7 +17,6 @@ import { queryKeys } from "./queryKeys";
 import {
   type BirthInfo,
   type BuildLasoResponse,
-  type ChartProfile,
   type CreateChartProfileRequest,
   type CreateRedeemCodeRequest,
   type PreviewLasoRequest,
@@ -119,54 +118,6 @@ export function useBuildLaso() {
     onSuccess: (data) => {
       if (getSignal()?.aborted) return;
       queryClient.setQueryData(queryKeys.laso.chart(data.id), data);
-    },
-  });
-}
-
-/** Restore a saved chart and its newest conversation before activating it. */
-export function useOpenChartProfile() {
-  const queryClient = useQueryClient();
-  const { getSignal, userId } = useAccountRequestScope();
-  return useMutation({
-    mutationFn: async (profile: ChartProfile) => {
-      const signal = getSignal();
-      const [chart, sessions] = await Promise.all([
-        request(apiEndpoints.buildLaso, {
-          method: "POST",
-          body: profile.birth_info,
-          schema: buildLasoResponseSchema,
-          signal,
-        }),
-        request(apiEndpoints.profileSessions(profile.id), {
-          schema: listSessionsResponseSchema,
-          withAuth: true,
-          expectedUserId: userId,
-          signal,
-        }),
-      ]);
-      // The chat opens on the newest conversation; the others load when selected.
-      const newest = [...sessions.sessions].sort((a, b) =>
-        b.updated_at.localeCompare(a.updated_at),
-      )[0];
-      const transcript =
-        newest === undefined
-          ? null
-          : await request(apiEndpoints.session(newest.id), {
-              schema: getSessionResponseSchema,
-              withAuth: true,
-              expectedUserId: userId,
-              signal,
-            });
-      signal?.throwIfAborted();
-      return { chart, sessions, transcript };
-    },
-    onSuccess: ({ chart, sessions, transcript }, profile) => {
-      getSignal()?.throwIfAborted();
-      queryClient.setQueryData(queryKeys.laso.chart(chart.id), chart);
-      queryClient.setQueryData(queryKeys.sessions.byProfile(profile.id), sessions);
-      if (transcript !== null) {
-        queryClient.setQueryData(queryKeys.sessions.detail(transcript.session.id), transcript);
-      }
     },
   });
 }
