@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  keepPreviousData,
-  skipToken,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { skipToken, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useChartStore } from "@/store/chart-store";
 
@@ -15,14 +9,9 @@ import { newIdempotencyKey, request } from "./client";
 import { apiEndpoints } from "./endpoints";
 import { queryKeys } from "./queryKeys";
 import {
-  type BirthInfo,
   type BuildLasoResponse,
-  type CreateChartProfileRequest,
   type CreateRedeemCodeRequest,
-  type PreviewLasoRequest,
   accountAccessSchema,
-  buildLasoResponseSchema,
-  createChartProfileRequestSchema,
   createChartProfileResponseSchema,
   createRedeemCodeRequestSchema,
   createRedeemCodeResponseSchema,
@@ -32,8 +21,6 @@ import {
   getSessionResponseSchema,
   listChartProfilesResponseSchema,
   listSessionsResponseSchema,
-  previewLasoRequestSchema,
-  previewLasoResponseSchema,
   renameChartProfileRequestSchema,
   redeemCodeRequestSchema,
   redeemCodeResponseSchema,
@@ -94,35 +81,6 @@ export function useCreateRedeemCode() {
 }
 
 /**
- * Cast a chart from birth information.
- *
- * A mutation rather than a query because casting is user-initiated. The
- * backend builds the chart from this request without storing shared state.
- *
- * On success the response is also written into the query cache under its
- * deterministic id — that entry is the one query the persister keeps across
- * reloads. Callers still get the mutation result; the cache write is what
- * `useLasoChart` and later screens read.
- */
-export function useBuildLaso() {
-  const queryClient = useQueryClient();
-  const { getSignal } = useAccountRequestScope();
-  return useMutation({
-    mutationFn: (birth: BirthInfo) =>
-      request(apiEndpoints.buildLaso, {
-        method: "POST",
-        body: birth,
-        schema: buildLasoResponseSchema,
-        signal: getSignal(),
-      }),
-    onSuccess: (data) => {
-      if (getSignal()?.aborted) return;
-      queryClient.setQueryData(queryKeys.laso.chart(data.id), data);
-    },
-  });
-}
-
-/**
  * The cast chart, read cache-only.
  *
  * Data arrives via `setQueryData` after a cast or via the persisted-cache
@@ -134,34 +92,6 @@ export function useLasoChart() {
   return useQuery<BuildLasoResponse>({
     queryKey: queryKeys.laso.chart(chartId ?? "idle"),
     queryFn: skipToken,
-  });
-}
-
-/**
- * Preview cung Mệnh's chính tinh for the reward reveal.
- *
- * A query keyed by the mapped birth tuple: TanStack Query dedupes and orders
- * the responses, so a dial being spun can never apply a stale preview out of
- * order. `birth` is `null` until every input exists — the caller debounces;
- * this hook does not. Failures surface as the normalized `ApiError` so the
- * screen can choose to stay silent.
- */
-export function useLasoPreview(birth: PreviewLasoRequest | null) {
-  return useQuery({
-    queryKey: queryKeys.laso.preview(birth),
-    queryFn: ({ signal }) =>
-      request(apiEndpoints.previewLaso, {
-        method: "POST",
-        body: previewLasoRequestSchema.parse(birth),
-        schema: previewLasoResponseSchema,
-        signal,
-      }),
-    enabled: birth !== null,
-    // The response is a pure function of the birth tuple — it never goes stale.
-    staleTime: Infinity,
-    // While a new tuple loads, keep showing the previous preview: a spinning
-    // dial must not make the reward flicker off and on.
-    placeholderData: keepPreviousData,
   });
 }
 
@@ -184,46 +114,6 @@ export function useChartProfiles(enabled = true) {
         signal,
       }),
     enabled,
-  });
-}
-
-/** A stable idempotency key for a chart profile, from its birth tuple. */
-export function profileIdempotencyKey(birth: BirthInfo): string {
-  return `profile:${birth.year}-${birth.month}-${birth.day}-${birth.hour}-${birth.gender}`;
-}
-
-/** A readable label for an auto-saved profile: the cast birth date. */
-export function profileDisplayName(birth: BirthInfo): string {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(birth.day)}/${pad(birth.month)}/${birth.year}`;
-}
-
-/**
- * Create a chart profile from a birth tuple.
- *
- * The idempotency key is derived from the birth tuple, so re-casting the same
- * data reuses the same profile instead of accumulating duplicates. This is the
- * auto-save path the cast flow fires; the Hồ sơ screen's user-facing save is
- * still a separate change.
- */
-export function useCreateChartProfile() {
-  const queryClient = useQueryClient();
-  const { getSignal, userId } = useAccountRequestScope();
-  return useMutation({
-    mutationFn: (input: CreateChartProfileRequest) =>
-      request(apiEndpoints.chartProfiles, {
-        method: "POST",
-        body: createChartProfileRequestSchema.parse(input),
-        schema: createChartProfileResponseSchema,
-        withAuth: true,
-        expectedUserId: userId,
-        idempotencyKey: profileIdempotencyKey(input.birth_info),
-        signal: getSignal(),
-      }),
-    onSuccess: () => {
-      if (getSignal()?.aborted) return;
-      void queryClient.invalidateQueries({ queryKey: queryKeys.chartProfiles.all() });
-    },
   });
 }
 

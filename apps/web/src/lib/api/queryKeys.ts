@@ -44,6 +44,7 @@ export const queryKeys = {
  * mutation's state through `useIsMutating` without holding the mutation object.
  */
 export const mutationKeys = {
+  castChart: () => ["laso", "cast"] as const,
   openChartProfile: () => ["chartProfiles", "open"] as const,
 } as const;
 

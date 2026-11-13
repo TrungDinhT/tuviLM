@@ -8,6 +8,7 @@ import { request } from "./client";
 import { apiEndpoints } from "./endpoints";
 import { mutationKeys, queryKeys } from "./queryKeys";
 import {
+  type BirthInfo,
   type ChartProfile,
   buildLasoResponseSchema,
   getSessionResponseSchema,
@@ -73,3 +74,13 @@ export const openChartProfileMutationOptions = ({ getSignal, userId }: AccountRe
         .castChart(outcomeFromChart(chart), chart.id, profile.birth_info, profile.id);
     },
   });
+
+/** A stable idempotency key for a chart profile, from its birth tuple. */
+export const profileIdempotencyKey = (birth: BirthInfo): string =>
+  `profile:${birth.year}-${birth.month}-${birth.day}-${birth.hour}-${birth.gender}`;
+
+const pad2 = (n: number) => String(n).padStart(2, "0");
+
+/** A readable label for an auto-saved profile: the cast birth date. */
+export const profileDisplayName = (birth: BirthInfo): string =>
+  `${pad2(birth.day)}/${pad2(birth.month)}/${birth.year}`;

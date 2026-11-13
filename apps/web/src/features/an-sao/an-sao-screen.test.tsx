@@ -1,34 +1,37 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import fixture from "@/lib/api/__fixtures__/build-laso.json";
 import { useChartStore } from "@/store/chart-store";
 import { usePreferencesStore } from "@/store/preferences-store";
 
 import { AnSaoScreen } from "./an-sao-screen";
 
-const { previewData, accountState, build, createProfile, push } = vi.hoisted(() => ({
-  previewData: { chinh_tinh: ["Tham Lang"] },
-  accountState: {
-    data: null as { user: { id: string; name: string } } | null,
-    isPending: false,
-  },
-  build: vi.fn(),
-  createProfile: vi.fn(),
-  push: vi.fn(),
-}));
+const { previewData, castChart, useMutation, castChartMutationOptions, toast, push } = vi.hoisted(
+  () => ({
+    previewData: { chinh_tinh: ["Tham Lang"] },
+    castChart: { mutate: vi.fn(), isPending: false, isSuccess: false },
+    useMutation: vi.fn(),
+    castChartMutationOptions: vi.fn(),
+    toast: vi.fn(),
+    push: vi.fn(),
+  }),
+);
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push }),
 }));
 
-vi.mock("@/lib/auth-client", () => ({ authClient: { useSession: () => accountState } }));
+vi.mock("@/lib/toast", () => ({ showToast: toast, dismissToast: vi.fn() }));
 
-vi.mock("@/lib/api/hooks", () => ({
-  profileDisplayName: () => "01/01/2000",
-  useBuildLaso: () => ({ mutateAsync: build }),
-  useCreateChartProfile: () => ({ mutateAsync: createProfile }),
-  useLasoPreview: (birth: { hour?: number } | null) => ({
+vi.mock("@/lib/api/laso", () => ({
+  castChartMutationOptions,
+  lasoPreviewQueryOptions: ({ birth }: { birth: { hour?: number } | null }) => ({ birth }),
+}));
+
+vi.mock("@tanstack/react-query", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@tanstack/react-query")>()),
+  useMutation,
+  useQuery: ({ birth }: { birth: { hour?: number } | null }) => ({
     data: birth === null ? undefined : previewData,
     isPlaceholderData: birth?.hour === 4,
   }),
@@ -43,9 +46,7 @@ beforeEach(() => {
       disconnect() {}
     },
   );
-  accountState.data = null;
-  build.mockResolvedValue(fixture);
-  createProfile.mockResolvedValue({ chart_profile: { id: "profile-1" } });
+  useMutation.mockReturnValue(castChart);
   usePreferencesStore.setState({ muteBirthConfirm: false });
   useChartStore.getState().reset();
 });
@@ -53,102 +54,67 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("AnSaoScreen hierarchy", () => {
-  it("prefills saved birth data without changing it when casting again", async () => {
-    vi.useFakeTimers();
-    try {
-      accountState.data = { user: { id: "account-a", name: "Account A" } };
-      usePreferencesStore.setState({ muteBirthConfirm: true });
-      for (const hour of [0, 12, 22]) {
-        const birth = {
-          calendar: "solar" as const,
-          year: 1996,
-          month: 4,
-          day: 15,
-          hour,
-          gender: "F" as const,
-        };
-        useChartStore.setState({ birthInfo: birth });
-        const view = render(<AnSaoScreen />);
-        expect(
-          screen.getByRole("radio", { name: hour < 12 ? "AM" : "PM" }).getAttribute("aria-checked"),
-        ).toBe("true");
-        expect(screen.getByRole("radio", { name: "Nữ" }).getAttribute("aria-checked")).toBe("true");
-        fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
-        await act(async () => vi.advanceTimersByTimeAsync(2600));
-        expect(build).toHaveBeenLastCalledWith(birth);
-        expect(createProfile).toHaveBeenLastCalledWith({
-          display_name: "01/01/2000",
-          birth_info: birth,
-        });
-        expect(push).toHaveBeenLastCalledWith("/ban-menh");
-        view.unmount();
-      }
-    } finally {
-      vi.useRealTimers();
+  it("prefills saved birth data without changing it when casting again", () => {
+    usePreferencesStore.setState({ muteBirthConfirm: true });
+    for (const hour of [0, 12, 22]) {
+      const birth = {
+        calendar: "solar" as const,
+        year: 1996,
+        month: 4,
+        day: 15,
+        hour,
+        gender: "F" as const,
+      };
+      useChartStore.setState({ birthInfo: birth });
+      const view = render(<AnSaoScreen />);
+      expect(
+        screen.getByRole("radio", { name: hour < 12 ? "AM" : "PM" }).getAttribute("aria-checked"),
+      ).toBe("true");
+      expect(screen.getByRole("radio", { name: "Nữ" }).getAttribute("aria-checked")).toBe("true");
+      fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
+      expect(castChart.mutate).toHaveBeenLastCalledWith(birth, expect.any(Object));
+      view.unmount();
     }
   });
 
-  it("does not auto-save an old account's delayed build after the screen unmounts", async () => {
-    vi.useFakeTimers();
-    try {
-      let resolveBuild!: (value: typeof fixture) => void;
-      build.mockImplementation(
-        () =>
-          new Promise((resolve) => {
-            resolveBuild = resolve;
-          }),
-      );
-      accountState.data = { user: { id: "account-a", name: "Account A" } };
-      usePreferencesStore.setState({ muteBirthConfirm: true });
-      const view = render(<AnSaoScreen />);
-      fireEvent.keyDown(screen.getByRole("slider", { name: "Giờ sinh" }), { key: "ArrowRight" });
-      fireEvent.click(screen.getByRole("radio", { name: "Nam" }));
-      fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
-      view.unmount();
-      accountState.data = { user: { id: "account-b", name: "Account B" } };
-      await act(async () => {
-        resolveBuild(fixture);
-        await vi.advanceTimersByTimeAsync(2600);
-      });
-      expect(createProfile).not.toHaveBeenCalled();
-      expect(useChartStore.getState().hasChart).toBe(false);
-      expect(push).not.toHaveBeenCalled();
-    } finally {
-      vi.useRealTimers();
+  it("holds the loader for the loading interlude and only navigates on success", () => {
+    usePreferencesStore.setState({ muteBirthConfirm: true });
+    const view = render(<AnSaoScreen />);
+    expect(castChartMutationOptions).toHaveBeenCalledWith(
+      expect.objectContaining({ minDurationMs: 2600 }),
+    );
+    fireEvent.keyDown(screen.getByRole("slider", { name: "Giờ sinh" }), { key: "ArrowRight" });
+    fireEvent.click(screen.getByRole("radio", { name: "Nam" }));
+    fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
+    const [, callbacks] = castChart.mutate.mock.calls[0]!;
+
+    for (const state of [{ isPending: true }, { isSuccess: true }]) {
+      useMutation.mockReturnValue({ ...castChart, ...state });
+      view.rerender(<AnSaoScreen />);
+      expect(screen.queryByRole("button", { name: /Luận giải lá số của tôi/ })).toBeNull();
     }
+    // The hook activates the chart; the screen only navigates.
+    expect(push).not.toHaveBeenCalled();
+    act(() => callbacks.onSuccess());
+    expect(push).toHaveBeenCalledWith("/ban-menh");
   });
 
-  it("does not restore an old chart after its delayed auto-save finishes", async () => {
-    vi.useFakeTimers();
-    try {
-      let resolveProfile!: (value: { chart_profile: { id: string } }) => void;
-      createProfile.mockImplementation(
-        () =>
-          new Promise((resolve) => {
-            resolveProfile = resolve;
-          }),
-      );
-      accountState.data = { user: { id: "account-a", name: "Account A" } };
-      usePreferencesStore.setState({ muteBirthConfirm: true });
-      const view = render(<AnSaoScreen />);
-      fireEvent.keyDown(screen.getByRole("slider", { name: "Giờ sinh" }), { key: "ArrowRight" });
-      fireEvent.click(screen.getByRole("radio", { name: "Nam" }));
-      fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
-      await act(async () => {
-        await Promise.resolve();
-      });
-      expect(createProfile).toHaveBeenCalledTimes(1);
-      view.unmount();
-      await act(async () => {
-        resolveProfile({ chart_profile: { id: "profile-a" } });
-        await vi.advanceTimersByTimeAsync(2600);
-      });
-      expect(useChartStore.getState().hasChart).toBe(false);
-      expect(useChartStore.getState().chartProfileId).toBeNull();
-      expect(push).not.toHaveBeenCalled();
-    } finally {
-      vi.useRealTimers();
-    }
+  it("returns to the form and reports a failed cast", () => {
+    usePreferencesStore.setState({ muteBirthConfirm: true });
+    const view = render(<AnSaoScreen />);
+    fireEvent.keyDown(screen.getByRole("slider", { name: "Giờ sinh" }), { key: "ArrowRight" });
+    fireEvent.click(screen.getByRole("radio", { name: "Nam" }));
+    fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
+    const [, callbacks] = castChart.mutate.mock.calls[0]!;
+    useMutation.mockReturnValue({ ...castChart, isPending: true });
+    view.rerender(<AnSaoScreen />);
+
+    useMutation.mockReturnValue(castChart);
+    view.rerender(<AnSaoScreen />);
+    act(() => callbacks.onError(new Error("build failed")));
+    expect(screen.getByRole("button", { name: /Luận giải lá số của tôi/ })).toBeTruthy();
+    expect(toast).toHaveBeenCalledWith("Có lỗi xảy ra khi an sao. Bạn thử lại nhé.");
+    expect(push).not.toHaveBeenCalled();
   });
 
   it("puts the primary action before the atmospheric reward in reading order", () => {
