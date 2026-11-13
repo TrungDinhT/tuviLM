@@ -31,6 +31,13 @@ export const queryKeys = {
     all: () => ["chartProfiles"] as const,
   },
 
+  capability: {
+    /** Prefix of every capability report, for clearing them with the chart. */
+    all: () => ["capability"] as const,
+    /** One report; `key` is `capabilityKey(birth, userId)`. */
+    report: (key: string) => ["capability", key] as const,
+  },
+
   sessions: {
     all: () => ["sessions"] as const,
     /** Sessions under one chart profile. */

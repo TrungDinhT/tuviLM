@@ -20,6 +20,7 @@ import {
 import { useChartStore } from "@/store/chart-store";
 import { AccountRequestContext } from "@/lib/api/account-request";
 import { bindChartResetClearing } from "@/lib/api/chart-persistence";
+import { queryKeys } from "@/lib/api/queryKeys";
 const USER = "user-1";
 const birth = {
   calendar: "solar" as const,
@@ -266,7 +267,7 @@ describe("capability report", () => {
       });
       expect(readStaleResponse).toHaveBeenCalledOnce();
       expect(useCapabilityStore.getState().entries[key]?.report).toEqual(newReport);
-      expect(client.getQueryData(["capability", key])).toEqual(newReport);
+      expect(client.getQueryData(queryKeys.capability.report(key))).toEqual(newReport);
       expect(oldSignal?.aborted).toBe(true);
       expect(
         JSON.parse(localStorage.getItem("tuvi.capability-v1")!).state.entries[key].report,
