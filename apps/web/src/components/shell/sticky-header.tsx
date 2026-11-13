@@ -1,3 +1,8 @@
+"use client";
+
+import { ProfileSwitcher } from "@/features/profile-switcher/profile-switcher";
+import { useChartStore } from "@/store/chart-store";
+
 import { BalanceBadge } from "./balance-badge";
 
 /**
@@ -24,6 +29,9 @@ import { BalanceBadge } from "./balance-badge";
  * pin, leaving an unblurred strip for content to scroll through and making the
  * band appear to jump the moment it sticks. Keep it equal to `ScreenPad`'s
  * padding-top at every tier.
+ *
+ * Once a chart exists the first row carries the profile switcher, and the
+ * eyebrow drops to its own line under it.
  */
 export function StickyHeader({
   eyebrow,
@@ -34,6 +42,11 @@ export function StickyHeader({
   title: string;
   subtitle?: string;
 }) {
+  const hasChart = useChartStore((state) => state.hasChart);
+  const eyebrowLabel = (
+    <div className="text-[10px] font-bold tracking-[0.26em] text-accent uppercase">{eyebrow}</div>
+  );
+
   return (
     <div
       className={[
@@ -45,11 +58,12 @@ export function StickyHeader({
       ].join(" ")}
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="text-[10px] font-bold tracking-[0.26em] text-accent uppercase">
-          {eyebrow}
+        {hasChart ? <ProfileSwitcher /> : eyebrowLabel}
+        <div className="shrink-0">
+          <BalanceBadge />
         </div>
-        <BalanceBadge />
       </div>
+      {hasChart ? <div className="mt-4">{eyebrowLabel}</div> : null}
       <h2 className="mt-[7px] font-display text-[26px] leading-[1.06] font-semibold tracking-[-0.01em] md:text-[29px]">
         {title}
       </h2>
