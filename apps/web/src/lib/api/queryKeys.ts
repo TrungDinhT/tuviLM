@@ -40,6 +40,14 @@ export const queryKeys = {
 } as const;
 
 /**
+ * Every TanStack Query mutation key, defined once. The key lets a unit read a
+ * mutation's state through `useIsMutating` without holding the mutation object.
+ */
+export const mutationKeys = {
+  openChartProfile: () => ["chartProfiles", "open"] as const,
+} as const;
+
+/**
  * The persistence whitelist: only the cast chart survives a reload. Every
  * other query — previews included — stays transient.
  */

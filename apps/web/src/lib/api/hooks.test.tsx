@@ -1,55 +1,23 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { isApiError } from "@/lib/http/errors";
+import { useChartStore } from "@/store/chart-store";
 
-import { AccountRequestContext } from "./account-request";
 import {
   useAccountAccess,
   useChartProfiles,
   useDeleteChartProfile,
-  useOpenChartProfile,
   useRenameChartProfile,
 } from "./hooks";
 import { queryKeys } from "./queryKeys";
-import { accountAccessSchema, buildLasoResponseSchema, emptyResponseSchema, type ChartProfile } from "./schemas";
-import buildLasoFixture from "./__fixtures__/build-laso.json";
-
-function jsonResponse(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
-function noBody(status = 204) {
-  return new Response(null, { status });
-}
-
-const PROFILE = {
-  id: "p1",
-  display_name: "Bạn thân · Minh",
-  birth_info: { calendar: "solar", year: 1996, month: 4, day: 15, hour: 10, gender: "M" },
-  created_at: "2026-08-28T00:00:00+00:00",
-  updated_at: "2026-08-28T00:00:00+00:00",
-} satisfies ChartProfile;
-
-function wrapperWith(client: QueryClient, userId?: string | null, signal?: AbortSignal) {
-  return function Wrapper({ children }: { children: ReactNode }) {
-    return (
-      <QueryClientProvider client={client}>
-        <AccountRequestContext.Provider value={{ getSignal: () => signal, userId }}>
-          {children}
-        </AccountRequestContext.Provider>
-      </QueryClientProvider>
-    );
-  };
-}
+import { accountAccessSchema, emptyResponseSchema } from "./schemas";
+import { PROFILE, jsonResponse, noBody, wrapperWith } from "./test-utils";
 
 beforeEach(() => {
   localStorage.clear();
+  useChartStore.getState().reset();
 });
 
 afterEach(() => {
@@ -113,94 +81,6 @@ describe("useChartProfiles", () => {
   });
 });
 
-describe("useOpenChartProfile", () => {
-  const chart = buildLasoResponseSchema.parse(buildLasoFixture);
-
-  it("rebuilds the chart and freshly loads only the newest conversation", async () => {
-    const sessions = [
-      { id: "s1", updated_at: "2026-01-01T00:00:00Z" },
-      { id: "s2", updated_at: "2026-02-01T00:00:00Z" },
-    ].map(({ id, updated_at }) => ({
-      id, chart_profile_id: PROFILE.id, title: null, message_count: 1,
-      created_at: PROFILE.created_at, updated_at,
-    }));
-    const transcripts = sessions.map((session) => ({ session: { ...session, messages: [{
-      id: `message-${session.id}`, role: "user", content: session.id, status: "confirmed",
-      created_at: session.created_at, updated_at: session.updated_at,
-    }] } }));
-    const fetchMock = vi.fn((url: string) => Promise.resolve(jsonResponse(
-      url.endsWith("/laso/build") ? chart : url.endsWith("/p1/sessions") ? { sessions }
-        : transcripts.find(({ session }) => url.endsWith(`/${session.id}`)),
-    )));
-    vi.stubGlobal("fetch", fetchMock);
-    const client = new QueryClient();
-    client.setQueryData(queryKeys.sessions.byProfile(PROFILE.id), { sessions: [] });
-    const { result } = renderHook(() => useOpenChartProfile(), { wrapper: wrapperWith(client, "user-1") });
-
-    await act(async () => { await result.current.mutateAsync(PROFILE); });
-
-    expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/laso/build"),
-      expect.objectContaining({ method: "POST", body: JSON.stringify(PROFILE.birth_info) }));
-    expect(client.getQueryData(queryKeys.laso.chart(chart.id))).toEqual(chart);
-    expect(client.getQueryData(queryKeys.sessions.byProfile(PROFILE.id))).toEqual({ sessions });
-    expect(client.getQueryData(queryKeys.sessions.detail("s2"))).toMatchObject({
-      session: { id: "s2", messages: transcripts[1]!.session.messages },
-    });
-    expect(client.getQueryData(queryKeys.sessions.detail("s1"))).toBeUndefined();
-  });
-
-  it("opens a chart without creating a conversation when its history is empty", async () => {
-    const fetchMock = vi.fn((url: string) => Promise.resolve(jsonResponse(
-      url.endsWith("/laso/build") ? chart : { sessions: [] },
-    )));
-    vi.stubGlobal("fetch", fetchMock);
-    const client = new QueryClient();
-    const { result } = renderHook(() => useOpenChartProfile(), { wrapper: wrapperWith(client, "user-1") });
-
-    await act(async () => { await result.current.mutateAsync(PROFILE); });
-
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(client.getQueryData(queryKeys.sessions.byProfile(PROFILE.id))).toEqual({ sessions: [] });
-  });
-
-  it("keeps existing data and skips activation when history fails or the account leaves", async () => {
-    const session = {
-      id: "s1", chart_profile_id: PROFILE.id, title: null, messages: [],
-      created_at: PROFILE.created_at, updated_at: PROFILE.updated_at,
-    };
-    for (const cancelled of [false, true]) {
-      const controller = new AbortController();
-      vi.stubGlobal("fetch", vi.fn((url: string) => {
-        if (url.endsWith("/laso/build")) return Promise.resolve(jsonResponse(chart));
-        if (url.endsWith("/p1/sessions")) {
-          return Promise.resolve(jsonResponse({ sessions: [{ ...session, message_count: 0 }] }));
-        }
-        if (cancelled) controller.abort();
-        return Promise.resolve(jsonResponse(
-          cancelled ? { session } : { detail: "Unavailable" }, cancelled ? 200 : 503,
-        ));
-      }));
-      const client = new QueryClient();
-      client.setQueryData(queryKeys.laso.chart(chart.id), { previous: true });
-      const onSuccess = vi.fn();
-      const { result, unmount } = renderHook(() => useOpenChartProfile(), {
-        wrapper: wrapperWith(client, "user-1", controller.signal),
-      });
-
-      await act(async () => {
-        await expect(result.current.mutateAsync(PROFILE, { onSuccess })).rejects.toThrow();
-      });
-
-      expect(client.getQueryData(queryKeys.laso.chart(chart.id))).toEqual({ previous: true });
-      expect(client.getQueryData(queryKeys.sessions.byProfile(PROFILE.id))).toBeUndefined();
-      expect(client.getQueryData(queryKeys.sessions.detail(session.id))).toBeUndefined();
-      expect(onSuccess).not.toHaveBeenCalled();
-      unmount();
-    }
-  });
-});
-
 describe("useRenameChartProfile", () => {
   it("patches the trimmed name and refetches the active saved-chart list", async () => {
     let profile = PROFILE;
@@ -225,9 +105,14 @@ describe("useRenameChartProfile", () => {
     });
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining("/api/v1/chart-profiles/p1"),
-      expect.objectContaining({ method: "PATCH", body: JSON.stringify({ display_name: "Gia đình" }) }),
+      expect.objectContaining({
+        method: "PATCH",
+        body: JSON.stringify({ display_name: "Gia đình" }),
+      }),
     );
-    await waitFor(() => expect(list.current.data?.chart_profiles[0]?.display_name).toBe("Gia đình"));
+    await waitFor(() =>
+      expect(list.current.data?.chart_profiles[0]?.display_name).toBe("Gia đình"),
+    );
   });
 });
 
