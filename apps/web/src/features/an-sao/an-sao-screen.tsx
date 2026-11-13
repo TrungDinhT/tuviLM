@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -7,13 +8,8 @@ import { Pill } from "@/components/primitives/pill";
 import { AuthLinks } from "@/components/shell/auth-links";
 import { BrandLink } from "@/components/shell/brand-link";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import {
-  profileDisplayName,
-  useBuildLaso,
-  useCreateChartProfile,
-  useLasoPreview,
-} from "@/lib/api/hooks";
-import { authClient } from "@/lib/auth-client";
+import { useAccountRequestScope } from "@/lib/api/account-request";
+import { castChartMutationOptions, lasoPreviewQueryOptions } from "@/lib/api/laso";
 import { describe, isApiError } from "@/lib/http/errors";
 import { starKeyFromName } from "@/lib/theme";
 import { showToast } from "@/lib/toast";
@@ -31,7 +27,6 @@ import {
 } from "./birth-time";
 import { CastingLoader } from "./casting-loader";
 import { ConstellationReward } from "./constellation-reward";
-import { outcomeFromChart } from "./outcome";
 import { SegmentedControl } from "./segmented-control";
 import { TimePicker } from "./time-picker";
 import { WheelPicker } from "./wheel-picker";
@@ -58,9 +53,7 @@ function pad2(value: number): string {
  */
 export function AnSaoScreen() {
   const router = useRouter();
-  const { data: session } = authClient.useSession();
   const savedBirth = useChartStore((state) => state.birthInfo);
-  const [phase, setPhase] = useState<"form" | "loading">("form");
   const [date, setDate] = useState<BirthDateInput>(() =>
     savedBirth
       ? { year: savedBirth.year, month: savedBirth.month, day: savedBirth.day }
@@ -88,16 +81,8 @@ export function AnSaoScreen() {
 
   const clockRef = useRef<HTMLDivElement>(null);
   const genderRef = useRef<HTMLDivElement>(null);
-  const isMounted = useRef(true);
-  useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
 
   const setPreviewOutcome = useChartStore((state) => state.setPreviewOutcome);
-  const castChart = useChartStore((state) => state.castChart);
   const muteBirthConfirm = usePreferencesStore((state) => state.muteBirthConfirm);
 
   // --- Reward preview: debounce the dials, map to the API tuple, fetch. ---
@@ -108,11 +93,13 @@ export function AnSaoScreen() {
     const mapped = toApiBirthTime(debouncedInput.date, debouncedInput.time);
     return mapped.ok ? ({ calendar: "solar", ...mapped.value } as const) : null;
   }, [debouncedInput]);
-  const preview = useLasoPreview(previewBirth);
+  const { data: preview, isPlaceholderData } = useQuery(
+    lasoPreviewQueryOptions({ birth: previewBirth }),
+  );
 
   useEffect(() => {
-    if (preview.data === undefined || preview.isPlaceholderData || debouncedInput === null) return;
-    const names = preview.data.chinh_tinh;
+    if (preview === undefined || isPlaceholderData || debouncedInput === null) return;
+    const names = preview.chinh_tinh;
     // This is intentionally a snapshot, not derived state: placeholder data
     // must keep the last settled reward mounted until the new query resolves.
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -121,20 +108,24 @@ export function AnSaoScreen() {
       stars: names.map(starKeyFromName),
       names,
     });
-  }, [debouncedInput, preview.data, preview.isPlaceholderData]);
+  }, [debouncedInput, preview, isPlaceholderData]);
 
   useEffect(() => {
-    if (preview.data === undefined) return;
-    setPreviewOutcome({ stars: preview.data.chinh_tinh.map(starKeyFromName) });
-  }, [preview.data, setPreviewOutcome]);
+    if (preview === undefined) return;
+    setPreviewOutcome({ stars: preview.chinh_tinh.map(starKeyFromName) });
+  }, [preview, setPreviewOutcome]);
 
   // The preview accent belongs to this screen. Leaving without casting — or
   // casting, which replaces it — must not leave it tinting the rest of the app.
   useEffect(() => () => setPreviewOutcome(null), [setPreviewOutcome]);
 
   // --- Casting -------------------------------------------------------------
-  const buildLaso = useBuildLaso();
-  const createProfile = useCreateChartProfile();
+  const scope = useAccountRequestScope();
+  const {
+    mutate: castChart,
+    isPending: isCasting,
+    isSuccess: isCast,
+  } = useMutation(castChartMutationOptions({ ...scope, minDurationMs: MIN_LOADING_MS }));
 
   const requestCast = () => {
     if (time === null) {
@@ -149,13 +140,13 @@ export function AnSaoScreen() {
       return;
     }
     if (muteBirthConfirm) {
-      void cast();
+      cast();
     } else {
       setConfirmOpen(true);
     }
   };
 
-  const cast = async () => {
+  const cast = () => {
     if (time === null || gender === null) return;
     const mapped = toApiBirthTime(date, time);
     if (!mapped.ok) {
@@ -166,35 +157,19 @@ export function AnSaoScreen() {
     const birth = { calendar: "solar" as const, ...mapped.value, gender };
 
     setConfirmOpen(false);
-    setPhase("loading");
-    const minimumLoading = new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS));
-    try {
-      const chart = await buildLaso.mutateAsync(birth);
-      if (!isMounted.current) return;
-      const [, profileId] = await Promise.all([
-        minimumLoading,
-        // Auto-save starts only after a valid build. It must never fail the
-        // cast, so it resolves to the profile id or null.
-        session
-          ? createProfile
-              .mutateAsync({ display_name: profileDisplayName(birth), birth_info: birth })
-              .then((res) => res.chart_profile.id)
-              .catch(() => null)
-          : Promise.resolve(null),
-      ]);
-      if (!isMounted.current) return;
-      castChart(outcomeFromChart(chart), chart.id, birth, profileId);
-      router.push("/ban-menh");
-    } catch (error) {
-      if (!isMounted.current) return;
-      setPhase("form");
-      showToast(
-        isApiError(error) ? describe(error.error) : "Có lỗi xảy ra khi an sao. Bạn thử lại nhé.",
-      );
-    }
+    // The mutation builds, saves and activates the chart. Only the UI work is
+    // here; it has no meaning once this screen is gone.
+    castChart(birth, {
+      onSuccess: () => router.push("/ban-menh"),
+      onError: (error) =>
+        showToast(
+          isApiError(error) ? describe(error.error) : "Có lỗi xảy ra khi an sao. Bạn thử lại nhé.",
+        ),
+    });
   };
 
-  if (phase === "loading") return <CastingLoader />;
+  // The loader stays up after success, until the navigation replaces this screen.
+  if (isCasting || isCast) return <CastingLoader />;
 
   const canhGio = time === null ? null : canhGioOf(time.hour12, time.meridiem);
   const confirmSummary =
@@ -316,7 +291,7 @@ export function AnSaoScreen() {
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         summary={confirmSummary}
-        onConfirm={() => void cast()}
+        onConfirm={cast}
       />
     </div>
   );
