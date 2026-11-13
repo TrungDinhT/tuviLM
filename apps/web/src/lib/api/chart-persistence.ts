@@ -2,7 +2,7 @@ import type { Query, QueryClient } from "@tanstack/react-query";
 
 import { useChartStore } from "@/store/chart-store";
 
-import { isPersistedQueryKey } from "./queryKeys";
+import { isPersistedQueryKey, queryKeys } from "./queryKeys";
 import { buildLasoResponseSchema } from "./schemas";
 
 /**
@@ -47,8 +47,8 @@ export function reconcileChartState(queryClient: QueryClient): void {
 export function bindChartResetClearing(queryClient: QueryClient): () => void {
   return useChartStore.subscribe((state, previous) => {
     if (previous.hasChart && !state.hasChart) {
-      void queryClient.cancelQueries({ queryKey: ["capability"] });
-      queryClient.removeQueries({ queryKey: ["capability"] });
+      void queryClient.cancelQueries({ queryKey: queryKeys.capability.all() });
+      queryClient.removeQueries({ queryKey: queryKeys.capability.all() });
       queryClient.removeQueries({
         predicate: (query) => isPersistedQueryKey(query.queryKey),
       });

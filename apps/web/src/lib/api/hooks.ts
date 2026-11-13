@@ -5,7 +5,7 @@ import { skipToken, useMutation, useQuery, useQueryClient } from "@tanstack/reac
 import { useChartStore } from "@/store/chart-store";
 
 import { useAccountRequestScope } from "./account-request";
-import { newIdempotencyKey, request } from "./client";
+import { request } from "./client";
 import { apiEndpoints } from "./endpoints";
 import { queryKeys } from "./queryKeys";
 import {
@@ -15,8 +15,6 @@ import {
   createChartProfileResponseSchema,
   createRedeemCodeRequestSchema,
   createRedeemCodeResponseSchema,
-  createSessionRequestSchema,
-  createSessionResponseSchema,
   emptyResponseSchema,
   getSessionResponseSchema,
   listChartProfilesResponseSchema,
@@ -196,35 +194,5 @@ export function useGetSession(sessionId: string | null) {
         signal,
       }),
     enabled: sessionId !== null,
-  });
-}
-
-/**
- * Create a new session under a chart profile and refresh the session list.
- *
- * Each invocation mints a fresh `Idempotency-Key`; mutations never auto-retry,
- * so a manual retry is a fresh create action with its own key.
- */
-export function useCreateSession(profileId: string | null) {
-  const queryClient = useQueryClient();
-  const { getSignal, userId } = useAccountRequestScope();
-  return useMutation({
-    mutationFn: () => {
-      if (profileId === null) throw new Error("chart profile id required");
-      return request(apiEndpoints.profileSessions(profileId), {
-        method: "POST",
-        body: createSessionRequestSchema.parse({ title: null }),
-        schema: createSessionResponseSchema,
-        withAuth: true,
-        expectedUserId: userId,
-        idempotencyKey: newIdempotencyKey(),
-        signal: getSignal(),
-      });
-    },
-    onSuccess: () => {
-      if (getSignal()?.aborted) return;
-      if (profileId === null) return;
-      void queryClient.invalidateQueries({ queryKey: queryKeys.sessions.byProfile(profileId) });
-    },
   });
 }

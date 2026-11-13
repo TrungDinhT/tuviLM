@@ -1,6 +1,6 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -8,14 +8,10 @@ import { Pill } from "@/components/primitives/pill";
 import { useAccountRequestScope } from "@/lib/api/account-request";
 import { newIdempotencyKey, request } from "@/lib/api/client";
 import { apiEndpoints } from "@/lib/api/endpoints";
-import {
-  useAccountAccess,
-  useCreateSession,
-  useGetSession,
-  useListSessions,
-} from "@/lib/api/hooks";
-import { queryKeys } from "@/lib/api/queryKeys";
+import { useAccountAccess, useGetSession, useListSessions } from "@/lib/api/hooks";
+import { mutationKeys, queryKeys } from "@/lib/api/queryKeys";
 import { getSessionResponseSchema, type ChatMessage, type SseChatEvent } from "@/lib/api/schemas";
+import { createSessionMutationOptions } from "@/lib/api/sessions";
 import { streamChat } from "@/lib/api/stream";
 import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
@@ -93,7 +89,6 @@ function ChatConversation() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const autoCreatedFor = useRef<string | null>(null);
   const activeStreamRef = useRef<ActiveStream | null>(null);
-  const creatingSessionRef = useRef(false);
 
   const abortActiveStream = useCallback(() => {
     const active = activeStreamRef.current;
@@ -106,7 +101,17 @@ function ChatConversation() {
 
   const accountProfileId = account ? chartProfileId : null;
   const list = useListSessions(accountProfileId);
-  const createSession = useCreateSession(accountProfileId);
+  const {
+    mutate: createSession,
+    isPending: isCreatingSession,
+    isError: createSessionFailed,
+  } = useMutation(
+    createSessionMutationOptions({
+      getSignal: getAccountSignal,
+      userId,
+      profileId: accountProfileId,
+    }),
+  );
 
   const sessions = useMemo(
     () => [...(list.data?.sessions ?? [])].sort((a, b) => b.updated_at.localeCompare(a.updated_at)),
@@ -165,7 +170,7 @@ function ChatConversation() {
   useEffect(() => {
     if (!needsSession || autoCreatedFor.current === chartProfileId) return;
     autoCreatedFor.current = chartProfileId;
-    createSession.mutate();
+    createSession();
   }, [needsSession, createSession, chartProfileId]);
 
   if (!hasChart) return null;
@@ -385,23 +390,25 @@ function ChatConversation() {
     setHistoryOpen(false);
   };
 
-  const handleCreateNew = async () => {
-    if (chartProfileId === null || creatingSessionRef.current) return;
-    abortActiveStream();
-    creatingSessionRef.current = true;
-    const accountSignal = getAccountSignal();
-    try {
-      const result = await createSession.mutateAsync();
-      if (accountSignal?.aborted) return;
-      setDraft(null);
-      setSelectedId(result.session.id);
-      setHistoryOpen(false);
-    } catch (error) {
-      if (accountSignal?.aborted) return;
-      showToast(isApiError(error) ? describe(error.error) : "Không tạo được cuộc trò chuyện.");
-    } finally {
-      creatingSessionRef.current = false;
+  const handleCreateNew = () => {
+    if (chartProfileId === null) return;
+    // Read from the mutation cache, not `isCreatingSession`: the cache is
+    // already up to date for a second click in the same tick, before a render.
+    if (queryClient.isMutating({ mutationKey: mutationKeys.createSession(accountProfileId) }) > 0) {
+      return;
     }
+    abortActiveStream();
+    // UI work only. These do not run once this screen is gone, which covers an
+    // account that left while the request was in flight.
+    createSession(undefined, {
+      onSuccess: (result) => {
+        setDraft(null);
+        setSelectedId(result.session.id);
+        setHistoryOpen(false);
+      },
+      onError: (error) =>
+        showToast(isApiError(error) ? describe(error.error) : "Không tạo được cuộc trò chuyện."),
+    });
   };
 
   return (
@@ -421,8 +428,8 @@ function ChatConversation() {
           <Pill
             variant="ghost"
             className="px-4 py-2 text-[13px]"
-            disabled={createDisabled || createSession.isPending}
-            onClick={() => void handleCreateNew()}
+            disabled={createDisabled || isCreatingSession}
+            onClick={handleCreateNew}
           >
             Tạo mới
           </Pill>
@@ -444,10 +451,10 @@ function ChatConversation() {
       ) : null}
 
       <div className={`${styles.enterTranscript} flex flex-col gap-3`}>
-        {list.isError || createSession.isError ? (
+        {list.isError || createSessionFailed ? (
           <div className="flex items-center gap-3">
             <p className="text-[13.5px] text-muted">
-              {createSession.isError
+              {createSessionFailed
                 ? "Không tạo được cuộc trò chuyện."
                 : "Không tải được cuộc trò chuyện."}
             </p>
@@ -455,9 +462,9 @@ function ChatConversation() {
               variant="ghost"
               className="px-4 py-2 text-[13px]"
               onClick={() => {
-                if (createSession.isError) {
+                if (createSessionFailed) {
                   autoCreatedFor.current = null;
-                  createSession.mutate();
+                  createSession();
                 } else {
                   void list.refetch();
                 }
@@ -524,10 +531,10 @@ function ChatConversation() {
         onOpenChange={setHistoryOpen}
         sessions={sessions}
         activeSessionId={activeSessionId}
-        creating={createSession.isPending}
+        creating={isCreatingSession}
         createDisabled={createDisabled}
         onSelect={handleSelect}
-        onCreateNew={() => void handleCreateNew()}
+        onCreateNew={handleCreateNew}
       />
     </div>
   );

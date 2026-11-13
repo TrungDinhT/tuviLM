@@ -6,6 +6,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { z } from "zod";
 import { useAccountRequestScope } from "@/lib/api/account-request";
 import { request } from "@/lib/api/client";
+import { apiEndpoints } from "@/lib/api/endpoints";
 import { queryKeys } from "@/lib/api/queryKeys";
 import type { BirthInfo } from "@/lib/api/schemas";
 import { safeStorage } from "@/lib/safe-storage";
@@ -86,7 +87,7 @@ export function useCapabilityReport(birth: BirthInfo | null, unlocked: boolean) 
   const key = capabilityKey(birth, userId);
   const saved = useCapabilityStore((state) => state.entries[key]?.report);
   return useQuery({
-    queryKey: ["capability", key],
+    queryKey: queryKeys.capability.report(key),
     enabled: key !== "idle" && unlocked,
     initialData: saved,
     staleTime: Infinity,
@@ -98,7 +99,7 @@ export function useCapabilityReport(birth: BirthInfo | null, unlocked: boolean) 
     queryFn: async ({ signal }) => {
       const restored = useCapabilityStore.getState().entries[key]?.report;
       if (restored) return restored;
-      const report = await request("/api/v1/laso/strength-weakness", {
+      const report = await request(apiEndpoints.strengthWeakness, {
         method: "POST",
         body: birth,
         schema: capabilitySchema,

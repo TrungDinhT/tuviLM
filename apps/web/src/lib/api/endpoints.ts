@@ -4,6 +4,7 @@ export const apiEndpoints = {
   createRedeemCode: "/api/v1/admin/redeem-codes",
   buildLaso: "/api/v1/laso/build",
   previewLaso: "/api/v1/laso/preview",
+  strengthWeakness: "/api/v1/laso/strength-weakness",
   chartProfiles: "/api/v1/chart-profiles",
   chartProfile: (id: string) => `/api/v1/chart-profiles/${encodeURIComponent(id)}`,
   profileSessions: (profileId: string) =>
