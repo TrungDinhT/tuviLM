@@ -2,10 +2,11 @@
 
 import { useIsMutating, useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 
 import { Dialog } from "@/components/primitives/dialog";
 import { CastingLoader } from "@/features/an-sao/casting-loader";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { useAccountRequestScope } from "@/lib/api/account-request";
 import { openChartProfileMutationOptions } from "@/lib/api/chart-profiles";
 import { mutationKeys } from "@/lib/api/queryKeys";
@@ -17,12 +18,6 @@ import { SavedChartCard } from "./saved-chart-card";
 const TABLET_QUERY = "(min-width: 768px)";
 const PAGE_BUTTON_CLASS =
   "pill-ghost min-h-11 cursor-pointer rounded-full px-3 text-[13px] disabled:pointer-events-none disabled:opacity-40";
-
-const subscribeWidth = (onChange: () => void) => {
-  const media = window.matchMedia(TABLET_QUERY);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-};
 
 const normalizeSearch = (value: string): string =>
   value
@@ -47,11 +42,7 @@ export function SavedChartList({ profiles }: SavedChartListProps) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageDraft, setPageDraft] = useState<string | null>(null);
-  const isTablet = useSyncExternalStore(
-    subscribeWidth,
-    () => window.matchMedia(TABLET_QUERY).matches,
-    () => false,
-  );
+  const isTablet = useMediaQuery(TABLET_QUERY);
   const pageSize = isTablet ? 4 : 3;
   const query = normalizeSearch(search);
   const matches = profiles.filter((profile) => {
