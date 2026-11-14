@@ -3,9 +3,6 @@ from __future__ import annotations
 import json
 from datetime import datetime
 
-import pytest
-from fastapi import HTTPException
-
 from tuvi_api.main import read_cau_phu
 from tuvi_api.schemas import BuildLasoRequest
 from tuvi_engine.cau_phu import (
@@ -66,12 +63,3 @@ def test_api_returns_original_phu_for_requested_birth() -> None:
     assert response.cau_phu == expected.cau_phu
     assert response.cac_cau == list(expected.cac_cau)
     assert response.tieu_de == expected.tieu_de
-
-
-def test_api_rejects_invalid_birth_date() -> None:
-    payload = BuildLasoRequest(year=2000, month=2, day=31, hour=10, gender="M")
-
-    with pytest.raises(HTTPException) as exc_info:
-        read_cau_phu(payload)
-
-    assert exc_info.value.status_code == 422

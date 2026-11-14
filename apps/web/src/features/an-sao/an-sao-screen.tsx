@@ -14,6 +14,7 @@ import {
   useLasoPreview,
 } from "@/lib/api/hooks";
 import { authClient } from "@/lib/auth-client";
+import { daysInMonth } from "@/lib/calendar-date";
 import { describe, isApiError } from "@/lib/http/errors";
 import { starKeyFromName } from "@/lib/theme";
 import { showToast } from "@/lib/toast";
@@ -41,14 +42,18 @@ const MIN_LOADING_MS = 2600;
 /** Dial-spin settling before a preview fires. */
 const PREVIEW_DEBOUNCE_MS = 250;
 
-const DAY_RANGE = { min: 1, max: 31 } as const;
 const MONTH_RANGE = { min: 1, max: 12 } as const;
-const YEAR_RANGE = { min: 1990, max: 2099 } as const;
+const YEAR_RANGE = { min: 1975, max: 2099 } as const;
 
 const DEFAULT_DATE: BirthDateInput = { year: 2000, month: 1, day: 1 };
 
 function pad2(value: number): string {
   return String(value).padStart(2, "0");
+}
+
+function clampDay(date: BirthDateInput): BirthDateInput {
+  const lastDay = daysInMonth(date.year, date.month);
+  return date.day > lastDay ? { ...date, day: lastDay } : date;
 }
 
 /**
@@ -61,11 +66,12 @@ export function AnSaoScreen() {
   const { data: session } = authClient.useSession();
   const savedBirth = useChartStore((state) => state.birthInfo);
   const [phase, setPhase] = useState<"form" | "loading">("form");
-  const [date, setDate] = useState<BirthDateInput>(() =>
+  const [pickedDate, setPickedDate] = useState<BirthDateInput>(() =>
     savedBirth
       ? { year: savedBirth.year, month: savedBirth.month, day: savedBirth.day }
       : DEFAULT_DATE,
   );
+  const date = useMemo(() => clampDay(pickedDate), [pickedDate]);
   const [meridiem, setMeridiem] = useState<Meridiem>(() =>
     savedBirth && savedBirth.hour >= 12 ? MERIDIEM.PM : MERIDIEM.AM,
   );
@@ -159,7 +165,11 @@ export function AnSaoScreen() {
     if (time === null || gender === null) return;
     const mapped = toApiBirthTime(date, time);
     if (!mapped.ok) {
-      showToast("Ngày giờ này vượt quá phạm vi Thiên Hạc an được (năm 1990 – 2099) nhé.");
+      showToast(
+        mapped.reason === "invalid-date"
+          ? "Ngày này không có trong tháng đã chọn. Bạn chọn lại ngày sinh nhé."
+          : `Ngày giờ này vượt quá phạm vi Thiên Hạc an được (năm ${YEAR_RANGE.min} – ${YEAR_RANGE.max}) nhé.`,
+      );
       return;
     }
 
@@ -236,11 +246,11 @@ export function AnSaoScreen() {
           />
           <WheelPicker
             label="Ngày"
-            min={DAY_RANGE.min}
-            max={DAY_RANGE.max}
+            min={1}
+            max={daysInMonth(date.year, date.month)}
             pad
             value={date.day}
-            onChange={(day) => setDate((current) => ({ ...current, day }))}
+            onChange={(day) => setPickedDate((current) => ({ ...current, day }))}
           />
           <WheelPicker
             label="Tháng"
@@ -248,14 +258,14 @@ export function AnSaoScreen() {
             max={MONTH_RANGE.max}
             pad
             value={date.month}
-            onChange={(month) => setDate((current) => ({ ...current, month }))}
+            onChange={(month) => setPickedDate((current) => ({ ...current, month }))}
           />
           <WheelPicker
             label="Năm"
             min={YEAR_RANGE.min}
             max={YEAR_RANGE.max}
             value={date.year}
-            onChange={(year) => setDate((current) => ({ ...current, year }))}
+            onChange={(year) => setPickedDate((current) => ({ ...current, year }))}
           />
         </div>
 

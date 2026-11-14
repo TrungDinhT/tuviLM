@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime as dt
 import logging
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -214,19 +213,9 @@ def me(user: ReconciledUser) -> Principal:
 @app.post("/api/v1/laso/preview", response_model=PreviewLasoResponse)
 def preview_laso(payload: PreviewLasoRequest) -> PreviewLasoResponse:
     """Return the main stars for a preview without storing chart state."""
-    try:
-        solar_dt = dt.datetime(
-            year=payload.year,
-            month=payload.month,
-            day=payload.day,
-            hour=payload.hour,
-        )
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
-
     # Gender only steers vận direction, never cung Mệnh's chính tinh — a fixed
     # stand-in keeps the preview gender-free.
-    prior = LaSoPrior.from_solar_day(solar_dt, Gender.MALE)
+    prior = LaSoPrior.from_solar_day(payload.solar_datetime(), Gender.MALE)
     la_so = LaSo.from_prior(prior)
 
     menh_position = la_so.natal_context.menh_position
@@ -244,18 +233,9 @@ def preview_laso(payload: PreviewLasoRequest) -> PreviewLasoResponse:
 
 
 def _build_la_so(birth_info: BirthInfo) -> LaSo:
-    try:
-        solar_dt = dt.datetime(
-            year=birth_info.year,
-            month=birth_info.month,
-            day=birth_info.day,
-            hour=birth_info.hour,
-        )
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
-
     prior = LaSoPrior.from_solar_day(
-        solar_dt, Gender.MALE if birth_info.gender == "M" else Gender.FEMALE
+        birth_info.solar_datetime(),
+        Gender.MALE if birth_info.gender == "M" else Gender.FEMALE,
     )
     return LaSo.from_prior(prior)
 
@@ -365,18 +345,8 @@ def read_cau_phu(payload: BuildLasoRequest) -> CauPhuResponse:
 
 @app.post("/api/v1/laso/build_sao_luu", response_model=BuildSaoLuuResponse)
 def build_sao_luu(payload: BuildSaoLuuRequest) -> BuildSaoLuuResponse:
-    try:
-        observed_solar_dt = dt.datetime(
-            year=payload.observation_time.year,
-            month=payload.observation_time.month,
-            day=payload.observation_time.day,
-            hour=payload.observation_time.hour,
-        )
-    except ValueError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
-
     la_so = _build_la_so(payload.birth_info)
-    la_so_view = build_laso_view(la_so, study_year=observed_solar_dt.year)
+    la_so_view = build_laso_view(la_so, study_year=payload.observation_time.year)
 
     return BuildSaoLuuResponse(
         cung_by_position=to_cung_payload_map(la_so_view),

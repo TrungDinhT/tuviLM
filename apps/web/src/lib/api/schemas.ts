@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isRealDate } from "@/lib/calendar-date";
+
 /**
  * Zod mirrors of the backend contract.
  *
@@ -39,7 +41,7 @@ export const createRedeemCodeResponseSchema = createRedeemCodeRequestSchema.exte
 
 // --- api/chat/models.py ----------------------------------------------------
 
-export const birthInfoSchema = z.object({
+const birthFieldsSchema = z.object({
   calendar: z.literal("solar").default("solar"),
   year: z.number().int().min(1900).max(2099),
   month: z.number().int().min(1).max(12),
@@ -47,6 +49,8 @@ export const birthInfoSchema = z.object({
   hour: z.number().int().min(0).max(23),
   gender: z.enum(["M", "F"]),
 });
+
+export const birthInfoSchema = birthFieldsSchema.refine(isRealDate, { path: ["day"] });
 
 export type BirthInfo = z.infer<typeof birthInfoSchema>;
 
@@ -250,7 +254,9 @@ export const buildSaoLuuResponseSchema = z.object({
  * `POST /laso/preview`. Gender is omitted: cung Mệnh's chính tinh do not
  * depend on it, and the preview is meant to fire before the user picks one.
  */
-export const previewLasoRequestSchema = birthInfoSchema.omit({ gender: true });
+export const previewLasoRequestSchema = birthFieldsSchema
+  .omit({ gender: true })
+  .refine(isRealDate, { path: ["day"] });
 
 export type PreviewLasoRequest = z.infer<typeof previewLasoRequestSchema>;
 

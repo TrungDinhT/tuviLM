@@ -13,6 +13,7 @@ from beanie import PydanticObjectId
 from fastapi import HTTPException, Request
 from pymongo import AsyncMongoClient
 from pymongo.errors import ServerSelectionTimeoutError
+from pydantic import ValidationError
 from pydantic_ai import PartStartEvent, TextPart
 
 from tuvi_api.auth.dependencies import Principal, require_reconciled_user, require_user
@@ -210,6 +211,40 @@ async def test_chart_profile_endpoints_use_store(api_client, fake_store) -> None
     assert [profile["display_name"] for profile in list_response.json()["chart_profiles"]] == [
         "Me"
     ]
+
+
+async def test_create_chart_profile_rejects_date_that_does_not_exist(
+    api_client, fake_store
+) -> None:
+    response = await api_client.post(
+        "/api/v1/chart-profiles",
+        headers={
+            "Authorization": "Bearer anon_owner",
+            "Idempotency-Key": "create-profile-1",
+        },
+        json={
+            "display_name": "Me",
+            "birth_info": {"year": 2000, "month": 2, "day": 31, "hour": 8, "gender": "M"},
+        },
+    )
+
+    assert response.status_code == 422
+    assert await fake_store.list_chart_profiles("anon_owner") == []
+
+
+@pytest.mark.parametrize(
+    ("year", "month", "day"),
+    [(2000, 2, 30), (2001, 2, 29), (1900, 2, 29), (2024, 4, 31)],
+)
+def test_birth_info_rejects_date_that_does_not_exist(year, month, day) -> None:
+    with pytest.raises(ValidationError, match="day is out of range for month"):
+        BirthInfo(year=year, month=month, day=day, hour=8, gender="M")
+
+
+def test_birth_info_accepts_leap_day() -> None:
+    birth = BirthInfo(year=2000, month=2, day=29, hour=23, gender="F")
+
+    assert birth.solar_datetime() == datetime(2000, 2, 29, 23)
 
 
 async def test_create_chart_profile_requires_authentication(
