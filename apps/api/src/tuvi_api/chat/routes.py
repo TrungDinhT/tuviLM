@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
 from typing import Any, AsyncIterator, Awaitable, Callable
 
 import anyio
@@ -450,14 +449,8 @@ async def _stream_session_chat_events(
             if msg is not None:
                 yield msg
 def _build_la_so(birth_info: BirthInfo) -> LaSo:
-    solar_dt = datetime(
-        year=birth_info.year,
-        month=birth_info.month,
-        day=birth_info.day,
-        hour=birth_info.hour,
-    )
     prior = LaSoPrior.from_solar_day(
-        solar_dt,
+        birth_info.solar_datetime(),
         Gender.MALE if birth_info.gender == "M" else Gender.FEMALE,
     )
     return LaSo.from_prior(prior)

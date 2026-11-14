@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import fixture from "./__fixtures__/build-laso.json";
-import { buildLasoResponseSchema, sseChatEventSchema } from "./schemas";
+import {
+  birthInfoSchema,
+  buildLasoResponseSchema,
+  previewLasoRequestSchema,
+  sseChatEventSchema,
+} from "./schemas";
 
 const FOUNDATION_FIELDS = [
   "menh_cuc_relation",
@@ -66,5 +71,26 @@ describe("sseChatEventSchema", () => {
 
   it("rejects a text event missing its delta", () => {
     expect(sseChatEventSchema.safeParse({ type: "text" }).success).toBe(false);
+  });
+});
+
+describe("birth date schemas", () => {
+  const birth = { calendar: "solar", year: 2000, month: 2, day: 29, hour: 8, gender: "M" } as const;
+
+  it("accepts a leap day", () => {
+    expect(birthInfoSchema.parse(birth).day).toBe(29);
+    expect(previewLasoRequestSchema.parse({ ...birth, gender: undefined }).day).toBe(29);
+  });
+
+  it.each([
+    { year: 2000, day: 31 },
+    { year: 2001, day: 29 },
+  ])("rejects a date that does not exist: %o", (change) => {
+    for (const schema of [birthInfoSchema, previewLasoRequestSchema]) {
+      const result = schema.safeParse({ ...birth, ...change });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0]?.path).toEqual(["day"]);
+    }
   });
 });

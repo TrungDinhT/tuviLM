@@ -48,6 +48,24 @@ describe("toApiBirthTime", () => {
     expect(result).toEqual({ ok: true, value: { year: 2027, month: 1, day: 1, hour: 0 } });
   });
 
+  it("rolls an 11 PM pick on a leap day to 1 March", () => {
+    const result = toApiBirthTime(
+      { year: 2000, month: 2, day: 29 },
+      { hour12: 11, meridiem: "PM" },
+    );
+
+    expect(result).toEqual({ ok: true, value: { year: 2000, month: 3, day: 1, hour: 0 } });
+  });
+
+  it.each([
+    [{ year: 2000, month: 2, day: 31 }, { hour12: 8, meridiem: "AM" } as const],
+    [{ year: 2000, month: 2, day: 31 }, { hour12: 11, meridiem: "PM" } as const],
+    [{ year: 2001, month: 2, day: 29 }, { hour12: 11, meridiem: "PM" } as const],
+    [{ year: 2026, month: 4, day: 31 }, { hour12: 8, meridiem: "AM" } as const],
+  ])("rejects %o, a date that does not exist, at %o", (date, time) => {
+    expect(toApiBirthTime(date, time)).toEqual({ ok: false, reason: "invalid-date" });
+  });
+
   it("fails closed when the rollover exceeds the supported year range", () => {
     const result = toApiBirthTime(
       { year: 2099, month: 12, day: 31 },

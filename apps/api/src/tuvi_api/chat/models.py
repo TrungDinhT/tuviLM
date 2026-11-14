@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from enum import StrEnum
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class ChatRole(StrEnum):
@@ -33,6 +33,14 @@ class BirthInfo(BaseModel):
     day: int = Field(ge=1, le=31)
     hour: int = Field(ge=0, le=23)
     gender: Literal["M", "F"]
+
+    @model_validator(mode="after")
+    def _check_real_date(self) -> Self:
+        date(self.year, self.month, self.day)
+        return self
+
+    def solar_datetime(self) -> datetime:
+        return datetime(self.year, self.month, self.day, self.hour)
 
 
 class ChartProfile(BaseModel):

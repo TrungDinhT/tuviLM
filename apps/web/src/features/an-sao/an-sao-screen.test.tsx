@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import fixture from "@/lib/api/__fixtures__/build-laso.json";
@@ -52,6 +52,16 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllGlobals());
 
+function spinWheel(label: string, option: string) {
+  const wheel = screen.getByRole("listbox", { name: label });
+  const index = within(wheel)
+    .getAllByRole("option")
+    .findIndex((element) => element.textContent === option);
+  Object.defineProperty(wheel, "scrollTop", { configurable: true, writable: true, value: index * 46 });
+  fireEvent.scroll(wheel);
+  act(() => vi.advanceTimersByTime(120));
+}
+
 describe("AnSaoScreen hierarchy", () => {
   it("prefills saved birth data without changing it when casting again", async () => {
     vi.useFakeTimers();
@@ -83,6 +93,72 @@ describe("AnSaoScreen hierarchy", () => {
         expect(push).toHaveBeenLastCalledWith("/ban-menh");
         view.unmount();
       }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps the day wheel to the days the picked month and year have", async () => {
+    vi.useFakeTimers();
+    try {
+      usePreferencesStore.setState({ muteBirthConfirm: true });
+      useChartStore.setState({
+        birthInfo: { calendar: "solar", year: 2000, month: 1, day: 31, hour: 8, gender: "M" },
+      });
+      render(<AnSaoScreen />);
+      const days = () => within(screen.getByRole("listbox", { name: "Ngày" }));
+      expect(days().getAllByRole("option")).toHaveLength(31);
+
+      spinWheel("Tháng", "02");
+      expect(days().getAllByRole("option")).toHaveLength(29);
+      expect(days().getByRole("option", { selected: true }).textContent).toBe("29");
+
+      spinWheel("Năm", "2001");
+      expect(days().getAllByRole("option")).toHaveLength(28);
+      expect(days().getByRole("option", { selected: true }).textContent).toBe("28");
+
+      fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
+      await act(async () => vi.advanceTimersByTimeAsync(2600));
+      expect(build).toHaveBeenLastCalledWith({
+        calendar: "solar",
+        year: 2001,
+        month: 2,
+        day: 28,
+        hour: 8,
+        gender: "M",
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps the picked day after the month wheel passes a shorter month", async () => {
+    vi.useFakeTimers();
+    try {
+      usePreferencesStore.setState({ muteBirthConfirm: true });
+      useChartStore.setState({
+        birthInfo: { calendar: "solar", year: 2000, month: 1, day: 31, hour: 8, gender: "M" },
+      });
+      render(<AnSaoScreen />);
+      const days = () => within(screen.getByRole("listbox", { name: "Ngày" }));
+
+      spinWheel("Tháng", "02");
+      expect(days().getByRole("option", { selected: true }).textContent).toBe("29");
+
+      spinWheel("Tháng", "05");
+      expect(days().getAllByRole("option")).toHaveLength(31);
+      expect(days().getByRole("option", { selected: true }).textContent).toBe("31");
+
+      fireEvent.click(screen.getByRole("button", { name: /Luận giải lá số của tôi/ }));
+      await act(async () => vi.advanceTimersByTimeAsync(2600));
+      expect(build).toHaveBeenLastCalledWith({
+        calendar: "solar",
+        year: 2000,
+        month: 5,
+        day: 31,
+        hour: 8,
+        gender: "M",
+      });
     } finally {
       vi.useRealTimers();
     }

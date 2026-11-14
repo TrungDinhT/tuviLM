@@ -1,4 +1,5 @@
 import type { PreviewLasoRequest } from "@/lib/api/schemas";
+import { isRealDate } from "@/lib/calendar-date";
 
 /**
  * The bridge between what the user picks and what the backend accepts.
@@ -76,17 +77,21 @@ export function canhGioOf(hour12: number, meridiem: Meridiem): CanhGio {
 
 export type ApiBirthTime =
   | { readonly ok: true; readonly value: Omit<PreviewLasoRequest, "calendar"> }
-  | { readonly ok: false; readonly reason: "year-overflow" };
+  | { readonly ok: false; readonly reason: "invalid-date" | "year-overflow" };
 
 /**
  * Map a picked date + time to the API birth fields (minus `calendar`, which
  * callers add, and minus `gender`, which only the build call needs).
  *
  * The hour sent is the canh-giờ midpoint; a 23:xx pick rolls the date to the
- * next day with hour 0. Rolling 31/12/2099 forward exceeds the backend's year
- * ceiling, so that single edge fails closed instead of issuing a doomed call.
+ * next day with hour 0. A date that does not exist (31/02) fails before the
+ * roll, which would otherwise turn it into a real but different day. Rolling
+ * 31/12/2099 forward exceeds the backend's year ceiling, so that single edge
+ * fails closed instead of issuing a doomed call.
  */
 export function toApiBirthTime(date: BirthDateInput, time: BirthTimeInput): ApiBirthTime {
+  if (!isRealDate(date)) return { ok: false, reason: "invalid-date" };
+
   const hour24 = toHour24(time.hour12, time.meridiem);
   const apiHour = (canhIndex(hour24) * 2) % 24;
 
