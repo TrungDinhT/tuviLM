@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
+import { Schema } from "effect";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -94,9 +95,7 @@ describe("useAccountAccess", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.data).toBeUndefined();
     expect(isApiError(result.current.error) && result.current.error.error.kind).toBe("parse");
-    expect(accountAccessSchema.safeParse({ ...access, plan: "vip", balance: 0 }).success).toBe(
-      false,
-    );
+    expect(Schema.is(accountAccessSchema)({ ...access, plan: "vip", balance: 0 })).toBe(false);
   });
 });
 
@@ -114,7 +113,7 @@ describe("useChartProfiles", () => {
 });
 
 describe("useOpenChartProfile", () => {
-  const chart = buildLasoResponseSchema.parse(buildLasoFixture);
+  const chart = Schema.decodeUnknownSync(buildLasoResponseSchema)(buildLasoFixture);
 
   it("rebuilds the chart and freshly loads only the newest conversation", async () => {
     const sessions = [
@@ -288,9 +287,9 @@ describe("useDeleteChartProfile", () => {
 
 describe("emptyResponseSchema", () => {
   it("accepts a null body and rejects any non-null body", () => {
-    expect(emptyResponseSchema.safeParse(null).success).toBe(true);
-    expect(emptyResponseSchema.safeParse(undefined).success).toBe(false);
-    expect(emptyResponseSchema.safeParse({}).success).toBe(false);
-    expect(emptyResponseSchema.safeParse("ok").success).toBe(false);
+    expect(Schema.is(emptyResponseSchema)(null)).toBe(true);
+    expect(Schema.is(emptyResponseSchema)(undefined)).toBe(false);
+    expect(Schema.is(emptyResponseSchema)({})).toBe(false);
+    expect(Schema.is(emptyResponseSchema)("ok")).toBe(false);
   });
 });

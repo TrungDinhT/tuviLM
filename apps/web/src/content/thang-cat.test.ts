@@ -27,10 +27,10 @@ function lunarMonth(chiIndex: number): number {
 
 describe("THANG_CAT", () => {
   it("has a row for every địa chi", () => {
-    expect(Object.keys(THANG_CAT).sort()).toEqual([...diaChiSchema.options].sort());
+    expect(Object.keys(THANG_CAT).sort()).toEqual([...diaChiSchema.literals].sort());
   });
 
-  it.each(diaChiSchema.options)("%s matches the ±4 / 13−index definitions", (chi) => {
+  it.each(diaChiSchema.literals)("%s matches the ±4 / 13−index definitions", (chi) => {
     const i = INDEX[chi]!;
     const row = thangCatFor(chi);
 

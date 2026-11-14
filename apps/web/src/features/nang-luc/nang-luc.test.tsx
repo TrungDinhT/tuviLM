@@ -8,6 +8,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import { Schema } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CapabilityLauncher, CapabilityReport, NangLucScreen } from "./nang-luc-screen";
 import {
@@ -118,8 +119,8 @@ describe("capability report", () => {
   });
 
   it("accepts independent empty lists and rejects malformed findings", () => {
-    expect(capabilitySchema.safeParse(report).success).toBe(true);
-    expect(capabilitySchema.safeParse({ ...report, diem_yeu: [{ ten: "A" }] }).success).toBe(false);
+    expect(Schema.is(capabilitySchema)(report)).toBe(true);
+    expect(Schema.is(capabilitySchema)({ ...report, diem_yeu: [{ ten: "A" }] })).toBe(false);
   });
   it("opens the full explanation and handles an empty caution section", () => {
     render(<CapabilityReport report={report} />);

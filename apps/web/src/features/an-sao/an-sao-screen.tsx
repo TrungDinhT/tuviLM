@@ -78,7 +78,7 @@ export function AnSaoScreen() {
   const [rewardPreview, setRewardPreview] = useState<{
     key: string;
     stars: string[];
-    names: string[];
+    names: ReadonlyArray<string>;
   } | null>(null);
 
   const time = useMemo<BirthTimeInput | null>(

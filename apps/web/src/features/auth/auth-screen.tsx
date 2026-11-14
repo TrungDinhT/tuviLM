@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
-import { z } from "zod";
+import { Result, Schema } from "effect";
 
 import { Pill } from "@/components/primitives/pill";
 import { AN_SAO_ROUTE } from "@/config/site";
 import { useChartProfiles } from "@/lib/api/hooks";
 import { authClient } from "@/lib/auth-client";
+import { EMAIL_PATTERN, firstMessage, validate } from "@/lib/schema";
 import { showToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
@@ -28,25 +29,41 @@ export const SECONDARY_BUTTON_CLASS =
 export const INPUT_CLASS =
   "min-h-[50px] w-full rounded-[14px] border border-glass-line bg-white/[0.07] px-3.5 py-3 text-[15px] text-ink outline-none caret-accent transition-[border-color,box-shadow,background] placeholder:text-muted/70 hover:border-[color-mix(in_oklch,var(--color-glass-line)_60%,var(--color-ink))] focus:border-accent focus:bg-[color-mix(in_oklch,var(--color-bg-1)_78%,rgba(255,255,255,.07))] focus:shadow-[0_0_0_4px_color-mix(in_oklch,var(--accent)_14%,transparent)]";
 
-const registerFormSchema = z
-  .object({
-    displayName: z
-      .string()
-      .trim()
-      .min(1, "Vui lòng nhập tên hiển thị.")
-      .min(2, "Tên hiển thị phải có ít nhất 2 ký tự."),
-    email: z.string().trim().min(1, "Vui lòng nhập email.").email("Email chưa đúng định dạng."),
-    password: z
-      .string()
-      .min(1, "Vui lòng nhập mật khẩu.")
-      .min(8, "Mật khẩu phải có ít nhất 8 ký tự."),
-    confirmPassword: z.string().min(1, "Vui lòng nhập lại mật khẩu."),
-    terms: z.boolean().refine(Boolean, "Bạn cần đồng ý với điều khoản sử dụng."),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Hai mật khẩu chưa trùng nhau.",
-    path: ["confirmPassword"],
-  });
+export const emailField = Schema.Trim.check(
+  Schema.isMinLength(1, { message: "Vui lòng nhập email." }),
+  Schema.isPattern(EMAIL_PATTERN, { message: "Email chưa đúng định dạng." }),
+);
+
+/** Both passwords must match; the mismatch is reported on `confirmPassword`. */
+export const passwordsMatch = Schema.makeFilter(
+  (data: { readonly password: string; readonly confirmPassword: string }) =>
+    data.password === data.confirmPassword || {
+      path: ["confirmPassword"],
+      issue: "Hai mật khẩu chưa trùng nhau.",
+    },
+);
+
+export const confirmPasswordField = Schema.String.check(
+  Schema.isMinLength(1, { message: "Vui lòng nhập lại mật khẩu." }),
+);
+
+const registerFormSchema = Schema.Struct({
+  displayName: Schema.Trim.check(
+    Schema.isMinLength(1, { message: "Vui lòng nhập tên hiển thị." }),
+    Schema.isMinLength(2, { message: "Tên hiển thị phải có ít nhất 2 ký tự." }),
+  ),
+  email: emailField,
+  password: Schema.String.check(
+    Schema.isMinLength(1, { message: "Vui lòng nhập mật khẩu." }),
+    Schema.isMinLength(8, { message: "Mật khẩu phải có ít nhất 8 ký tự." }),
+  ),
+  confirmPassword: confirmPasswordField,
+  terms: Schema.Boolean.check(
+    Schema.makeFilter((accepted: boolean) => accepted, {
+      message: "Bạn cần đồng ý với điều khoản sử dụng.",
+    }),
+  ),
+}).check(passwordsMatch);
 
 export function AuthScreen({ callbackError, mode }: { callbackError?: string; mode: AuthMode }) {
   const isLogin = mode === "login";
@@ -66,7 +83,7 @@ export function AuthScreen({ callbackError, mode }: { callbackError?: string; mo
     let displayName = "";
 
     if (!isLogin) {
-      const result = registerFormSchema.safeParse({
+      const result = validate(registerFormSchema, {
         displayName: String(form.get("displayName") ?? ""),
         email,
         password,
@@ -74,12 +91,12 @@ export function AuthScreen({ callbackError, mode }: { callbackError?: string; mo
         terms: form.has("terms"),
       });
 
-      if (!result.success) {
-        showToast(result.error.issues[0]?.message ?? "Thông tin đăng ký chưa hợp lệ.");
+      if (Result.isFailure(result)) {
+        showToast(firstMessage(result.failure, "Thông tin đăng ký chưa hợp lệ."));
         return;
       }
 
-      ({ displayName, email, password } = result.data);
+      ({ displayName, email, password } = result.success);
     }
 
     setPendingAction("email");

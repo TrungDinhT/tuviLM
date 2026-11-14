@@ -1,3 +1,5 @@
+import { Option, Schema } from "effect";
+
 import { ApiErrorException } from "@/lib/http/errors";
 
 import { assertSignedIn, expectedUserHeader, safeBody } from "./client";
@@ -13,7 +15,7 @@ import { sseChatEventSchema, type SseChatEvent } from "./schemas";
  * idempotency headers, and the same normalized `ApiError` failures.
  *
  * The backend sends one `data: {…}\n\n` frame per event. A frame is split
- * into `data:` lines and JSON-decoded; an event that fails the Zod schema
+ * into `data:` lines and JSON-decoded; an event that fails the schema
  * resolves to the `stream` error variant rather than corrupting the transcript.
  */
 
@@ -92,14 +94,16 @@ export async function* parseSseStream(
       const data = extractData(rawFrame);
       if (data === null) continue;
 
-      const parsed = sseChatEventSchema.safeParse(data);
-      if (!parsed.success) {
+      const event = decodeEvent(data);
+      if (Option.isNone(event)) {
         throw new ApiErrorException({ kind: "stream", event: rawFrame });
       }
-      yield parsed.data;
+      yield event.value;
     }
   }
 }
+
+const decodeEvent = Schema.decodeUnknownOption(sseChatEventSchema);
 
 /** Join the `data:` lines of one SSE frame and JSON-decode them. */
 function extractData(rawFrame: string): unknown | null {

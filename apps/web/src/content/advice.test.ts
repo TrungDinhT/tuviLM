@@ -6,8 +6,8 @@ import { ADVICE_ENTRIES, adviceFor } from "./advice";
 
 describe("ADVICE_ENTRIES", () => {
   it("resolves all ten relation × polarity pairs", () => {
-    for (const relation of menhCucRelationSchema.options) {
-      for (const polarity of amDuongRelationSchema.options) {
+    for (const relation of menhCucRelationSchema.literals) {
+      for (const polarity of amDuongRelationSchema.literals) {
         const entry = adviceFor(relation, polarity);
         expect(entry.phrase.trim()).not.toBe("");
         expect(entry.advice.trim()).not.toBe("");

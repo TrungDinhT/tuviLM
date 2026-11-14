@@ -1,4 +1,7 @@
+import { Result, Schema } from "effect";
 import { describe, expect, it } from "vitest";
+
+import { validate } from "@/lib/schema";
 
 import fixture from "./__fixtures__/build-laso.json";
 import { buildLasoResponseSchema, sseChatEventSchema } from "./schemas";
@@ -12,7 +15,7 @@ const FOUNDATION_FIELDS = [
 
 describe("buildLasoResponseSchema", () => {
   it("parses a real backend response and exposes the foundation fields", () => {
-    const result = buildLasoResponseSchema.parse(fixture);
+    const result = Schema.decodeUnknownSync(buildLasoResponseSchema)(fixture);
 
     expect(result.menh_cuc_relation).toBe("khac_nhap");
     expect(result.am_duong_relation).toBe("thuan_ly");
@@ -24,21 +27,18 @@ describe("buildLasoResponseSchema", () => {
     const payload = { ...fixture } as Record<string, unknown>;
     delete payload[field];
 
-    const result = buildLasoResponseSchema.safeParse(payload);
+    const result = validate(buildLasoResponseSchema, payload);
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.path.includes(field))).toBe(true);
+    expect(Result.isFailure(result)).toBe(true);
+    if (Result.isFailure(result)) {
+      expect(result.failure.some((issue) => issue.path?.includes(field))).toBe(true);
     }
   });
 
   it("rejects a foundation value outside its enum", () => {
-    const result = buildLasoResponseSchema.safeParse({
-      ...fixture,
-      menh_cuc_relation: "hoa_kim",
-    });
+    const isChart = Schema.is(buildLasoResponseSchema);
 
-    expect(result.success).toBe(false);
+    expect(isChart({ ...fixture, menh_cuc_relation: "hoa_kim" })).toBe(false);
   });
 });
 
@@ -57,14 +57,14 @@ describe("sseChatEventSchema", () => {
     { type: "tool_call", id: "t1", name: "xem", arguments: { a: 1 } },
     { type: "error", message: "boom" },
   ])("accepts %o", (event) => {
-    expect(sseChatEventSchema.parse(event).type).toBe(event.type);
+    expect(Schema.decodeUnknownSync(sseChatEventSchema)(event).type).toBe(event.type);
   });
 
   it("rejects an unknown event type", () => {
-    expect(sseChatEventSchema.safeParse({ type: "bogus" }).success).toBe(false);
+    expect(Schema.is(sseChatEventSchema)({ type: "bogus" })).toBe(false);
   });
 
   it("rejects a text event missing its delta", () => {
-    expect(sseChatEventSchema.safeParse({ type: "text" }).success).toBe(false);
+    expect(Schema.is(sseChatEventSchema)({ type: "text" })).toBe(false);
   });
 });

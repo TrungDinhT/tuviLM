@@ -34,7 +34,7 @@ function normalizeSearch(value: string): string {
 }
 
 interface SavedChartListProps {
-  profiles: ChartProfile[];
+  profiles: ReadonlyArray<ChartProfile>;
 }
 
 export function SavedChartList({ profiles }: SavedChartListProps) {

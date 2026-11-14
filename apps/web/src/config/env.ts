@@ -1,5 +1,5 @@
 import { createEnv } from "@t3-oss/env-nextjs";
-import { z } from "zod";
+import { Effect, Schema } from "effect";
 
 /**
  * Validated environment.
@@ -14,7 +14,11 @@ export const env = createEnv({
      * `next.config.ts` forwards every `/api/*` request to it, so cookies stay
      * on this site's domain. On Vercel, set it to the API service URL.
      */
-    API_ORIGIN: z.url().default("http://localhost:8000"),
+    API_ORIGIN: Schema.toStandardSchemaV1(
+      Schema.String.check(
+        Schema.makeFilter((value: string) => URL.canParse(value), { message: "Invalid URL" }),
+      ).pipe(Schema.withDecodingDefault(Effect.succeed("http://localhost:8000"))),
+    ),
   },
   client: {},
   runtimeEnv: {

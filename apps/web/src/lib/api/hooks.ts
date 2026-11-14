@@ -7,6 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { Schema } from "effect";
 
 import { useChartStore } from "@/store/chart-store";
 
@@ -63,7 +64,7 @@ export function useRedeemCode() {
     mutationFn: (code: string) =>
       request(apiEndpoints.redeemCode, {
         method: "POST",
-        body: redeemCodeRequestSchema.parse({ code }),
+        body: Schema.decodeUnknownSync(redeemCodeRequestSchema)({ code }),
         schema: redeemCodeResponseSchema,
         withAuth: true,
         expectedUserId: userId,
@@ -85,7 +86,7 @@ export function useCreateRedeemCode() {
     mutationFn: (input: CreateRedeemCodeRequest) =>
       request(apiEndpoints.createRedeemCode, {
         method: "POST",
-        body: createRedeemCodeRequestSchema.parse(input),
+        body: Schema.decodeUnknownSync(createRedeemCodeRequestSchema)(input),
         schema: createRedeemCodeResponseSchema,
         withAuth: true,
         expectedUserId: userId,
@@ -201,7 +202,7 @@ export function useLasoPreview(birth: PreviewLasoRequest | null) {
     queryFn: ({ signal }) =>
       request(apiEndpoints.previewLaso, {
         method: "POST",
-        body: previewLasoRequestSchema.parse(birth),
+        body: Schema.decodeUnknownSync(previewLasoRequestSchema)(birth),
         schema: previewLasoResponseSchema,
         signal,
       }),
@@ -262,7 +263,7 @@ export function useCreateChartProfile() {
     mutationFn: (input: CreateChartProfileRequest) =>
       request(apiEndpoints.chartProfiles, {
         method: "POST",
-        body: createChartProfileRequestSchema.parse(input),
+        body: Schema.decodeUnknownSync(createChartProfileRequestSchema)(input),
         schema: createChartProfileResponseSchema,
         withAuth: true,
         expectedUserId: userId,
@@ -309,7 +310,7 @@ export function useRenameChartProfile() {
     mutationFn: ({ id, display_name }: { id: string; display_name: string }) =>
       request(apiEndpoints.chartProfile(id), {
         method: "PATCH",
-        body: renameChartProfileRequestSchema.parse({ display_name }),
+        body: Schema.decodeUnknownSync(renameChartProfileRequestSchema)({ display_name }),
         schema: createChartProfileResponseSchema,
         withAuth: true,
         expectedUserId: userId,
@@ -372,7 +373,7 @@ export function useCreateSession(profileId: string | null) {
       if (profileId === null) throw new Error("chart profile id required");
       return request(apiEndpoints.profileSessions(profileId), {
         method: "POST",
-        body: createSessionRequestSchema.parse({ title: null }),
+        body: Schema.decodeUnknownSync(createSessionRequestSchema)({ title: null }),
         schema: createSessionResponseSchema,
         withAuth: true,
         expectedUserId: userId,

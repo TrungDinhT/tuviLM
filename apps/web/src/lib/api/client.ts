@@ -1,6 +1,7 @@
-import type { z } from "zod";
+import { Result, type Schema } from "effect";
 
 import { ApiErrorException } from "@/lib/http/errors";
+import { validate } from "@/lib/schema";
 
 
 /**
@@ -9,7 +10,7 @@ import { ApiErrorException } from "@/lib/http/errors";
  * Three things happen here and nowhere else:
  * - requests go to same-origin `/api` paths, which Next forwards to FastAPI
  * - idempotency headers are attached (the session cookie goes along by itself)
- * - every response is parsed by a Zod schema and every failure is normalized
+ * - every response is decoded by an Effect schema and every failure is normalized
  *   to the `ApiError` union
  *
  * Components and hooks call the wrappers below; nothing calls `fetch` on the
@@ -19,7 +20,7 @@ import { ApiErrorException } from "@/lib/http/errors";
 export interface RequestOptions<T> {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
-  schema: z.ZodType<T>;
+  schema: Schema.ConstraintDecoder<T>;
   /**
    * Whether the request requires a signed-in account. Public chart building,
    * preview and health do not. The session cookie decides who the API sees.
@@ -101,12 +102,12 @@ export async function request<T>(path: string, options: RequestOptions<T>): Prom
     throw new ApiErrorException({ kind: "http", status: response.status, body: payload });
   }
 
-  const parsed = schema.safeParse(payload);
-  if (!parsed.success) {
-    throw new ApiErrorException({ kind: "parse", issues: parsed.error.issues });
+  const decoded = validate(schema, payload);
+  if (Result.isFailure(decoded)) {
+    throw new ApiErrorException({ kind: "parse", issues: decoded.failure });
   }
 
-  return parsed.data;
+  return decoded.success;
 }
 
 /**

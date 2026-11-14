@@ -2,17 +2,21 @@
 
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
-import { z } from "zod";
+import { Result, Schema } from "effect";
 
 import { authClient } from "@/lib/auth-client";
+import { firstMessage, validate } from "@/lib/schema";
 import { showToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 import {
   AUTH_CARD_CLASS,
   AuthField,
+  confirmPasswordField,
+  emailField,
   INPUT_CLASS,
   PasswordInput,
+  passwordsMatch,
   PRIMARY_BUTTON_CLASS,
   SECONDARY_BUTTON_CLASS,
 } from "./auth-screen";
@@ -20,24 +24,13 @@ import {
 const NETWORK_ERROR = "Không thể kết nối máy chủ xác thực. Vui lòng thử lại sau.";
 const RATE_LIMITED = "Bạn thao tác hơi nhanh. Vui lòng đợi một chút rồi thử lại.";
 
-const emailSchema = z
-  .string()
-  .trim()
-  .min(1, "Vui lòng nhập email.")
-  .email("Email chưa đúng định dạng.");
-
-const newPasswordSchema = z
-  .object({
-    password: z
-      .string()
-      .min(1, "Vui lòng nhập mật khẩu mới.")
-      .min(8, "Mật khẩu phải có ít nhất 8 ký tự."),
-    confirmPassword: z.string().min(1, "Vui lòng nhập lại mật khẩu."),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Hai mật khẩu chưa trùng nhau.",
-    path: ["confirmPassword"],
-  });
+const newPasswordSchema = Schema.Struct({
+  password: Schema.String.check(
+    Schema.isMinLength(1, { message: "Vui lòng nhập mật khẩu mới." }),
+    Schema.isMinLength(8, { message: "Mật khẩu phải có ít nhất 8 ký tự." }),
+  ),
+  confirmPassword: confirmPasswordField,
+}).check(passwordsMatch);
 
 export function ForgotPasswordScreen() {
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -65,12 +58,12 @@ export function ForgotPasswordScreen() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const result = emailSchema.safeParse(String(new FormData(event.currentTarget).get("email")));
-    if (!result.success) {
-      showToast(result.error.issues[0]?.message ?? "Email chưa đúng định dạng.");
+    const result = validate(emailField, String(new FormData(event.currentTarget).get("email")));
+    if (Result.isFailure(result)) {
+      showToast(firstMessage(result.failure, "Email chưa đúng định dạng."));
       return;
     }
-    void sendResetLink(result.data);
+    void sendResetLink(result.success);
   };
 
   if (sentTo) {
@@ -135,19 +128,19 @@ export function ResetPasswordScreen({ token }: { token: string | null }) {
     event.preventDefault();
     if (!token) return;
     const form = new FormData(event.currentTarget);
-    const parsed = newPasswordSchema.safeParse({
+    const parsed = validate(newPasswordSchema, {
       password: String(form.get("password") ?? ""),
       confirmPassword: String(form.get("confirmPassword") ?? ""),
     });
-    if (!parsed.success) {
-      showToast(parsed.error.issues[0]?.message ?? "Mật khẩu chưa hợp lệ.");
+    if (Result.isFailure(parsed)) {
+      showToast(firstMessage(parsed.failure, "Mật khẩu chưa hợp lệ."));
       return;
     }
 
     setPending(true);
     try {
       const result = await authClient.resetPassword({
-        newPassword: parsed.data.password,
+        newPassword: parsed.success.password,
         token,
       });
       if (result.error) {

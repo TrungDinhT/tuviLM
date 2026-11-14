@@ -1,91 +1,113 @@
-import { z } from "zod";
+import { Effect, Schema, SchemaGetter, Struct } from "effect";
+
+import { IntBetween, IsoDateTime, NonEmpty } from "@/lib/schema";
 
 /**
- * Zod mirrors of the backend contract.
+ * Effect Schema mirrors of the backend contract.
  *
  * Sources: `api/schemas.py` and `api/chat/models.py`. When either changes,
  * change these — a drift shows up as a `parse` error carrying the issues,
  * which is the point.
  */
 
-export const accountAccessSchema = z.object({
-  user_id: z.string(),
-  role: z.enum(["user", "admin"]),
-  plan: z.enum(["normal", "full_unlock"]),
-  balance: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+const nullByDefault = <S extends Schema.Constraint & { readonly Encoded: unknown }>(schema: S) =>
+  Schema.NullOr(schema).pipe(Schema.withDecodingDefault(Effect.succeed(null)));
+
+const falseByDefault = Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false)));
+
+const Coins = IntBetween(1, Number.MAX_SAFE_INTEGER);
+
+export const accountAccessSchema = Schema.Struct({
+  user_id: Schema.String,
+  role: Schema.Literals(["user", "admin"]),
+  plan: Schema.Literals(["normal", "full_unlock"]),
+  balance: IntBetween(0, Number.MAX_SAFE_INTEGER),
 });
 
-export type AccountAccess = z.infer<typeof accountAccessSchema>;
+export type AccountAccess = typeof accountAccessSchema.Type;
 
-export const redeemCodeRequestSchema = z.object({
-  code: z.string().trim().toUpperCase().min(1),
+/** The code is trimmed and upper-cased before it is sent. */
+export const redeemCodeRequestSchema = Schema.Struct({
+  code: Schema.Trim.pipe(
+    Schema.decodeTo(NonEmpty, {
+      decode: SchemaGetter.toUpperCase(),
+      encode: SchemaGetter.passthrough(),
+    }),
+  ),
 });
 
-export const redeemCodeResponseSchema = z.object({
-  coins: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+export const redeemCodeResponseSchema = Schema.Struct({
+  coins: Coins,
 });
 
-export const createRedeemCodeRequestSchema = z.object({
-  coins: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
-  kind: z.enum(["single_use", "per_account"]),
-  expires_at: z.iso.datetime({ offset: true }),
+export const createRedeemCodeRequestSchema = Schema.Struct({
+  coins: Coins,
+  kind: Schema.Literals(["single_use", "per_account"]),
+  expires_at: IsoDateTime,
 });
 
-export type CreateRedeemCodeRequest = z.infer<typeof createRedeemCodeRequestSchema>;
+export type CreateRedeemCodeRequest = typeof createRedeemCodeRequestSchema.Type;
 
-export const createRedeemCodeResponseSchema = createRedeemCodeRequestSchema.extend({
-  code: z.string().min(1),
-});
+export const createRedeemCodeResponseSchema = createRedeemCodeRequestSchema.mapFields(
+  Struct.assign({ code: NonEmpty }),
+);
 
 // --- api/chat/models.py ----------------------------------------------------
 
-export const birthInfoSchema = z.object({
-  calendar: z.literal("solar").default("solar"),
-  year: z.number().int().min(1900).max(2099),
-  month: z.number().int().min(1).max(12),
-  day: z.number().int().min(1).max(31),
-  hour: z.number().int().min(0).max(23),
-  gender: z.enum(["M", "F"]),
+export const birthInfoSchema = Schema.Struct({
+  calendar: Schema.Literal("solar").pipe(
+    Schema.withDecodingDefault(Effect.succeed("solar" as const)),
+  ),
+  year: IntBetween(1900, 2099),
+  month: IntBetween(1, 12),
+  day: IntBetween(1, 31),
+  hour: IntBetween(0, 23),
+  gender: Schema.Literals(["M", "F"]),
 });
 
-export type BirthInfo = z.infer<typeof birthInfoSchema>;
+export type BirthInfo = typeof birthInfoSchema.Type;
 
-export const chatRoleSchema = z.enum(["user", "assistant"]);
+export const chatRoleSchema = Schema.Literals(["user", "assistant"]);
 
-export const chatMessageStatusSchema = z.enum(["pending", "confirmed", "failed", "cancelled"]);
+export const chatMessageStatusSchema = Schema.Literals([
+  "pending",
+  "confirmed",
+  "failed",
+  "cancelled",
+]);
 
-export const chatMessageSchema = z.object({
-  id: z.string(),
+export const chatMessageSchema = Schema.Struct({
+  id: Schema.String,
   role: chatRoleSchema,
-  content: z.string(),
+  content: Schema.String,
   status: chatMessageStatusSchema,
-  created_at: z.iso.datetime({ offset: true }),
-  updated_at: z.iso.datetime({ offset: true }),
+  created_at: IsoDateTime,
+  updated_at: IsoDateTime,
 });
 
-export type ChatMessage = z.infer<typeof chatMessageSchema>;
+export type ChatMessage = typeof chatMessageSchema.Type;
 
-export const chatSessionSchema = z.object({
-  id: z.string(),
-  chart_profile_id: z.string(),
-  title: z.string().nullable().default(null),
-  messages: z.array(chatMessageSchema),
-  created_at: z.iso.datetime({ offset: true }),
-  updated_at: z.iso.datetime({ offset: true }),
+export const chatSessionSchema = Schema.Struct({
+  id: Schema.String,
+  chart_profile_id: Schema.String,
+  title: nullByDefault(Schema.String),
+  messages: Schema.Array(chatMessageSchema),
+  created_at: IsoDateTime,
+  updated_at: IsoDateTime,
 });
 
-export type ChatSession = z.infer<typeof chatSessionSchema>;
+export type ChatSession = typeof chatSessionSchema.Type;
 
-export const chatSessionSummarySchema = z.object({
-  id: z.string(),
-  chart_profile_id: z.string(),
-  title: z.string().nullable().default(null),
-  message_count: z.number().int(),
-  created_at: z.iso.datetime({ offset: true }),
-  updated_at: z.iso.datetime({ offset: true }),
+export const chatSessionSummarySchema = Schema.Struct({
+  id: Schema.String,
+  chart_profile_id: Schema.String,
+  title: nullByDefault(Schema.String),
+  message_count: Schema.Number.check(Schema.isInt()),
+  created_at: IsoDateTime,
+  updated_at: IsoDateTime,
 });
 
-export type ChatSessionSummary = z.infer<typeof chatSessionSummarySchema>;
+export type ChatSessionSummary = typeof chatSessionSummarySchema.Type;
 
 // --- chat stream events (SSE) ----------------------------------------------
 
@@ -94,61 +116,61 @@ export type ChatSessionSummary = z.infer<typeof chatSessionSummarySchema>;
  * `chatMessageStatusSchema` because a duplicate in-progress stream also ends
  * with `done` carrying `duplicate_in_progress` — see `api/chat/routes.py`.
  */
-export const sseDoneStatusSchema = z.enum([
+export const sseDoneStatusSchema = Schema.Literals([
   "confirmed",
   "failed",
   "cancelled",
   "duplicate_in_progress",
 ]);
 
-export const sseIdsEventSchema = z.object({
-  type: z.literal("ids"),
-  user_message_id: z.string(),
-  assistant_message_id: z.string(),
+export const sseIdsEventSchema = Schema.Struct({
+  type: Schema.Literal("ids"),
+  user_message_id: Schema.String,
+  assistant_message_id: Schema.String,
 });
 
-export const sseTextEventSchema = z.object({
-  type: z.literal("text"),
-  delta: z.string(),
+export const sseTextEventSchema = Schema.Struct({
+  type: Schema.Literal("text"),
+  delta: Schema.String,
 });
 
-export const sseToolCallEventSchema = z.object({
-  type: z.literal("tool_call"),
-  id: z.string(),
-  name: z.string(),
-  arguments: z.unknown(),
+export const sseToolCallEventSchema = Schema.Struct({
+  type: Schema.Literal("tool_call"),
+  id: Schema.String,
+  name: Schema.String,
+  arguments: Schema.optionalKey(Schema.Unknown),
 });
 
-export const sseToolResultEventSchema = z.object({
-  type: z.literal("tool_result"),
-  id: z.string().nullable().optional(),
-  name: z.string().nullable().optional(),
-  content: z.unknown(),
+export const sseToolResultEventSchema = Schema.Struct({
+  type: Schema.Literal("tool_result"),
+  id: Schema.optional(Schema.NullOr(Schema.String)),
+  name: Schema.optional(Schema.NullOr(Schema.String)),
+  content: Schema.optionalKey(Schema.Unknown),
 });
 
-export const sseResultEventSchema = z.object({
-  type: z.literal("result"),
-  output: z.unknown(),
+export const sseResultEventSchema = Schema.Struct({
+  type: Schema.Literal("result"),
+  output: Schema.optionalKey(Schema.Unknown),
 });
 
-export const sseErrorEventSchema = z.object({
-  type: z.literal("error"),
-  message: z.string(),
+export const sseErrorEventSchema = Schema.Struct({
+  type: Schema.Literal("error"),
+  message: Schema.String,
 });
 
-export const sseDoneEventSchema = z.object({
-  type: z.literal("done"),
+export const sseDoneEventSchema = Schema.Struct({
+  type: Schema.Literal("done"),
   status: sseDoneStatusSchema,
 });
 
-export const sseDuplicateInProgressEventSchema = z.object({
-  type: z.literal("duplicate_in_progress"),
-  user_message_id: z.string(),
-  assistant_message_id: z.string(),
+export const sseDuplicateInProgressEventSchema = Schema.Struct({
+  type: Schema.Literal("duplicate_in_progress"),
+  user_message_id: Schema.String,
+  assistant_message_id: Schema.String,
   status: chatMessageStatusSchema,
 });
 
-export const sseChatEventSchema = z.discriminatedUnion("type", [
+export const sseChatEventSchema = Schema.Union([
   sseIdsEventSchema,
   sseTextEventSchema,
   sseToolCallEventSchema,
@@ -159,31 +181,31 @@ export const sseChatEventSchema = z.discriminatedUnion("type", [
   sseDuplicateInProgressEventSchema,
 ]);
 
-export type SseChatEvent = z.infer<typeof sseChatEventSchema>;
+export type SseChatEvent = typeof sseChatEventSchema.Type;
 
 // --- api/schemas.py --------------------------------------------------------
 
-export const starSchema = z.object({
-  name: z.string(),
-  display: z.string(),
-  element: z.string(),
+export const starSchema = Schema.Struct({
+  name: Schema.String,
+  display: Schema.String,
+  element: Schema.String,
 });
 
-export const cungSchema = z.object({
-  position: z.string(),
-  role: z.string().nullable().default(null),
-  chinh_tinh: z.array(z.string()),
-  phu_tinh: z.array(starSchema),
-  tuhoa: z.array(z.string()),
-  trang_sinh: z.string().nullable().default(null),
-  is_tuan: z.boolean().default(false),
-  is_triet: z.boolean().default(false),
-  is_cung_than: z.boolean().default(false),
-  age_daivan: z.number().int().nullable().default(null),
-  saoLuu: z.array(starSchema),
+export const cungSchema = Schema.Struct({
+  position: Schema.String,
+  role: nullByDefault(Schema.String),
+  chinh_tinh: Schema.Array(Schema.String),
+  phu_tinh: Schema.Array(starSchema),
+  tuhoa: Schema.Array(Schema.String),
+  trang_sinh: nullByDefault(Schema.String),
+  is_tuan: falseByDefault,
+  is_triet: falseByDefault,
+  is_cung_than: falseByDefault,
+  age_daivan: nullByDefault(Schema.Number.check(Schema.isInt())),
+  saoLuu: Schema.Array(starSchema),
 });
 
-export type Cung = z.infer<typeof cungSchema>;
+export type Cung = typeof cungSchema.Type;
 
 /**
  * Foundation fields — stable keys the deck keys content off. Required, never
@@ -191,7 +213,7 @@ export type Cung = z.infer<typeof cungSchema>;
  * screen is worse than a recast. Mirrors the `Literal` unions in
  * `api/schemas.py`.
  */
-export const menhCucRelationSchema = z.enum([
+export const menhCucRelationSchema = Schema.Literals([
   "sinh_xuat",
   "sinh_nhap",
   "khac_xuat",
@@ -199,9 +221,9 @@ export const menhCucRelationSchema = z.enum([
   "binh_hoa",
 ]);
 
-export const amDuongRelationSchema = z.enum(["thuan_ly", "nghich_ly"]);
+export const amDuongRelationSchema = Schema.Literals(["thuan_ly", "nghich_ly"]);
 
-export const diaChiSchema = z.enum([
+export const diaChiSchema = Schema.Literals([
   "ty",
   "suu",
   "dan",
@@ -216,104 +238,104 @@ export const diaChiSchema = z.enum([
   "hoi",
 ]);
 
-export const nguHanhSchema = z.enum(["Kim", "Mộc", "Thủy", "Hỏa", "Thổ"]);
+export const nguHanhSchema = Schema.Literals(["Kim", "Mộc", "Thủy", "Hỏa", "Thổ"]);
 
-export type MenhCucRelation = z.infer<typeof menhCucRelationSchema>;
-export type AmDuongRelation = z.infer<typeof amDuongRelationSchema>;
-export type DiaChi = z.infer<typeof diaChiSchema>;
-export type NguHanh = z.infer<typeof nguHanhSchema>;
+export type MenhCucRelation = typeof menhCucRelationSchema.Type;
+export type AmDuongRelation = typeof amDuongRelationSchema.Type;
+export type DiaChi = typeof diaChiSchema.Type;
+export type NguHanh = typeof nguHanhSchema.Type;
 
-export const buildLasoResponseSchema = z.object({
-  id: z.string(),
-  summary: z.string(),
-  ban_menh_name: z.string(),
-  cuc_name: z.string(),
-  menh_cuc_relation_label: z.string(),
+export const buildLasoResponseSchema = Schema.Struct({
+  id: Schema.String,
+  summary: Schema.String,
+  ban_menh_name: Schema.String,
+  cuc_name: Schema.String,
+  menh_cuc_relation_label: Schema.String,
   menh_cuc_relation: menhCucRelationSchema,
   am_duong_relation: amDuongRelationSchema,
   dia_chi_natal_year: diaChiSchema,
   ban_menh_ngu_hanh: nguHanhSchema,
-  cung_by_position: z.record(z.string(), cungSchema),
+  cung_by_position: Schema.Record(Schema.String, cungSchema),
 });
 
-export type BuildLasoResponse = z.infer<typeof buildLasoResponseSchema>;
+export type BuildLasoResponse = typeof buildLasoResponseSchema.Type;
 
-export const buildSaoLuuRequestSchema = z.object({
+export const buildSaoLuuRequestSchema = Schema.Struct({
   observation_time: birthInfoSchema,
 });
 
-export const buildSaoLuuResponseSchema = z.object({
-  cung_by_position: z.record(z.string(), cungSchema),
+export const buildSaoLuuResponseSchema = Schema.Struct({
+  cung_by_position: Schema.Record(Schema.String, cungSchema),
 });
 
 /**
  * `POST /laso/preview`. Gender is omitted: cung Mệnh's chính tinh do not
  * depend on it, and the preview is meant to fire before the user picks one.
  */
-export const previewLasoRequestSchema = birthInfoSchema.omit({ gender: true });
+export const previewLasoRequestSchema = birthInfoSchema.mapFields(Struct.omit(["gender"]));
 
-export type PreviewLasoRequest = z.infer<typeof previewLasoRequestSchema>;
+export type PreviewLasoRequest = typeof previewLasoRequestSchema.Type;
 
-export const previewLasoResponseSchema = z.object({
+export const previewLasoResponseSchema = Schema.Struct({
   /** Clean star names — no trạng thái suffix. Empty for vô chính diệu. */
-  chinh_tinh: z.array(z.string()),
-  menh_position: z.string(),
+  chinh_tinh: Schema.Array(Schema.String),
+  menh_position: Schema.String,
 });
 
-export type PreviewLasoResponse = z.infer<typeof previewLasoResponseSchema>;
+export type PreviewLasoResponse = typeof previewLasoResponseSchema.Type;
 
-export const chartProfileSchema = z.object({
-  id: z.string(),
-  display_name: z.string(),
+export const chartProfileSchema = Schema.Struct({
+  id: Schema.String,
+  display_name: Schema.String,
   birth_info: birthInfoSchema,
-  created_at: z.iso.datetime({ offset: true }),
-  updated_at: z.iso.datetime({ offset: true }),
+  created_at: IsoDateTime,
+  updated_at: IsoDateTime,
 });
 
-export type ChartProfile = z.infer<typeof chartProfileSchema>;
+export type ChartProfile = typeof chartProfileSchema.Type;
 
-export const createChartProfileRequestSchema = z.object({
-  display_name: z.string(),
+export const createChartProfileRequestSchema = Schema.Struct({
+  display_name: Schema.String,
   birth_info: birthInfoSchema,
 });
 
-export type CreateChartProfileRequest = z.infer<typeof createChartProfileRequestSchema>;
+export type CreateChartProfileRequest = typeof createChartProfileRequestSchema.Type;
 
-export const renameChartProfileRequestSchema = z.strictObject({
-  display_name: z.string().trim().min(1).max(80),
+export const renameChartProfileRequestSchema = Schema.Struct({
+  display_name: Schema.Trim.check(Schema.isMinLength(1), Schema.isMaxLength(80)),
 });
 
-export const createChartProfileResponseSchema = z.object({
+export const createChartProfileResponseSchema = Schema.Struct({
   chart_profile: chartProfileSchema,
 });
 
 /**
  * `DELETE /api/v1/chart-profiles/{id}` answers `204` with no body, which the
- * client's `safeBody` turns into `null`. Delete hooks parse their response
+ * client's `safeBody` turns into `null`. Delete requests decode their response
  * with this rather than a JSON schema. Any future 204 endpoint reuses it.
  */
-export const emptyResponseSchema = z.null();
+export const emptyResponseSchema = Schema.Null;
 
-export const listChartProfilesResponseSchema = z.object({
-  chart_profiles: z.array(chartProfileSchema),
+export const listChartProfilesResponseSchema = Schema.Struct({
+  chart_profiles: Schema.Array(chartProfileSchema),
 });
 
-export const createSessionRequestSchema = z.object({
-  title: z.string().nullable().optional(),
+export const createSessionRequestSchema = Schema.Struct({
+  title: Schema.optional(Schema.NullOr(Schema.String)),
 });
 
-export const createSessionResponseSchema = z.object({
+export const createSessionResponseSchema = Schema.Struct({
   session: chatSessionSchema,
 });
 
-export const getSessionResponseSchema = z.object({
+export const getSessionResponseSchema = Schema.Struct({
   session: chatSessionSchema,
 });
 
-export const listSessionsResponseSchema = z.object({
-  sessions: z.array(chatSessionSummarySchema),
+export const listSessionsResponseSchema = Schema.Struct({
+  sessions: Schema.Array(chatSessionSummarySchema),
 });
 
-export const healthResponseSchema = z.object({
-  status: z.string(),
+export const healthResponseSchema = Schema.Struct({
+  status: Schema.String,
 });

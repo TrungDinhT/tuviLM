@@ -1,4 +1,5 @@
 import type { Query, QueryClient } from "@tanstack/react-query";
+import { Schema } from "effect";
 
 import { useChartStore } from "@/store/chart-store";
 
@@ -13,6 +14,8 @@ import { buildLasoResponseSchema } from "./schemas";
  * the matching `chartId`, so the two must never disagree: a flag claiming a
  * chart the cache cannot show is worse than no flag at all.
  */
+
+const isUsableChart = Schema.is(buildLasoResponseSchema);
 
 /** Dehydration filter handed to the query-cache persister. */
 export function shouldPersistQuery(query: Query): boolean {
@@ -34,7 +37,7 @@ export function reconcileChartState(queryClient: QueryClient): void {
   // missing one.
   const hasUsableChart = queryClient
     .getQueriesData({ predicate: (query) => isPersistedQueryKey(query.queryKey) })
-    .some(([, data]) => buildLasoResponseSchema.safeParse(data).success);
+    .some(([, data]) => isUsableChart(data));
 
   if (!hasUsableChart) useChartStore.getState().reset();
 }

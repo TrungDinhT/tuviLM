@@ -1,4 +1,4 @@
-import type { z } from "zod";
+import type { Issue } from "@/lib/schema";
 
 /**
  * Every failure reaching a component, in one shape.
@@ -10,7 +10,7 @@ import type { z } from "zod";
 type ApiError =
   | { kind: "network" }
   | { kind: "http"; status: number; body: unknown }
-  | { kind: "parse"; issues: z.core.$ZodIssue[] }
+  | { kind: "parse"; issues: ReadonlyArray<Issue> }
   | { kind: "stream"; event: string };
 
 /** Thrown by the client so TanStack Query can carry it as a rejection. */

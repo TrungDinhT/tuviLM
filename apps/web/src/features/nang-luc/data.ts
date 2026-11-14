@@ -3,35 +3,39 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { z } from "zod";
+import { Option, Schema } from "effect";
 import { useAccountRequestScope } from "@/lib/api/account-request";
 import { request } from "@/lib/api/client";
 import { queryKeys } from "@/lib/api/queryKeys";
 import type { BirthInfo } from "@/lib/api/schemas";
 import { safeStorage } from "@/lib/safe-storage";
+import { NonEmpty } from "@/lib/schema";
 
 /** Coins on the normal plan; the backend charges each account once per chart. */
 export const CAPABILITY_REPORT_COST = 10;
 
-const description = { mo_ta: z.string().min(1), giai_thich: z.string().min(1) };
-export const capabilitySchema = z.object({
-  tong_quan: z.string().min(1),
-  diem_manh: z
-    .array(
-      z.object({ nang_luc_id: z.string().min(1), nang_luc: z.string().min(1), ...description }),
-    )
-    .max(6),
-  diem_yeu: z
-    .array(
-      z.object({
-        ten: z.string().min(1),
-        loai: z.enum(["han_che_truc_tiep", "qua_da", "xung_dot"]),
-        ...description,
-      }),
-    )
-    .max(6),
+const description = { mo_ta: NonEmpty, giai_thich: NonEmpty };
+export const capabilitySchema = Schema.Struct({
+  tong_quan: NonEmpty,
+  diem_manh: Schema.Array(
+    Schema.Struct({ nang_luc_id: NonEmpty, nang_luc: NonEmpty, ...description }),
+  ).check(Schema.isMaxLength(6)),
+  diem_yeu: Schema.Array(
+    Schema.Struct({
+      ten: NonEmpty,
+      loai: Schema.Literals(["han_che_truc_tiep", "qua_da", "xung_dot"]),
+      ...description,
+    }),
+  ).check(Schema.isMaxLength(6)),
 });
-export type CapabilityProfile = z.infer<typeof capabilitySchema>;
+export type CapabilityProfile = typeof capabilitySchema.Type;
+const persistedEntriesSchema = Schema.Struct({
+  entries: Schema.Record(
+    Schema.String,
+    Schema.Struct({ unlocked: Schema.Boolean, report: Schema.optionalKey(capabilitySchema) }),
+  ),
+});
+const decodePersistedEntries = Schema.decodeUnknownOption(persistedEntriesSchema);
 export function capabilityKey(birth: BirthInfo | null, userId: string | null | undefined) {
   return birth && userId
     ? `v1:${userId}:${birth.calendar}:${birth.year}:${birth.month}:${birth.day}:${birth.hour}:${birth.gender}`
@@ -66,15 +70,11 @@ export const useCapabilityStore = create<CapabilityState>()(
       skipHydration: true,
       partialize: (state) => ({ entries: state.entries }),
       merge: (persisted, current) => {
-        const parsed = z
-          .object({
-            entries: z.record(
-              z.string(),
-              z.object({ unlocked: z.boolean(), report: capabilitySchema.optional() }),
-            ),
-          })
-          .safeParse(persisted);
-        return parsed.success ? { ...current, entries: parsed.data.entries } : current;
+        const parsed = decodePersistedEntries(persisted);
+        return Option.match(parsed, {
+          onNone: () => current,
+          onSome: ({ entries }) => ({ ...current, entries: { ...entries } }),
+        });
       },
     },
   ),
