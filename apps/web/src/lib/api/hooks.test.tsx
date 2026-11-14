@@ -15,6 +15,7 @@ import {
   useRenameChartProfile,
 } from "./hooks";
 import { queryKeys } from "./queryKeys";
+import { sentRequest, sentRequests } from "./sent-request";
 import { accountAccessSchema, buildLasoResponseSchema, emptyResponseSchema, type ChartProfile } from "./schemas";
 import buildLasoFixture from "./__fixtures__/build-laso.json";
 
@@ -68,10 +69,9 @@ describe("useAccountAccess", () => {
     });
 
     await waitFor(() => expect(result.current.data).toEqual(access));
-    expect(fetchMock).toHaveBeenCalledWith(
-      "/api/v1/me",
-      expect.objectContaining({ method: "GET", headers: { "X-Expected-User-Id": "user-1" } }),
-    );
+    const sent = sentRequest(fetchMock.mock.calls[0]);
+    expect(sent).toMatchObject({ path: "/api/v1/me", method: "GET" });
+    expect(sent.headers.get("X-Expected-User-Id")).toBe("user-1");
     expect(client.getQueryData(queryKeys.accountAccess("user-1"))).toEqual(access);
   });
 
@@ -127,9 +127,9 @@ describe("useOpenChartProfile", () => {
       id: `message-${session.id}`, role: "user", content: session.id, status: "confirmed",
       created_at: session.created_at, updated_at: session.updated_at,
     }] } }));
-    const fetchMock = vi.fn((url: string) => Promise.resolve(jsonResponse(
-      url.endsWith("/laso/build") ? chart : url.endsWith("/p1/sessions") ? { sessions }
-        : transcripts.find(({ session }) => url.endsWith(`/${session.id}`)),
+    const fetchMock = vi.fn((url: string | URL) => Promise.resolve(jsonResponse(
+      String(url).endsWith("/laso/build") ? chart : String(url).endsWith("/p1/sessions") ? { sessions }
+        : transcripts.find(({ session }) => String(url).endsWith(`/${session.id}`)),
     )));
     vi.stubGlobal("fetch", fetchMock);
     const client = new QueryClient();
@@ -139,8 +139,9 @@ describe("useOpenChartProfile", () => {
     await act(async () => { await result.current.mutateAsync(PROFILE); });
 
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/laso/build"),
-      expect.objectContaining({ method: "POST", body: JSON.stringify(PROFILE.birth_info) }));
+    expect(sentRequests(fetchMock)).toContainEqual(
+      expect.objectContaining({ path: "/api/v1/laso/build", method: "POST", body: PROFILE.birth_info }),
+    );
     expect(client.getQueryData(queryKeys.laso.chart(chart.id))).toEqual(chart);
     expect(client.getQueryData(queryKeys.sessions.byProfile(PROFILE.id))).toEqual({ sessions });
     expect(client.getQueryData(queryKeys.sessions.detail("s2"))).toMatchObject({
@@ -150,8 +151,8 @@ describe("useOpenChartProfile", () => {
   });
 
   it("opens a chart without creating a conversation when its history is empty", async () => {
-    const fetchMock = vi.fn((url: string) => Promise.resolve(jsonResponse(
-      url.endsWith("/laso/build") ? chart : { sessions: [] },
+    const fetchMock = vi.fn((url: string | URL) => Promise.resolve(jsonResponse(
+      String(url).endsWith("/laso/build") ? chart : { sessions: [] },
     )));
     vi.stubGlobal("fetch", fetchMock);
     const client = new QueryClient();
@@ -170,9 +171,9 @@ describe("useOpenChartProfile", () => {
     };
     for (const cancelled of [false, true]) {
       const controller = new AbortController();
-      vi.stubGlobal("fetch", vi.fn((url: string) => {
-        if (url.endsWith("/laso/build")) return Promise.resolve(jsonResponse(chart));
-        if (url.endsWith("/p1/sessions")) {
+      vi.stubGlobal("fetch", vi.fn((url: string | URL) => {
+        if (String(url).endsWith("/laso/build")) return Promise.resolve(jsonResponse(chart));
+        if (String(url).endsWith("/p1/sessions")) {
           return Promise.resolve(jsonResponse({ sessions: [{ ...session, message_count: 0 }] }));
         }
         if (cancelled) controller.abort();
@@ -203,7 +204,7 @@ describe("useOpenChartProfile", () => {
 describe("useRenameChartProfile", () => {
   it("patches the trimmed name and refetches the active saved-chart list", async () => {
     let profile = PROFILE;
-    const fetchMock = vi.fn((_: string, init?: RequestInit) => {
+    const fetchMock = vi.fn((_: string | URL, init?: RequestInit) => {
       if (init?.method === "PATCH") {
         profile = { ...PROFILE, display_name: "Gia đình" };
         return Promise.resolve(jsonResponse({ chart_profile: profile }));
@@ -222,9 +223,12 @@ describe("useRenameChartProfile", () => {
     await act(async () => {
       await rename.current.mutateAsync({ id: PROFILE.id, display_name: "  Gia đình  " });
     });
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/chart-profiles/p1"),
-      expect.objectContaining({ method: "PATCH", body: JSON.stringify({ display_name: "Gia đình" }) }),
+    expect(sentRequests(fetchMock)).toContainEqual(
+      expect.objectContaining({
+        path: "/api/v1/chart-profiles/p1",
+        method: "PATCH",
+        body: { display_name: "Gia đình" },
+      }),
     );
     await waitFor(() => expect(list.current.data?.chart_profiles[0]?.display_name).toBe("Gia đình"));
   });
@@ -232,7 +236,7 @@ describe("useRenameChartProfile", () => {
 
 describe("useDeleteChartProfile", () => {
   it("invalidates the list so it refetches after a delete", async () => {
-    const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+    const fetchMock = vi.fn((url: string | URL, init?: RequestInit) => {
       if (init?.method === "DELETE") return Promise.resolve(noBody(204));
       return Promise.resolve(jsonResponse({ chart_profiles: [PROFILE] }));
     });

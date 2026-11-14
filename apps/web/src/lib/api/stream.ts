@@ -1,125 +1,120 @@
-import { Option, Schema } from "effect";
+import { Effect, Option, Schema, Stream } from "effect";
+import type { HttpClient } from "effect/http";
 
 import { ApiErrorException } from "@/lib/http/errors";
 
-import { assertSignedIn, expectedUserHeader, safeBody } from "./client";
+import { ensureSignedIn, failOnHttpError, fromTransport, makeRequest, send } from "./client";
 import { apiEndpoints } from "./endpoints";
 import { sseChatEventSchema, type SseChatEvent } from "./schemas";
 
 /**
  * The SSE reader for chat.
  *
- * Streams are not TanStack Query queries, so they do not go through `request`
- * (which reads the whole body). They do, however, share the client's rules:
- * same-origin `/api` paths, the same identity and
- * idempotency headers, and the same normalized `ApiError` failures.
+ * Streams are not TanStack Query queries, so they do not go through
+ * `apiRequest` (which reads the whole body). They do, however, share the
+ * client's rules: same-origin `/api` paths, the same identity and idempotency
+ * headers, and the same normalized `ApiError` failures.
  *
  * The backend sends one `data: {…}\n\n` frame per event. A frame is split
- * into `data:` lines and JSON-decoded; an event that fails the schema
- * resolves to the `stream` error variant rather than corrupting the transcript.
+ * into `data:` lines and JSON-decoded; an event that fails the schema fails
+ * the stream with the `stream` error variant rather than corrupting the
+ * transcript.
  */
 
+/** The body broke off mid-turn. */
+const connectionLost = () => new ApiErrorException({ kind: "stream", event: "connection lost" });
+
 /**
- * Stream a chat turn from the backend, yielding typed SSE events.
+ * Stream a chat turn from the backend as typed SSE events.
  *
  * The caller owns `idempotencyKey` so retrying this logical turn can reuse it.
- * The generator throws `ApiErrorException` for network, HTTP, and parse
- * failures; the backend's own `error` event arrives as a yielded `error`
- * event, followed by a `done` event carrying the failed status.
+ * The stream fails with `ApiErrorException` for network, HTTP, and parse
+ * failures; the backend's own `error` event arrives as an `error` event,
+ * followed by a `done` event carrying the failed status. Run it with
+ * `runApi` and the turn's abort signal.
  */
-export async function* streamChat(
+export const chatEvents = (
   sessionId: string,
   content: string,
-  opts: { idempotencyKey: string; signal?: AbortSignal; expectedUserId?: string | null },
-): AsyncGenerator<SseChatEvent> {
-  opts.signal?.throwIfAborted();
-  assertSignedIn(opts.expectedUserId);
-  let response: Response;
-  try {
-    response = await fetch(apiEndpoints.chatStream(sessionId), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Idempotency-Key": opts.idempotencyKey,
-        ...expectedUserHeader(opts.expectedUserId),
-      },
-      body: JSON.stringify({ content }),
-      signal: opts.signal,
-    });
-  } catch (cause) {
-    if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
-    throw new ApiErrorException({ kind: "network" });
-  }
-
-  if (!response.ok) {
-    throw new ApiErrorException({
-      kind: "http",
-      status: response.status,
-      body: await safeBody(response),
-    });
-  }
-
-  if (response.body === null) {
-    throw new ApiErrorException({ kind: "stream", event: "empty body" });
-  }
-
-  yield* parseSseStream(response.body);
-}
+  opts: { idempotencyKey: string; expectedUserId?: string | null },
+): Stream.Stream<SseChatEvent, ApiErrorException, HttpClient.HttpClient> =>
+  Stream.unwrap(
+    Effect.gen(function* () {
+      yield* ensureSignedIn(opts.expectedUserId);
+      const response = yield* send(
+        makeRequest(apiEndpoints.chatStream(sessionId), {
+          method: "POST",
+          body: { content },
+          idempotencyKey: opts.idempotencyKey,
+          expectedUserId: opts.expectedUserId,
+        }),
+      ).pipe(Effect.flatMap(failOnHttpError));
+      return sseEvents(
+        response.stream.pipe(
+          Stream.catchTag("HttpClientError", (failure) =>
+            Stream.fromEffect(fromTransport(connectionLost())(failure)),
+          ),
+        ),
+      );
+    }),
+  );
 
 /**
- * Parse a `ReadableStream` of SSE frames into typed chat events.
+ * Parse a byte stream of SSE frames into typed chat events.
  *
- * Buffers partial frames across chunk boundaries and partial UTF-8 sequences
- * across `decoder` calls. A frame without a `data:` line is ignored (a
- * heartbeat or comment); a frame whose data fails the schema throws the
- * `stream` error carrying the raw frame.
+ * Text decoding keeps a UTF-8 sequence split across chunks intact, and a
+ * frame split across chunks is buffered until its blank line arrives. A frame
+ * without a `data:` line is ignored (a heartbeat or comment); a frame whose
+ * data fails the schema fails the stream with the `stream` error carrying the
+ * raw frame.
  */
-export async function* parseSseStream(
-  body: ReadableStream<Uint8Array>,
-): AsyncGenerator<SseChatEvent> {
-  const reader = body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-
-    let boundary: number;
-    while ((boundary = buffer.indexOf("\n\n")) !== -1) {
-      const rawFrame = buffer.slice(0, boundary).replace(/\r/g, "");
-      buffer = buffer.slice(boundary + 2);
-
-      const data = extractData(rawFrame);
-      if (data === null) continue;
-
-      const event = decodeEvent(data);
-      if (Option.isNone(event)) {
-        throw new ApiErrorException({ kind: "stream", event: rawFrame });
-      }
-      yield event.value;
-    }
-  }
-}
+export const sseEvents = <E, R>(
+  bytes: Stream.Stream<Uint8Array, E, R>,
+): Stream.Stream<SseChatEvent, E | ApiErrorException, R> =>
+  bytes.pipe(
+    Stream.decodeText(),
+    Stream.mapAccum(
+      () => "",
+      (buffer, chunk): readonly [string, ReadonlyArray<string>] => {
+        const frames = (buffer + chunk).split("\n\n");
+        const rest = frames.pop() ?? "";
+        return [rest, frames.map((frame) => frame.replace(/\r/g, ""))];
+      },
+    ),
+    Stream.mapEffect(decodeFrame),
+    Stream.flattenIterable,
+  );
 
 const decodeEvent = Schema.decodeUnknownOption(sseChatEventSchema);
 
+/** The events of one frame: one, or none for a frame without data. */
+const decodeFrame = (
+  rawFrame: string,
+): Effect.Effect<ReadonlyArray<SseChatEvent>, ApiErrorException> =>
+  Option.match(extractData(rawFrame), {
+    onNone: () => Effect.succeed([]),
+    onSome: (data) =>
+      Option.match(decodeEvent(data), {
+        onNone: () => Effect.fail(new ApiErrorException({ kind: "stream", event: rawFrame })),
+        onSome: (event) => Effect.succeed([event]),
+      }),
+  });
+
 /** Join the `data:` lines of one SSE frame and JSON-decode them. */
-function extractData(rawFrame: string): unknown | null {
+const extractData = (rawFrame: string): Option.Option<unknown> => {
   const dataLines = rawFrame
     .split("\n")
     .filter((line) => line.startsWith("data:"))
     .map((line) => line.slice(5).trimStart());
 
-  if (dataLines.length === 0) return null;
+  if (dataLines.length === 0) return Option.none();
 
   const joined = dataLines.join("\n");
   try {
-    return JSON.parse(joined) as unknown;
+    return Option.some(JSON.parse(joined) as unknown);
   } catch {
-    // Not JSON — return the string so the schema rejects it as a `stream`
+    // Not JSON — keep the string so the schema rejects it as a `stream`
     // error rather than silently dropping the frame.
-    return joined;
+    return Option.some(joined);
   }
-}
+};

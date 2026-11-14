@@ -7,12 +7,12 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 import { useChartStore } from "@/store/chart-store";
 
 import { useAccountRequestScope } from "./account-request";
-import { newIdempotencyKey, request } from "./client";
+import { apiRequest, newIdempotencyKey, request, runApi } from "./client";
 import { apiEndpoints } from "./endpoints";
 import { queryKeys } from "./queryKeys";
 import {
@@ -124,43 +124,47 @@ export function useBuildLaso() {
   });
 }
 
+/**
+ * Rebuild a saved chart and load its sessions in parallel, then load the
+ * newest conversation. The chat opens on it; the others load when selected.
+ */
+const openChartProfile = (profile: ChartProfile, userId: string | null | undefined) =>
+  Effect.gen(function* () {
+    const [chart, sessions] = yield* Effect.all(
+      [
+        apiRequest(apiEndpoints.buildLaso, {
+          method: "POST",
+          body: profile.birth_info,
+          schema: buildLasoResponseSchema,
+        }),
+        apiRequest(apiEndpoints.profileSessions(profile.id), {
+          schema: listSessionsResponseSchema,
+          withAuth: true,
+          expectedUserId: userId,
+        }),
+      ],
+      { concurrency: "unbounded" },
+    );
+    const newest = [...sessions.sessions].sort((a, b) =>
+      b.updated_at.localeCompare(a.updated_at),
+    )[0];
+    const transcript =
+      newest === undefined
+        ? null
+        : yield* apiRequest(apiEndpoints.session(newest.id), {
+            schema: getSessionResponseSchema,
+            withAuth: true,
+            expectedUserId: userId,
+          });
+    return { chart, sessions, transcript };
+  });
+
 /** Restore a saved chart and its newest conversation before activating it. */
 export function useOpenChartProfile() {
   const queryClient = useQueryClient();
   const { getSignal, userId } = useAccountRequestScope();
   return useMutation({
-    mutationFn: async (profile: ChartProfile) => {
-      const signal = getSignal();
-      const [chart, sessions] = await Promise.all([
-        request(apiEndpoints.buildLaso, {
-          method: "POST",
-          body: profile.birth_info,
-          schema: buildLasoResponseSchema,
-          signal,
-        }),
-        request(apiEndpoints.profileSessions(profile.id), {
-          schema: listSessionsResponseSchema,
-          withAuth: true,
-          expectedUserId: userId,
-          signal,
-        }),
-      ]);
-      // The chat opens on the newest conversation; the others load when selected.
-      const newest = [...sessions.sessions].sort((a, b) =>
-        b.updated_at.localeCompare(a.updated_at),
-      )[0];
-      const transcript =
-        newest === undefined
-          ? null
-          : await request(apiEndpoints.session(newest.id), {
-              schema: getSessionResponseSchema,
-              withAuth: true,
-              expectedUserId: userId,
-              signal,
-            });
-      signal?.throwIfAborted();
-      return { chart, sessions, transcript };
-    },
+    mutationFn: (profile: ChartProfile) => runApi(openChartProfile(profile, userId), getSignal()),
     onSuccess: ({ chart, sessions, transcript }, profile) => {
       getSignal()?.throwIfAborted();
       queryClient.setQueryData(queryKeys.laso.chart(chart.id), chart);

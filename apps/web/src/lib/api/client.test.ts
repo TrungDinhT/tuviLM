@@ -5,6 +5,7 @@ import { isApiError } from "@/lib/http/errors";
 import fixture from "./__fixtures__/build-laso.json";
 import { newIdempotencyKey, request } from "./client";
 import { buildLasoResponseSchema } from "./schemas";
+import { sentRequest } from "./sent-request";
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -141,12 +142,13 @@ describe("headers", () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0]![0]).toBe("/api/v1/chart-profiles");
-    const headers = fetchMock.mock.calls[0]![1].headers;
-    expect(headers["Authorization"]).toBeUndefined();
-    expect(headers["Idempotency-Key"]).toBe(key);
-    expect(headers["X-Expected-User-Id"]).toBe("account-a");
-    expect(headers["Content-Type"]).toBe("application/json");
+    const { path, headers } = sentRequest(fetchMock.mock.calls[0]);
+    expect(path).toBe("/api/v1/chart-profiles");
+    expect(headers.has("Authorization")).toBe(false);
+    expect(headers.get("Idempotency-Key")).toBe(key);
+    expect(headers.get("X-Expected-User-Id")).toBe("account-a");
+    expect(headers.get("Content-Type")).toBe("application/json");
+    expect(headers.has("traceparent")).toBe(false);
   });
 
   it("passes a 401 from the API through without retrying", async () => {

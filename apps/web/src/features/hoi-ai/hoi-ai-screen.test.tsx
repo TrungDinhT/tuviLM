@@ -112,10 +112,10 @@ function renderScreen(client: QueryClient, loadAccess = false) {
 }
 
 function mockBillingChat(stream: string | ReadableStream<Uint8Array>, access: () => AccountAccess) {
-  const fetchMock = vi.fn((url: string) => {
-    if (url.endsWith("/api/v1/me")) return Promise.resolve(jsonResponse(access()));
-    if (url.endsWith("/chat/stream")) return Promise.resolve(new Response(stream, { status: 200 }));
-    if (url.endsWith("/sessions")) return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
+  const fetchMock = vi.fn((url: string | URL) => {
+    if (String(url).endsWith("/api/v1/me")) return Promise.resolve(jsonResponse(access()));
+    if (String(url).endsWith("/chat/stream")) return Promise.resolve(new Response(stream, { status: 200 }));
+    if (String(url).endsWith("/sessions")) return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
     return Promise.resolve(
       jsonResponse({ session: sessionDetail("s1", [message({ content: "Previous reply" })]) }),
     );
@@ -167,7 +167,7 @@ describe("HoiAiScreen", () => {
     expect((screen.getByRole("textbox") as HTMLInputElement).disabled).toBe(false);
     await sendQuestion();
     await waitFor(() =>
-      expect(fetchMock.mock.calls.some(([url]) => url.endsWith("/chat/stream"))).toBe(true),
+      expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/chat/stream"))).toBe(true),
     );
   });
 
@@ -181,7 +181,7 @@ describe("HoiAiScreen", () => {
     expect((screen.getByRole("button", { name: "Gửi" }) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.change(input, { target: { value: "My question" } });
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(fetchMock.mock.calls.some(([url]) => url.endsWith("/chat/stream"))).toBe(false);
+    expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/chat/stream"))).toBe(false);
     expect(screen.queryByText("My question")).toBeNull();
     expect(screen.queryByText("Tin nhắn chưa gửi trọn vẹn.")).toBeNull();
   });
@@ -255,11 +255,11 @@ describe("HoiAiScreen", () => {
   });
 
   it("opens on the most recent session and renders its transcript", async () => {
-    const fetchMock = vi.fn((url: string) => {
-      if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+    const fetchMock = vi.fn((url: string | URL) => {
+      if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
         return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
       }
-      if (url.endsWith("/api/v1/sessions/s1")) {
+      if (String(url).endsWith("/api/v1/sessions/s1")) {
         return Promise.resolve(
           jsonResponse({
             session: sessionDetail("s1", [
@@ -277,17 +277,17 @@ describe("HoiAiScreen", () => {
 
     expect(await screen.findByText("Chào bạn, tôi là Thiên Hạc.")).toBeTruthy();
     // The most recent session is s1; s2 is never opened.
-    expect(fetchMock.mock.calls.some(([url]) => url.endsWith("/api/v1/sessions/s2"))).toBe(false);
+    expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/api/v1/sessions/s2"))).toBe(false);
   });
 
   it("renders a greeting placeholder for an empty session", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn((url: string) => {
-        if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+      vi.fn((url: string | URL) => {
+        if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
           return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
         }
-        if (url.endsWith("/api/v1/sessions/s1")) {
+        if (String(url).endsWith("/api/v1/sessions/s1")) {
           return Promise.resolve(jsonResponse({ session: sessionDetail("s1", []) }));
         }
         return Promise.resolve(jsonResponse(ACCESS));
@@ -301,16 +301,16 @@ describe("HoiAiScreen", () => {
   });
 
   it("switches sessions from the history list", async () => {
-    const fetchMock = vi.fn((url: string) => {
-      if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+    const fetchMock = vi.fn((url: string | URL) => {
+      if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
         return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
       }
-      if (url.endsWith("/api/v1/sessions/s1")) {
+      if (String(url).endsWith("/api/v1/sessions/s1")) {
         return Promise.resolve(
           jsonResponse({ session: sessionDetail("s1", [message({ content: "tin từ s1" })]) }),
         );
       }
-      if (url.endsWith("/api/v1/sessions/s2")) {
+      if (String(url).endsWith("/api/v1/sessions/s2")) {
         return Promise.resolve(
           jsonResponse({ session: sessionDetail("s2", [message({ content: "tin từ s2" })]) }),
         );
@@ -347,11 +347,11 @@ describe("HoiAiScreen", () => {
       'data: {"type":"text","delta":"Old draft"}\n\ndata: {"type":"done","status":"failed"}\n\n';
     vi.stubGlobal(
       "fetch",
-      vi.fn((url: string) => {
-        if (url.endsWith("/chat/stream")) return Promise.resolve(new Response(stream));
-        if (url.endsWith("/sessions")) return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
-        if (url.endsWith("/api/v1/me")) return Promise.resolve(jsonResponse(ACCESS));
-        return Promise.resolve(jsonResponse({ session: detail(url.split("/").at(-1)!) }));
+      vi.fn((url: string | URL) => {
+        if (String(url).endsWith("/chat/stream")) return Promise.resolve(new Response(stream));
+        if (String(url).endsWith("/sessions")) return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
+        if (String(url).endsWith("/api/v1/me")) return Promise.resolve(jsonResponse(ACCESS));
+        return Promise.resolve(jsonResponse({ session: detail(String(url).split("/").at(-1)!) }));
       }),
     );
     setChart("p1");
@@ -375,19 +375,19 @@ describe("HoiAiScreen", () => {
   });
 
   it("creates a new session from the Tạo mới action", async () => {
-    const fetchMock = vi.fn((url: string, init?: RequestInit) => {
-      if (url.endsWith("/api/v1/chart-profiles/p1/sessions") && init?.method === "POST") {
+    const fetchMock = vi.fn((url: string | URL, init?: RequestInit) => {
+      if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions") && init?.method === "POST") {
         return Promise.resolve(jsonResponse({ session: sessionDetail("s3", []) }));
       }
-      if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+      if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
         return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
       }
-      if (url.endsWith("/api/v1/sessions/s1")) {
+      if (String(url).endsWith("/api/v1/sessions/s1")) {
         return Promise.resolve(
           jsonResponse({ session: sessionDetail("s1", [message({ content: "tin đã gửi" })]) }),
         );
       }
-      if (url.endsWith("/api/v1/sessions/s3")) {
+      if (String(url).endsWith("/api/v1/sessions/s3")) {
         return Promise.resolve(jsonResponse({ session: sessionDetail("s3", []) }));
       }
       return Promise.resolve(jsonResponse(ACCESS));
@@ -401,18 +401,18 @@ describe("HoiAiScreen", () => {
     fireEvent.click(screen.getByText("Tạo mới"));
 
     await waitFor(() =>
-      expect(fetchMock.mock.calls.some(([url]) => url.endsWith("/api/v1/sessions/s3"))).toBe(true),
+      expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/api/v1/sessions/s3"))).toBe(true),
     );
   });
 
   it("disables Tạo mới while the active session has only the greeting", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn((url: string) => {
-        if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+      vi.fn((url: string | URL) => {
+        if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
           return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
         }
-        if (url.endsWith("/api/v1/sessions/s1")) {
+        if (String(url).endsWith("/api/v1/sessions/s1")) {
           return Promise.resolve(jsonResponse({ session: sessionDetail("s1", []) }));
         }
         return Promise.resolve(jsonResponse(ACCESS));
@@ -433,15 +433,15 @@ describe("HoiAiScreen", () => {
     let cancellationReads = 0;
     let balanceReads = 0;
     const encoder = new TextEncoder();
-    const fetchMock = vi.fn((url: string, init?: RequestInit) => {
-      if (url.endsWith("/api/v1/me")) {
+    const fetchMock = vi.fn((url: string | URL, init?: RequestInit) => {
+      if (String(url).endsWith("/api/v1/me")) {
         balanceReads += 1;
         return Promise.resolve(jsonResponse({ ...ACCESS, balance: cancelled ? 6 : 3 }));
       }
-      if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+      if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
         return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
       }
-      if (url.endsWith("/api/v1/sessions/s1/chat/stream")) {
+      if (String(url).endsWith("/api/v1/sessions/s1/chat/stream")) {
         streamSignal = init?.signal as AbortSignal | undefined;
         const body = new ReadableStream<Uint8Array>({
           start(controller) {
@@ -457,7 +457,7 @@ describe("HoiAiScreen", () => {
         });
         return Promise.resolve(new Response(body, { status: 200 }));
       }
-      if (url.endsWith("/api/v1/sessions/s1")) {
+      if (String(url).endsWith("/api/v1/sessions/s1")) {
         const messages = [message({ content: "tin từ s1" })];
         if (streamSignal?.aborted) {
           cancelled = ++cancellationReads > 1;
@@ -467,7 +467,7 @@ describe("HoiAiScreen", () => {
         }
         return Promise.resolve(jsonResponse({ session: sessionDetail("s1", messages) }));
       }
-      if (url.endsWith("/api/v1/sessions/s2")) {
+      if (String(url).endsWith("/api/v1/sessions/s2")) {
         return Promise.resolve(
           jsonResponse({ session: sessionDetail("s2", [message({ content: "tin từ s2" })]) }),
         );
@@ -503,14 +503,14 @@ describe("HoiAiScreen", () => {
   it("removes the draft when the server rejects a stale balance with insufficient coins", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn((url: string) => {
-        if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+      vi.fn((url: string | URL) => {
+        if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
           return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
         }
-        if (url.endsWith("/api/v1/sessions/s1/chat/stream")) {
+        if (String(url).endsWith("/api/v1/sessions/s1/chat/stream")) {
           return Promise.resolve(jsonResponse({ detail: "Insufficient coins." }, 402));
         }
-        if (url.endsWith("/api/v1/sessions/s1")) {
+        if (String(url).endsWith("/api/v1/sessions/s1")) {
           return Promise.resolve(
             jsonResponse({
               session: sessionDetail("s1", [message({ content: "Previous reply" })]),
@@ -548,14 +548,14 @@ describe("HoiAiScreen", () => {
       ].join("\n\n") + "\n\n";
     vi.stubGlobal(
       "fetch",
-      vi.fn((url: string) => {
-        if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+      vi.fn((url: string | URL) => {
+        if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
           return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
         }
-        if (url.endsWith("/api/v1/sessions/s1/chat/stream")) {
+        if (String(url).endsWith("/api/v1/sessions/s1/chat/stream")) {
           return Promise.resolve(new Response(stream, { status: 200 }));
         }
-        if (url.endsWith("/api/v1/sessions/s1")) {
+        if (String(url).endsWith("/api/v1/sessions/s1")) {
           return Promise.resolve(
             jsonResponse({ session: sessionDetail("s1", [message({ content: "tin đã gửi" })]) }),
           );
@@ -591,18 +591,18 @@ describe("HoiAiScreen", () => {
       ].join("\n\n") + "\n\n";
     vi.stubGlobal(
       "fetch",
-      vi.fn((url: string) => {
-        if (url.endsWith("/api/v1/me")) {
+      vi.fn((url: string | URL) => {
+        if (String(url).endsWith("/api/v1/me")) {
           balanceReads += 1;
           return Promise.resolve(jsonResponse({ ...ACCESS, balance: 3 }));
         }
-        if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+        if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
           return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
         }
-        if (url.endsWith("/api/v1/sessions/s1/chat/stream")) {
+        if (String(url).endsWith("/api/v1/sessions/s1/chat/stream")) {
           return Promise.resolve(new Response(stream, { status: 200 }));
         }
-        if (url.endsWith("/api/v1/sessions/s1")) {
+        if (String(url).endsWith("/api/v1/sessions/s1")) {
           detailCalls += 1;
           const messages =
             detailCalls === 1
@@ -640,19 +640,19 @@ describe("HoiAiScreen", () => {
     const createResponse = new Promise<Response>((resolve) => {
       resolveCreate = resolve;
     });
-    const fetchMock = vi.fn((url: string, init?: RequestInit) => {
-      if (url.endsWith("/api/v1/chart-profiles/p1/sessions") && init?.method === "POST") {
+    const fetchMock = vi.fn((url: string | URL, init?: RequestInit) => {
+      if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions") && init?.method === "POST") {
         return createResponse;
       }
-      if (url.endsWith("/api/v1/chart-profiles/p1/sessions")) {
+      if (String(url).endsWith("/api/v1/chart-profiles/p1/sessions")) {
         return Promise.resolve(jsonResponse({ sessions: SESSIONS }));
       }
-      if (url.endsWith("/api/v1/sessions/s1")) {
+      if (String(url).endsWith("/api/v1/sessions/s1")) {
         return Promise.resolve(
           jsonResponse({ session: sessionDetail("s1", [message({ content: "tin đã gửi" })]) }),
         );
       }
-      if (url.endsWith("/api/v1/sessions/s3")) {
+      if (String(url).endsWith("/api/v1/sessions/s3")) {
         return Promise.resolve(jsonResponse({ session: sessionDetail("s3", []) }));
       }
       return Promise.resolve(jsonResponse(ACCESS));
@@ -669,14 +669,14 @@ describe("HoiAiScreen", () => {
     await waitFor(() => {
       const createCalls = fetchMock.mock.calls.filter(
         ([url, init]) =>
-          url.endsWith("/api/v1/chart-profiles/p1/sessions") && init?.method === "POST",
+          String(url).endsWith("/api/v1/chart-profiles/p1/sessions") && init?.method === "POST",
       );
       expect(createCalls).toHaveLength(1);
     });
 
     resolveCreate?.(jsonResponse({ session: sessionDetail("s3", []) }));
     await waitFor(() =>
-      expect(fetchMock.mock.calls.some(([url]) => url.endsWith("/api/v1/sessions/s3"))).toBe(true),
+      expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/api/v1/sessions/s3"))).toBe(true),
     );
   });
 });

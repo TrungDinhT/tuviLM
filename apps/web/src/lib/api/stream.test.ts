@@ -1,9 +1,12 @@
+import { Effect, Stream } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { isApiError } from "@/lib/http/errors";
 
+import { runApi } from "./client";
 import type { SseChatEvent } from "./schemas";
-import { parseSseStream, streamChat } from "./stream";
+import { sentRequest } from "./sent-request";
+import { chatEvents, sseEvents } from "./stream";
 
 function sseBody(chunks: (string | Uint8Array)[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -17,10 +20,22 @@ function sseBody(chunks: (string | Uint8Array)[]): ReadableStream<Uint8Array> {
   });
 }
 
+function parse(body: ReadableStream<Uint8Array>) {
+  return sseEvents(Stream.fromReadableStream({ evaluate: () => body, onError: (error) => error }));
+}
+
 async function collect(body: ReadableStream<Uint8Array>): Promise<SseChatEvent[]> {
-  const events: SseChatEvent[] = [];
-  for await (const event of parseSseStream(body)) events.push(event);
-  return events;
+  return Effect.runPromise(Stream.runCollect(parse(body)));
+}
+
+/** Run one chat turn to completion, collecting its events. */
+function runTurn(
+  sessionId: string,
+  content: string,
+  opts: { idempotencyKey: string; signal?: AbortSignal; expectedUserId?: string | null },
+): Promise<SseChatEvent[]> {
+  const { signal, ...rest } = opts;
+  return runApi(Stream.runCollect(chatEvents(sessionId, content, rest)), signal);
 }
 
 beforeEach(() => {
@@ -31,15 +46,15 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("streamChat", () => {
+describe("chatEvents", () => {
   it("does not open a stream while signed out", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     await expect(
-      streamChat("session-a", "Account A message", {
+      runTurn("session-a", "Account A message", {
         idempotencyKey: "turn-a",
         expectedUserId: null,
-      }).next(),
+      }),
     ).rejects.toMatchObject({ error: { kind: "http", status: 401 } });
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -49,7 +64,7 @@ describe("streamChat", () => {
     const controller = new AbortController();
     controller.abort();
     await expect(
-      streamChat("s1", "Hello", { idempotencyKey: "turn-1", signal: controller.signal }).next(),
+      runTurn("s1", "Hello", { idempotencyKey: "turn-1", signal: controller.signal }),
     ).rejects.toMatchObject({ name: "AbortError" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -63,27 +78,24 @@ describe("streamChat", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
 
-    const events: SseChatEvent[] = [];
-    for await (const event of streamChat("s1", "xin chào", {
+    const events = await runTurn("s1", "xin chào", {
       idempotencyKey: "turn-key-1",
       signal: controller.signal,
       expectedUserId: "account-a",
-    })) {
-      events.push(event);
-    }
+    });
 
     expect(events).toEqual([{ type: "done", status: "confirmed" }]);
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/sessions/s1/chat/stream"),
-      expect.objectContaining({
-        signal: controller.signal,
-        headers: {
-          "Content-Type": "application/json",
-          "Idempotency-Key": "turn-key-1",
-          "X-Expected-User-Id": "account-a",
-        },
-      }),
-    );
+    const sent = sentRequest(fetchMock.mock.calls[0]);
+    expect(sent).toMatchObject({
+      path: "/api/v1/sessions/s1/chat/stream",
+      method: "POST",
+      body: { content: "xin chào" },
+    });
+    expect(Object.fromEntries(sent.headers)).toEqual({
+      "content-type": "application/json",
+      "idempotency-key": "turn-key-1",
+      "x-expected-user-id": "account-a",
+    });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(localStorage.length).toBe(0);
   });
@@ -100,13 +112,13 @@ describe("streamChat", () => {
       ),
     );
 
-    await expect(
-      streamChat("s1", "Hello", { idempotencyKey: "turn-1" }).next(),
-    ).rejects.toMatchObject({ error: { kind: "http", status: 402, body } });
+    await expect(runTurn("s1", "Hello", { idempotencyKey: "turn-1" })).rejects.toMatchObject({
+      error: { kind: "http", status: 402, body },
+    });
   });
 });
 
-describe("parseSseStream", () => {
+describe("sseEvents", () => {
   it("yields each typed event in order", async () => {
     const body = sseBody([
       'data: {"type":"ids","user_message_id":"u1","assistant_message_id":"a1"}\n\n',
@@ -151,10 +163,9 @@ describe("parseSseStream", () => {
   it("throws a stream error for an unrecognised event", async () => {
     const body = sseBody(['data: {"type":"bogus"}\n\n']);
 
-    const iterable = parseSseStream(body);
     let caught: unknown;
     try {
-      await iterable.next();
+      await Effect.runPromise(Stream.runCollect(parse(body)));
     } catch (error) {
       caught = error;
     }

@@ -1,12 +1,13 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { Effect, Schedule, Stream } from "effect";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Pill } from "@/components/primitives/pill";
 import { useAccountRequestScope } from "@/lib/api/account-request";
-import { newIdempotencyKey, request } from "@/lib/api/client";
+import { apiRequest, newIdempotencyKey, runApi } from "@/lib/api/client";
 import { apiEndpoints } from "@/lib/api/endpoints";
 import {
   useAccountAccess,
@@ -16,7 +17,7 @@ import {
 } from "@/lib/api/hooks";
 import { queryKeys } from "@/lib/api/queryKeys";
 import { getSessionResponseSchema, type ChatMessage, type SseChatEvent } from "@/lib/api/schemas";
-import { streamChat } from "@/lib/api/stream";
+import { chatEvents } from "@/lib/api/stream";
 import { authClient } from "@/lib/auth-client";
 import { describe, isApiError } from "@/lib/http/errors";
 import { showToast } from "@/lib/toast";
@@ -75,6 +76,36 @@ function doneTerminal(status: string): Terminal {
  * The transcript is the backend's `GET /sessions/{id}`; the in-flight turn is
  * local state that reconciles away once the backend confirms it.
  */
+/**
+ * A disconnected stream can end before the server releases its coin hold.
+ * Poll the session once a second until the reply is no longer pending; the
+ * server settles within seconds, so stop after 30 tries.
+ */
+const waitForSettledReply = (
+  sessionId: string,
+  assistantMessageId: string | null,
+  userId: string | null | undefined,
+) =>
+  apiRequest(apiEndpoints.session(sessionId), {
+    schema: getSessionResponseSchema,
+    withAuth: true,
+    expectedUserId: userId,
+  }).pipe(
+    Effect.map(({ session }) =>
+      session.messages.some(
+        (message) =>
+          message.role === "assistant" &&
+          message.status === "pending" &&
+          (assistantMessageId === null || message.id === assistantMessageId),
+      ),
+    ),
+    Effect.repeat({
+      schedule: Schedule.spaced("1 second"),
+      while: (pending) => pending,
+      times: 29,
+    }),
+  );
+
 export function HoiAiScreen() {
   const chartKey = useChartStore((state) => state.chartProfileId ?? state.chartId ?? "idle");
   return <ChatConversation key={chartKey} />;
@@ -321,13 +352,13 @@ function ChatConversation() {
     });
     scrollToBottom();
     try {
-      for await (const event of streamChat(turn.sessionId, trimmed, {
-        idempotencyKey: turn.idempotencyKey,
-        signal: turn.controller.signal,
-        expectedUserId: userId,
-      })) {
-        applyEvent(event, turn);
-      }
+      await runApi(
+        chatEvents(turn.sessionId, trimmed, {
+          idempotencyKey: turn.idempotencyKey,
+          expectedUserId: userId,
+        }).pipe(Stream.runForEach((event) => Effect.sync(() => applyEvent(event, turn)))),
+        turn.controller.signal,
+      );
     } catch (error) {
       if (activeStreamRef.current !== turn) return;
       if (error instanceof DOMException && error.name === "AbortError") {
@@ -349,24 +380,10 @@ function ChatConversation() {
       if (!accountSignal?.aborted && userId) {
         if (!turn.receivedDone) {
           try {
-            // A disconnected stream can end before the server releases its coin hold;
-            // the server settles within seconds, so stop polling after 30 tries.
-            for (let attempt = 0; attempt < 30 && !accountSignal?.aborted; attempt++) {
-              const result = await request(apiEndpoints.session(turn.sessionId), {
-                schema: getSessionResponseSchema,
-                withAuth: true,
-                expectedUserId: userId,
-                signal: accountSignal,
-              });
-              const pending = result.session.messages.some(
-                (message) =>
-                  message.role === "assistant" &&
-                  message.status === "pending" &&
-                  (turn.assistantMessageId === null || message.id === turn.assistantMessageId),
-              );
-              if (!pending) break;
-              await new Promise((resolve) => window.setTimeout(resolve, 1_000));
-            }
+            await runApi(
+              waitForSettledReply(turn.sessionId, turn.assistantMessageId, userId),
+              accountSignal,
+            );
           } catch {
             // The next balance refresh will retry reconciliation if the session is unavailable.
           }

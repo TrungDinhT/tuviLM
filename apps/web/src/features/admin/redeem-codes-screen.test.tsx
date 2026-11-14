@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { sentRequests } from "@/lib/api/sent-request";
+
 import { RedeemCodesScreen } from "./redeem-codes-screen";
 
 const mocks = vi.hoisted(() => ({ access: vi.fn(), scope: vi.fn() }));
@@ -91,11 +93,11 @@ describe("RedeemCodesScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Tạo mã" }));
 
     await screen.findByText(created.code);
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/admin/redeem-codes"),
+    expect(sentRequests(fetchMock)).toContainEqual(
       expect.objectContaining({
+        path: "/api/v1/admin/redeem-codes",
         method: "POST",
-        body: JSON.stringify({ coins: 60, kind: "per_account", expires_at: created.expires_at }),
+        body: { coins: 60, kind: "per_account", expires_at: created.expires_at },
       }),
     );
     fireEvent.click(screen.getByRole("button", { name: "Tạo mã" }));

@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { sentRequests } from "@/lib/api/sent-request";
+
 import { AccountRequestContext } from "@/lib/api/account-request";
 import { useAccountAccess } from "@/lib/api/hooks";
 
@@ -50,7 +52,7 @@ function renderForm() {
 describe("RedeemCodeForm", () => {
   it("normalizes the code and refetches the active account balance after success", async () => {
     let balance = 6;
-    const fetchMock = vi.fn((_url: string, options?: RequestInit) => {
+    const fetchMock = vi.fn((_url: string | URL, options?: RequestInit) => {
       if (options?.method === "POST") {
         balance += 30;
         return Promise.resolve(jsonResponse({ coins: 30 }));
@@ -69,14 +71,17 @@ describe("RedeemCodeForm", () => {
     await screen.findByText("Nhập mã thành công! Bạn nhận được 30 xu.");
     expect(screen.getByLabelText("Số dư").textContent).toBe("36");
     expect((screen.getByLabelText("Mã ưu đãi") as HTMLInputElement).value).toBe("");
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/account/redeem-code"),
-      expect.objectContaining({ method: "POST", body: JSON.stringify({ code: "WELCOME" }) }),
+    expect(sentRequests(fetchMock)).toContainEqual(
+      expect.objectContaining({
+        path: "/api/v1/account/redeem-code",
+        method: "POST",
+        body: { code: "WELCOME" },
+      }),
     );
   });
 
   it("shows a Vietnamese failure and leaves the balance unchanged for an already-used code", async () => {
-    const fetchMock = vi.fn((_url: string, options?: RequestInit) =>
+    const fetchMock = vi.fn((_url: string | URL, options?: RequestInit) =>
       Promise.resolve(
         options?.method === "POST"
           ? jsonResponse({ detail: "Code already redeemed." }, 409)

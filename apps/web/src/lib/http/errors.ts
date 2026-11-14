@@ -1,3 +1,5 @@
+import { Data } from "effect";
+
 import type { Issue } from "@/lib/schema";
 
 /**
@@ -7,20 +9,23 @@ import type { Issue } from "@/lib/schema";
  * are added as new variants, never as a thrown string — a string carries no
  * status, no issues, and nothing a `switch` can be exhaustive over.
  */
-type ApiError =
+export type ApiError =
   | { kind: "network" }
   | { kind: "http"; status: number; body: unknown }
   | { kind: "parse"; issues: ReadonlyArray<Issue> }
   | { kind: "stream"; event: string };
 
-/** Thrown by the client so TanStack Query can carry it as a rejection. */
-export class ApiErrorException extends Error {
-  readonly error: ApiError;
-
+/**
+ * The typed failure of every API effect. It is also the rejection that
+ * TanStack Query carries when a request runs as a promise.
+ */
+export class ApiErrorException extends Data.TaggedError("ApiError")<{ readonly error: ApiError }> {
   constructor(error: ApiError) {
-    super(describe(error));
-    this.name = "ApiErrorException";
-    this.error = error;
+    super({ error });
+  }
+
+  override get message(): string {
+    return describe(this.error);
   }
 }
 

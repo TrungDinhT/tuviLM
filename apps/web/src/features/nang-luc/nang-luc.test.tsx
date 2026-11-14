@@ -10,6 +10,8 @@ import {
 } from "@testing-library/react";
 import { Schema } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { sentRequest } from "@/lib/api/sent-request";
 import { CapabilityLauncher, CapabilityReport, NangLucScreen } from "./nang-luc-screen";
 import {
   capabilityKey,
@@ -213,9 +215,10 @@ describe("capability report", () => {
     const { result } = renderHook(() => useCapabilityReport(birth, true), { wrapper });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(JSON.parse(fetch.mock.calls[0]?.[1].body)).toEqual(birth);
+    const sent = sentRequest(fetch.mock.calls[0]);
+    expect(sent.body).toEqual(birth);
     // The session cookie identifies the account; no token header is sent.
-    expect(fetch.mock.calls[0]?.[1].headers.Authorization).toBeUndefined();
+    expect(sent.headers.has("Authorization")).toBe(false);
     expect(useCapabilityStore.getState().entries[key]?.report).toEqual(report);
     expect(
       useCapabilityStore.getState().entries[capabilityKey({ ...birth, hour: 11 }, USER)],
@@ -265,7 +268,8 @@ describe("capability report", () => {
       await act(async () => {
         completeOld(staleResponse);
       });
-      expect(readStaleResponse).toHaveBeenCalledOnce();
+      // The interrupted request never reads the late body at all.
+      expect(readStaleResponse).not.toHaveBeenCalled();
       expect(useCapabilityStore.getState().entries[key]?.report).toEqual(newReport);
       expect(client.getQueryData(["capability", key])).toEqual(newReport);
       expect(oldSignal?.aborted).toBe(true);
