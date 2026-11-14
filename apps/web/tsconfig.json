@@ -19,7 +19,11 @@
         "name": "next"
       },
       {
-        "name": "@effect/language-service"
+        "name": "@effect/language-service",
+        "diagnosticSeverity": {
+          "globalFetch": "error",
+          "globalFetchInEffect": "error"
+        }
       }
     ],
     "paths": {

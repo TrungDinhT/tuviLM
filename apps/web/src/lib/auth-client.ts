@@ -1,23 +1,31 @@
+import { Effect } from "effect";
+import type { HttpClient } from "effect/http";
 import { useEffect, useSyncExternalStore } from "react";
+
+import {
+  apiRequest,
+  makeRequest,
+  readBody,
+  runApi,
+  send,
+  withFetchOptions,
+} from "@/lib/api/client";
+import { sessionResponseSchema, type SessionUser } from "@/lib/api/schemas";
 
 /**
  * Login, through the FastAPI routes under `/api/v1/auth`.
  *
  * The session is an httpOnly cookie that the API sets; the browser sends it
  * with every same-origin `/api` request, so no token is handled here. This
- * module only keeps who is signed in, for rendering.
+ * module only keeps who is signed in, for rendering. Every call is an Effect
+ * program on the API client, run as a promise for the screens.
  *
  * The session lives in a small store outside TanStack Query on purpose: the
  * query client is created per account (see QueryProvider), so it cannot hold
  * the value that decides which account that is.
  */
 
-export interface SessionUser {
-  id: string;
-  email: string;
-  name: string;
-  role: "user" | "admin";
-}
+export type { SessionUser };
 
 export interface Session {
   user: SessionUser;
@@ -57,29 +65,36 @@ function subscribe(listener: () => void) {
 
 const SERVER_STATE: SessionState = { session: undefined, googleEnabled: false };
 
+/**
+ * The session the API reports. An error answer means signed out. An
+ * unreachable API or an unreadable answer also renders as a guest, but keeps
+ * the last known Google setting; the next action asks again.
+ */
+const loadSession: Effect.Effect<SessionState, never, HttpClient.HttpClient> = apiRequest(
+  SESSION_PATH,
+  { schema: sessionResponseSchema },
+).pipe(
+  withFetchOptions({ cache: "no-store" }),
+  Effect.match({
+    onSuccess: (body) => ({
+      session: body.user ? { user: body.user } : null,
+      googleEnabled: body.google_enabled,
+    }),
+    onFailure: (error) => ({
+      session: null,
+      googleEnabled: error.error.kind === "http" ? false : state.googleEnabled,
+    }),
+  }),
+);
+
 /** Ask the API who is signed in. Concurrent callers share one request. */
 export function refreshSession(): Promise<void> {
-  pending ??= (async () => {
-    try {
-      const response = await fetch(SESSION_PATH, { cache: "no-store" });
-      const body = response.ok ? ((await response.json()) as SessionBody) : null;
-      setState({
-        session: body?.user ? { user: body.user } : null,
-        googleEnabled: body?.google_enabled ?? false,
-      });
-    } catch {
-      // Unreachable API: render as a guest; the next action asks again.
-      setState({ session: null, googleEnabled: state.googleEnabled });
-    } finally {
+  pending ??= runApi(loadSession)
+    .then(setState)
+    .finally(() => {
       pending = null;
-    }
-  })();
+    });
   return pending;
-}
-
-interface SessionBody {
-  user: SessionUser | null;
-  google_enabled: boolean;
 }
 
 function useSession() {
@@ -95,25 +110,30 @@ function useSession() {
   };
 }
 
-async function post(path: string, body?: unknown): Promise<Response> {
-  return fetch(path, {
-    method: "POST",
-    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-}
+/**
+ * POST to an auth route. An error answer resolves to an `AuthError`; only an
+ * unreachable API rejects, so the screens can show their network message.
+ */
+const post = (path: string, body?: unknown): Promise<AuthResult> =>
+  runApi(
+    send(makeRequest(path, { method: "POST", body })).pipe(
+      Effect.flatMap((response) =>
+        response.status >= 200 && response.status < 300
+          ? Effect.succeed<AuthResult>({ error: null })
+          : readBody(response).pipe(Effect.map((payload) => toResult(response.status, payload))),
+      ),
+    ),
+  );
 
-async function toResult(response: Response): Promise<AuthResult> {
-  if (response.ok) return { error: null };
-  let detail: unknown = null;
-  try {
-    detail = ((await response.json()) as { detail?: unknown }).detail;
-  } catch {
-    // An empty or non-JSON body still has a status.
-  }
+/** An error answer as an `AuthResult`. An empty or non-JSON body still has a status. */
+const toResult = (status: number, payload: unknown): AuthResult => {
+  const detail =
+    typeof payload === "object" && payload !== null && "detail" in payload
+      ? payload.detail
+      : undefined;
   const message = typeof detail === "string" ? detail : undefined;
-  return { error: { status: response.status, code: codeFor(response.status, message), message } };
-}
+  return { error: { status, code: codeFor(status, message), message } };
+};
 
 /** Stable codes for the answers the screens branch on. */
 function codeFor(status: number, message: string | undefined): string | undefined {
@@ -128,7 +148,7 @@ export const authClient = {
 
   signIn: {
     async email(input: { email: string; password: string }): Promise<AuthResult> {
-      const result = await toResult(await post("/api/v1/auth/login", input));
+      const result = await post("/api/v1/auth/login", input);
       if (!result.error) await refreshSession();
       return result;
     },
@@ -149,30 +169,28 @@ export const authClient = {
   signUp: {
     /** Creates the account and emails a verification link. It does not sign in. */
     async email(input: { name: string; email: string; password: string }): Promise<AuthResult> {
-      return toResult(await post("/api/v1/auth/register", input));
+      return post("/api/v1/auth/register", input);
     },
   },
 
   async signOut(): Promise<AuthResult> {
-    const result = await toResult(await post("/api/v1/auth/logout"));
+    const result = await post("/api/v1/auth/logout");
     setState({ session: null, googleEnabled: state.googleEnabled });
     return result;
   },
 
   async sendVerificationEmail(input: { email: string }): Promise<AuthResult> {
-    return toResult(await post("/api/v1/auth/verification-email", input));
+    return post("/api/v1/auth/verification-email", input);
   },
 
   async requestPasswordReset(input: { email: string }): Promise<AuthResult> {
-    return toResult(await post("/api/v1/auth/forgot-password", input));
+    return post("/api/v1/auth/forgot-password", input);
   },
 
   async resetPassword(input: { newPassword: string; token: string }): Promise<AuthResult> {
-    return toResult(
-      await post("/api/v1/auth/reset-password", {
-        token: input.token,
-        password: input.newPassword,
-      }),
-    );
+    return post("/api/v1/auth/reset-password", {
+      token: input.token,
+      password: input.newPassword,
+    });
   },
 };

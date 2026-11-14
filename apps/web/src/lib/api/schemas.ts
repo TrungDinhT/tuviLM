@@ -339,3 +339,20 @@ export const listSessionsResponseSchema = Schema.Struct({
 export const healthResponseSchema = Schema.Struct({
   status: Schema.String,
 });
+
+// --- api/auth/routes.py ----------------------------------------------------
+
+export const sessionUserSchema = Schema.Struct({
+  id: Schema.String,
+  email: Schema.String,
+  name: Schema.String,
+  role: Schema.Literals(["user", "admin"]),
+});
+
+export type SessionUser = typeof sessionUserSchema.Type;
+
+/** `GET /api/v1/auth/session`: who is signed in, and whether Google login is on. */
+export const sessionResponseSchema = Schema.Struct({
+  user: Schema.NullOr(sessionUserSchema),
+  google_enabled: falseByDefault,
+});

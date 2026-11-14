@@ -1,6 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { sentRequest, sentRequests } from "./api/sent-request";
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(body === null ? null : JSON.stringify(body), {
     status,
@@ -38,7 +40,11 @@ describe("useSession", () => {
     await waitFor(() => expect(result.current.isPending).toBe(false));
     expect(result.current.data?.user.name).toBe("Lan");
     expect(result.current.googleEnabled).toBe(true);
-    expect(fetch).toHaveBeenCalledWith("/api/v1/auth/session", { cache: "no-store" });
+    expect(sentRequest(vi.mocked(fetch).mock.calls[0])).toMatchObject({
+      path: "/api/v1/auth/session",
+      method: "GET",
+      cache: "no-store",
+    });
   });
 
   it("treats an unreachable API as signed out", async () => {
@@ -62,12 +68,14 @@ describe("authClient", () => {
     const result = await authClient.signIn.email({ email: "lan@example.com", password: "pw" });
 
     expect(result.error).toBeNull();
-    expect(fetch).toHaveBeenNthCalledWith(1, "/api/v1/auth/login", {
+    const [login, session] = sentRequests(vi.mocked(fetch));
+    expect(login).toMatchObject({
+      path: "/api/v1/auth/login",
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: "lan@example.com", password: "pw" }),
+      body: { email: "lan@example.com", password: "pw" },
     });
-    expect(fetch).toHaveBeenNthCalledWith(2, "/api/v1/auth/session", { cache: "no-store" });
+    expect(login?.headers.get("Content-Type")).toBe("application/json");
+    expect(session).toMatchObject({ path: "/api/v1/auth/session", cache: "no-store" });
   });
 
   it.each([
@@ -90,10 +98,10 @@ describe("authClient", () => {
 
     await authClient.resetPassword({ token: "t", newPassword: "password123" });
 
-    expect(fetch).toHaveBeenCalledWith(
-      "/api/v1/auth/reset-password",
-      expect.objectContaining({ body: JSON.stringify({ token: "t", password: "password123" }) }),
-    );
+    expect(sentRequest(vi.mocked(fetch).mock.calls[0])).toMatchObject({
+      path: "/api/v1/auth/reset-password",
+      body: { token: "t", password: "password123" },
+    });
   });
 
   it("reports Google as unavailable when the API has no Google config", async () => {
@@ -116,10 +124,8 @@ describe("authClient", () => {
     await authClient.signOut();
 
     await waitFor(() => expect(result.current.data).toBeNull());
-    expect(fetch).toHaveBeenLastCalledWith("/api/v1/auth/logout", {
-      method: "POST",
-      headers: undefined,
-      body: undefined,
-    });
+    const logout = sentRequests(vi.mocked(fetch)).at(-1);
+    expect(logout).toMatchObject({ path: "/api/v1/auth/logout", method: "POST", body: undefined });
+    expect(logout?.headers.has("Content-Type")).toBe(false);
   });
 });

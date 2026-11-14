@@ -46,6 +46,8 @@ export interface RequestOptions<T> {
    * backend will create a duplicate.
    */
   idempotencyKey?: string;
+  /** Extra request headers, e.g. the browser's cookies on the server. */
+  headers?: Record<string, string>;
 }
 
 /** A fresh key for one logical operation. Reuse it across retries. */
@@ -159,15 +161,25 @@ export const apiHeaders = (options: {
 /** Build the request for `path`, with a JSON body when one is given. */
 export const makeRequest = (
   path: string,
-  options: { method?: HttpMethod; body?: unknown } & Parameters<typeof apiHeaders>[0],
+  options: {
+    method?: HttpMethod;
+    body?: unknown;
+    headers?: Record<string, string>;
+  } & Parameters<typeof apiHeaders>[0],
 ): HttpClientRequest.HttpClientRequest => {
   const request = HttpClientRequest.make(options.method ?? "GET")(path, {
-    headers: apiHeaders(options),
+    headers: { ...options.headers, ...apiHeaders(options) },
   });
   return options.body === undefined
     ? request
     : HttpClientRequest.bodyJsonUnsafe(request, options.body);
 };
+
+/** Fetch options for one effect, e.g. `{ cache: "no-store" }` for Next's fetch cache. */
+export const withFetchOptions =
+  (init: RequestInit) =>
+  <A, E, R>(effect: Effect.Effect<A, E, R>): Effect.Effect<A, E, R> =>
+    Effect.provideService(effect, FetchHttpClient.RequestInit, init);
 
 /** One API call as an Effect: send, check the status, decode the body. */
 export const apiRequest = <T>(
@@ -183,8 +195,10 @@ export const apiRequest = <T>(
 
 /**
  * The browser `fetch`, read at call time rather than captured once, so a
- * polyfill or a test stub installed later still applies.
+ * polyfill or a test stub installed later still applies. This is the one
+ * place that may name the global `fetch`: it is what the HttpClient calls.
  */
+// @effect-diagnostics-next-line effect/globalFetch:off
 const lateFetch: typeof globalThis.fetch = (input, init) => globalThis.fetch(input, init);
 
 /**

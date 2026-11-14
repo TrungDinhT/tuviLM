@@ -10,6 +10,7 @@ export interface SentRequest {
   headers: Headers;
   body: unknown;
   signal: AbortSignal | null | undefined;
+  cache: RequestCache | undefined;
 }
 
 export const sentRequest = (call: readonly unknown[] | undefined): SentRequest => {
@@ -29,6 +30,7 @@ export const sentRequest = (call: readonly unknown[] | undefined): SentRequest =
     headers: new Headers(init.headers),
     body: text === undefined ? undefined : (JSON.parse(text) as unknown),
     signal: init.signal,
+    cache: init.cache,
   };
 };
 
